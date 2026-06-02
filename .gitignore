@@ -1,0 +1,12 @@
+.DS_Store
+.dart_tool/
+.idea/
+.vscode/
+.fvm/
+**/.dart_tool/
+**/build/
+**/.flutter-plugins
+**/.flutter-plugins-dependencies
+**/.pub/
+**/coverage/
+melos_*.iml

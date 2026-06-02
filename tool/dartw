@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ -n "${DART_BIN:-}" && -x "${DART_BIN}" ]]; then
+  exec "${DART_BIN}" "$@"
+fi
+
+if command -v dart >/dev/null 2>&1; then
+  exec dart "$@"
+fi
+
+if [[ -n "${FLUTTER_BIN:-}" && -x "${FLUTTER_BIN}" ]]; then
+  exec "$(dirname "${FLUTTER_BIN}")/dart" "$@"
+fi
+
+if command -v fvm >/dev/null 2>&1; then
+  exec fvm dart "$@"
+fi
+
+echo "dart 未找到。请设置 DART_BIN，或把 dart / fvm 放进 PATH。" >&2
+exit 127

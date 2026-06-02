@@ -1,0 +1,13 @@
+name: koi_api_bootstrap
+description: Koi API bootstrap for koi_network
+publish_to: none
+repository: https://github.com/mrkoi-is/koi_blueprint_flutter/tree/main/packages/koi_api_bootstrap
+homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
+issue_tracker: https://github.com/mrkoi-is/koi_blueprint_flutter/issues
+resolution: workspace
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  koi_network: ^0.0.2

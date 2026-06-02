@@ -1,0 +1,7 @@
+---
+description: Koi Flutter workspace rule
+alwaysApply: true
+---
+
+优先读取根级 `AGENTS.md`、`docs/ai-quickstart.md` 和 `.agent/skills/index.yaml`。
+只在任务需要时读取对应 Skill，不要一次性加载全部技能文件。

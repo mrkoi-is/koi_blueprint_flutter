@@ -1,0 +1,22 @@
+skills:
+  - id: workspace-init
+    description: 初始化或调整 Flutter workspace、Melos、根级工具链
+    keywords: [workspace, melos, bootstrap, init, monorepo]
+  - id: add-feature-module
+    description: 新增业务 Feature，按 core/features/shared 约定落目录
+    keywords: [feature, module, page, screen, provider]
+  - id: add-shared-package
+    description: 新增 packages 下的共享包，并建立依赖边界
+    keywords: [package, shared, core, ui, domain]
+  - id: add-generated-api-package
+    description: 接入 koi_swagger_parser 生成 API 包与网络编排包
+    keywords: [swagger, openapi, api, koi_swagger_parser, sdk]
+  - id: add-routing
+    description: 调整 go_router 路由、redirect 与页面装配
+    keywords: [route, router, navigation, go_router]
+  - id: architecture-review
+    description: 对照 Koi Flutter 蓝图审查结构、边界与门禁
+    keywords: [review, architecture, audit]
+  - id: testing-scaffold
+    description: 补齐单测、Widget 测试和 Provider 测试
+    keywords: [test, widget, provider, mock]

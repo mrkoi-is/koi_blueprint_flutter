@@ -1,0 +1,76 @@
+name: koi_blueprint_flutter
+publish_to: none
+description: Koi Flutter monorepo blueprint
+repository: https://github.com/mrkoi-is/koi_blueprint_flutter
+homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
+issue_tracker: https://github.com/mrkoi-is/koi_blueprint_flutter/issues
+
+environment:
+  sdk: ^3.11.0
+
+workspace:
+  - apps/koi_admin_app
+  - packages/koi_api_bootstrap
+  - packages/koi_auth
+  - packages/koi_core
+  - packages/koi_domain
+  - packages/koi_ui
+
+dev_dependencies:
+  flutter_lints: ^6.0.0
+  melos: ^7.3.0
+
+melos:
+  command:
+    bootstrap:
+      runPubGetInParallel: true
+      usePubspecOverrides: false
+
+  scripts:
+    get:
+      description: 初始化所有包依赖
+      exec: "$MELOS_ROOT_PATH/tool/flutterw pub get"
+
+    analyze:
+      description: 分析全部 package 和 app
+      exec: "$MELOS_ROOT_PATH/tool/dartw analyze --fatal-infos"
+
+    format:check:
+      description: 检查格式化
+      exec: "$MELOS_ROOT_PATH/tool/dartw format . --set-exit-if-changed"
+
+    format:fix:
+      description: 自动格式化
+      exec: "$MELOS_ROOT_PATH/tool/dartw format ."
+
+    fix:apply:
+      description: 自动修复 lint
+      exec: "$MELOS_ROOT_PATH/tool/dartw fix --apply"
+
+    generate:
+      description: 运行代码生成
+      exec: "$MELOS_ROOT_PATH/tool/dartw run build_runner build"
+      packageFilters:
+        dependsOn: build_runner
+
+    generate:watch:
+      description: watch 模式代码生成
+      exec: "$MELOS_ROOT_PATH/tool/dartw run build_runner watch"
+      packageFilters:
+        dependsOn: build_runner
+
+    test:
+      description: 运行全部测试
+      run: "$MELOS_ROOT_PATH/tool/flutterw test"
+      exec:
+        concurrency: 1
+      packageFilters:
+        dirExists: test
+
+    clean:
+      description: 清理工作区
+      exec: "$MELOS_ROOT_PATH/tool/flutterw clean"
+
+    precommit:
+      description: 提交前检查
+      run: melos run format:check --no-select && melos run analyze --no-select && melos run test --no-select
