@@ -1,4 +1,5 @@
 name: koi_blueprint_flutter
+version: 0.1.0
 publish_to: none
 description: Koi Flutter monorepo blueprint
 repository: https://github.com/mrkoi-is/koi_blueprint_flutter
@@ -6,7 +7,7 @@ homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
 issue_tracker: https://github.com/mrkoi-is/koi_blueprint_flutter/issues
 
 environment:
-  sdk: ^3.11.0
+  sdk: '>=3.11.0 <4.0.0'
 
 workspace:
   - apps/koi_admin_app
@@ -17,8 +18,9 @@ workspace:
   - packages/koi_ui
 
 dev_dependencies:
+  analyzer: 9.0.0
   flutter_lints: ^6.0.0
-  melos: ^7.3.0
+  melos: ^7.8.2
 
 melos:
   command:
@@ -37,7 +39,7 @@ melos:
 
     format:check:
       description: 检查格式化
-      exec: "$MELOS_ROOT_PATH/tool/dartw format . --set-exit-if-changed"
+      exec: "$MELOS_ROOT_PATH/tool/dartw format --output=none --set-exit-if-changed ."
 
     format:fix:
       description: 自动格式化
@@ -67,10 +69,18 @@ melos:
       packageFilters:
         dirExists: test
 
+    coverage:
+      description: 检查每个 workspace 成员的测试与合并行覆盖率
+      run: "$MELOS_ROOT_PATH/scripts/check_coverage.sh"
+
     clean:
       description: 清理工作区
       exec: "$MELOS_ROOT_PATH/tool/flutterw clean"
 
     precommit:
       description: 提交前检查
-      run: melos run format:check --no-select && melos run analyze --no-select && melos run test --no-select
+      run: >-
+        "$MELOS_ROOT_PATH/tool/melos" run format:check --no-select &&
+        "$MELOS_ROOT_PATH/scripts/check_generated.sh" &&
+        "$MELOS_ROOT_PATH/tool/melos" run analyze --no-select &&
+        "$MELOS_ROOT_PATH/tool/melos" run test --no-select

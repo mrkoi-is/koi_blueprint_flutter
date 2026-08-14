@@ -1,17 +1,36 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_FVM_FLUTTER="$ROOT_DIR/.fvm/flutter_sdk/bin/flutter"
+
 if [[ -n "${FLUTTER_BIN:-}" && -x "${FLUTTER_BIN}" ]]; then
+  flutter_bin_dir="$(dirname "${FLUTTER_BIN}")"
+  export PATH="$flutter_bin_dir:$PATH"
   exec "${FLUTTER_BIN}" "$@"
+fi
+
+if [[ -x "$PROJECT_FVM_FLUTTER" ]]; then
+  project_fvm_flutter_dir="$(dirname "$PROJECT_FVM_FLUTTER")"
+  export PATH="$project_fvm_flutter_dir:$PATH"
+  exec "$PROJECT_FVM_FLUTTER" "$@"
+fi
+
+if command -v fvm >/dev/null 2>&1; then
+  fvm_flutter_root="$(
+    fvm flutter --version --machine 2>/dev/null |
+      awk -F'"' '/"flutterRoot"/ {print $4; exit}' || true
+  )"
+  if [[ -x "$fvm_flutter_root/bin/flutter" ]]; then
+    export PATH="$fvm_flutter_root/bin:$PATH"
+    exec "$fvm_flutter_root/bin/flutter" "$@"
+  fi
+  exec fvm flutter "$@"
 fi
 
 if command -v flutter >/dev/null 2>&1; then
   exec flutter "$@"
 fi
 
-if command -v fvm >/dev/null 2>&1; then
-  exec fvm flutter "$@"
-fi
-
-echo "flutter 未找到。请设置 FLUTTER_BIN，或把 flutter / fvm 放进 PATH。" >&2
+echo "flutter 未找到。请设置 FLUTTER_BIN，或配置项目 FVM。" >&2
 exit 127

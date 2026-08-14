@@ -1,21 +1,45 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PROJECT_FVM_DART="$ROOT_DIR/.fvm/flutter_sdk/bin/dart"
+
 if [[ -n "${DART_BIN:-}" && -x "${DART_BIN}" ]]; then
+  dart_bin_dir="$(dirname "${DART_BIN}")"
+  export PATH="$dart_bin_dir:$PATH"
   exec "${DART_BIN}" "$@"
+fi
+
+if [[ -n "${FLUTTER_BIN:-}" && -x "${FLUTTER_BIN}" ]]; then
+  flutter_dart="$(dirname "${FLUTTER_BIN}")/dart"
+  if [[ -x "$flutter_dart" ]]; then
+    flutter_dart_dir="$(dirname "$flutter_dart")"
+    export PATH="$flutter_dart_dir:$PATH"
+    exec "$flutter_dart" "$@"
+  fi
+fi
+
+if [[ -x "$PROJECT_FVM_DART" ]]; then
+  project_fvm_dart_dir="$(dirname "$PROJECT_FVM_DART")"
+  export PATH="$project_fvm_dart_dir:$PATH"
+  exec "$PROJECT_FVM_DART" "$@"
+fi
+
+if command -v fvm >/dev/null 2>&1; then
+  fvm_flutter_root="$(
+    fvm flutter --version --machine 2>/dev/null |
+      awk -F'"' '/"flutterRoot"/ {print $4; exit}' || true
+  )"
+  if [[ -x "$fvm_flutter_root/bin/dart" ]]; then
+    export PATH="$fvm_flutter_root/bin:$PATH"
+    exec "$fvm_flutter_root/bin/dart" "$@"
+  fi
+  exec fvm dart "$@"
 fi
 
 if command -v dart >/dev/null 2>&1; then
   exec dart "$@"
 fi
 
-if [[ -n "${FLUTTER_BIN:-}" && -x "${FLUTTER_BIN}" ]]; then
-  exec "$(dirname "${FLUTTER_BIN}")/dart" "$@"
-fi
-
-if command -v fvm >/dev/null 2>&1; then
-  exec fvm dart "$@"
-fi
-
-echo "dart 未找到。请设置 DART_BIN，或把 dart / fvm 放进 PATH。" >&2
+echo "dart 未找到。请设置 DART_BIN / FLUTTER_BIN，或配置项目 FVM。" >&2
 exit 127
