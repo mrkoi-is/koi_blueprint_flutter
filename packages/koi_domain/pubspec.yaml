@@ -1,5 +1,6 @@
 name: koi_domain
 description: Koi 共享领域实体和值对象
+version: 0.1.0
 publish_to: none
 repository: https://github.com/mrkoi-is/koi_blueprint_flutter/tree/main/packages/koi_domain
 homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
@@ -10,13 +11,13 @@ environment:
   sdk: ^3.11.0
 
 dependencies:
-  json_annotation: ^4.11.0
+  json_annotation: 4.11.0
   freezed_annotation: ^3.1.0
   koi_core:
 
 dev_dependencies:
-  build_runner: ^2.11.1
+  build_runner: ^2.15.1
   flutter_test:
     sdk: flutter
-  freezed: ^3.2.5
-  json_serializable: ^6.13.0
+  freezed: 3.2.5
+  json_serializable: 6.13.0
