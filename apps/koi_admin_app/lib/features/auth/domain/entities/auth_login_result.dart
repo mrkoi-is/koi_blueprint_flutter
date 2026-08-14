@@ -3,7 +3,7 @@ import 'package:koi_domain/koi_domain.dart';
 
 part 'auth_login_result.freezed.dart';
 
-@freezed
+@Freezed(toStringOverride: false)
 abstract class AuthLoginResult with _$AuthLoginResult {
   const factory AuthLoginResult({
     required KoiUser user,

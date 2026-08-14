@@ -20,9 +20,9 @@ class KoiBlueprintAdminApp extends ConsumerWidget {
       scaffoldMessengerKey: scaffoldMessengerKey,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
-      themeMode: ThemeMode.light,
+      themeMode: ThemeMode.system,
       routerConfig: router,
-      supportedLocales: const [Locale('zh', 'CN'), Locale('en')],
+      supportedLocales: const [Locale('zh', 'CN')],
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,

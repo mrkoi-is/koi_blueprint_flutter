@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_admin_app/core/config/app_environment.dart';
@@ -56,7 +58,7 @@ class SettingsPage extends ConsumerWidget {
             alignment: Alignment.centerLeft,
             child: FilledButton.icon(
               onPressed: () =>
-                  ref.read(authControllerProvider.notifier).logout(),
+                  unawaited(ref.read(authControllerProvider.notifier).logout()),
               icon: const Icon(Icons.logout),
               label: const Text('退出示例登录'),
             ),

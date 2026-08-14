@@ -7,7 +7,16 @@ import 'package:koi_admin_app/features/splash/presentation/screens/splash_page.d
 
 part 'app_routes.g.dart';
 
-@TypedGoRoute<SplashRoute>(path: '/')
+/// 路由路径常量，仅供路由定义与 redirect 匹配使用；
+/// 页面导航一律通过 `app_navigation.dart` 的类型化扩展。
+abstract final class AppRoutePaths {
+  static const splash = '/';
+  static const login = '/login';
+  static const dashboard = '/dashboard';
+  static const settings = '/settings';
+}
+
+@TypedGoRoute<SplashRoute>(path: AppRoutePaths.splash)
 class SplashRoute extends GoRouteData with $SplashRoute {
   const SplashRoute();
 
@@ -15,7 +24,7 @@ class SplashRoute extends GoRouteData with $SplashRoute {
   Widget build(BuildContext context, GoRouterState state) => const SplashPage();
 }
 
-@TypedGoRoute<LoginRoute>(path: '/login')
+@TypedGoRoute<LoginRoute>(path: AppRoutePaths.login)
 class LoginRoute extends GoRouteData with $LoginRoute {
   const LoginRoute();
 
@@ -23,7 +32,7 @@ class LoginRoute extends GoRouteData with $LoginRoute {
   Widget build(BuildContext context, GoRouterState state) => const LoginPage();
 }
 
-@TypedGoRoute<DashboardRoute>(path: '/dashboard')
+@TypedGoRoute<DashboardRoute>(path: AppRoutePaths.dashboard)
 class DashboardRoute extends GoRouteData with $DashboardRoute {
   const DashboardRoute();
 
@@ -32,7 +41,7 @@ class DashboardRoute extends GoRouteData with $DashboardRoute {
       const DashboardPage();
 }
 
-@TypedGoRoute<SettingsRoute>(path: '/settings')
+@TypedGoRoute<SettingsRoute>(path: AppRoutePaths.settings)
 class SettingsRoute extends GoRouteData with $SettingsRoute {
   const SettingsRoute();
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:koi_admin_app/core/router/app_routes.dart';
+import 'package:koi_admin_app/core/router/app_navigation.dart';
 import 'package:koi_admin_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:koi_ui/koi_ui.dart';
 
@@ -17,20 +17,19 @@ class _SplashPageState extends ConsumerState<SplashPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_navigated || !mounted) {
         return;
       }
-      await Future<void>.delayed(const Duration(milliseconds: 360));
       final authenticated = ref.read(isAuthenticatedProvider);
       _navigated = true;
       if (!mounted) {
         return;
       }
       if (authenticated) {
-        const DashboardRoute().go(context);
+        context.goToDashboard();
       } else {
-        const LoginRoute().go(context);
+        context.goToLogin();
       }
     });
   }

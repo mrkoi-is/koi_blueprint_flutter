@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:koi_admin_app/core/router/app_routes.dart';
+import 'package:koi_admin_app/core/router/app_navigation.dart';
 
 class HomeShellScaffold extends StatelessWidget {
   const HomeShellScaffold({
@@ -20,10 +20,10 @@ class HomeShellScaffold extends StatelessWidget {
     void onDestinationSelected(int index) {
       switch (index) {
         case 1:
-          const SettingsRoute().go(context);
+          context.goToSettings();
           return;
         default:
-          const DashboardRoute().go(context);
+          context.goToDashboard();
           return;
       }
     }

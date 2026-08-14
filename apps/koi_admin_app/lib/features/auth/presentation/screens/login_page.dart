@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_admin_app/core/config/app_environment.dart';
-import 'package:koi_admin_app/core/router/app_routes.dart';
 import 'package:koi_admin_app/features/auth/presentation/providers/auth_providers.dart';
 import 'package:koi_auth/koi_auth.dart';
 import 'package:koi_domain/koi_domain.dart';
@@ -21,9 +22,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
-    _companyCodeController = TextEditingController(text: 'KOI');
-    _usernameController = TextEditingController(text: 'admin');
-    _passwordController = TextEditingController(text: '123456');
+    final demoMode = AppEnvironment.current.usesMockAuth;
+    _companyCodeController = TextEditingController(text: demoMode ? 'KOI' : '');
+    _usernameController = TextEditingController(text: demoMode ? 'admin' : '');
+    _passwordController = TextEditingController(text: demoMode ? '123456' : '');
   }
 
   @override
@@ -41,7 +43,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         return;
       }
       next.whenOrNull(
-        authenticated: (user, token) => const DashboardRoute().go(context),
         failure: (message) {
           ScaffoldMessenger.of(
             context,
@@ -82,7 +83,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       ),
                       const SizedBox(height: 12),
                       Text(
-                        '参考 jiejing 技术栈构建的 Flutter Monorepo 起步盘。',
+                        AppEnvironment.current.usesMockAuth
+                            ? '当前为本地演示认证，不会持久化登录令牌。'
+                            : '请输入生产认证服务提供的账号信息。',
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                       const SizedBox(height: 20),
@@ -119,10 +122,12 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       TextField(
                         controller: _passwordController,
                         obscureText: true,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           labelText: '密码',
-                          helperText: '示例密码固定为 123456',
-                          border: OutlineInputBorder(),
+                          helperText: AppEnvironment.current.usesMockAuth
+                              ? '示例密码固定为 123456'
+                              : null,
+                          border: const OutlineInputBorder(),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -131,7 +136,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         child: FilledButton.icon(
                           onPressed: isLoading
                               ? null
-                              : () {
+                              : () => unawaited(
                                   ref
                                       .read(authControllerProvider.notifier)
                                       .login(
@@ -139,8 +144,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                             _companyCodeController.text,
                                         username: _usernameController.text,
                                         password: _passwordController.text,
-                                      );
-                                },
+                                      ),
+                                ),
                           icon: isLoading
                               ? const SizedBox(
                                   width: 16,
