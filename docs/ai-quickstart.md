@@ -36,6 +36,8 @@
 ## 推荐执行顺序
 
 1. 改源码
-2. 运行 `generate`
-3. 运行 `analyze`
-4. 运行 `test`
+2. 运行 `format-check`
+3. 运行 `generate-check`
+4. 运行 `analyze`
+5. 运行 `test`
+6. 运行 `coverage`

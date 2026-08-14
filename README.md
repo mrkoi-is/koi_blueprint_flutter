@@ -25,7 +25,7 @@ koi_blueprint_flutter/
 │   ├── koi_domain/             # 共享领域实体
 │   ├── koi_ui/                 # 主题与通用状态组件
 │   ├── koi_auth/               # 认证状态模型
-│   └── koi_api_bootstrap/      # koi_network 初始化入口
+│   └── koi_api_bootstrap/      # Native 网络编排 + Web 安全降级
 ├── docs/
 │   └── architecture/
 ├── .agent/skills/
@@ -39,12 +39,20 @@ koi_blueprint_flutter/
 ## 技术栈基线
 
 - Flutter Workspace (`pubspec.yaml` 顶层 `workspace`)
-- Melos 7
+- Flutter 3.41.2 / Dart 3.11（见 `.fvmrc`）
+- Melos 7.8
 - Riverpod 3 + `riverpod_generator`
 - go_router 17 + `go_router_builder`
 - Freezed 3 + `json_serializable`
 - `fpdart`
 - `koi_network`
+
+## SDK 升级策略
+
+本蓝图按季度跟随 Flutter stable 升级。每次升级必须同步三处：
+- `.fvmrc` 中的 Flutter 版本
+- `.github/workflows/quality.yml` 中的 `flutter-version` 及其 grep 校验步骤
+- `CHANGELOG.md` 中记录本次升级
 
 ## 快速开始
 
@@ -59,9 +67,11 @@ export DART_BIN=/path/to/dart
 
 ```bash
 make bootstrap
-make generate
+make format-check
+make generate-check
 make analyze
 make test
+make coverage
 ```
 
 或直接使用 Melos：
@@ -69,11 +79,25 @@ make test
 ```bash
 export PATH="$PWD/tool:$PATH"
 ./tool/dartw pub get
-./tool/dartw run melos bootstrap
-./tool/dartw run melos run generate --no-select
-./tool/dartw run melos run analyze --no-select
-./tool/dartw run melos run test --no-select
+./tool/melos bootstrap
+./tool/melos run format:check --no-select
+./scripts/check_generated.sh
+./tool/melos run analyze --no-select
+./tool/melos run test --no-select
+./scripts/check_coverage.sh
 ```
+
+运行 Web 示例：
+
+```bash
+cd apps/koi_admin_app
+../../tool/flutterw run -d chrome
+```
+
+Debug/Profile 未指定环境时默认 `ENV=dev`，使用 Mock 登录；Native 令牌经安全存储
+（Keychain / Keystore）持久化，Web 令牌只保存在内存中，刷新后需重新登录。
+Release 必须显式传入 `--dart-define=ENV=staging` 或 `prod`，并禁止 `dev` Mock 认证。
+`staging` / `prod` 不会回退到 Mock，并会在真实 API 或认证数据源未配置时拒绝启动。
 
 ## API 包接入约定
 
@@ -88,6 +112,20 @@ packages/<project>_network/
 - `<project>_api` 由 `koi_swagger_parser` 生成
 - `<project>_network` 负责编排 `koi_network` 的 adapter、错误处理、登录态刷新、envelope 解析
 - App 层不直接散落处理 Dio 细节
+
+`koi_api_bootstrap` 的公共 API 不暴露 Dio 或 `koi_network` 类型。Native
+运行时注入 token、401 和日志回调；Web 示例使用明确的 no-op 网络 runtime，
+因此可以构建和运行，但真实 Web API 接入需要提供项目自己的 Web 网络实现。
+该 bootstrap 只管理自己的 main runtime；额外业务网络模块应在各自的 network package 中复用同等的 token/revision 401 保护。
+
+## 质量门禁
+
+- GitHub Actions 固定 Flutter 版本并执行格式、代码生成、分析、测试、覆盖率和 Web 构建
+- 6 个 Workspace 成员都必须提供测试
+- 手写代码合并行覆盖率不得低于 60%
+- 含可执行逻辑的新源码必须进入覆盖率报告，平台/入口文件由 Web 构建门禁补充验证
+- 生成物（`*.g.dart` / `*.freezed.dart`）不入库，本地与 CI 通过 `generate` 重新生成
+- 当前蓝图测试覆盖认证成功/失败、路由重定向、401、序列化和共享 UI
 
 ## 为什么这样设计
 

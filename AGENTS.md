@@ -42,4 +42,4 @@
 2. 再读 `AGENTS.md`
 3. 再读 `.agent/skills/index.yaml`
 4. 只加载当前任务对应的少数 Skill
-5. 最后跑 `generate / analyze / test`
+5. 最后跑 `format-check / generate-check / analyze / test / coverage`
