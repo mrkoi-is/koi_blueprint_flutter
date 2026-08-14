@@ -1,31 +1,44 @@
-import 'package:koi_network/koi_network.dart';
+library;
 
-class KoiApiBootstrapOptions {
-  const KoiApiBootstrapOptions({
-    required this.baseUrl,
-    required this.environment,
-    this.enableLogging = true,
-  });
+import 'package:koi_api_bootstrap/src/backend/web_backend.dart'
+    if (dart.library.io) 'package:koi_api_bootstrap/src/backend/native_backend.dart'
+    as backend;
+import 'package:koi_api_bootstrap/src/koi_api_bindings.dart';
+import 'package:koi_api_bootstrap/src/koi_api_bootstrap_options.dart';
+import 'package:koi_api_bootstrap/src/koi_api_runtime.dart';
+import 'package:koi_api_bootstrap/src/koi_memory_token_session.dart';
+import 'package:koi_api_bootstrap/src/token_storage/web_token_session.dart'
+    if (dart.library.io) 'package:koi_api_bootstrap/src/token_storage/native_token_session.dart'
+    as token_storage;
 
-  final String baseUrl;
-  final String environment;
-  final bool enableLogging;
+export 'src/koi_api_bindings.dart';
+export 'src/koi_api_bootstrap_options.dart';
+export 'src/koi_api_log.dart';
+export 'src/koi_api_runtime.dart';
+export 'src/koi_memory_token_session.dart';
+export 'src/koi_secure_token_session.dart';
+
+/// Initializes the platform-appropriate API runtime.
+///
+/// Native platforms initialize `koi_network`. Web receives an explicit no-op
+/// runtime so importing this public library never pulls native-only networking
+/// code into a web build.
+Future<KoiApiRuntime> bootstrapKoiApi(
+  KoiApiBootstrapOptions options, {
+  KoiApiBindings? bindings,
+}) {
+  return backend.bootstrapKoiApiBackend(options, bindings ?? KoiApiBindings());
 }
 
-Future<void> bootstrapKoiApi(KoiApiBootstrapOptions options) async {
-  KoiNetworkAdapters.register(
-    authAdapter: KoiDefaultAuthAdapter(),
-    errorHandlerAdapter: KoiDefaultErrorHandlerAdapter(),
-    loadingAdapter: KoiDefaultLoadingAdapter(),
-    platformAdapter: KoiDefaultPlatformAdapter(),
-    loggerAdapter: KoiDefaultLoggerAdapter(),
-    responseParser: const KoiDefaultResponseParser(),
-    requestEncoder: const KoiJsonRequestEncoder(),
-  );
+/// Disposes the active API runtime, if one exists.
+Future<void> disposeKoiApi() => backend.disposeKoiApiBackend();
 
-  await KoiNetworkInitializer.initialize(
-    baseUrl: options.baseUrl,
-    environment: options.environment,
-    enableLogging: options.enableLogging,
-  );
+/// Creates the platform-default token session.
+///
+/// Native platforms persist the token in secure storage so a restart keeps
+/// the session. Web keeps the token in memory only, so a refresh starts a
+/// fresh login. The concrete storage implementation never leaks into the
+/// public API.
+Future<KoiTokenSession> createDefaultTokenSession() {
+  return token_storage.loadDefaultTokenSession();
 }
