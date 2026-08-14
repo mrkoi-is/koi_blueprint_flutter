@@ -2,7 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'auth_session.freezed.dart';
 
-@freezed
+@Freezed(toStringOverride: false)
 sealed class AuthSession<TUser> with _$AuthSession<TUser> {
   const AuthSession._();
 
