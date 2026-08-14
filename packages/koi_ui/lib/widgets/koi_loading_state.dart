@@ -11,7 +11,7 @@ class KoiLoadingState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const CircularProgressIndicator.adaptive(),
+          const CircularProgressIndicator(),
           const SizedBox(height: 16),
           Text(message, style: Theme.of(context).textTheme.titleMedium),
         ],

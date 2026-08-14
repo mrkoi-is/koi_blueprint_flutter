@@ -1,5 +1,6 @@
 name: koi_ui
 description: Koi 主题与通用状态组件
+version: 0.1.0
 publish_to: none
 repository: https://github.com/mrkoi-is/koi_blueprint_flutter/tree/main/packages/koi_ui
 homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
@@ -8,12 +9,11 @@ resolution: workspace
 
 environment:
   sdk: ^3.11.0
-  flutter: '>=3.41.0'
+  flutter: '>=3.41.2'
 
 dependencies:
   flutter:
     sdk: flutter
-  koi_core:
 
 dev_dependencies:
   flutter_test:
