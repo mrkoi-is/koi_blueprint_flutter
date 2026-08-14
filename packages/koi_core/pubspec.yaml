@@ -1,5 +1,6 @@
 name: koi_core
 description: Koi 基础错误类型、typedef 与扩展
+version: 0.1.0
 publish_to: none
 repository: https://github.com/mrkoi-is/koi_blueprint_flutter/tree/main/packages/koi_core
 homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
@@ -14,7 +15,7 @@ dependencies:
   freezed_annotation: ^3.1.0
 
 dev_dependencies:
-  build_runner: ^2.11.1
+  build_runner: ^2.15.1
   flutter_test:
     sdk: flutter
-  freezed: ^3.2.5
+  freezed: 3.2.5
