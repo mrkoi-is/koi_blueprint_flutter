@@ -1,0 +1,14 @@
+# Dependabot 依赖更新策略：pub 与 GitHub Actions 均按周检查
+version: 2
+updates:
+  # 根目录 pub workspace（Melos 管理的所有成员共享同一份解析）
+  - package-ecosystem: pub
+    directory: /
+    schedule:
+      interval: weekly
+
+  # CI 工作流中引用的 GitHub Actions
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

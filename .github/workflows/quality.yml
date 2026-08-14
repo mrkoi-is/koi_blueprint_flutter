@@ -1,0 +1,63 @@
+name: Quality
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Flutter 3.41.2
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.41.2
+          channel: stable
+          cache: true
+
+      - name: Verify toolchain
+        run: |
+          ./tool/flutterw --version
+          ./tool/dartw --version
+          ./tool/flutterw --version | head -n 1 | grep -F 'Flutter 3.41.2'
+
+      - name: Bootstrap workspace
+        run: |
+          ./tool/dartw pub get
+          ./tool/melos bootstrap
+
+      - name: Generate code (generated outputs are not versioned)
+        run: ./scripts/check_generated.sh
+
+      - name: Check formatting without writes
+        run: ./tool/melos run format:check --no-select
+
+      - name: Analyze workspace
+        run: ./tool/melos run analyze --no-select
+
+      - name: Run all tests
+        run: ./tool/melos run test --no-select
+
+      - name: Verify Web boundaries and release build
+        run: |
+          ./tool/dartw compile js packages/koi_api_bootstrap/test/web_compile_smoke.dart -o /tmp/koi_api_bootstrap_web_smoke.js
+          node /tmp/koi_api_bootstrap_web_smoke.js
+          cd apps/koi_admin_app
+          ../../tool/flutterw build web --release --dart-define=ENV=prod
+
+      - name: Enforce merged handwritten-code coverage
+        env:
+          COVERAGE_THRESHOLD: '60'
+        run: ./scripts/check_coverage.sh
