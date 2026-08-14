@@ -10,3 +10,7 @@
 **/.pub/
 **/coverage/
 melos_*.iml
+
+# Codegen outputs are not versioned; regenerate via `melos run generate`
+**/*.g.dart
+**/*.freezed.dart
