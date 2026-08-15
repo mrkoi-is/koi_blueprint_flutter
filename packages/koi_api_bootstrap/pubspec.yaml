@@ -15,7 +15,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^11.0.0
-  koi_network: ^0.0.4
+  koi_network: ^0.0.5
 
 dev_dependencies:
   flutter_test:
