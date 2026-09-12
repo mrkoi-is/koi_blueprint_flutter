@@ -34,7 +34,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   freezed: 3.2.5
-  go_router_builder: ^4.3.0
+  go_router_builder: ^4.5.0
   json_serializable: 6.13.0
   riverpod_generator: 4.0.3
 
