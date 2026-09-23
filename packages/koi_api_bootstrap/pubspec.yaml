@@ -8,14 +8,14 @@ issue_tracker: https://github.com/mrkoi-is/koi_blueprint_flutter/issues
 resolution: workspace
 
 environment:
-  sdk: ^3.11.0
-  flutter: '>=3.41.2'
+  sdk: ^3.13.0
+  flutter: '>=3.47.0'
 
 dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^11.0.0
-  koi_network: ^0.0.4
+  koi_network: ^0.0.5
 
 dev_dependencies:
   flutter_test:

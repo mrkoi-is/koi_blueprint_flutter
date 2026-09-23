@@ -39,20 +39,27 @@ koi_blueprint_flutter/
 ## 技术栈基线
 
 - Flutter Workspace (`pubspec.yaml` 顶层 `workspace`)
-- Flutter 3.41.2 / Dart 3.11（见 `.fvmrc`）
-- Melos 7.8
-- Riverpod 3 + `riverpod_generator`
-- go_router 17 + `go_router_builder`
-- Freezed 3 + `json_serializable`
+- Flutter 3.47.2 / Dart 3.13.2（见 `.fvmrc`）
+- Melos 8.9
+- Riverpod 3.4.3 + `riverpod_annotation` 4.0.7 + `riverpod_generator` 4.0.9
+- go_router 17.5 + `go_router_builder` 4.5
+- Freezed 4.0.2 + `freezed_annotation` 3.1.0 + `json_serializable` 6.14.1
 - `fpdart`
 - `koi_network`
 
 ## SDK 升级策略
 
-本蓝图按季度跟随 Flutter stable 升级。每次升级必须同步三处：
+本蓝图按季度跟随 Flutter stable 升级。每次升级必须同步：
 - `.fvmrc` 中的 Flutter 版本
+- 根与 workspace 成员 `pubspec.yaml` 中的 Dart / Flutter 兼容范围
 - `.github/workflows/quality.yml` 中的 `flutter-version` 及其 grep 校验步骤
-- `CHANGELOG.md` 中记录本次升级
+- 使用新工具链重新解析 `pubspec.lock`
+- `README.md`、`MELOS_USAGE.md` 与 `CHANGELOG.md` 中的版本记录
+
+代码生成依赖必须成组升级。当前组合为 `analyzer 14.4.0`、
+`riverpod_generator 4.0.9`、`Freezed 4.0.2`、
+`json_serializable 6.14.1`、`build_runner 2.16.1`；不要用
+`dependency_overrides` 强制跨越生成器声明的 analyzer 约束。
 
 ## 快速开始
 
@@ -63,29 +70,21 @@ export FLUTTER_BIN=/path/to/flutter
 export DART_BIN=/path/to/dart
 ```
 
-然后执行：
+然后执行与 CI 相同的完整验证：
 
 ```bash
-make bootstrap
-make format-check
-make generate-check
-make analyze
-make test
-make coverage
+make validate
 ```
 
 或直接使用 Melos：
 
 ```bash
-export PATH="$PWD/tool:$PATH"
-./tool/dartw pub get
-./tool/melos bootstrap
-./tool/melos run format:check --no-select
-./scripts/check_generated.sh
-./tool/melos run analyze --no-select
-./tool/melos run test --no-select
-./scripts/check_coverage.sh
+./scripts/validate_workspace.sh
 ```
+
+锁文件使用官方 `pub.dev` 包源；严格锁文件校验时，开发环境与 CI 必须使用相同包源。
+单独检查可使用 `make format-check`、`make generate-check`、`make analyze`、
+`make test` 和 `make coverage`。
 
 运行 Web 示例：
 
@@ -95,7 +94,7 @@ cd apps/koi_admin_app
 ```
 
 Debug/Profile 未指定环境时默认 `ENV=dev`，使用 Mock 登录；Native 令牌经安全存储
-（Keychain / Keystore）持久化，Web 令牌只保存在内存中，刷新后需重新登录。
+（Keychain / Keystore）持久化，但当前示例没有跨进程恢复用户会话，重新启动后会清理孤立令牌；Web 令牌只保存在内存中，刷新后需重新登录。
 Release 必须显式传入 `--dart-define=ENV=staging` 或 `prod`，并禁止 `dev` Mock 认证。
 `staging` / `prod` 不会回退到 Mock，并会在真实 API 或认证数据源未配置时拒绝启动。
 
@@ -117,6 +116,7 @@ packages/<project>_network/
 运行时注入 token、401 和日志回调；Web 示例使用明确的 no-op 网络 runtime，
 因此可以构建和运行，但真实 Web API 接入需要提供项目自己的 Web 网络实现。
 该 bootstrap 只管理自己的 main runtime；额外业务网络模块应在各自的 network package 中复用同等的 token/revision 401 保护。
+示例网络适配器尚未实现 token refresh，因此主动刷新默认关闭；接入真实刷新逻辑后再启用。
 
 ## 质量门禁
 
@@ -126,6 +126,7 @@ packages/<project>_network/
 - 含可执行逻辑的新源码必须进入覆盖率报告，平台/入口文件由 Web 构建门禁补充验证
 - 生成物（`*.g.dart` / `*.freezed.dart`）不入库，本地与 CI 通过 `generate` 重新生成
 - 当前蓝图测试覆盖认证成功/失败、路由重定向、401、序列化和共享 UI
+- 启动装配测试从 `bootstrap()` 进入并验证本地演示登录到控制台
 
 ## 为什么这样设计
 

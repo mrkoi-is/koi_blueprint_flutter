@@ -6,7 +6,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 
 const _compileOnlySources = <String>{
-  'apps/koi_admin_app/lib/bootstrap.dart',
   'apps/koi_admin_app/lib/main.dart',
   'packages/koi_api_bootstrap/lib/src/backend/web_backend.dart',
   'packages/koi_api_bootstrap/lib/src/token_storage/web_token_session.dart',

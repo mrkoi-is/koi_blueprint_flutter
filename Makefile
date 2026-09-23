@@ -3,7 +3,7 @@
 DART := ./tool/dartw
 MELOS := PATH="$(CURDIR)/tool:$$PATH" ./tool/melos
 
-.PHONY: bootstrap format-check generate generate-check analyze test coverage precommit help
+.PHONY: bootstrap format-check generate generate-check analyze test coverage validate precommit help
 
 bootstrap: ## 初始化 workspace 依赖
 	$(DART) pub get
@@ -26,6 +26,9 @@ test: ## 运行全部测试
 
 coverage: ## 检查测试完整性与合并行覆盖率
 	./scripts/check_coverage.sh
+
+validate: ## 执行与 CI 相同的完整验证
+	./scripts/validate_workspace.sh
 
 precommit: ## 格式 + 生成产物 + 分析 + 测试
 	$(MELOS) run precommit --no-select

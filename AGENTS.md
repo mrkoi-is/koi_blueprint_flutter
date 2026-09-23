@@ -11,7 +11,7 @@
 
 ## 技术栈基线
 
-- Flutter Workspace + Melos 7
+- Flutter Workspace + Melos 8
 - Riverpod 3 + `riverpod_generator`
 - go_router + `go_router_builder`
 - Freezed + `json_serializable`

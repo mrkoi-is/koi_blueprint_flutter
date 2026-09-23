@@ -9,7 +9,7 @@ import 'package:koi_admin_app/features/auth/presentation/providers/auth_provider
 import 'package:koi_api_bootstrap/koi_api_bootstrap.dart';
 import 'package:koi_core/koi_core.dart';
 
-Future<void> bootstrap() async {
+Future<ProviderContainer> bootstrap({KoiTokenSession? tokenStorage}) async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final environment = AppEnvironment.current;
@@ -18,7 +18,7 @@ Future<void> bootstrap() async {
 
   final unauthorizedBridge = _UnauthorizedBridge();
   final bindings = KoiApiBindings(
-    tokenStorage: await createDefaultTokenSession(),
+    tokenStorage: tokenStorage ?? await createDefaultTokenSession(),
     onUnauthorized: unauthorizedBridge.handle,
     onError: (message) {
       AppLogger.error(message);
@@ -69,6 +69,7 @@ Future<void> bootstrap() async {
       child: const KoiBlueprintAdminApp(),
     ),
   );
+  return container;
 }
 
 AuthDataSource _createAuthDataSource(AppEnvironment environment) {

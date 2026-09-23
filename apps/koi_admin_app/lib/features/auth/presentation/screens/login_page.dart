@@ -44,9 +44,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       }
       next.whenOrNull(
         failure: (message) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(message)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(message)));
         },
       );
     });

@@ -7,7 +7,7 @@ homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
 issue_tracker: https://github.com/mrkoi-is/koi_blueprint_flutter/issues
 
 environment:
-  sdk: '>=3.11.0 <4.0.0'
+  sdk: '>=3.13.0 <4.0.0'
 
 workspace:
   - apps/koi_admin_app
@@ -18,9 +18,9 @@ workspace:
   - packages/koi_ui
 
 dev_dependencies:
-  analyzer: 9.0.0
+  analyzer: 14.4.0
   flutter_lints: ^6.0.0
-  melos: ^7.8.2
+  melos: ^8.9.0
 
 melos:
   command:
@@ -31,40 +31,47 @@ melos:
   scripts:
     get:
       description: 初始化所有包依赖
-      exec: "$MELOS_ROOT_PATH/tool/flutterw pub get"
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/flutterw pub get"
 
     analyze:
       description: 分析全部 package 和 app
-      exec: "$MELOS_ROOT_PATH/tool/dartw analyze --fatal-infos"
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/dartw analyze --fatal-infos"
 
     format:check:
       description: 检查格式化
-      exec: "$MELOS_ROOT_PATH/tool/dartw format --output=none --set-exit-if-changed ."
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/dartw format --output=none --set-exit-if-changed ."
 
     format:fix:
       description: 自动格式化
-      exec: "$MELOS_ROOT_PATH/tool/dartw format ."
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/dartw format ."
 
     fix:apply:
       description: 自动修复 lint
-      exec: "$MELOS_ROOT_PATH/tool/dartw fix --apply"
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/dartw fix --apply"
 
     generate:
       description: 运行代码生成
-      exec: "$MELOS_ROOT_PATH/tool/dartw run build_runner build"
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/dartw run build_runner build"
       packageFilters:
         dependsOn: build_runner
 
     generate:watch:
       description: watch 模式代码生成
-      exec: "$MELOS_ROOT_PATH/tool/dartw run build_runner watch"
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/dartw run build_runner watch"
       packageFilters:
         dependsOn: build_runner
 
     test:
       description: 运行全部测试
-      run: "$MELOS_ROOT_PATH/tool/flutterw test"
       exec:
+        command: "$MELOS_ROOT_PATH/tool/flutterw test"
         concurrency: 1
       packageFilters:
         dirExists: test
@@ -75,7 +82,8 @@ melos:
 
     clean:
       description: 清理工作区
-      exec: "$MELOS_ROOT_PATH/tool/flutterw clean"
+      exec:
+        command: "$MELOS_ROOT_PATH/tool/flutterw clean"
 
     precommit:
       description: 提交前检查

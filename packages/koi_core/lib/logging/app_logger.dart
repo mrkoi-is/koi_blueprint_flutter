@@ -2,13 +2,12 @@ import 'dart:developer' as developer;
 
 enum AppLogLevel { debug, info, warning, error }
 
-typedef AppLogSink =
-    void Function(
-      AppLogLevel level,
-      String message, {
-      Object? error,
-      StackTrace? stackTrace,
-    });
+typedef AppLogSink = void Function(
+  AppLogLevel level,
+  String message, {
+  Object? error,
+  StackTrace? stackTrace,
+});
 
 /// 零依赖日志门面：默认输出到 `dart:developer`，测试可替换 [sink] 捕获记录。
 abstract final class AppLogger {

@@ -19,7 +19,7 @@
 | 网络 | koi_network |
 | API 生成 | koi_swagger_parser |
 
-SDK 按季度跟随 Flutter stable 升级，升级时同步 `.fvmrc`、`.github/workflows/quality.yml` 中的 Flutter 版本及 grep 校验步骤，并在 `CHANGELOG.md` 记录。
+SDK 按季度跟随 Flutter stable 升级，升级时同步 `.fvmrc`、根与成员 `pubspec.yaml` 的兼容范围、`.github/workflows/quality.yml` 的 Flutter 版本及校验、`pubspec.lock` 与版本文档。代码生成依赖按 README 中记录的兼容簇整体升级，不使用 `dependency_overrides` 跨越生成器声明的 analyzer 上限。
 本地持久化刻意不内置：蓝图不预置 drift / hive / shared_preferences 等数据库或缓存依赖；有本地缓存或离线需求时按 Feature 引入，并在该 Feature 的 `data/` 层封装，不泄漏到 domain / presentation。
 
 ## 分层边界
@@ -47,7 +47,7 @@ SDK 按季度跟随 Flutter stable 升级，升级时同步 `.fvmrc`、`.github/
 
 ### apps/<app>
 - 只负责业务 Feature、App Router、第三方平台整合
-- 所有共享逻辑优先沉淀到 package
+- 稳定的跨 App 共享逻辑沉淀到 package；App 内复用先留在 shared
 
 ## Feature 规范
 

@@ -83,7 +83,7 @@ class AuthRepositoryImpl implements AuthRepository {
           try {
             await tokenSession.clearToken();
           } catch (_) {
-            // Preserve the original token-write failure for diagnostics.
+            // 保留原始令牌写入错误，以便后续诊断。
           }
           rethrow;
         }

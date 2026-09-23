@@ -17,7 +17,7 @@
 
 - Monorepo：根级 `pubspec.yaml` 使用 `workspace`
 - App 目录：`apps/<app_name>/lib/{core,features,shared}`
-- 共享能力：统一放在 `packages/`
+- 跨 App 的稳定共享能力放在 `packages/`；仅 App 内复用先留在 `shared/`
 - 路由：默认 `go_router`
 - 状态管理：默认 `Riverpod 3`
 - 数据模型：默认 `Freezed + json_serializable`

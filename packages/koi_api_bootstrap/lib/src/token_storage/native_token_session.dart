@@ -4,8 +4,8 @@ import 'package:koi_api_bootstrap/src/koi_secure_token_session.dart';
 
 const _tokenStorageKey = 'koi_api_auth_token';
 
-/// Persists the token in the platform secure storage (Keychain / Keystore)
-/// so a restart keeps the session.
+/// 使用平台安全存储（Keychain / Keystore）持久化令牌。
+/// 调用方应用必须另外验证令牌并恢复用户会话。
 Future<KoiTokenSession> loadDefaultTokenSession() {
   return KoiSecureTokenSession.load(
     _FlutterSecureTokenStore(const FlutterSecureStorage()),

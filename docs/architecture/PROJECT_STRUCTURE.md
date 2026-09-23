@@ -26,6 +26,8 @@ apps/<app>/lib/
 ```
 
 三层是标准骨架；纯展示型 Feature（如 `splash`）允许只保留 `presentation/` 层。
+脚手架可使用 `python3 scripts/create_feature.py apps/<app> <feature> --presentation-only`
+生成轻量目录，不为展示页创建空的数据与领域层。
 
 可运行 App 还必须提交至少一个目标平台目录。本蓝图提交 `apps/koi_admin_app/web/`，
 并通过固定 Flutter SDK 执行 release build 验证。

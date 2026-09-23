@@ -4,15 +4,12 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 # melos 的 exec 脚本会在子 shell 中调用裸 `melos`，要求 PATH 上存在该命令。
-# 未全局安装 melos 时（CI、全新开发机）自动生成一个指向本 wrapper 绝对路径的
-# shim 脚本（不用符号链接，避免 BASH_SOURCE 解析到 shim 目录），
-# 保证脚本在任何环境都能自洽运行。
-if ! command -v melos >/dev/null 2>&1; then
-  SHIM_DIR="$ROOT_DIR/.dart_tool/tool-shims"
-  mkdir -p "$SHIM_DIR"
-  printf '#!/usr/bin/env bash\nexec "%s/tool/melos" "$@"\n' "$ROOT_DIR" >"$SHIM_DIR/melos"
-  chmod +x "$SHIM_DIR/melos"
-  export PATH="$SHIM_DIR:$PATH"
-fi
+# 始终把项目 shim 放在 PATH 最前，避免全局安装的旧 Melos / Dart snapshot
+# 抢先被调用。shim 使用 wrapper 绝对路径，确保 CI 与开发机行为一致。
+SHIM_DIR="$ROOT_DIR/.dart_tool/tool-shims"
+mkdir -p "$SHIM_DIR"
+printf '#!/usr/bin/env bash\nexec "%s/tool/melos" "$@"\n' "$ROOT_DIR" >"$SHIM_DIR/melos"
+chmod +x "$SHIM_DIR/melos"
+export PATH="$SHIM_DIR:$PATH"
 
 exec "$ROOT_DIR/tool/dartw" run melos "$@"

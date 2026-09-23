@@ -5,27 +5,27 @@ class KoiApiBootstrapOptions {
     this.enableLogging = false,
     this.enableInternalLogging = false,
     this.validateCertificate = true,
-    this.enableProactiveTokenRefresh = true,
+    this.enableProactiveTokenRefresh = false,
     this.tokenRefreshWhiteList = const [],
   });
 
   final String baseUrl;
   final String environment;
 
-  /// Enables request and response logging in the native network backend.
+  /// 是否在原生网络后端记录请求与响应日志。
   ///
-  /// Disabled by default because the locked network implementation logs request
-  /// bodies without a public redaction hook.
+  /// 默认关闭，因为当前网络实现会记录请求正文，且没有公开的脱敏接口。
   final bool enableLogging;
 
-  /// Enables diagnostic messages emitted through the configured log callback.
+  /// 是否通过已配置的日志回调输出诊断信息。
   final bool enableInternalLogging;
 
-  /// Controls certificate validation outside production.
+  /// 控制生产环境以外是否验证证书。
   ///
-  /// Production always validates certificates even when this is false.
+  /// 即使此值为 `false`，生产环境仍始终验证证书。
   final bool validateCertificate;
 
+  /// 在接入真实令牌刷新实现之前保持关闭。
   final bool enableProactiveTokenRefresh;
   final List<String> tokenRefreshWhiteList;
 

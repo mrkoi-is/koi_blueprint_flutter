@@ -6,6 +6,17 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    groups:
+      codegen-stack:
+        patterns:
+          - "analyzer"
+          - "build_runner"
+          - "flutter_riverpod"
+          - "riverpod*"
+          - "freezed*"
+          - "json_annotation"
+          - "json_serializable"
+          - "go_router_builder"
 
   # CI 工作流中引用的 GitHub Actions
   - package-ecosystem: github-actions
