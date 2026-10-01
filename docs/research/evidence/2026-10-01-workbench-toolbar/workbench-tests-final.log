@@ -1,0 +1,58 @@
+Waiting for another flutter command to release the startup lock...
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workbench_window_chrome_test.dart: missing or failed chrome leaves app content usable (variant: TargetPlatform.macOS)
+macOS window chrome failed: PlatformException(WINDOW_CLOSED, null, null, null)
+00:00 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workbench_window_chrome_test.dart: native toolbar errors leave the session usable (variant: TargetPlatform.macOS)
+macOS navigation toolbar failed: PlatformException(WINDOW_CLOSED, null, null, null)
+00:00 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: history shortcuts replay pages without ordinary typing navigation
+00:02 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: native toolbar owns the top row and replays the shared history (variant: TargetPlatform.macOS)
+00:02 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: macOS history shortcuts work before focusing a control (variant: TargetPlatform.macOS)
+macOS window chrome unavailable: MissingPluginException(No implementation found for method applyChrome on channel koi/workbench_window)
+00:02 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: sidebar search, rename, todo CRUD and theme settings are real consumers
+00:03 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: 320 width and 200 percent text remain usable across all views
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 0 widgets with widget matching predicate: []" (used in a call to "tap()") could
+not find any matching widgets.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2095:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart:492:18)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  320 width and 200 percent text remain usable across all views
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:03 +11 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: 320 width and 200 percent text remain usable across all views [E]
+  Test failed. See exception logs above.
+  The test description was: 320 width and 200 percent text remain usable across all views
+  
+00:03 +11 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: Cmd/Ctrl+O opens current import and both real panel widths persist
+00:03 +12 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: one job state update does not rebuild theme or unrelated document editor
+00:03 +13 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: text draft, selection and controller survive resize and three navigation branches
+00:04 +14 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: Ctrl+S saves once and save failure keeps the editable draft
+00:04 +15 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: media resize retains player/controller, route exit pauses and does not autoplay on return
+00:04 +16 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: initialization failure offers a real retry
+00:04 +17 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: task retry selects and mounts video B while retaining its failed job
+00:04 +18 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: cancelled import can retry and direct routes persist the last view
+00:05 +19 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: media search, category filters, grid/list selection and image read retry
+00:05 +20 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: image thumbnail retry preserves the failed job and publishes a new stored thumbnail
+00:05 +21 -1: Some tests failed.
+
+Failing tests:
+  /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: 320 width and 200 percent text remain usable across all views

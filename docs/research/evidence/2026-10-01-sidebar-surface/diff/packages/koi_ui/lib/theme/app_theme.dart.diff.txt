@@ -1,0 +1,21 @@
+--- before/packages/koi_ui/lib/theme/app_theme.dart
++++ after/packages/koi_ui/lib/theme/app_theme.dart
+@@ -22,8 +22,8 @@
+           // The custom amber replaces the seed color, so pair its foreground
+           // explicitly instead of retaining the seed's white onSecondary.
+           onSecondary: dark ? AppColors.ink : const Color(0xFF242424),
+-          surface: dark ? AppColors.nightPanel : AppColors.content,
+-          surfaceDim: dark ? AppColors.nightPanel : const Color(0xFFDEDEDE),
++          surface: dark ? AppColors.nightContent : AppColors.content,
++          surfaceDim: dark ? AppColors.nightContent : const Color(0xFFDEDEDE),
+           surfaceBright: dark ? const Color(0xFF383838) : AppColors.content,
+           surfaceContainerLowest: dark ? const Color(0xFF111111) : Colors.white,
+           surfaceContainerHigh: dark
+@@ -48,6 +48,7 @@
+     final tokens = KoiThemeTokens.fromScheme(colors, density: density).copyWith(
+       chromeBackground: dark ? AppColors.night : AppColors.chrome,
+       contentBackground: colors.surface,
++      panelBackground: dark ? AppColors.nightPanel : AppColors.panel,
+       selectedBackground: dark
+           ? const Color(0xFF303030)
+           : const Color(0xFFEBEBEB),

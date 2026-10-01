@@ -1,0 +1,120 @@
+{
+  "captured_at": "2026-09-30T14:57:24.613539+08:00",
+  "runtime": "Actual macOS Debug app, com.mrkoi.fixture.runtimeacceptApp",
+  "screenshots": [
+    {
+      "file": "text-light.png",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_14-50-41.png",
+      "sha256": "068ef5ac57bf134ca113f590df20dd465631f40883533d88280cf2cd56ab997f",
+      "size": [
+        3644,
+        2238
+      ],
+      "unmodified": true,
+      "chrome_pixel_samples": {
+        "native_titlebar": [
+          254,
+          251,
+          245
+        ],
+        "app_header": [
+          255,
+          251,
+          246
+        ],
+        "navigation_rail": [
+          254,
+          252,
+          246
+        ]
+      },
+      "sample_coordinates": {
+        "native_titlebar": [
+          600,
+          145
+        ],
+        "app_header": [
+          600,
+          230
+        ],
+        "navigation_rail": [
+          150,
+          800
+        ]
+      }
+    },
+    {
+      "file": "media-dark.png",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_14-51-36.png",
+      "sha256": "dd2661d17baff310acd0137e429e1ceccaba2c2813d15f65357a3f1d3c7ff38e",
+      "size": [
+        3644,
+        2238
+      ],
+      "unmodified": true,
+      "chrome_pixel_samples": {
+        "native_titlebar": [
+          18,
+          27,
+          24
+        ],
+        "app_header": [
+          19,
+          26,
+          24
+        ],
+        "navigation_rail": [
+          18,
+          27,
+          25
+        ]
+      },
+      "sample_coordinates": {
+        "native_titlebar": [
+          600,
+          145
+        ],
+        "app_header": [
+          600,
+          230
+        ],
+        "navigation_rail": [
+          150,
+          800
+        ]
+      }
+    }
+  ],
+  "verification": {
+    "validate": "PASS",
+    "coverage": {
+      "hit": 3194,
+      "total": 3692,
+      "percent": 86.51
+    },
+    "macos_debug_build": "PASS",
+    "macos_runtime": "PASS: native traffic lights, unified light/dark chrome, upward settings menu, Escape closes, text/media navigation",
+    "generator": "PASS: workbench -> workbench, macos/web, renamed Chinese output paths",
+    "windows_linux_native_chrome": "NOT_IMPLEMENTED / NOT_RUN",
+    "other_platform_builds_this_followup": "NOT_RUN"
+  },
+  "logs": {
+    "validate.log": {
+      "original": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-navigation-validation-20260930-mbd297qb/validate.log",
+      "sha256": "b8b4139c9dbb376398f52e8a52d902e0a8fcaaf416557ec379df6ea6c650eda0"
+    },
+    "generator.log": {
+      "original": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-navigation-generator-20260930-oumnjqsb/generator.log",
+      "sha256": "60dd25a8d2cb885619c03d2a9c178e48a4e6740dfddab397001ec5d2f72fa631"
+    }
+  },
+  "baseline": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-navigation-rail-baseline-20260930-cwd8wql_",
+  "implementation_sources": {
+    "packages/koi_ui/lib/widgets/koi_workbench_frame.dart": "4d79c6737c8f5de48e42af54ad7858d6d720c1f4142fc3577ee217e1fd7e2eb0",
+    "examples/workbench_app/lib/app.dart": "8a9b64f1bdd8fd6def1a6ba927ba42c3d15f8db7eb0f1e36cd907260c2e1e419",
+    "examples/workbench_app/lib/core/window/workbench_window_chrome.dart": "1504566e51ffb922148b300b3ce39d54ebf1415c14a7916b648e537ee3ac3729",
+    "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart": "a60b58f26f604f2892f6ec141ef8ffd1300010a9015f5d10007846da9e6e9bfb",
+    "examples/ui_lab/lib/main.dart": "c0c68b5268d6e3e810cc4bff596da20dbbb204279712916a2b8246c1ba67b543",
+    "tool/platform_configuration.py": "45c3f68e6abd2ceafa00015e3ddc42f2ddba28cda5568e378615d29eda87375a"
+  }
+}

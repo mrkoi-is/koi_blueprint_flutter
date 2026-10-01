@@ -12,6 +12,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  python-compatibility:
+    name: Python ${{ matrix.python-version }} generator tests
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ['3.11', '3.12']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: python -m unittest discover -s scripts/tests -p 'test_*.py'
+      - run: python -m unittest discover -s tool/tests -p 'test_*.py'
+
   quality:
     runs-on: ubuntu-latest
     timeout-minutes: 30
@@ -20,6 +34,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
 
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Install Flutter 3.47.2
         uses: subosito/flutter-action@v2
         with:
@@ -27,14 +46,115 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Verify toolchain
-        run: |
-          ./tool/flutterw --version
-          ./tool/dartw --version
-          expected_flutter="$(python3 -c 'import json; print(json.load(open(".fvmrc"))["flutter"])')"
-          ./tool/flutterw --version | head -n 1 | grep -F "Flutter $expected_flutter"
+      - name: Install native media test dependencies
+        run: sudo apt-get update && sudo apt-get install -y libmpv-dev mpv libepoxy-dev
 
       - name: Validate workspace
-        env:
-          COVERAGE_THRESHOLD: '60'
-        run: ./scripts/validate_workspace.sh
+        run: python blueprint.py validate
+
+      - name: Compile and test renamed feature and module outputs
+        run: python tool/generator_smoke.py
+
+  generated-project:
+    name: Fresh project / ${{ matrix.template }} / ${{ matrix.platforms }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platforms: web,android,linux
+            template: minimal
+          - os: macos-latest
+            platforms: ios,macos
+            template: minimal
+          - os: windows-latest
+            platforms: windows
+            template: minimal
+          - os: ubuntu-latest
+            platforms: web,android,linux
+            template: workbench
+          - os: macos-latest
+            platforms: ios,macos
+            template: workbench
+          - os: windows-latest
+            platforms: windows
+            template: workbench
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install Java for Android
+        if: runner.os == 'Linux'
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev mpv libepoxy-dev
+
+      - name: Install Flutter 3.47.2
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+
+      - name: Generate a new six-platform project
+        run: python blueprint.py create ci_blueprint --output "${{ runner.temp }}/koi-blueprint-generated" --org com.example --template "${{ matrix.template }}"
+
+      - name: Validate the generated project
+        run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" validate --workspace "${{ runner.temp }}/koi-blueprint-generated"
+
+      - name: Build native platforms and web
+        run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" build --app "${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app" --platforms "${{ matrix.platforms }}"
+
+      - name: Run real native media and storage smoke on macOS
+        if: matrix.template == 'workbench' && runner.os == 'macOS'
+        working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
+        run: |
+          set -o pipefail
+          flutter test --no-pub -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+
+      - name: Run real native media and storage smoke on Windows
+        if: matrix.template == 'workbench' && runner.os == 'Windows'
+        working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
+        run: |
+          flutter test --no-pub -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Run real native media and storage smoke on Linux
+        if: matrix.template == 'workbench' && runner.os == 'Linux'
+        working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
+        run: |
+          set -o pipefail
+          xvfb-run -a flutter test --no-pub -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+
+      - name: Run real Chrome media and IndexedDB smoke
+        if: matrix.template == 'workbench' && runner.os == 'Linux'
+        working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
+        shell: bash
+        run: |
+          chromedriver --port=4444 > chromedriver.log 2>&1 &
+          driver_pid=$!
+          trap 'kill "$driver_pid" 2>/dev/null || true' EXIT
+          flutter drive --no-pub --driver integration_test/support/runtime_driver.dart --target integration_test/workbench_runtime_test.dart -d web-server --headless --driver-port=4444 --web-browser-flag=--autoplay-policy=no-user-gesture-required
+
+      - name: Preserve runtime evidence
+        if: always() && matrix.template == 'workbench'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-runtime-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/integration_response_data.json
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
+          if-no-files-found: ignore

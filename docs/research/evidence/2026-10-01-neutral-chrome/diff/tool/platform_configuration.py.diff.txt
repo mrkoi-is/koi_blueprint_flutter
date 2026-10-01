@@ -1,0 +1,131 @@
+--- before/tool/platform_configuration.py
++++ after/tool/platform_configuration.py
+@@ -13,8 +13,7 @@
+   private var koiTitleLabel: NSTextField?
+   private var koiSidebarButton: NSButton?
+   private var koiDetailButton: NSButton?
+-  private let koiBackItem = NSToolbarItem.Identifier("koi.back")
+-  private let koiForwardItem = NSToolbarItem.Identifier("koi.forward")
++  private let koiHistoryItem = NSToolbarItem.Identifier("koi.history")
+   private let koiTitleItem = NSToolbarItem.Identifier("koi.title")
+   private let koiSaveItem = NSToolbarItem.Identifier("koi.save")
+   private let koiSidebarItem = NSToolbarItem.Identifier("koi.sidebar")
+@@ -51,6 +50,8 @@
+         }
+         window.title = title
+         window.koiTitleLabel?.stringValue = title
++        window.koiTitleLabel?.setAccessibilityLabel(title)
++        window.toolbar?.items.first(where: { $0.itemIdentifier == window.koiTitleItem })?.label = title
+         let titleSize = (arguments["titleFontSize"] as? NSNumber)?.doubleValue ?? 14
+         let titleWeight = (arguments["titleFontWeight"] as? NSNumber)?.intValue ?? 500
+         let weight: NSFont.Weight = titleWeight >= 700 ? .bold : titleWeight >= 600 ? .semibold : titleWeight >= 500 ? .medium : .regular
+@@ -88,6 +89,8 @@
+         window.koiSetItemVisible(window.koiDetailItem, visible: detail, before: window.koiSaveItem)
+         window.koiSidebarButton?.state = sidebarOpen ? .on : .off
+         window.koiDetailButton?.state = detailOpen ? .on : .off
++        window.koiSidebarButton?.contentTintColor = sidebarOpen ? .labelColor : .secondaryLabelColor
++        window.koiDetailButton?.contentTintColor = detailOpen ? .labelColor : .secondaryLabelColor
+         result(nil)
+       default:
+         result(FlutterMethodNotImplemented)
+@@ -96,7 +99,7 @@
+   }
+ 
+   func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+-    return [koiBackItem, koiForwardItem, koiSidebarItem, koiTitleItem, .flexibleSpace, koiDetailItem, koiSaveItem]
++    return [koiHistoryItem, koiSidebarItem, koiTitleItem, .flexibleSpace, koiDetailItem, koiSaveItem]
+   }
+ 
+   func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+@@ -106,10 +109,31 @@
+   func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier identifier: NSToolbarItem.Identifier,
+                willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+     let item = NSToolbarItem(itemIdentifier: identifier)
++    if identifier == koiHistoryItem {
++      let back = koiToolbarButton(symbol: "arrow.left", label: "后退", action: #selector(koiNavigateBack))
++      let forward = koiToolbarButton(symbol: "arrow.right", label: "前进", action: #selector(koiNavigateForward))
++      back.isEnabled = false
++      forward.isEnabled = false
++      koiBackButton = back
++      koiForwardButton = forward
++      let group = NSStackView(views: [back, forward])
++      group.orientation = .horizontal
++      group.spacing = 4
++      group.edgeInsets = NSEdgeInsetsZero
++      item.view = group
++      item.label = "页面历史"
++      item.visibilityPriority = .high
++      return item
++    }
+     if identifier == koiTitleItem {
+       let label = NSTextField(labelWithString: title)
+       koiTitleLabel = label
+       label.font = .systemFont(ofSize: 14, weight: .medium)
++      label.lineBreakMode = .byTruncatingTail
++      label.maximumNumberOfLines = 1
++      label.setAccessibilityLabel(title)
++      label.translatesAutoresizingMaskIntoConstraints = false
++      label.widthAnchor.constraint(lessThanOrEqualToConstant: 400).isActive = true
+       item.view = label
+       item.label = label.stringValue
+       item.visibilityPriority = .low
+@@ -119,10 +143,6 @@
+     let label: String
+     let action: Selector
+     switch identifier {
+-    case koiBackItem:
+-      symbol = "arrow.left"; label = "后退"; action = #selector(koiNavigateBack)
+-    case koiForwardItem:
+-      symbol = "arrow.right"; label = "前进"; action = #selector(koiNavigateForward)
+     case koiSaveItem:
+       symbol = "square.and.arrow.down"; label = "保存工作区"; action = #selector(koiSaveWorkspace)
+     case koiSidebarItem:
+@@ -132,25 +152,11 @@
+     default:
+       return nil
+     }
+-    let image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)!
+-    let button = NSButton(image: image, target: self, action: action)
+-    button.bezelStyle = .texturedRounded
+-    button.isBordered = false
+-    button.setAccessibilityLabel(label)
+-    button.toolTip = label
++    let button = koiToolbarButton(symbol: symbol, label: label, action: action)
+     item.view = button
+     item.label = label
+     item.visibilityPriority = .high
+-    button.translatesAutoresizingMaskIntoConstraints = false
+-    button.widthAnchor.constraint(equalToConstant: 32).isActive = true
+-    button.heightAnchor.constraint(equalToConstant: 28).isActive = true
+-    if identifier == koiBackItem {
+-      button.isEnabled = false
+-      koiBackButton = button
+-    } else if identifier == koiForwardItem {
+-      button.isEnabled = false
+-      koiForwardButton = button
+-    } else if identifier == koiSidebarItem {
++    if identifier == koiSidebarItem {
+       button.setButtonType(.toggle)
+       koiSidebarButton = button
+     } else if identifier == koiDetailItem {
+@@ -158,6 +164,20 @@
+       koiDetailButton = button
+     }
+     return item
++  }
++
++  private func koiToolbarButton(symbol: String, label: String, action: Selector) -> NSButton {
++    let image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)!
++    let button = NSButton(image: image, target: self, action: action)
++    button.bezelStyle = .texturedRounded
++    button.isBordered = false
++    button.contentTintColor = .secondaryLabelColor
++    button.setAccessibilityLabel(label)
++    button.toolTip = label
++    button.translatesAutoresizingMaskIntoConstraints = false
++    button.widthAnchor.constraint(equalToConstant: 32).isActive = true
++    button.heightAnchor.constraint(equalToConstant: 28).isActive = true
++    return button
+   }
+ 
+   @objc private func koiNavigateBack() {

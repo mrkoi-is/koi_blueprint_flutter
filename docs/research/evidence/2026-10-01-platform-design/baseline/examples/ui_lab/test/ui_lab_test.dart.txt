@@ -1,0 +1,109 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:ui_lab/main.dart';
+
+void main() {
+  testWidgets('theme, density, type size and long text switches are real', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1440, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(const KoiUiLabApp());
+    await tester.tap(find.text('暗色主题'));
+    await tester.pumpAndSettle();
+    final context = tester.element(find.byType(KoiWorkbenchFrame));
+    expect(Theme.of(context).brightness, Brightness.dark);
+    await tester.tap(find.text('紧凑密度'));
+    await tester.pumpAndSettle();
+    expect(KoiThemeTokens.of(context).density, KoiDensity.compact);
+    await tester.tap(find.byTooltip('工作区设置'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('切换明亮主题'));
+    await tester.pumpAndSettle();
+    expect(Theme.of(context).brightness, Brightness.light);
+    await tester.tap(find.byTooltip('工作区设置'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('切换舒适密度'));
+    await tester.pumpAndSettle();
+    expect(KoiThemeTokens.of(context).density, KoiDensity.comfortable);
+    await tester.tap(find.text('长中文'));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('用于验证中文长标题'), findsOneWidget);
+    await tester.tap(find.text('200% 字号'));
+    await tester.pumpAndSettle();
+    expect(MediaQuery.textScalerOf(context).scale(10), 20);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('menu, popover, disabled button and status views work', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(1440, 1200));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(const KoiUiLabApp());
+    await tester.tap(find.text('执行操作'));
+    await tester.pump();
+    expect(find.text('按钮已激活'), findsOneWidget);
+    await tester.tap(find.text('打开菜单'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('重命名'));
+    await tester.pumpAndSettle();
+    expect(find.text('已选择重命名'), findsOneWidget);
+    await tester.tap(find.text('打开浮层'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('关闭浮层'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.hourglass_empty).first);
+    await tester.pump();
+    expect(find.text('正在加载内容'), findsOneWidget);
+    expect(find.text('暂无资料'), findsOneWidget);
+    await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+  });
+  testWidgets(
+    'width presets, side selection, editor state and layout tab work',
+    (tester) async {
+      await tester.binding.setSurfaceSize(const Size(1440, 1200));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      await tester.pumpWidget(const KoiUiLabApp());
+      await tester.enterText(
+        find.byKey(const ValueKey('ui-lab-editor')),
+        '实验输入',
+      );
+      await tester.tap(find.text('可选择条目'));
+      await tester.pumpAndSettle();
+      expect(find.text('条目已激活'), findsOneWidget);
+      await tester.drag(find.bySemanticsLabel('调整侧栏宽度'), const Offset(40, 0));
+      await tester.pumpAndSettle();
+      await tester.drag(find.bySemanticsLabel('调整详情宽度'), const Offset(-20, 0));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.view_sidebar_outlined).first);
+      await tester.pumpAndSettle();
+      expect(find.textContaining('拖动分隔线'), findsOneWidget);
+      await tester.tap(find.byIcon(Icons.widgets_outlined).first);
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('ui-lab-editor')))
+            .controller!
+            .text,
+        '实验输入',
+      );
+      for (final width in [320, 600, 1440]) {
+        await tester.tap(find.byType(DropdownButton<double>));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('$width px').last);
+        await tester.pumpAndSettle();
+        expect(tester.getSize(find.byType(KoiWorkbenchFrame)).width, width);
+        expect(
+          tester
+              .widget<TextField>(find.byKey(const ValueKey('ui-lab-editor')))
+              .controller!
+              .text,
+          '实验输入',
+        );
+        expect(tester.takeException(), isNull);
+      }
+    },
+  );
+}

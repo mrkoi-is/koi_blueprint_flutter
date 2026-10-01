@@ -1,0 +1,34 @@
+{
+  "url": "http://127.0.0.1:8786/",
+  "viewport": [
+    1710,
+    863
+  ],
+  "finding": "Exported slider input covers entire viewport, rail and sidebar controls absent",
+  "sliderRect": {
+    "x": 2,
+    "y": 2,
+    "width": 1710,
+    "height": 859
+  },
+  "exportedLabels": [
+    "调整详情宽度",
+    "后退",
+    "前进",
+    "PlatformReview 工作区",
+    "保存工作区",
+    "新建资料",
+    "导入文本",
+    "重命名当前资料",
+    "资料详情"
+  ],
+  "missing": [
+    "文本资料 rail",
+    "媒体素材 rail",
+    "任务 rail",
+    "工作区设置",
+    "搜索资料",
+    "设计规范.md selectable row",
+    "调整侧栏宽度"
+  ]
+}

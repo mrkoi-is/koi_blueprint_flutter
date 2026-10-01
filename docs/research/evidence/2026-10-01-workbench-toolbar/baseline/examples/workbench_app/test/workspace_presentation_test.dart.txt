@@ -1,0 +1,1102 @@
+import 'dart:async';
+import 'dart:convert';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:workbench_app/app.dart';
+import 'package:workbench_app/bootstrap.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
+import 'package:workbench_app/features/workspace/presentation/screens/media_page.dart';
+import 'package:workbench_app/features/workspace/presentation/widgets/workspace_panels.dart';
+import 'package:workbench_app/main.dart';
+
+import 'presentation_support.dart';
+
+Future<void> closeApp(WidgetTester tester, WorkbenchBootstrap bootstrap) async {
+  await tester.pumpWidget(const SizedBox());
+  var closed = false;
+  Object? failure;
+  bootstrap.disposeAsync().then(
+    (_) => closed = true,
+    onError: (Object error) {
+      failure = error;
+      closed = true;
+    },
+  );
+  // Owner cleanup crosses both widget microtasks and real async operations.
+  for (var attempt = 0; attempt < 20 && !closed; attempt++) {
+    await tester.pump();
+    await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+  }
+  expect(closed, isTrue, reason: 'All owned resources must finish closing');
+  expect(failure, isNull);
+  await tester.pump();
+}
+
+void main() {
+  testWidgets(
+    'toolbar replays content history and retains editors and player',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1400, 1000);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final storage = MemoryStorage(
+        const WorkspaceSnapshot(
+          documents: [
+            WorkspaceDocument(id: 'a', title: '资料 A', text: '原始内容'),
+            WorkspaceDocument(id: 'b', title: '资料 B', text: '另一份资料'),
+          ],
+          assets: [
+            WorkspaceAsset(
+              id: 'video',
+              name: 'A.mp4',
+              kind: MediaKind.video,
+              storageKey: 'video',
+              byteLength: 1,
+              thumbnailStatus: ThumbnailStatus.ready,
+            ),
+          ],
+          preferences: WorkspacePreferences(
+            selectedDocumentId: 'a',
+            selectedAssetId: 'video',
+          ),
+        ),
+      );
+      final players = <FakePlayback>[];
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        createPlayback: () {
+          final player = FakePlayback();
+          players.add(player);
+          return player;
+        },
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      IconButton arrow(IconData icon) =>
+          tester.widget<IconButton>(find.widgetWithIcon(IconButton, icon));
+      expect(arrow(Icons.arrow_back).onPressed, isNull);
+      expect(arrow(Icons.arrow_forward).onPressed, isNull);
+      final editor = tester
+          .widget<TextField>(find.byKey(const ValueKey('editor-a')))
+          .controller;
+      await tester.enterText(
+        find.byKey(const ValueKey('editor-a')),
+        '导航后仍保留的草稿',
+      );
+      await tester.tap(find.text('资料 B').first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.perm_media_outlined).first);
+      await tester.pumpAndSettle();
+      final player = bootstrap.preview.playback;
+      expect(players, hasLength(1));
+      await tester.tap(find.byTooltip('后退'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('editor-b')), findsOneWidget);
+      await tester.tap(find.byTooltip('后退'));
+      await tester.pumpAndSettle();
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('editor-a')))
+            .controller,
+        same(editor),
+      );
+      expect(editor!.text, '导航后仍保留的草稿');
+      await tester.tap(find.byTooltip('前进'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('前进'));
+      await tester.pumpAndSettle();
+      expect(bootstrap.preview.playback, same(player));
+      expect(players, hasLength(1));
+      expect(players.single.playing, isFalse);
+      await tester.tap(find.byTooltip('后退'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.task_alt_outlined).first);
+      await tester.pumpAndSettle();
+      expect(arrow(Icons.arrow_forward).onPressed, isNull);
+      final router = bootstrap.router;
+      tester.view.physicalSize = const Size(320, 1000);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('后退'));
+      await tester.pumpAndSettle();
+      expect(bootstrap.router, same(router));
+      expect(find.byKey(const ValueKey('editor-b')), findsOneWidget);
+      await tester.tap(find.byTooltip('前进'));
+      await tester.pumpAndSettle();
+      expect(
+        bootstrap.router.routeInformationProvider.value.uri.path,
+        '/tasks',
+      );
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+      expect(players.single.closes, 1);
+      expect(storage.leaseReleases, 1);
+      expect(storage.closes, 1);
+    },
+  );
+
+  testWidgets(
+    'history shortcuts replay pages without ordinary typing navigation',
+    (tester) async {
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => MemoryStorage(
+          const WorkspaceSnapshot(
+            documents: [WorkspaceDocument(id: 'doc', title: '资料')],
+            preferences: WorkspacePreferences(selectedDocumentId: 'doc'),
+          ),
+        ),
+        fileImportPort: CancelImport(),
+        createPlayback: FakePlayback.new,
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      bootstrap.router.go('/tasks');
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('new-todo')));
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+      await tester.pumpAndSettle();
+      expect(bootstrap.router.routeInformationProvider.value.uri.path, '/text');
+      await tester.tap(find.byKey(const ValueKey('editor-doc')));
+      await tester.enterText(
+        find.byKey(const ValueKey('editor-doc')),
+        '[正常编辑]',
+      );
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(bootstrap.router.routeInformationProvider.value.uri.path, '/text');
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.bracketRight);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
+      await tester.pumpAndSettle();
+      expect(
+        bootstrap.router.routeInformationProvider.value.uri.path,
+        '/tasks',
+      );
+      expect(bootstrap.session.state.snapshot.documents.single.text, '[正常编辑]');
+      await closeApp(tester, bootstrap);
+    },
+  );
+
+  testWidgets(
+    'native toolbar owns the top row and replays the shared history',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1400, 1000);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      const channel = MethodChannel('koi/workbench_window');
+      final calls = <MethodCall>[];
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(channel, (
+        call,
+      ) async {
+        calls.add(call);
+        return call.method == 'applyChrome'
+            ? {'titlebarHeight': 44.0, 'nativeToolbar': true}
+            : null;
+      });
+      addTearDown(
+        () => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+          channel,
+          null,
+        ),
+      );
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => MemoryStorage(
+          const WorkspaceSnapshot(
+            documents: [WorkspaceDocument(id: 'doc', title: '资料', text: '原文')],
+            preferences: WorkspacePreferences(selectedDocumentId: 'doc'),
+          ),
+        ),
+        fileImportPort: CancelImport(),
+        createPlayback: FakePlayback.new,
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      expect(find.byType(AppBar), findsNothing);
+      expect(find.byTooltip('后退'), findsNothing);
+      final editor = tester
+          .widget<TextField>(find.byKey(const ValueKey('editor-doc')))
+          .controller;
+      await tester.enterText(
+        find.byKey(const ValueKey('editor-doc')),
+        '同一标题栏下保留的草稿',
+      );
+      bootstrap.router.go('/tasks');
+      await tester.pumpAndSettle();
+      expect(calls.last.arguments, {'canGoBack': true, 'canGoForward': false});
+      final reply = Completer<ByteData?>();
+      tester.binding.channelBuffers.push(
+        channel.name,
+        const StandardMethodCodec().encodeMethodCall(
+          const MethodCall('navigateBack'),
+        ),
+        reply.complete,
+      );
+      await reply.future;
+      await tester.pumpAndSettle();
+      expect(bootstrap.router.routeInformationProvider.value.uri.path, '/text');
+      expect(
+        tester
+            .widget<TextField>(find.byKey(const ValueKey('editor-doc')))
+            .controller,
+        same(editor),
+      );
+      expect(editor!.text, '同一标题栏下保留的草稿');
+      expect(calls.last.arguments, {'canGoBack': false, 'canGoForward': true});
+      tester.view.physicalSize = const Size(320, 1000);
+      await tester.pumpAndSettle();
+      expect(find.byType(AppBar), findsOneWidget);
+      expect(find.byTooltip('设置'), findsOneWidget);
+      await tester.tap(find.byTooltip('Open navigation menu'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('document-search')), findsOneWidget);
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+    },
+    variant: TargetPlatformVariant.only(TargetPlatform.macOS),
+  );
+
+  testWidgets('macOS history shortcuts work before focusing a control', (
+    tester,
+  ) async {
+    final bootstrap = await WorkbenchBootstrap.create(
+      openStorage: () async => MemoryStorage(
+        const WorkspaceSnapshot(
+          documents: [WorkspaceDocument(id: 'doc', title: '资料', text: '保留正文')],
+          preferences: WorkspacePreferences(selectedDocumentId: 'doc'),
+        ),
+      ),
+      fileImportPort: CancelImport(),
+      createPlayback: FakePlayback.new,
+    );
+    await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+    await tester.pumpAndSettle();
+    bootstrap.router.go('/tasks');
+    await tester.pumpAndSettle();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.bracketLeft);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
+    await tester.pumpAndSettle();
+    expect(bootstrap.router.routeInformationProvider.value.uri.path, '/text');
+    await tester.tap(find.byKey(const ValueKey('editor-doc')));
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.altLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.altLeft);
+    await tester.pumpAndSettle();
+    expect(bootstrap.router.routeInformationProvider.value.uri.path, '/text');
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.metaLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.bracketRight);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.metaLeft);
+    await tester.pumpAndSettle();
+    expect(bootstrap.router.routeInformationProvider.value.uri.path, '/tasks');
+    expect(bootstrap.session.state.snapshot.documents.single.text, '保留正文');
+    await closeApp(tester, bootstrap);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
+  testWidgets(
+    'sidebar search, rename, todo CRUD and theme settings are real consumers',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1400, 1100);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final storage = MemoryStorage();
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        createPlayback: FakePlayback.new,
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('new-document')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('重命名当前资料'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        '重要笔记',
+      );
+      await tester.tap(find.text('确定'));
+      await tester.pumpAndSettle();
+      expect(bootstrap.session.state.snapshot.documents.single.title, '重要笔记');
+      await tester.enterText(
+        find.byKey(const ValueKey('document-search')),
+        'not present',
+      );
+      await tester.pump();
+      expect(find.text('没有匹配的资料'), findsOneWidget);
+      await tester.enterText(
+        find.byKey(const ValueKey('document-search')),
+        '重要',
+      );
+      await tester.pump();
+      expect(find.text('没有匹配的资料'), findsNothing);
+      await tester.tap(find.byTooltip('设置'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('深色主题'));
+      await tester.pumpAndSettle();
+      expect(
+        bootstrap.session.state.snapshot.preferences.themeMode,
+        WorkspaceThemeMode.dark,
+      );
+      await tester.tap(find.byTooltip('设置'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('紧凑密度'));
+      await tester.pumpAndSettle();
+      expect(
+        bootstrap.session.state.snapshot.preferences.density,
+        WorkspaceDensity.compact,
+      );
+      await tester.tap(find.byIcon(Icons.task_alt_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const ValueKey('new-todo')), '准备素材');
+      await tester.tap(find.byTooltip('添加待办'));
+      await tester.pump();
+      await tester.tap(find.byTooltip('重命名待办：准备素材'));
+      await tester.pumpAndSettle();
+      await tester.enterText(
+        find.descendant(
+          of: find.byType(AlertDialog),
+          matching: find.byType(TextField),
+        ),
+        '检查素材',
+      );
+      await tester.tap(find.text('确定'));
+      await tester.pumpAndSettle();
+      expect(bootstrap.session.state.snapshot.todos.single.title, '检查素材');
+      await tester.tap(find.byType(Checkbox).first);
+      await tester.pump();
+      expect(bootstrap.session.state.snapshot.todos.single.completed, isTrue);
+      await tester.tap(find.text('仅未完成'));
+      await tester.pump();
+      expect(find.text('暂无待办'), findsOneWidget);
+      await tester.tap(find.text('仅未完成'));
+      await tester.pump();
+      await tester.tap(find.byTooltip('删除待办：检查素材'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, '删除'));
+      await tester.pumpAndSettle();
+      expect(bootstrap.session.state.snapshot.todos, isEmpty);
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+    },
+  );
+
+  testWidgets('320 width and 200 percent text remain usable across all views', (
+    tester,
+  ) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 1000);
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    final storage = MemoryStorage(
+      const WorkspaceSnapshot(
+        documents: [
+          WorkspaceDocument(
+            id: 'doc',
+            title: '很长的中文文本资料标题用于验证小窗口',
+            text: '中文草稿',
+          ),
+        ],
+        todos: [WorkspaceTodo(id: 'todo', title: '很长的中文待办事项也应该可以正常完成')],
+        assets: [
+          WorkspaceAsset(
+            id: 'video',
+            name: '很长的中文视频文件名称.mp4',
+            kind: MediaKind.video,
+            byteLength: 5,
+            storageKey: 'video',
+            thumbnailStatus: ThumbnailStatus.ready,
+          ),
+        ],
+        preferences: WorkspacePreferences(
+          selectedDocumentId: 'doc',
+          selectedAssetId: 'video',
+        ),
+      ),
+    );
+    final bootstrap = await WorkbenchBootstrap.create(
+      openStorage: () async => storage,
+      fileImportPort: CancelImport(),
+      createPlayback: FakePlayback.new,
+    );
+    await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    await tester.tap(find.byTooltip('设置'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('深色主题'));
+    await tester.pumpAndSettle();
+    expect(
+      Theme.of(tester.element(find.byType(NavigationBar))).brightness,
+      Brightness.dark,
+    );
+    await tester.tap(find.byTooltip('Open navigation menu'));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('document-search')), findsOneWidget);
+    await tester.enterText(find.byKey(const ValueKey('document-search')), '很长');
+    await tester.pump();
+    Navigator.of(tester.element(find.byKey(const ValueKey('document-search'))))
+        .pop();
+    await tester.pumpAndSettle();
+    for (final location in ['/media', '/tasks', '/text']) {
+      bootstrap.router.go(location);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    }
+    await closeApp(tester, bootstrap);
+  });
+
+  testWidgets(
+    'Cmd/Ctrl+O opens current import and both real panel widths persist',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1500, 1000);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final storage = MemoryStorage(
+        const WorkspaceSnapshot(
+          documents: [WorkspaceDocument(id: 'doc', title: '资料')],
+          preferences: WorkspacePreferences(selectedDocumentId: 'doc'),
+        ),
+      );
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        createPlayback: FakePlayback.new,
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const ValueKey('editor-doc')));
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyO);
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pumpAndSettle();
+      expect(
+        bootstrap.session.state.snapshot.jobs.single.importKind,
+        ImportKind.text,
+      );
+      final initial = bootstrap.session.state.snapshot.preferences;
+      Finder handle(String label) => find.byWidgetPredicate(
+        (widget) => widget is Semantics && widget.properties.label == label,
+      );
+      await tester.drag(handle('调整侧栏宽度'), const Offset(30, 0));
+      await tester.pump();
+      await tester.drag(handle('调整详情宽度'), const Offset(-30, 0));
+      await tester.pump();
+      final preferences = bootstrap.session.state.snapshot.preferences;
+      expect(preferences.sidebarWidth, greaterThan(initial.sidebarWidth));
+      expect(preferences.detailsWidth, greaterThan(initial.detailsWidth));
+      await closeApp(tester, bootstrap);
+      expect(
+        storage.repository.snapshot.preferences.sidebarWidth,
+        preferences.sidebarWidth,
+      );
+      expect(
+        storage.repository.snapshot.preferences.detailsWidth,
+        preferences.detailsWidth,
+      );
+    },
+  );
+  testWidgets(
+    'one job state update does not rebuild theme or unrelated document editor',
+    (tester) async {
+      final storage = MemoryStorage(
+        const WorkspaceSnapshot(
+          documents: [WorkspaceDocument(id: 'doc', title: '资料')],
+          preferences: WorkspacePreferences(selectedDocumentId: 'doc'),
+        ),
+      );
+      final importer = PendingImport();
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: importer,
+        createPlayback: FakePlayback.new,
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      final themeWidget = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      final editorWidget = tester.widget<TextField>(
+        find.byKey(const ValueKey('editor-doc')),
+      );
+      final importing = bootstrap.session.importFiles(ImportKind.media);
+      await tester.pump();
+      await tester.pump();
+      expect(
+        bootstrap.session.state.snapshot.jobs.single.status,
+        JobStatus.running,
+      );
+      expect(
+        tester.widget<MaterialApp>(find.byType(MaterialApp)),
+        same(themeWidget),
+      );
+      expect(
+        tester.widget<TextField>(find.byKey(const ValueKey('editor-doc'))),
+        same(editorWidget),
+      );
+      importer.result.complete(const ImportCancelled());
+      await importing;
+      await tester.pump();
+      expect(
+        tester.widget<MaterialApp>(find.byType(MaterialApp)),
+        same(themeWidget),
+      );
+      expect(
+        tester.widget<TextField>(find.byKey(const ValueKey('editor-doc'))),
+        same(editorWidget),
+      );
+      await closeApp(tester, bootstrap);
+    },
+  );
+  testWidgets(
+    'text draft, selection and controller survive resize and three navigation branches',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1400, 900);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final storage = MemoryStorage(
+        const WorkspaceSnapshot(
+          documents: [
+            WorkspaceDocument(id: 'doc', title: '中文资料', text: 'original'),
+          ],
+          preferences: WorkspacePreferences(selectedDocumentId: 'doc'),
+        ),
+      );
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        createPlayback: FakePlayback.new,
+      );
+      final router = bootstrap.router;
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      final editor = find.byKey(const ValueKey('editor-doc'));
+      await tester.enterText(editor, '中文草稿 preserved');
+      await tester.pump();
+      final controller = tester.widget<TextField>(editor).controller;
+      controller!.selection = const TextSelection.collapsed(offset: 2);
+      tester.view.physicalSize = const Size(600, 900);
+      await tester.pumpAndSettle();
+      expect(tester.widget<TextField>(editor).controller, same(controller));
+      expect(controller.selection.extentOffset, 2);
+      expect(controller.text, '中文草稿 preserved');
+      await tester.tap(find.byIcon(Icons.perm_media_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.tap(find.byIcon(Icons.task_alt_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byKey(const ValueKey('new-todo')), '检查字幕');
+      await tester.tap(find.byTooltip('添加待办'));
+      await tester.pump();
+      expect(bootstrap.session.state.snapshot.todos.single.title, '检查字幕');
+      await tester.tap(find.byIcon(Icons.description_outlined).first);
+      await tester.pumpAndSettle();
+      expect(tester.widget<TextField>(editor).controller, same(controller));
+      expect(controller.text, '中文草稿 preserved');
+      expect(bootstrap.router, same(router));
+      expect(
+        bootstrap.session.state.snapshot.preferences.selectedDocumentId,
+        'doc',
+      );
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+    },
+  );
+
+  testWidgets('Ctrl+S saves once and save failure keeps the editable draft', (
+    tester,
+  ) async {
+    final storage = MemoryStorage(
+      const WorkspaceSnapshot(
+        documents: [WorkspaceDocument(id: 'doc', title: '资料')],
+        preferences: WorkspacePreferences(selectedDocumentId: 'doc'),
+      ),
+    );
+    final bootstrap = await WorkbenchBootstrap.create(
+      openStorage: () async => storage,
+      fileImportPort: CancelImport(),
+      createPlayback: FakePlayback.new,
+    );
+    await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+    await tester.pumpAndSettle();
+    await tester.enterText(
+      find.byKey(const ValueKey('editor-doc')),
+      'new content',
+    );
+    await tester.pump();
+    await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+    await tester.sendKeyEvent(LogicalKeyboardKey.keyS);
+    await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+    await tester.pumpAndSettle();
+    expect(storage.repository.saves, 1);
+    expect(bootstrap.session.state.snapshot.documents.single.dirty, isFalse);
+    storage.repository.failSave = true;
+    await tester.enterText(
+      find.byKey(const ValueKey('editor-doc')),
+      'keep after error',
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    await tester.pumpAndSettle();
+    expect(
+      bootstrap.session.state.snapshot.documents.single.text,
+      'keep after error',
+    );
+    expect(bootstrap.session.state.snapshot.documents.single.dirty, isTrue);
+    expect(find.textContaining('保存失败'), findsWidgets);
+    storage.repository.failSave = false;
+    await closeApp(tester, bootstrap);
+  });
+
+  testWidgets(
+    'media resize retains player/controller, route exit pauses and does not autoplay on return',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1400, 1000);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final storage = MemoryStorage(
+        const WorkspaceSnapshot(
+          assets: [
+            WorkspaceAsset(
+              id: 'video',
+              name: 'video.mp4',
+              kind: MediaKind.video,
+              byteLength: 5,
+              storageKey: 'video',
+              thumbnailStatus: ThumbnailStatus.ready,
+            ),
+          ],
+          preferences: WorkspacePreferences(selectedAssetId: 'video'),
+        ),
+      );
+      final players = <FakePlayback>[];
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        initialLocation: '/media',
+        createPlayback: () {
+          final player = FakePlayback();
+          players.add(player);
+          return player;
+        },
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      expect(players, hasLength(1));
+      final player = players.single;
+      await tester.ensureVisible(find.byTooltip('播放视频'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('播放视频'));
+      await tester.pump();
+      expect(player.playing, isTrue);
+      tester.view.physicalSize = const Size(600, 1000);
+      await tester.pumpAndSettle();
+      expect(bootstrap.preview.playback, same(player));
+      expect(player.position, const Duration(seconds: 7));
+      expect(players, hasLength(1));
+      await tester.tap(find.byIcon(Icons.task_alt_outlined).first);
+      await tester.pumpAndSettle();
+      expect(player.playing, isFalse);
+      await tester.tap(find.byIcon(Icons.perm_media_outlined).first);
+      await tester.pumpAndSettle();
+      expect(player.playing, isFalse);
+      expect(players, hasLength(1));
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+      expect(player.closes, 1);
+      expect(storage.leaseReleases, 1);
+    },
+  );
+
+  testWidgets('initialization failure offers a real retry', (tester) async {
+    final storage = MemoryStorage();
+    var calls = 0;
+    WorkbenchBootstrap? bootstrap;
+    await tester.pumpWidget(
+      WorkbenchLauncher(
+        createBootstrap: () async {
+          ++calls;
+          if (calls == 1) {
+            throw StateError('temporary initialization failure');
+          }
+          return bootstrap = await WorkbenchBootstrap.create(
+            openStorage: () async => storage,
+            fileImportPort: CancelImport(),
+            createPlayback: FakePlayback.new,
+          );
+        },
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('工作区初始化失败'), findsOneWidget);
+    await tester.tap(find.text('重试'));
+    await tester.pumpAndSettle();
+    expect(calls, 2);
+    expect(find.text('新建资料'), findsOneWidget);
+    await closeApp(tester, bootstrap!);
+  });
+
+  testWidgets(
+    'task retry selects and mounts video B while retaining its failed job',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1400, 1100);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final storage = MemoryStorage(
+        const WorkspaceSnapshot(
+          assets: [
+            WorkspaceAsset(
+              id: 'a',
+              name: 'A.mp4',
+              kind: MediaKind.video,
+              byteLength: 5,
+              storageKey: 'a',
+              thumbnailStatus: ThumbnailStatus.ready,
+            ),
+            WorkspaceAsset(
+              id: 'b',
+              name: 'B.mp4',
+              kind: MediaKind.video,
+              byteLength: 5,
+              storageKey: 'b',
+              thumbnailStatus: ThumbnailStatus.failed,
+              thumbnailError: 'previous screenshot failed',
+            ),
+          ],
+          jobs: [
+            WorkspaceJob(
+              id: 'old-b',
+              kind: JobKind.thumbnail,
+              name: 'B.mp4 缩略图',
+              status: JobStatus.failed,
+              assetId: 'b',
+              error: 'previous screenshot failed',
+            ),
+          ],
+          preferences: WorkspacePreferences(selectedAssetId: 'a'),
+        ),
+      );
+      final players = <FakePlayback>[];
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        initialLocation: '/media',
+        encodeThumbnail: (bytes) async => bytes,
+        createPlayback: () {
+          final player = FakePlayback()
+            ..screenshotBytes = Uint8List.fromList(
+              base64Decode(
+                'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+              ),
+            );
+          players.add(player);
+          return player;
+        },
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      expect(bootstrap.preview.asset?.id, 'a');
+      await tester.tap(find.byIcon(Icons.task_alt_outlined).first);
+      await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('重试作业'));
+      await tester.tap(find.text('重试作业'));
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pump();
+      expect(
+        bootstrap.router.routeInformationProvider.value.uri.path,
+        '/media',
+      );
+      expect(bootstrap.session.state.snapshot.preferences.navId, 'media');
+      expect(bootstrap.session.state.snapshot.preferences.selectedAssetId, 'b');
+      expect(bootstrap.preview.asset?.id, 'b');
+      expect(players, hasLength(2));
+      expect(players.first.closes, 1);
+      expect(storage.leaseReleases, 1);
+      expect(players.last.openedUri, 'test://b');
+      expect(find.text('B.mp4'), findsWidgets);
+      final jobs = bootstrap.session.state.snapshot.jobs;
+      expect(jobs, hasLength(2));
+      expect(jobs.first.id, 'old-b');
+      expect(jobs.first.status, JobStatus.failed);
+      expect(jobs.last.assetId, 'b');
+      expect(jobs.last.status, JobStatus.succeeded);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+      expect(players.last.closes, 1);
+      expect(storage.leaseReleases, 2);
+    },
+  );
+
+  testWidgets(
+    'cancelled import can retry and direct routes persist the last view',
+    (tester) async {
+      final storage = MemoryStorage();
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        createPlayback: FakePlayback.new,
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pumpAndSettle();
+      final imported = bootstrap.session.importFiles(ImportKind.text);
+      await tester.pumpAndSettle();
+      await imported;
+      bootstrap.router.go('/tasks');
+      await tester.pumpAndSettle();
+      expect(bootstrap.session.state.snapshot.preferences.navId, 'tasks');
+      expect(find.text('重试作业'), findsOneWidget);
+      await tester.tap(find.text('重试作业'));
+      await tester.pumpAndSettle();
+      expect(bootstrap.session.state.snapshot.jobs, hasLength(2));
+      expect(
+        bootstrap.session.state.snapshot.jobs.every(
+          (job) => job.status == JobStatus.cancelled,
+        ),
+        isTrue,
+      );
+      bootstrap.router.go('/media');
+      await tester.pumpAndSettle();
+      expect(bootstrap.session.state.snapshot.preferences.navId, 'media');
+      await closeApp(tester, bootstrap);
+      await tester.runAsync(() async {
+        final restored = await WorkbenchBootstrap.create(
+          openStorage: () async => storage,
+          fileImportPort: CancelImport(),
+          createPlayback: FakePlayback.new,
+        );
+        expect(
+          restored.router.routeInformationProvider.value.uri.path,
+          '/media',
+        );
+        await restored.disposeAsync();
+      });
+    },
+  );
+
+  testWidgets(
+    'media search, category filters, grid/list selection and image read retry',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1500, 1100);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final png = base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+      );
+      final storage = MemoryStorage(
+        const WorkspaceSnapshot(
+          assets: [
+            WorkspaceAsset(
+              id: 'photo',
+              name: 'photo.png',
+              kind: MediaKind.image,
+              byteLength: 68,
+              storageKey: 'photo',
+              thumbnailKey: 'photo-thumb',
+              thumbnailStatus: ThumbnailStatus.ready,
+            ),
+            WorkspaceAsset(
+              id: 'other',
+              name: 'other.png',
+              kind: MediaKind.image,
+              byteLength: 68,
+              storageKey: 'other',
+            ),
+            WorkspaceAsset(
+              id: 'clip',
+              name: 'clip.mp4',
+              kind: MediaKind.video,
+              byteLength: 10,
+              storageKey: 'clip',
+            ),
+          ],
+          preferences: WorkspacePreferences(selectedAssetId: 'photo'),
+        ),
+      );
+      storage.assetStore.values.addAll({
+        'photo': png,
+        'photo-thumb': png,
+        'other': png,
+      });
+      storage.assetStore.failedReads.add('photo');
+      var players = 0;
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        initialLocation: '/media',
+        createPlayback: () {
+          ++players;
+          return FakePlayback();
+        },
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const ValueKey('image-viewer-photo')), findsOneWidget);
+      expect(find.textContaining('图片读取失败'), findsOneWidget);
+      storage.assetStore.failedReads.clear();
+      await tester.ensureVisible(find.text('重试读取'));
+      await tester.tap(find.text('重试读取'));
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('图片读取失败'), findsNothing);
+      expect(find.byType(Image), findsNWidgets(2));
+
+      final search = find.byKey(const ValueKey('media-search'));
+      await tester.enterText(search, 'missing');
+      await tester.pump();
+      expect(find.text('暂无匹配素材'), findsOneWidget);
+      expect(
+        bootstrap.session.state.snapshot.preferences.selectedAssetId,
+        'photo',
+      );
+      await tester.enterText(search, '');
+      await tester.pump();
+      Finder category(String label) => find.descendant(
+        of: find.byType(WorkspaceSidebar),
+        matching: find.text(label),
+      );
+      Finder gridItem(String name) => find.descendant(
+        of: find.byKey(const PageStorageKey('media-grid')),
+        matching: find.text(name),
+      );
+      await tester.tap(category('视频'));
+      await tester.pump();
+      expect(gridItem('clip.mp4'), findsOneWidget);
+      expect(gridItem('photo.png'), findsNothing);
+      expect(find.text('打开预览生成缩略图'), findsOneWidget);
+      await tester.tap(category('图片'));
+      await tester.pump();
+      expect(gridItem('clip.mp4'), findsNothing);
+      expect(gridItem('photo.png'), findsOneWidget);
+      await tester.tap(category('全部'));
+      await tester.pump();
+      expect(gridItem('clip.mp4'), findsOneWidget);
+      await tester.tap(find.byTooltip('切换列表'));
+      await tester.pumpAndSettle();
+      final list = find.byKey(const PageStorageKey('media-list'));
+      expect(
+        find.descendant(of: list, matching: find.byType(Image)),
+        findsOneWidget,
+      );
+      await tester.tap(
+        find.descendant(of: list, matching: find.text('other.png')),
+      );
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pumpAndSettle();
+      expect(
+        bootstrap.session.state.snapshot.preferences.selectedAssetId,
+        'other',
+      );
+      expect(find.byKey(const ValueKey('image-viewer-other')), findsOneWidget);
+      await tester.tap(find.byTooltip('切换网格'));
+      await tester.pump();
+      await tester.tap(gridItem('photo.png'));
+      await tester.pumpAndSettle();
+      expect(
+        bootstrap.session.state.snapshot.preferences.selectedAssetId,
+        'photo',
+      );
+      expect(players, 0);
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+    },
+  );
+
+  testWidgets(
+    'image thumbnail retry preserves the failed job and publishes a new stored thumbnail',
+    (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1500, 1100);
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final png = base64Decode(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+      );
+      final storage = MemoryStorage(
+        WorkspaceSnapshot(
+          assets: [
+            WorkspaceAsset(
+              id: 'photo',
+              name: 'photo.png',
+              kind: MediaKind.image,
+              byteLength: png.length,
+              storageKey: 'photo',
+              thumbnailStatus: ThumbnailStatus.failed,
+              thumbnailError: 'previous decode failed',
+            ),
+          ],
+          jobs: const [
+            WorkspaceJob(
+              id: 'old-photo',
+              kind: JobKind.thumbnail,
+              name: 'photo.png 缩略图',
+              status: JobStatus.failed,
+              assetId: 'photo',
+              error: 'previous decode failed',
+            ),
+          ],
+          preferences: const WorkspacePreferences(selectedAssetId: 'photo'),
+        ),
+      );
+      storage.assetStore.values['photo'] = png;
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => storage,
+        fileImportPort: CancelImport(),
+        initialLocation: '/media',
+        createPlayback: FakePlayback.new,
+        encodeThumbnail: (bytes) async => bytes,
+      );
+      await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pumpAndSettle();
+      final retry = find.descendant(
+        of: find.byType(MediaPage),
+        matching: find.text('重试缩略图'),
+      );
+      await tester.ensureVisible(retry);
+      await tester.tap(retry);
+      await tester.pump();
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+      await tester.pump();
+      final snapshot = bootstrap.session.state.snapshot;
+      expect(snapshot.jobs, hasLength(2));
+      expect(snapshot.jobs.first.status, JobStatus.failed);
+      expect(snapshot.jobs.last.status, JobStatus.succeeded);
+      expect(snapshot.jobs.last.processedBytes, png.length);
+      expect(snapshot.assets.single.thumbnailStatus, ThumbnailStatus.ready);
+      expect(
+        storage.assetStore.values[snapshot.assets.single.thumbnailKey],
+        orderedEquals(png),
+      );
+      await tester.pumpAndSettle();
+      expect(retry, findsNothing);
+      expect(find.byType(Image), findsNWidgets(2));
+      expect(tester.takeException(), isNull);
+      await closeApp(tester, bootstrap);
+      expect(
+        storage.repository.snapshot.assets.single.thumbnailKey,
+        snapshot.assets.single.thumbnailKey,
+      );
+    },
+  );
+}

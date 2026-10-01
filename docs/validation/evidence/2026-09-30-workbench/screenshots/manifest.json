@@ -1,0 +1,39 @@
+{
+  "date": "2026-09-30",
+  "platform": "macOS",
+  "app": "com.mrkoi.fixture.runtimeacceptApp",
+  "mode": "debug",
+  "source": "actual native UI, unedited window screenshots",
+  "media": "repository test fixtures, gradient.jpg and landscape.mp4 imported through native file_selector dialog",
+  "keyboard_observation": "Tab, Tab, Tab, Enter activated task navigation. Cmd/Ctrl shortcut acceptance is unchanged.",
+  "captures": [
+    {
+      "file": "text-dark.png",
+      "label": "文本资料，深色主题",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_14-03-29-w17637.png",
+      "bytes": 1127411,
+      "sha256": "3889460902732ef4470181115107d1690003d1a3011d8c3f0f427653ca31bb89"
+    },
+    {
+      "file": "media-dark.png",
+      "label": "图片与视频预览，深色主题",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_14-07-23.png",
+      "bytes": 2431260,
+      "sha256": "bb36210514c75e6df9aac31a10270099d08499b15405231e7202b756639df250"
+    },
+    {
+      "file": "media-light.png",
+      "label": "图片与视频预览，明亮主题",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_14-09-50.png",
+      "bytes": 2646814,
+      "sha256": "b4a7341eaecd383dd38ff7c632a308c4b5293198bcc5849031122651993c2b74"
+    },
+    {
+      "file": "tasks-light.png",
+      "label": "真实导入及缩略图任务，明亮主题",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_14-11-56.png",
+      "bytes": 1579752,
+      "sha256": "a792e38cf826e37f433ef6f0b79afaea6affc7f38f5a6469bf10111c6dca0460"
+    }
+  ]
+}

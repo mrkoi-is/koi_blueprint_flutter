@@ -1,0 +1,15 @@
+{
+  "host": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project",
+  "files": [
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/lib/widgets/koi_resizable_split_view.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/packages/koi_ui/lib/widgets/koi_resizable_split_view.dart",
+      "sha256": "81b5e6760a85babf16d924dee5ce5d5ea9463d0edb59e089295f455e7fb9b422"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "sha256": "b371b44f3b2cdcfe34805022a2b514cdc782feb708b94025aec266baa3539dfe"
+    }
+  ]
+}

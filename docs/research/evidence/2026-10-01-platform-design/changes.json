@@ -1,0 +1,92 @@
+[
+  {
+    "path": "DESIGN.md",
+    "before_sha256": "1cc11514b675f531aa000cb062affb3ce9de9620f00df3ed5fb809b96ee70d72",
+    "after_sha256": "a831b5aec9c20148840d70822333dd43d7691047d1472ad53cfb7caddcb765ec"
+  },
+  {
+    "path": "examples/ui_lab/lib/main.dart",
+    "before_sha256": "29bec9c2d02027d6549d0aef89c4f2a52760c4148efe6f736e558786c242147a",
+    "after_sha256": "24cc7587f42a5ade81f644b82df7f74bb05e4347c82dd97f9faa94c1b838797e"
+  },
+  {
+    "path": "examples/ui_lab/test/ui_lab_test.dart",
+    "before_sha256": "eb536d037f759290110e635a076af0e839277390a103a2e3a8427822118451dd",
+    "after_sha256": "8020dc16e75a4f0ab049d619650f92d720bf9603a5dd2b9f08db9433f83fb83c"
+  },
+  {
+    "path": "examples/workbench_app/lib/features/workspace/presentation/screens/media_page.dart",
+    "before_sha256": "beeb8bae7f0e94d5903d41b5dfd48a0a9dfe0c4808876f06c822587572f4d51b",
+    "after_sha256": "039ff814e3a13ab0d38f9e5e94e759cb3e5dd25ce171f56b4e0457aae6cd8196"
+  },
+  {
+    "path": "examples/workbench_app/lib/features/workspace/presentation/screens/tasks_page.dart",
+    "before_sha256": "02a0e0cea7bcfc6c4d2c5918d2f21a48e9fdaf6527bf31ecd8b3c90fc0924f09",
+    "after_sha256": "afa55ea0d4c18194151aa6a16812603581b7c19bb682913353487cc03b63768f"
+  },
+  {
+    "path": "examples/workbench_app/lib/features/workspace/presentation/screens/text_page.dart",
+    "before_sha256": "7e7e00b8fb63087651315cb042303509b40a1a92e16acfab8e3aa306851f3da8",
+    "after_sha256": "26a702561bccfcf47595b6245775dc7a41b9b6a6023f4676c8e7eabbbf75fd2f"
+  },
+  {
+    "path": "examples/workbench_app/test/workspace_presentation_test.dart",
+    "before_sha256": "276f41e74840cb3444335ee85c8cee2893e57ae76cd354a1209c01e725596264",
+    "after_sha256": "cfeb0fc0b6635a67bde073d4cac83fdc0a907ba8f310697bbb12c2840cd4a38c"
+  },
+  {
+    "path": "packages/koi_ui/README.md",
+    "before_sha256": "1c19bce96b790ce3bfa3df818a92309974af8beaa36fcde8bb1e985ac9430e8a",
+    "after_sha256": "366f3a8ebd957434a9d3fffc32ed56a0edb9556440f80cc53af4ca6efe1c38b0"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/app_theme.dart",
+    "before_sha256": "7168410d1d93d969aa3ca72a44fb889cab6949f291b7b99d61307e875a92113f",
+    "after_sha256": "66c4f002417e9a5e345a1bd4af7bd468fe5321d72dc521677cc6bae61343993a"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_menu.dart",
+    "before_sha256": "0d1db451c423f98fadf8873ff2617b3ea85b7e48ca4cbe403dee36114a2f8591",
+    "after_sha256": "7d0bb0f025ffd6b40ef401eddaf36897a0150ff25da85a25f70abb10f08c32f1"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_popover.dart",
+    "before_sha256": "4a28baba1a9cfa383f970b3e3c3482448a8b5847658ea84830134dc6985985c5",
+    "after_sha256": "ec4eccfcdc939a4a89b0c8d3295ec14a6b564f433a8ec6da99b2933688012462"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_resizable_split_view.dart",
+    "before_sha256": "81b5e6760a85babf16d924dee5ce5d5ea9463d0edb59e089295f455e7fb9b422",
+    "after_sha256": "91f80a7c5210ecc1079c6b5fdaae664b97d476572b445246fe7ede2cbaa2a764"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_selectable_list_tile.dart",
+    "before_sha256": "09cacdc602c4f0d9d905171c77a516801c0e7457d9881307a7ddfa75cd029486",
+    "after_sha256": "cf52756a07bea4e15c1546952714a2bee941920a399a65c860cc68f25912ffe3"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "before_sha256": "76bda17ee9e1b986008896eccae7728e89c4bcfaf9f95446a5a3f1d211c15da7",
+    "after_sha256": "f27d4b342f68f4bd132b51676409aba282a4d51adbd47d256f4cd35adae454fb"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_accessible_theme_test.dart",
+    "before_sha256": null,
+    "after_sha256": "06fbd117c0bd3260c5e1ffda1767c8df7d8206b597b54b3e090ce302f58966de"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_overlay_accessibility_test.dart",
+    "before_sha256": null,
+    "after_sha256": "e8a864aa5dbe3c565a9cb23d0ffe1307a219019c430f2ebd228137bc9674daeb"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_platform_layout_test.dart",
+    "before_sha256": null,
+    "after_sha256": "dbc32930abf2b9d64a3b93d50b5adcb4a89eedc71c1e2fb8452c0c7d17d93a37"
+  },
+  {
+    "path": "examples/workbench_app/test/workspace_accessibility_test.dart",
+    "before_sha256": null,
+    "after_sha256": "42bd70687faafecfcacaca3981b14e82948caa96db168e932a88080f2b905263"
+  }
+]

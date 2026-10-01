@@ -1,0 +1,8 @@
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart
+00:00 +0: modal popover hides the background and traps focus until Escape
+00:00 +1: popover content stays above keyboard and is scrollable
+00:00 +2: late popover close is safe after closing or removing its owner
+00:00 +3: system Back closes the popover before leaving its page
+00:01 +4: system Back closes a menu before leaving its page
+00:01 +5: menu trigger exposes one label and expanded state
+00:01 +6: All tests passed!

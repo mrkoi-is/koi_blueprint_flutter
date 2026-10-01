@@ -1,0 +1,117 @@
+import 'dart:ui' show lerpDouble;
+
+import 'package:flutter/material.dart';
+
+enum KoiDensity { comfortable, compact }
+
+/// Shared, logical-pixel spacing and radii. Product colors live in theme tokens.
+abstract final class KoiSpace {
+  static const double xs = 4;
+  static const double sm = 8;
+  static const double md = 16;
+  static const double lg = 24;
+  static const double xl = 32;
+}
+
+abstract final class KoiRadius {
+  static const double small = 8;
+  static const double medium = 12;
+  static const double large = 24;
+}
+
+@immutable
+class KoiThemeTokens extends ThemeExtension<KoiThemeTokens> {
+  const KoiThemeTokens({
+    required this.panelBackground,
+    required this.weakBorder,
+    required this.selectedBackground,
+    required this.dropIndicator,
+    required this.density,
+    required this.itemPadding,
+    Color? chromeBackground,
+    Color? contentBackground,
+  }) : chromeBackground = chromeBackground ?? panelBackground,
+       contentBackground = contentBackground ?? panelBackground;
+
+  factory KoiThemeTokens.fromScheme(
+    ColorScheme colors, {
+    KoiDensity density = KoiDensity.comfortable,
+  }) => KoiThemeTokens(
+    panelBackground: colors.surface,
+    chromeBackground: colors.surfaceContainerLow,
+    contentBackground: colors.surface,
+    weakBorder: colors.outlineVariant,
+    selectedBackground: colors.secondaryContainer,
+    dropIndicator: colors.primary,
+    density: density,
+    itemPadding: density == KoiDensity.compact ? 8 : 16,
+  );
+
+  /// Regular Material hosts receive sensible tokens without a Koi extension.
+  static KoiThemeTokens of(BuildContext context) {
+    final theme = Theme.of(context);
+    return theme.extension<KoiThemeTokens>() ??
+        KoiThemeTokens.fromScheme(theme.colorScheme);
+  }
+
+  final Color panelBackground;
+
+  /// Window title bar and fixed navigation rail share this surface.
+  final Color chromeBackground;
+
+  /// Content sidebar, main workspace and details share one rounded surface.
+  final Color contentBackground;
+  final Color weakBorder;
+  final Color selectedBackground;
+  final Color dropIndicator;
+  final KoiDensity density;
+  final double itemPadding;
+
+  @override
+  KoiThemeTokens copyWith({
+    Color? panelBackground,
+    Color? chromeBackground,
+    Color? contentBackground,
+    Color? weakBorder,
+    Color? selectedBackground,
+    Color? dropIndicator,
+    KoiDensity? density,
+    double? itemPadding,
+  }) => KoiThemeTokens(
+    panelBackground: panelBackground ?? this.panelBackground,
+    chromeBackground: chromeBackground ?? this.chromeBackground,
+    contentBackground: contentBackground ?? this.contentBackground,
+    weakBorder: weakBorder ?? this.weakBorder,
+    selectedBackground: selectedBackground ?? this.selectedBackground,
+    dropIndicator: dropIndicator ?? this.dropIndicator,
+    density: density ?? this.density,
+    itemPadding: itemPadding ?? this.itemPadding,
+  );
+
+  @override
+  KoiThemeTokens lerp(covariant KoiThemeTokens? other, double t) {
+    if (other == null) return this;
+    return KoiThemeTokens(
+      panelBackground: Color.lerp(panelBackground, other.panelBackground, t)!,
+      chromeBackground: Color.lerp(
+        chromeBackground,
+        other.chromeBackground,
+        t,
+      )!,
+      contentBackground: Color.lerp(
+        contentBackground,
+        other.contentBackground,
+        t,
+      )!,
+      weakBorder: Color.lerp(weakBorder, other.weakBorder, t)!,
+      selectedBackground: Color.lerp(
+        selectedBackground,
+        other.selectedBackground,
+        t,
+      )!,
+      dropIndicator: Color.lerp(dropIndicator, other.dropIndicator, t)!,
+      density: t < .5 ? density : other.density,
+      itemPadding: lerpDouble(itemPadding, other.itemPadding, t)!,
+    );
+  }
+}

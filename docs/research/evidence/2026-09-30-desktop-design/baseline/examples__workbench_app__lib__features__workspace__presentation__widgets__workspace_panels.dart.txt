@@ -1,0 +1,274 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/presentation/models/text_view_state.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
+import 'package:workbench_app/features/workspace/presentation/services/media_retry.dart';
+
+class WorkspaceSidebar extends ConsumerWidget {
+  const WorkspaceSidebar({super.key, required this.index});
+  final int index;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(workspaceSessionProvider);
+    if (index == 0) {
+      final state = ref.watch(
+        workspaceStateProvider.select(
+          (value) => TextViewState(
+            documents:
+                value.value?.snapshot.documents ??
+                session.state.snapshot.documents,
+            selectedId: value.value?.snapshot.preferences.selectedDocumentId,
+            sidebarWidth: 0,
+          ),
+        ),
+      );
+      final query = ref.watch(documentSearchProvider);
+      final documents = searchDocuments(state.documents, query);
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Text('文本资料', style: Theme.of(context).textTheme.titleLarge),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextFormField(
+              key: const ValueKey('document-search'),
+              initialValue: query,
+              decoration: const InputDecoration(
+                labelText: '搜索资料',
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: ref.read(documentSearchProvider.notifier).setQuery,
+            ),
+          ),
+          Expanded(
+            child: documents.isEmpty
+                ? const Center(child: Text('没有匹配的资料'))
+                : ListView(
+                    children: [
+                      for (final document in documents)
+                        KoiSelectableListTile(
+                          title: Text(
+                            document.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          subtitle: Text(document.dirty ? '未保存' : '已保存'),
+                          selected: document.id == state.selectedId,
+                          onTap: () {
+                            session.updatePreferences(
+                              session.state.snapshot.preferences.copyWith(
+                                selectedDocumentId: document.id,
+                              ),
+                            );
+                            if (Scaffold.maybeOf(context)?.isDrawerOpen ??
+                                false) {
+                              Navigator.of(context).pop();
+                            }
+                          },
+                        ),
+                    ],
+                  ),
+          ),
+        ],
+      );
+    }
+    if (index == 1) {
+      final assets =
+          ref.watch(
+            workspaceStateProvider.select(
+              (value) => value.value?.snapshot.assets,
+            ),
+          ) ??
+          session.state.snapshot.assets;
+      final kind = ref.watch(mediaFilterProvider);
+      final query = ref.watch(mediaSearchProvider);
+      return ListView(
+        padding: const EdgeInsets.all(12),
+        children: [
+          Text('媒体分类', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 12),
+          TextFormField(
+            key: const ValueKey('media-search'),
+            initialValue: query,
+            decoration: const InputDecoration(
+              labelText: '搜索素材',
+              prefixIcon: Icon(Icons.search),
+            ),
+            onChanged: ref.read(mediaSearchProvider.notifier).setQuery,
+          ),
+          const SizedBox(height: 12),
+          KoiSelectableListTile(
+            title: const Text('全部'),
+            trailing: Text('${assets.length}'),
+            selected: kind == null,
+            onTap: () => ref.read(mediaFilterProvider.notifier).setKind(null),
+          ),
+          KoiSelectableListTile(
+            title: const Text('图片'),
+            trailing: Text(
+              '${assets.where((asset) => asset.kind == MediaKind.image).length}',
+            ),
+            selected: kind == MediaKind.image,
+            onTap: () =>
+                ref.read(mediaFilterProvider.notifier).setKind(MediaKind.image),
+          ),
+          KoiSelectableListTile(
+            title: const Text('视频'),
+            trailing: Text(
+              '${assets.where((asset) => asset.kind == MediaKind.video).length}',
+            ),
+            selected: kind == MediaKind.video,
+            onTap: () =>
+                ref.read(mediaFilterProvider.notifier).setKind(MediaKind.video),
+          ),
+          const SizedBox(height: 24),
+          const Text('导入的素材副本保存在当前工作区；切换视图会暂停视频并保留播放位置。'),
+        ],
+      );
+    }
+    final counts = ref.watch(
+      workspaceStateProvider.select(
+        (value) => (
+          todos:
+              value.value?.snapshot.todos
+                  .where((todo) => !todo.completed)
+                  .length ??
+              0,
+          jobs:
+              value.value?.snapshot.jobs.where((job) => !job.terminal).length ??
+              0,
+        ),
+      ),
+    );
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text('任务概览', style: Theme.of(context).textTheme.titleLarge),
+        const SizedBox(height: 16),
+        Text('${counts.todos} 项待办未完成'),
+        const SizedBox(height: 8),
+        Text('${counts.jobs} 项 IO 作业处理中'),
+        const SizedBox(height: 24),
+        const Text('任务在切换视图时继续运行。取消会停止读取并清理暂存内容。'),
+      ],
+    );
+  }
+}
+
+class WorkspaceDetails extends ConsumerWidget {
+  const WorkspaceDetails({super.key, required this.index});
+  final int index;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(workspaceSessionProvider);
+    if (index == 0) {
+      final document = ref.watch(
+        workspaceStateProvider.select((value) {
+          final snapshot = value.value?.snapshot;
+          return snapshot?.documents
+              .where(
+                (document) =>
+                    document.id == snapshot.preferences.selectedDocumentId,
+              )
+              .firstOrNull;
+        }),
+      );
+      return _Information(
+        title: '资料详情',
+        lines: document == null
+            ? ['尚未选择资料']
+            : [
+                document.title,
+                '${document.text.length} 字',
+                '版本 ${document.revision}',
+                document.dirty ? '未保存' : '已保存',
+                '停止输入 500 毫秒后自动保存',
+              ],
+      );
+    }
+    if (index == 1) {
+      final asset = ref.watch(
+        workspaceStateProvider.select((value) {
+          final snapshot = value.value?.snapshot;
+          return snapshot?.assets
+              .where(
+                (asset) => asset.id == snapshot.preferences.selectedAssetId,
+              )
+              .firstOrNull;
+        }),
+      );
+      return ListView(
+        padding: const EdgeInsets.all(16),
+        children: [
+          Text('素材详情', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 16),
+          if (asset == null)
+            const Text('尚未选择素材')
+          else ...[
+            Text(asset.name),
+            const SizedBox(height: 12),
+            Text('${asset.byteLength} 字节'),
+            Text(asset.kind == MediaKind.image ? '图片' : '视频'),
+            Text(switch (asset.thumbnailStatus) {
+              ThumbnailStatus.none => '缩略图待生成',
+              ThumbnailStatus.generating => '正在生成缩略图',
+              ThumbnailStatus.ready => '缩略图已保存',
+              ThumbnailStatus.failed => '缩略图失败',
+            }),
+            if (asset.thumbnailError != null) Text(asset.thumbnailError!),
+            if (asset.thumbnailStatus == ThumbnailStatus.failed)
+              TextButton(
+                onPressed: () {
+                  if (asset.kind == MediaKind.video) {
+                    unawaited(retryVideoThumbnail(context, ref, asset));
+                  } else {
+                    final job = session.state.snapshot.jobs
+                        .where(
+                          (job) =>
+                              job.assetId == asset.id &&
+                              job.kind == JobKind.thumbnail,
+                        )
+                        .lastOrNull;
+                    if (job != null) {
+                      unawaited(session.retryJob(job.id));
+                    }
+                  }
+                },
+                child: const Text('重试缩略图'),
+              ),
+          ],
+        ],
+      );
+    }
+    return const _Information(
+      title: '任务说明',
+      lines: [
+        '待办可以新建、重命名、完成和删除。',
+        'IO 进度来自实际字节读取。缩略图处理采用不确定进度。',
+        '关闭工作区会取消作业并保存当前草稿。',
+      ],
+    );
+  }
+}
+
+class _Information extends StatelessWidget {
+  const _Information({required this.title, required this.lines});
+  final String title;
+  final List<String> lines;
+  @override
+  Widget build(BuildContext context) => ListView(
+    padding: const EdgeInsets.all(16),
+    children: [
+      Text(title, style: Theme.of(context).textTheme.titleLarge),
+      const SizedBox(height: 16),
+      for (final line in lines)
+        Padding(padding: const EdgeInsets.only(bottom: 12), child: Text(line)),
+    ],
+  );
+}

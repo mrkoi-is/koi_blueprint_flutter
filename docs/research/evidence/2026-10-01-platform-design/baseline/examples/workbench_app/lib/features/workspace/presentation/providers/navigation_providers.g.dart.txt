@@ -1,0 +1,61 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'navigation_providers.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Borrowed from bootstrap, which awaits history cleanup before closing IO.
+
+@ProviderFor(navigationHistory)
+final navigationHistoryProvider = NavigationHistoryProvider._();
+
+/// Borrowed from bootstrap, which awaits history cleanup before closing IO.
+
+final class NavigationHistoryProvider
+    extends
+        $FunctionalProvider<
+          WorkbenchNavigationHistory,
+          WorkbenchNavigationHistory,
+          WorkbenchNavigationHistory
+        >
+    with $Provider<WorkbenchNavigationHistory> {
+  /// Borrowed from bootstrap, which awaits history cleanup before closing IO.
+  NavigationHistoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'navigationHistoryProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$navigationHistoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<WorkbenchNavigationHistory> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  WorkbenchNavigationHistory create(Ref ref) {
+    return navigationHistory(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WorkbenchNavigationHistory value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WorkbenchNavigationHistory>(value),
+    );
+  }
+}
+
+String _$navigationHistoryHash() => r'd0eba985a7f44d2d2854ea3c1f1c0f44e87f08f0';

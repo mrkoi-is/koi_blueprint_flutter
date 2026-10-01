@@ -1,0 +1,170 @@
+--- packages/koi_ui/lib/theme/app_theme.dart (turn baseline)
++++ packages/koi_ui/lib/theme/app_theme.dart
+@@ -1,5 +1,6 @@
+ import 'package:flutter/material.dart';
+ import 'package:koi_ui/theme/app_colors.dart';
++import 'package:koi_ui/theme/koi_material_theme.dart';
+ import 'package:koi_ui/theme/koi_theme_tokens.dart';
+ 
+ abstract final class AppTheme {
+@@ -36,6 +37,13 @@
+           onSurfaceVariant: dark
+               ? const Color(0xFFB8B8B8)
+               : const Color(0xFF626262),
++          inverseSurface: dark
++              ? const Color(0xFFE8E8E8)
++              : const Color(0xFF242424),
++          onInverseSurface: dark
++              ? const Color(0xFF242424)
++              : const Color(0xFFF5F5F5),
++          inversePrimary: dark ? AppColors.moss : const Color(0xFF88BCAC),
+           surfaceContainerLow: dark
+               ? const Color(0xFF232323)
+               : const Color(0xFFF5F5F5),
+@@ -102,145 +110,6 @@
+         fontWeight: FontWeight.w500,
+       ),
+     );
+-    final outline = OutlineInputBorder(
+-      borderRadius: BorderRadius.circular(KoiRadius.small),
+-      borderSide: BorderSide(color: colors.outline),
+-    );
+-    final button = ButtonStyle(
+-      textStyle: WidgetStatePropertyAll(text.labelLarge),
+-      minimumSize: WidgetStatePropertyAll(Size(0, tokens.controlHeight)),
+-      padding: WidgetStatePropertyAll(tokens.controlPadding),
+-      iconSize: const WidgetStatePropertyAll(18),
+-      visualDensity: VisualDensity.standard,
+-      tapTargetSize: density == KoiDensity.compact
+-          ? MaterialTapTargetSize.shrinkWrap
+-          : MaterialTapTargetSize.padded,
+-      shape: WidgetStatePropertyAll(
+-        RoundedRectangleBorder(
+-          borderRadius: BorderRadius.circular(KoiRadius.small),
+-        ),
+-      ),
+-    );
+-    return base.copyWith(
+-      textTheme: text,
+-      extensions: [tokens],
+-      visualDensity: VisualDensity.standard,
+-      iconTheme: IconThemeData(size: 20, color: colors.onSurfaceVariant),
+-      scaffoldBackgroundColor: tokens.chromeBackground,
+-      appBarTheme: AppBarTheme(
+-        backgroundColor: tokens.chromeBackground,
+-        foregroundColor: colors.onSurface,
+-        surfaceTintColor: Colors.transparent,
+-        titleTextStyle: text.titleSmall,
+-        elevation: 0,
+-        scrolledUnderElevation: 0,
+-      ),
+-      cardTheme: CardThemeData(
+-        color: colors.surface,
+-        surfaceTintColor: Colors.transparent,
+-        elevation: 0,
+-        shape: RoundedRectangleBorder(
+-          borderRadius: BorderRadius.circular(KoiRadius.medium),
+-          side: BorderSide(color: tokens.weakBorder),
+-        ),
+-      ),
+-      inputDecorationTheme: InputDecorationThemeData(
+-        filled: true,
+-        isDense: true,
+-        fillColor: colors.surfaceContainerLow,
+-        hintStyle: text.bodyMedium!.copyWith(color: colors.onSurfaceVariant),
+-        labelStyle: text.bodyMedium,
+-        border: outline,
+-        enabledBorder: outline,
+-        focusedBorder: outline.copyWith(
+-          borderSide: BorderSide(color: colors.primary, width: 2),
+-        ),
+-        contentPadding: tokens.inputPadding,
+-      ),
+-      filledButtonTheme: FilledButtonThemeData(style: button),
+-      elevatedButtonTheme: ElevatedButtonThemeData(
+-        style: button.copyWith(elevation: const WidgetStatePropertyAll(0)),
+-      ),
+-      outlinedButtonTheme: OutlinedButtonThemeData(style: button),
+-      textButtonTheme: TextButtonThemeData(style: button),
+-      iconButtonTheme: IconButtonThemeData(
+-        style: button.copyWith(
+-          minimumSize: WidgetStatePropertyAll(
+-            Size.square(tokens.controlHeight),
+-          ),
+-          padding: const WidgetStatePropertyAll(EdgeInsets.all(6)),
+-          textStyle: null,
+-        ),
+-      ),
+-      listTileTheme: ListTileThemeData(
+-        titleTextStyle: text.bodyMedium,
+-        subtitleTextStyle: text.bodySmall,
+-        minTileHeight: tokens.listTileHeight,
+-        minVerticalPadding: 6,
+-        contentPadding: EdgeInsets.symmetric(
+-          horizontal: tokens.listHorizontalPadding,
+-        ),
+-        selectedColor: colors.onSurface,
+-        selectedTileColor: tokens.selectedBackground,
+-      ),
+-      chipTheme: ChipThemeData(
+-        labelStyle: text.labelMedium,
+-        backgroundColor: colors.surface,
+-        shape: RoundedRectangleBorder(
+-          borderRadius: BorderRadius.circular(KoiRadius.row),
+-        ),
+-      ),
+-      menuTheme: MenuThemeData(
+-        style: MenuStyle(
+-          backgroundColor: WidgetStatePropertyAll(tokens.overlayBackground),
+-          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+-          elevation: const WidgetStatePropertyAll(3),
+-          padding: const WidgetStatePropertyAll(EdgeInsets.all(4)),
+-          shape: WidgetStatePropertyAll(
+-            RoundedRectangleBorder(
+-              borderRadius: BorderRadius.circular(KoiRadius.medium),
+-            ),
+-          ),
+-        ),
+-      ),
+-      menuButtonTheme: MenuButtonThemeData(
+-        style: button.copyWith(
+-          textStyle: WidgetStatePropertyAll(text.bodyMedium),
+-          foregroundColor: WidgetStateProperty.resolveWith(
+-            (states) => states.contains(WidgetState.disabled)
+-                ? colors.onSurface.withValues(alpha: .38)
+-                : colors.onSurface,
+-          ),
+-          shape: WidgetStatePropertyAll(
+-            RoundedRectangleBorder(
+-              borderRadius: BorderRadius.circular(KoiRadius.row),
+-            ),
+-          ),
+-        ),
+-      ),
+-      dialogTheme: DialogThemeData(
+-        backgroundColor: tokens.overlayBackground,
+-        surfaceTintColor: Colors.transparent,
+-        titleTextStyle: text.headlineSmall,
+-        shape: RoundedRectangleBorder(
+-          borderRadius: BorderRadius.circular(KoiRadius.dialog),
+-        ),
+-      ),
+-      navigationBarTheme: NavigationBarThemeData(
+-        indicatorColor: tokens.selectedBackground,
+-        labelTextStyle: WidgetStatePropertyAll(text.labelMedium),
+-      ),
+-      navigationRailTheme: NavigationRailThemeData(
+-        useIndicator: true,
+-        minWidth: KoiWorkbenchMetrics.railWidth,
+-        indicatorColor: tokens.selectedBackground,
+-        selectedIconTheme: IconThemeData(size: 20, color: colors.onSurface),
+-        unselectedIconTheme: IconThemeData(
+-          size: 20,
+-          color: colors.onSurfaceVariant,
+-        ),
+-      ),
+-      dividerTheme: DividerThemeData(color: tokens.weakBorder, space: 1),
+-    );
++    return applyKoiMaterialTheme(base.copyWith(textTheme: text), tokens);
+   }
+ }

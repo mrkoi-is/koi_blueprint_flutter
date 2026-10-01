@@ -7,5 +7,10 @@ abstract final class AppColors {
   static const sand = Color(0xFFF5EFE6);
   static const amber = Color(0xFFC98324);
   static const paper = Color(0xFFFFFBF5);
-  static const night = Color(0xFF101B18);
+  static const content = Color(0xFFFCFCFC);
+  static const night = Color(0xFF222222);
+  static const chrome = Color(0xFFF3F3F3);
+  static const panel = Color(0xFFF5F5F5);
+  static const nightPanel = Color(0xFF1C1C1C);
+  static const nightContent = Color(0xFF101010);
 }

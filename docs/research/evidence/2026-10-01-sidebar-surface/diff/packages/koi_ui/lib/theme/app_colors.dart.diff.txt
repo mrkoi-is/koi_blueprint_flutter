@@ -1,0 +1,11 @@
+--- before/packages/koi_ui/lib/theme/app_colors.dart
++++ after/packages/koi_ui/lib/theme/app_colors.dart
+@@ -10,5 +10,7 @@
+   static const content = Color(0xFFFCFCFC);
+   static const night = Color(0xFF222222);
+   static const chrome = Color(0xFFF3F3F3);
+-  static const nightPanel = Color(0xFF161616);
++  static const panel = Color(0xFFF5F5F5);
++  static const nightPanel = Color(0xFF1C1C1C);
++  static const nightContent = Color(0xFF101010);
+ }

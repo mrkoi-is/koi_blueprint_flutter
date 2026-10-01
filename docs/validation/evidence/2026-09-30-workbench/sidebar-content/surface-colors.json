@@ -1,0 +1,97 @@
+{
+  "inspection": "Read-only sampling from unmodified native screenshots; captured pixels may vary within a logical surface",
+  "points": {
+    "native_titlebar": [
+      2200,
+      150
+    ],
+    "icon_rail": [
+      160,
+      1000
+    ],
+    "document_list": [
+      500,
+      1100
+    ],
+    "main_content": [
+      2500,
+      350
+    ],
+    "details": [
+      3200,
+      1050
+    ]
+  },
+  "results": {
+    "light": {
+      "size": [
+        3644,
+        2236
+      ],
+      "samples": {
+        "native_titlebar": [
+          242,
+          243,
+          241
+        ],
+        "icon_rail": [
+          243,
+          243,
+          242
+        ],
+        "document_list": [
+          254,
+          251,
+          245
+        ],
+        "main_content": [
+          253,
+          252,
+          247
+        ],
+        "details": [
+          255,
+          251,
+          245
+        ]
+      },
+      "chrome_max_channel_difference": 1,
+      "content_max_channel_spread": 2
+    },
+    "dark": {
+      "size": [
+        3644,
+        2236
+      ],
+      "samples": {
+        "native_titlebar": [
+          18,
+          27,
+          24
+        ],
+        "icon_rail": [
+          19,
+          27,
+          25
+        ],
+        "document_list": [
+          28,
+          37,
+          33
+        ],
+        "main_content": [
+          28,
+          39,
+          35
+        ],
+        "details": [
+          29,
+          37,
+          34
+        ]
+      },
+      "chrome_max_channel_difference": 1,
+      "content_max_channel_spread": 2
+    }
+  }
+}

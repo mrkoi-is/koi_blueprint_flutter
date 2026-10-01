@@ -1,0 +1,72 @@
+[
+  {
+    "path": "DESIGN.md",
+    "before_sha256": "a831b5aec9c20148840d70822333dd43d7691047d1472ad53cfb7caddcb765ec",
+    "after_sha256": "78d3110164a8c89b01daba4685ef544e82fc43f3191466aa6b3133b925d1b78a"
+  },
+  {
+    "path": "packages/koi_ui/README.md",
+    "before_sha256": "366f3a8ebd957434a9d3fffc32ed56a0edb9556440f80cc53af4ca6efe1c38b0",
+    "after_sha256": "b996b233a691b87f9d67141481b7cc76acd703b0506fb94f800f76ae8a2cf7bd"
+  },
+  {
+    "path": "packages/koi_ui/lib/koi_ui.dart",
+    "before_sha256": "fbae9021870d5deb0aefd064716688ee7f73b231ff381069b26b90967853bb0f",
+    "after_sha256": "5590856783f1a77421f2e218889a06d8bc5230d46cc3f9c4558ee26f591d85b1"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "before_sha256": "f27d4b342f68f4bd132b51676409aba282a4d51adbd47d256f4cd35adae454fb",
+    "after_sha256": "ee4fdf044f6d0524d2a1cce2c4119daf209544281a8118ae16e32381345c99ad"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_components_test.dart",
+    "before_sha256": "08105c05c0896f8a0fef4f89e4802a754f80b875af2c2cc02a2cd352a8c285b2",
+    "after_sha256": "31ecfaa7e30b947ce6f935c8c349295df7b26e06058c198e6fb8851f0cf21e8d"
+  },
+  {
+    "path": "examples/workbench_app/lib/app.dart",
+    "before_sha256": "ceb5445f44b96806ef94c9558305e97e78131a3f16b0cf58c6e16ff3574c4fc0",
+    "after_sha256": "c380871ee265665a54482c0248be28bcfb4713b2387993681e9f7c35090f5ea7"
+  },
+  {
+    "path": "examples/workbench_app/lib/core/window/workbench_window_chrome.dart",
+    "before_sha256": "b64337d8e4de06f5b735a2b78c11487d60e22fcda71898254380f73bed7f1f50",
+    "after_sha256": "f2555a964ff135882f7c9f21a0d54f8e58cdac1e85486c428b630fa93ccb2780"
+  },
+  {
+    "path": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+    "before_sha256": "42cffb773962a8239f075f11010edfda0cc02fbc128786878e1c487f56179dd5",
+    "after_sha256": "916cfcff7ea1121f35dd817e9dfee1b2a292ad41a8a6ad77b69b1f15cb24c750"
+  },
+  {
+    "path": "examples/workbench_app/test/workbench_window_chrome_test.dart",
+    "before_sha256": "2482741060ef3e61c53e129a1f39d18400fce2b2735764763074bdcf2648f1ab",
+    "after_sha256": "455cf2aa852ed1c270fddc0c258343a696201311fca99a97f5f8ef9f2251e1d2"
+  },
+  {
+    "path": "examples/workbench_app/test/workspace_presentation_test.dart",
+    "before_sha256": "cfeb0fc0b6635a67bde073d4cac83fdc0a907ba8f310697bbb12c2840cd4a38c",
+    "after_sha256": "621517d9e1e00de75fc58c2de67377a413108fa984e2fd707946212370ed5839"
+  },
+  {
+    "path": "tool/platform_configuration.py",
+    "before_sha256": "f35e456815c8f313518815eae321e069bf54443019050b1048b2d19d5cda6b46",
+    "after_sha256": "8b1e7400020d4abaf83dd1e2ecbf3c141708e7c5ef727775e119e95d20879efe"
+  },
+  {
+    "path": "tool/tests/test_platform_configuration.py",
+    "before_sha256": "2a06ad6aa9ed44cdf0cb528286c88e918bbb8399eedaccaff31f1f7f306e8194",
+    "after_sha256": "571eca9bc6f5c1820bb9eab84135c7f6c87e7424f374e46749ad42427e07a71a"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_panel_icon.dart",
+    "before_sha256": null,
+    "after_sha256": "9a083e63111f5627e8e3a061d68d6109727e46486f03127570c2a796fc777713"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_workbench_toolbar_test.dart",
+    "before_sha256": null,
+    "after_sha256": "e18a5273af1ea27402da83aadc40c2a031a0075a36def98399e4964c9b0b3141"
+  }
+]

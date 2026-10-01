@@ -1,43 +1,47 @@
 # AI Quickstart
 
-给 AI Agent 的最短上手路径。
+## 最小读取路径
 
-## 最小读取顺序
+1. 读本文件和 [AGENTS.md](../AGENTS.md)。
+2. 从 [技能索引](../.agent/skills/index.yaml) 选择任务；只读对应 `SKILL.md`。
+3. 需要时读该技能指向的架构文档、references 和样例源码。
+4. 调用脚手架；再完成业务实现与注册、注入、测试。
+5. 运行受影响测试和完整门禁，分别报告结果。
 
-1. `docs/ai-quickstart.md`
-2. `AGENTS.md`
-3. `.agent/skills/index.yaml`
-4. 当前任务对应的 `SKILL.md`
-5. 只有在需要时再读：
-   - `docs/architecture/ARCHITECTURE.md`
-   - `docs/architecture/MONOREPO_ARCHITECTURE.md`
-   - `docs/architecture/PROJECT_STRUCTURE.md`
+## 先确定四件事
 
-## 全局硬约束
+- 新建项目还是维护存量项目？维护时保留既有工作区变化，先确认有效决策与当前代码差异。
+- 能力属于 App 内 Feature、App 内 shared、跨 App package，还是独立业务 module？
+- 是纯展示、API 请求、本地存储，还是包含业务编排？目录反映职责，`data` 与 `application` 可并存。
+- 目标平台是什么？创建的平台目录、依赖、测试和构建证据应一致。
 
-- Monorepo：根级 `pubspec.yaml` 使用 `workspace`
-- App 目录：`apps/<app_name>/lib/{core,features,shared}`
-- 跨 App 的稳定共享能力放在 `packages/`；仅 App 内复用先留在 `shared/`
-- 路由：默认 `go_router`
-- 状态管理：默认 `Riverpod 3`
-- 数据模型：默认 `Freezed + json_serializable`
-- 网络：默认 `koi_network`
+## 常用命令
 
-## 常见任务路由
+```sh
+python3 blueprint.py create acme --output ../acme --org com.example --platforms web --dry-run
+python3 blueprint.py create acme --output ../acme --org com.example --platforms web
+python3 blueprint.py create studio --output ../studio --org com.example --template workbench --platforms web,macos
+python3 blueprint.py feature apps/acme_app catalog --kind api
+python3 blueprint.py module orders --workspace .
+python3 blueprint.py check generate-check
+python3 blueprint.py validate
+python3 blueprint.py build --app apps/acme_app --platforms web
+```
 
-- 初始化工作区：`workspace-init`
-- 新增 Feature：`add-feature-module`
-- 新增共享包：`add-shared-package`
-- 接入 API 包：`add-generated-api-package`
-- 调整路由：`add-routing`
-- 架构审查：`architecture-review`
-- 补测试：`testing-scaffold`
+创建完成后进入生成项目再运行后续命令。Windows 将 `python3` 替换为 `py -3`。命令细节以 `--help` 为准；见 [创建项目](new-project.md)。
 
-## 推荐执行顺序
+## UI 设计入口
 
-1. 改源码
-2. 运行 `format-check`
-3. 运行 `generate-check`
-4. 运行 `analyze`
-5. 运行 `test`
-6. 运行 `coverage`
+编写主题、共享控件或页面时，先读 [Flutter 设计规范](../DESIGN.md)，再从样例地图选实际消费宿主。视觉角色和尺寸维护在 koi_ui，业务状态由 App 拥有。设计目标与已验收结果分开记录；生成项目继承设计规范后可以明确记录产品差异。
+
+标准按钮、输入、选择、菜单、表格和反馈直接使用 Flutter Material 控件，由 `AppTheme` 提供样式。先检查 DESIGN 的标准控件映射和 UI Lab 分类目录；仅在标准控件无法表达布局或交互时增加 Koi 组合组件，不创建平行的 Button/Dialog/Checkbox 引擎。
+
+## 参照代码
+
+从 [样例地图](examples.md) 选择最小宿主、三类 Feature、认证或模块会话样例。完整源码只在受测样例维护，Skill 不复制第二份实现。
+
+API、本地 IO、认证、持久化都是按需能力。不要从认证样例推导出新项目必须有账号、网络或数据库。
+
+## 规则优先级
+
+明确的用户要求和当前有效决策确定目标；可运行代码与测试证明现状。若二者不一致，记录差异并修复或登记有理由的例外，不把既有违规自动升级为规范。架构文档负责边界，Skill 负责执行步骤，模板和测试验证可执行性。历史项目和外部资料是设计参考，不是任务前置依赖。

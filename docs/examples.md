@@ -1,0 +1,16 @@
+# 可运行样例与源码参照
+
+这份目录是规范/Skill 到真实源码的唯一样例地图。蓝图仓库直接使用下列路径；生成项目将参照源码快照放到 `.blueprint/reference/` 并调整本页链接。快照只供阅读，不作为生成项目的活动 workspace 成员。
+
+| 样例 | 学习重点 | 源码 |
+| --- | --- | --- |
+| Starter | 最小宿主、基础注入和运行测试，不附带登录/API | [starter_app](../examples/starter_app/) |
+| UI Lab | 标准组件六类目录、主题/密度、表单校验、选择/排序、菜单/反馈与自适应工作区 | [ui_lab](../examples/ui_lab/) |
+| Workbench | 文本、图片/视频、任务、Native/Web 持久化；可选生成模板 | [workbench_app](../examples/workbench_app/) |
+| Feature Lab | presentation/api/local 三类 Feature、provider 和测试 | [feature_lab](../examples/feature_lab/) |
+| 认证样例 | 完整 auth、loading/error、并发防护、bootstrap 和路由 | [auth](../apps/koi_admin_app/lib/features/auth/)、[bootstrap](../apps/koi_admin_app/lib/bootstrap.dart)、[router](../apps/koi_admin_app/lib/core/router/)、[测试](../apps/koi_admin_app/test/) |
+| 最小业务模块 | module 命令的受测源模板，不依赖 Showcase 业务服务 | [minimal_module](../examples/minimal_module/) |
+| 模块契约 | 不可变 catalog、session 拥有者、切换与过期结果 | [koi_modules](../packages/koi_modules/) |
+| 模块宿主 | 两个业务模块、共享契约、路由和注入 | [module_showcase](../examples/module_showcase/) |
+
+样例是相应行为的参照，不代表用户项目已完成真实后端、持久化或所有平台验收。修改模板或关键 Skill 后，应在临时 workspace 实际生成并测试，不能只检查这份路径表。

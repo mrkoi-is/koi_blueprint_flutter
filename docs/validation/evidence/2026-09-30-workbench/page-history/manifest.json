@@ -1,0 +1,70 @@
+{
+  "date": "2026-09-30",
+  "scope": "Real navigation history and macOS unified native toolbar after traffic lights",
+  "screenshot": {
+    "file": "native-text-light.png",
+    "bytes": 1551587,
+    "sha256": "625ce7dac1798f4b0941e86e088f51d1418b083353eab858913b2b0443e94bbe",
+    "original": "/Users/max/Desktop/screenshot-2026-09-30_16-21-54.png",
+    "modified": false,
+    "native_window_id": 19393,
+    "theme": "light",
+    "state": "Chinese text document restored by native back; both back and forward enabled"
+  },
+  "validation": {
+    "result": "PASS",
+    "coverage_percent": 87.15,
+    "covered_lines": 3390,
+    "handwritten_lines": 3890,
+    "workbench_vm_tests": 72,
+    "workbench_chrome_storage_tests": 8
+  },
+  "macos": {
+    "debug_build": "PASS",
+    "real_run": "PASS",
+    "observations": [
+      "Back and forward occupy the native toolbar row immediately after traffic lights",
+      "No duplicate Flutter app header in wide native window",
+      "Native back restores media selection; native forward restores Chinese text document",
+      "Native disabled states follow shared page history",
+      "Changing to light appearance synchronizes native toolbar and fixed icon rail",
+      "Native zoom preserves the text view"
+    ]
+  },
+  "generator": {
+    "parent": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-native-toolbar-generator-final-99noqg8p/新工作台",
+    "child": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-native-toolbar-generator-final-99noqg8p/递归工作台",
+    "verification": "PASS: macos/web create, analyze, exact transformed source, one native toolbar and fixture bytes"
+  },
+  "logs": [
+    {
+      "file": "validate.log",
+      "bytes": 111618,
+      "sha256": "70c7ff1871986bf97f5be317fdaa457a549ddf9be7dfd140708daa0f72da682a"
+    },
+    {
+      "file": "macos-build.log",
+      "bytes": 390,
+      "sha256": "1a20805e4874770494e7512a1def66e5dd90a351116d33ac2884bd92eda27fa4"
+    },
+    {
+      "file": "generator.log",
+      "bytes": 13471,
+      "sha256": "1128fb7f6057bb05fc13d19e2709b3255807daf1cc092b0181dfedd3aab038db"
+    }
+  ],
+  "source_verification": "All runtime-source-manifest.json source, target and native configuration hashes rechecked after build and capture",
+  "superseded": [
+    "text-dark.png",
+    "image-forward-disabled.png",
+    "video-restored.png"
+  ],
+  "not_run": [
+    "Android, iOS and Web builds for this toolbar change",
+    "Windows and Linux native toolbar implementation and real run",
+    "Safari real run"
+  ],
+  "not_verified": [
+    "Real macOS Cmd+[ and Cmd+] activation; widget tests pass"
+  ]
+}

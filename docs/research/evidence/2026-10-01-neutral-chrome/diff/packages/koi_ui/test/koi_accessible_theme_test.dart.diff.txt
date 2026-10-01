@@ -1,0 +1,33 @@
+--- before/packages/koi_ui/test/koi_accessible_theme_test.dart
++++ after/packages/koi_ui/test/koi_accessible_theme_test.dart
+@@ -6,6 +6,30 @@
+ import 'package:koi_ui/koi_ui.dart';
+ 
+ void main() {
++  test('neutral workspace surfaces reserve chroma for brand actions', () {
++    for (final brightness in Brightness.values) {
++      final theme = AppTheme.build(brightness: brightness);
++      final tokens = theme.extension<KoiThemeTokens>()!;
++      for (final color in [
++        tokens.chromeBackground,
++        tokens.contentBackground,
++        tokens.overlayBackground,
++        tokens.selectedBackground,
++        tokens.hoverBackground,
++        theme.colorScheme.surfaceContainerLow,
++      ]) {
++        final rgb = color.toARGB32();
++        expect((rgb >> 16) & 255, (rgb >> 8) & 255);
++        expect((rgb >> 8) & 255, rgb & 255);
++      }
++      expect(
++        theme.navigationRailTheme.selectedIconTheme!.color,
++        theme.colorScheme.onSurface,
++      );
++      expect(theme.colorScheme.primary, isNot(theme.colorScheme.onSurface));
++    }
++  });
++
+   for (final brightness in Brightness.values) {
+     test(
+       '$brightness readable foregrounds and necessary control boundaries',

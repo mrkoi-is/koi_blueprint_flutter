@@ -1,0 +1,219 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/presentation/models/text_view_state.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
+
+class TextPage extends ConsumerStatefulWidget {
+  const TextPage({super.key});
+  @override
+  ConsumerState<TextPage> createState() => _TextPageState();
+}
+
+class _TextPageState extends ConsumerState<TextPage> {
+  final _editors = <String, TextEditingController>{};
+  final _scrolls = <String, ScrollController>{};
+  final _focus = <String, FocusNode>{};
+  @override
+  void dispose() {
+    for (final controller in _editors.values) {
+      controller.dispose();
+    }
+    for (final controller in _scrolls.values) {
+      controller.dispose();
+    }
+    for (final node in _focus.values) {
+      node.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _rename(WorkspaceDocument document) async {
+    final title = await showDialog<String>(
+      context: context,
+      builder: (_) => _DocumentTitleDialog(title: document.title),
+    );
+    if (mounted && title != null && title.trim().isNotEmpty) {
+      ref
+          .read(workspaceSessionProvider)
+          .renameDocument(document.id, title.trim());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final session = ref.watch(workspaceSessionProvider);
+    final state = ref.watch(
+      workspaceStateProvider.select(
+        (value) => TextViewState(
+          documents:
+              value.value?.snapshot.documents ??
+              session.state.snapshot.documents,
+          selectedId:
+              value.value?.snapshot.preferences.selectedDocumentId ??
+              session.state.snapshot.preferences.selectedDocumentId,
+          sidebarWidth: 0,
+        ),
+      ),
+    );
+    final selected =
+        state.documents
+            .where((document) => document.id == state.selectedId)
+            .firstOrNull ??
+        state.documents.firstOrNull;
+    final editor = selected == null
+        ? null
+        : _editors.putIfAbsent(
+            selected.id,
+            () => TextEditingController(text: selected.text),
+          );
+    ref.listen(
+      workspaceStateProvider.select((value) => value.value?.snapshot.documents),
+      (_, next) {
+        for (final document in next ?? <WorkspaceDocument>[]) {
+          final controller = _editors[document.id];
+          if (controller == null ||
+              controller.text == document.text ||
+              !controller.value.composing.isCollapsed) {
+            continue;
+          }
+          final selection = controller.selection;
+          controller.value = TextEditingValue(
+            text: document.text,
+            selection: TextSelection.collapsed(
+              offset: selection.isValid
+                  ? selection.extentOffset.clamp(0, document.text.length)
+                  : document.text.length,
+            ),
+          );
+        }
+      },
+    );
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              FilledButton.icon(
+                key: const ValueKey('new-document'),
+                onPressed: session.createDocument,
+                icon: const Icon(Icons.add),
+                label: const Text('新建资料'),
+              ),
+              OutlinedButton.icon(
+                onPressed: () =>
+                    unawaited(session.importFiles(ImportKind.text)),
+                icon: const Icon(Icons.file_open_outlined),
+                label: const Text('导入文本'),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: selected == null
+              ? const KoiEmptyState(
+                  title: '暂无文本资料',
+                  description: '新建资料，或导入 UTF-8 TXT/Markdown 文件',
+                )
+              : Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              selected.title,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: '重命名当前资料',
+                            onPressed: () => unawaited(_rename(selected)),
+                            icon: const Icon(Icons.edit_outlined),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: TextField(
+                          key: ValueKey('editor-${selected.id}'),
+                          controller: editor,
+                          focusNode: _focus.putIfAbsent(
+                            selected.id,
+                            FocusNode.new,
+                          ),
+                          scrollController: _scrolls.putIfAbsent(
+                            selected.id,
+                            ScrollController.new,
+                          ),
+                          expands: true,
+                          maxLines: null,
+                          minLines: null,
+                          textAlignVertical: TextAlignVertical.top,
+                          decoration: const InputDecoration(
+                            hintText: '写下内容…',
+                            border: OutlineInputBorder(),
+                          ),
+                          onChanged: (text) =>
+                              session.editDocument(selected.id, text),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${selected.text.length} 字 · ${selected.dirty ? '未保存' : '已保存'}',
+                      ),
+                    ],
+                  ),
+                ),
+        ),
+      ],
+    );
+  }
+}
+
+class _DocumentTitleDialog extends StatefulWidget {
+  const _DocumentTitleDialog({required this.title});
+  final String title;
+  @override
+  State<_DocumentTitleDialog> createState() => _DocumentTitleDialogState();
+}
+
+class _DocumentTitleDialogState extends State<_DocumentTitleDialog> {
+  late final _controller = TextEditingController(text: widget.title);
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('重命名资料'),
+    content: TextField(
+      controller: _controller,
+      autofocus: true,
+      onSubmitted: (value) => Navigator.pop(context, value),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('取消'),
+      ),
+      FilledButton(
+        onPressed: () => Navigator.pop(context, _controller.text),
+        child: const Text('确定'),
+      ),
+    ],
+  );
+}

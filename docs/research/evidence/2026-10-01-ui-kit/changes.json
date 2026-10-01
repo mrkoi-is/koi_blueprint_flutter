@@ -1,0 +1,52 @@
+[
+  {
+    "path": "packages/koi_ui/lib/theme/app_theme.dart",
+    "sha256": "7225ea2c6575bcaff583925d1918cbd16c9d59550bf1d00ef903883626658043",
+    "afterSha256": "a7b38efb845d2960b6718a4b64798046fe4b826e2d9b005eec2c94d15646559d"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+    "sha256": "ee94dd348dcc5aa3ae1897b58a79719b35f060197be2ca1546f337c02403f63f",
+    "afterSha256": "ee94dd348dcc5aa3ae1897b58a79719b35f060197be2ca1546f337c02403f63f"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_menu.dart",
+    "sha256": "7d0bb0f025ffd6b40ef401eddaf36897a0150ff25da85a25f70abb10f08c32f1",
+    "afterSha256": "c7fbc4c18631759dd7767a51bc756ea02915dbd7299d0090d6bb82ca03ece491"
+  },
+  {
+    "path": "packages/koi_ui/README.md",
+    "sha256": "974982e92cf867c2601a77e95db9619c0bcbd73114e6781799f55b6203bd8630",
+    "afterSha256": "bbcc8049433aaad6de43738ae2504fa87d81509ce4fa8f0f36655fc9a1f30d04"
+  },
+  {
+    "path": "DESIGN.md",
+    "sha256": "ee1453e171a46493a1bb5ffaa2883f1605ec74903f645b38ca00d80970fc3dec",
+    "afterSha256": "97bfa187b017a423753180d2ccc0e67a141b223ea070b8fbdc557ab424ecfe37"
+  },
+  {
+    "path": "docs/ai-quickstart.md",
+    "sha256": "59863ea4750d8c08043ff95890e5be1538083de7a291c6fa2f6fc52d03a827ee",
+    "afterSha256": "9cf7ff7b3f9c395d71c58ce6671fc6452ac2d9ba0574d8c5eb9df2616e5f2862"
+  },
+  {
+    "path": "docs/examples.md",
+    "sha256": "69ca880fba4238af294d2dfa805cc9b981c1b1c03e1e4817d92315baffff7253",
+    "afterSha256": "301435c672171f8cbe862e77a7066437fec3557e8231a233e9f4228fc37c6c1f"
+  },
+  {
+    "path": ".agent/skills/add-feature-module/SKILL.md",
+    "sha256": "afdddee17c2f781dc79891c478304cec9ecbe677179b33a36d74960e3d9c330b",
+    "afterSha256": "0331c1543d9ead9e3319c50e1d95dadb2afe8f351fac0d9afb367b26777990f9"
+  },
+  {
+    "path": "README.md",
+    "sha256": "a052b14ef95e7759cba055f62c5b161114d5b38538dd52674bbe48c15d69612e",
+    "afterSha256": "a052b14ef95e7759cba055f62c5b161114d5b38538dd52674bbe48c15d69612e"
+  },
+  {
+    "path": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+    "sha256": "b6ab87eafd909a183cc7b88a2b5d4086cf3ce1e4ecd86e95f06a3be99e914fbe",
+    "afterSha256": "8e9603b5dab4a272b2c7b1ba09bac4d18f960201aa33c9dbfc3dc951d9c1d987"
+  }
+]

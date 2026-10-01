@@ -1,0 +1,70 @@
+--- before/tool/platform_configuration.py
++++ after/tool/platform_configuration.py
+@@ -13,7 +13,8 @@
+   private var koiTitleLabel: NSTextField?
+   private var koiSidebarButton: NSButton?
+   private var koiDetailButton: NSButton?
+-  private let koiHistoryItem = NSToolbarItem.Identifier("koi.history")
++  private let koiBackItem = NSToolbarItem.Identifier("koi.back")
++  private let koiForwardItem = NSToolbarItem.Identifier("koi.forward")
+   private let koiTitleItem = NSToolbarItem.Identifier("koi.title")
+   private let koiSaveItem = NSToolbarItem.Identifier("koi.save")
+   private let koiSidebarItem = NSToolbarItem.Identifier("koi.sidebar")
+@@ -99,7 +100,7 @@
+   }
+ 
+   func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+-    return [koiHistoryItem, koiSidebarItem, koiTitleItem, .flexibleSpace, koiDetailItem, koiSaveItem]
++    return [koiBackItem, koiForwardItem, koiSidebarItem, koiTitleItem, .flexibleSpace, koiDetailItem, koiSaveItem]
+   }
+ 
+   func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+@@ -109,22 +110,6 @@
+   func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier identifier: NSToolbarItem.Identifier,
+                willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+     let item = NSToolbarItem(itemIdentifier: identifier)
+-    if identifier == koiHistoryItem {
+-      let back = koiToolbarButton(symbol: "arrow.left", label: "后退", action: #selector(koiNavigateBack))
+-      let forward = koiToolbarButton(symbol: "arrow.right", label: "前进", action: #selector(koiNavigateForward))
+-      back.isEnabled = false
+-      forward.isEnabled = false
+-      koiBackButton = back
+-      koiForwardButton = forward
+-      let group = NSStackView(views: [back, forward])
+-      group.orientation = .horizontal
+-      group.spacing = 4
+-      group.edgeInsets = NSEdgeInsetsZero
+-      item.view = group
+-      item.label = "页面历史"
+-      item.visibilityPriority = .high
+-      return item
+-    }
+     if identifier == koiTitleItem {
+       let label = NSTextField(labelWithString: title)
+       koiTitleLabel = label
+@@ -143,6 +128,10 @@
+     let label: String
+     let action: Selector
+     switch identifier {
++    case koiBackItem:
++      symbol = "arrow.left"; label = "后退"; action = #selector(koiNavigateBack)
++    case koiForwardItem:
++      symbol = "arrow.right"; label = "前进"; action = #selector(koiNavigateForward)
+     case koiSaveItem:
+       symbol = "square.and.arrow.down"; label = "保存工作区"; action = #selector(koiSaveWorkspace)
+     case koiSidebarItem:
+@@ -156,7 +145,13 @@
+     item.view = button
+     item.label = label
+     item.visibilityPriority = .high
+-    if identifier == koiSidebarItem {
++    if identifier == koiBackItem {
++      button.isEnabled = false
++      koiBackButton = button
++    } else if identifier == koiForwardItem {
++      button.isEnabled = false
++      koiForwardButton = button
++    } else if identifier == koiSidebarItem {
+       button.setButtonType(.toggle)
+       koiSidebarButton = button
+     } else if identifier == koiDetailItem {

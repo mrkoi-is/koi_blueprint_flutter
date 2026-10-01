@@ -1,0 +1,245 @@
+"""Deterministic additions to the pinned Flutter runners (Python stdlib)."""
+from pathlib import Path
+import plistlib
+
+
+_WINDOW_ANCHOR = '    RegisterGeneratedPlugins(registry: flutterViewController)'
+_WINDOW_CALL = '    configureKoiWindowChrome(flutterViewController)'
+_WINDOW_MEMBERS = '''
+  // Koi workbench window chrome begin
+  private var koiWindowChannel: FlutterMethodChannel?
+  private var koiBackButton: NSButton?
+  private var koiForwardButton: NSButton?
+  private var koiTitleLabel: NSTextField?
+  private var koiSidebarButton: NSButton?
+  private var koiDetailButton: NSButton?
+  private let koiHistoryItem = NSToolbarItem.Identifier("koi.history")
+  private let koiTitleItem = NSToolbarItem.Identifier("koi.title")
+  private let koiSaveItem = NSToolbarItem.Identifier("koi.save")
+  private let koiSidebarItem = NSToolbarItem.Identifier("koi.sidebar")
+  private let koiDetailItem = NSToolbarItem.Identifier("koi.detail")
+
+  private func configureKoiWindowChrome(_ controller: FlutterViewController) {
+    styleMask.insert(.fullSizeContentView)
+    titlebarAppearsTransparent = true
+    titleVisibility = .hidden
+    titlebarSeparatorStyle = .none
+    toolbarStyle = .unifiedCompact
+    let bar = NSToolbar(identifier: "koi.workbench")
+    bar.delegate = self
+    bar.displayMode = .iconOnly
+    bar.allowsUserCustomization = false
+    bar.autosavesConfiguration = false
+    toolbar = bar
+    let channel = FlutterMethodChannel(
+      name: "koi/workbench_window", binaryMessenger: controller.engine.binaryMessenger)
+    koiWindowChannel = channel
+    channel.setMethodCallHandler { [weak self] call, result in
+      guard let window = self else {
+        result(FlutterError(code: "WINDOW_CLOSED", message: "Window closed", details: nil))
+        return
+      }
+      switch call.method {
+      case "applyChrome":
+        guard let arguments = call.arguments as? [String: Any],
+              let color = arguments["color"] as? NSNumber,
+              let dark = arguments["dark"] as? Bool,
+              let title = arguments["title"] as? String else {
+          result(FlutterError(code: "INVALID_CHROME", message: "Invalid window chrome", details: nil))
+          return
+        }
+        window.title = title
+        window.koiTitleLabel?.stringValue = title
+        window.koiTitleLabel?.setAccessibilityLabel(title)
+        window.toolbar?.items.first(where: { $0.itemIdentifier == window.koiTitleItem })?.label = title
+        let titleSize = (arguments["titleFontSize"] as? NSNumber)?.doubleValue ?? 14
+        let titleWeight = (arguments["titleFontWeight"] as? NSNumber)?.intValue ?? 500
+        let weight: NSFont.Weight = titleWeight >= 700 ? .bold : titleWeight >= 600 ? .semibold : titleWeight >= 500 ? .medium : .regular
+        window.koiTitleLabel?.font = .systemFont(ofSize: CGFloat(min(48, max(8, titleSize))), weight: weight)
+        let argb = color.uint32Value
+        window.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
+        window.backgroundColor = NSColor(
+          srgbRed: CGFloat((argb >> 16) & 255) / 255,
+          green: CGFloat((argb >> 8) & 255) / 255,
+          blue: CGFloat(argb & 255) / 255,
+          alpha: CGFloat((argb >> 24) & 255) / 255)
+        window.contentView?.layoutSubtreeIfNeeded()
+        result(["titlebarHeight": Double(window.frame.height - window.contentLayoutRect.height),
+                "nativeToolbar": true, "panelToolbar": true])
+      case "updateNavigation":
+        guard let arguments = call.arguments as? [String: Any],
+              let back = arguments["canGoBack"] as? Bool,
+              let forward = arguments["canGoForward"] as? Bool else {
+          result(FlutterError(code: "INVALID_HISTORY", message: "Invalid history state", details: nil))
+          return
+        }
+        window.koiBackButton?.isEnabled = back
+        window.koiForwardButton?.isEnabled = forward
+        result(nil)
+      case "updatePanels":
+        guard let arguments = call.arguments as? [String: Any],
+              let sidebar = arguments["canToggleSidebar"] as? Bool,
+              let detail = arguments["canToggleDetail"] as? Bool,
+              let sidebarOpen = arguments["sidebarOpen"] as? Bool,
+              let detailOpen = arguments["detailOpen"] as? Bool else {
+          result(FlutterError(code: "INVALID_PANELS", message: "Invalid panel state", details: nil))
+          return
+        }
+        window.koiSetItemVisible(window.koiSidebarItem, visible: sidebar, before: window.koiTitleItem)
+        window.koiSetItemVisible(window.koiDetailItem, visible: detail, before: window.koiSaveItem)
+        window.koiSidebarButton?.state = sidebarOpen ? .on : .off
+        window.koiDetailButton?.state = detailOpen ? .on : .off
+        window.koiSidebarButton?.contentTintColor = sidebarOpen ? .labelColor : .secondaryLabelColor
+        window.koiDetailButton?.contentTintColor = detailOpen ? .labelColor : .secondaryLabelColor
+        result(nil)
+      default:
+        result(FlutterMethodNotImplemented)
+      }
+    }
+  }
+
+  func toolbarDefaultItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+    return [koiHistoryItem, koiSidebarItem, koiTitleItem, .flexibleSpace, koiDetailItem, koiSaveItem]
+  }
+
+  func toolbarAllowedItemIdentifiers(_ toolbar: NSToolbar) -> [NSToolbarItem.Identifier] {
+    return toolbarDefaultItemIdentifiers(toolbar)
+  }
+
+  func toolbar(_ toolbar: NSToolbar, itemForItemIdentifier identifier: NSToolbarItem.Identifier,
+               willBeInsertedIntoToolbar flag: Bool) -> NSToolbarItem? {
+    let item = NSToolbarItem(itemIdentifier: identifier)
+    if identifier == koiHistoryItem {
+      let back = koiToolbarButton(symbol: "arrow.left", label: "后退", action: #selector(koiNavigateBack))
+      let forward = koiToolbarButton(symbol: "arrow.right", label: "前进", action: #selector(koiNavigateForward))
+      back.isEnabled = false
+      forward.isEnabled = false
+      koiBackButton = back
+      koiForwardButton = forward
+      let group = NSStackView(views: [back, forward])
+      group.orientation = .horizontal
+      group.spacing = 4
+      group.edgeInsets = NSEdgeInsetsZero
+      item.view = group
+      item.label = "页面历史"
+      item.visibilityPriority = .high
+      return item
+    }
+    if identifier == koiTitleItem {
+      let label = NSTextField(labelWithString: title)
+      koiTitleLabel = label
+      label.font = .systemFont(ofSize: 14, weight: .medium)
+      label.lineBreakMode = .byTruncatingTail
+      label.maximumNumberOfLines = 1
+      label.setAccessibilityLabel(title)
+      label.translatesAutoresizingMaskIntoConstraints = false
+      label.widthAnchor.constraint(lessThanOrEqualToConstant: 400).isActive = true
+      item.view = label
+      item.label = label.stringValue
+      item.visibilityPriority = .low
+      return item
+    }
+    let symbol: String
+    let label: String
+    let action: Selector
+    switch identifier {
+    case koiSaveItem:
+      symbol = "square.and.arrow.down"; label = "保存工作区"; action = #selector(koiSaveWorkspace)
+    case koiSidebarItem:
+      symbol = "sidebar.left"; label = "切换资料侧栏"; action = #selector(koiToggleSidebar)
+    case koiDetailItem:
+      symbol = "sidebar.right"; label = "切换详情面板"; action = #selector(koiToggleDetail)
+    default:
+      return nil
+    }
+    let button = koiToolbarButton(symbol: symbol, label: label, action: action)
+    item.view = button
+    item.label = label
+    item.visibilityPriority = .high
+    if identifier == koiSidebarItem {
+      button.setButtonType(.toggle)
+      koiSidebarButton = button
+    } else if identifier == koiDetailItem {
+      button.setButtonType(.toggle)
+      koiDetailButton = button
+    }
+    return item
+  }
+
+  private func koiToolbarButton(symbol: String, label: String, action: Selector) -> NSButton {
+    let image = NSImage(systemSymbolName: symbol, accessibilityDescription: label)!
+    let button = NSButton(image: image, target: self, action: action)
+    button.bezelStyle = .texturedRounded
+    button.isBordered = false
+    button.contentTintColor = .secondaryLabelColor
+    button.setAccessibilityLabel(label)
+    button.toolTip = label
+    button.translatesAutoresizingMaskIntoConstraints = false
+    button.widthAnchor.constraint(equalToConstant: 32).isActive = true
+    button.heightAnchor.constraint(equalToConstant: 28).isActive = true
+    return button
+  }
+
+  @objc private func koiNavigateBack() {
+    koiWindowChannel?.invokeMethod("navigateBack", arguments: nil)
+  }
+  @objc private func koiNavigateForward() {
+    koiWindowChannel?.invokeMethod("navigateForward", arguments: nil)
+  }
+  @objc private func koiSaveWorkspace() {
+    koiWindowChannel?.invokeMethod("saveWorkspace", arguments: nil)
+  }
+  private func koiSetItemVisible(_ identifier: NSToolbarItem.Identifier, visible: Bool,
+                                 before next: NSToolbarItem.Identifier) {
+    guard let bar = toolbar else { return }
+    if let index = bar.items.firstIndex(where: { $0.itemIdentifier == identifier }) {
+      if !visible { bar.removeItem(at: index) }
+    } else if visible {
+      let index = bar.items.firstIndex(where: { $0.itemIdentifier == next }) ?? bar.items.count
+      bar.insertItem(withItemIdentifier: identifier, at: index)
+    }
+  }
+  @objc private func koiToggleSidebar() {
+    koiWindowChannel?.invokeMethod("toggleSidebar", arguments: nil)
+  }
+  @objc private func koiToggleDetail() {
+    koiWindowChannel?.invokeMethod("toggleDetail", arguments: nil)
+  }
+  // Koi workbench window chrome end
+'''
+_WINDOW_CONFORMANCE = '\nextension MainFlutterWindow: NSToolbarDelegate {}\n'
+
+
+
+def _configure_window(source: str) -> str:
+    if (_WINDOW_MEMBERS in source and source.count(_WINDOW_CALL) == 1 and
+            source.count(_WINDOW_CONFORMANCE) == 1):
+        return source
+    if ('class MainFlutterWindow: NSWindow {' not in source or
+            source.count(_WINDOW_ANCHOR) != 1 or
+            'configureKoiWindowChrome' in source or
+            not source.rstrip().endswith('\n}')):
+        raise ValueError('Unknown Flutter macOS MainFlutterWindow structure')
+    source = source.replace(_WINDOW_ANCHOR, _WINDOW_ANCHOR + '\n' + _WINDOW_CALL)
+    head, closing, tail = source.rpartition('\n}')
+    return head + '\n' + _WINDOW_MEMBERS + closing + tail + _WINDOW_CONFORMANCE
+
+
+def configure_workbench(app: Path, platforms: list[str]) -> None:
+    """Merge file access and theme-aware chrome into the pinned macOS runner."""
+    if 'macos' not in platforms:
+        return
+    changes = {}
+    for filename in ('DebugProfile.entitlements', 'Release.entitlements'):
+        path = app / 'macos' / 'Runner' / filename
+        with path.open('rb') as source:
+            values = plistlib.load(source)
+        if not isinstance(values, dict) or values.get('com.apple.security.app-sandbox') is not True:
+            raise ValueError(f'Unknown Flutter macOS entitlement structure: {filename}')
+        values['com.apple.security.files.user-selected.read-only'] = True
+        changes[path] = plistlib.dumps(values, sort_keys=False)
+    window = app / 'macos' / 'Runner' / 'MainFlutterWindow.swift'
+    changes[window] = _configure_window(window.read_text(encoding='utf-8')).encode('utf-8')
+    # Validate every input before modifying the newly created runner.
+    for path, contents in changes.items():
+        path.write_bytes(contents)

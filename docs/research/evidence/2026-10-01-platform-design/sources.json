@@ -1,0 +1,60 @@
+{
+  "checked_at": "2026-10-01T03:02:44.391096+08:00",
+  "sources": [
+    {
+      "title": "Apple Buttons",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/buttons",
+      "use": "Touch target conventions; pt differs from Flutter logical pixels"
+    },
+    {
+      "title": "Apple Accessibility",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/accessibility",
+      "use": "Reduce motion, perceptible status and contrast"
+    },
+    {
+      "title": "Apple Layout",
+      "url": "https://developer.apple.com/design/human-interface-guidelines/layout",
+      "use": "Text scaling and adaptive layout"
+    },
+    {
+      "title": "Windows touch interactions",
+      "url": "https://learn.microsoft.com/en-us/windows/apps/develop/input/touch-interactions",
+      "use": "40 epx baseline and touch optimized44+4 spacing"
+    },
+    {
+      "title": "Windows RTL",
+      "url": "https://learn.microsoft.com/en-us/windows/apps/design/globalizing/adjust-layout-and-fonts--and-support-rtl",
+      "use": "Mirrored physical layout"
+    },
+    {
+      "title": "Fluent typography",
+      "url": "https://fluent2.microsoft.design/typography",
+      "use": "Platform typography roles are distinct defaults"
+    },
+    {
+      "title": "Android accessibility principles",
+      "url": "https://developer.android.com/guide/topics/ui/accessibility/principles",
+      "use": "Labels, noncolor states, touch targets"
+    },
+    {
+      "title": "Flutter accessibility tests",
+      "url": "https://docs.flutter.dev/ui/accessibility/accessibility-testing",
+      "use": "Guideline API and real assistive-technology inspection are separate"
+    },
+    {
+      "title": "WAI modal dialog pattern",
+      "url": "https://www.w3.org/WAI/ARIA/apg/patterns/dialog-modal/",
+      "use": "Inert background, closed Tab cycle, Escape and focus restoration"
+    },
+    {
+      "title": "WCAG contrast minimum",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html",
+      "use": "Normal text pairing4.5 threshold"
+    },
+    {
+      "title": "WCAG nontext contrast",
+      "url": "https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html",
+      "use": "Necessary control and state indicators3 threshold; decorative lines distinct"
+    }
+  ]
+}

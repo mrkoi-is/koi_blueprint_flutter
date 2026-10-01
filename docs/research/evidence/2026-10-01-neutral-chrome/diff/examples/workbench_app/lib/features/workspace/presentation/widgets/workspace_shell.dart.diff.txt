@@ -1,0 +1,17 @@
+--- before/examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart
++++ after/examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart
+@@ -130,7 +130,13 @@
+             preferences().copyWith(detailsWidth: width),
+           ),
+           showHeader: !nativeToolbar,
+-          title: nativeToolbar ? null : const Text('Koi 工作区'),
++          title: nativeToolbar
++              ? null
++              : Text(
++                  WorkbenchWindowInfo.titleOf(context),
++                  maxLines: 1,
++                  overflow: TextOverflow.ellipsis,
++                ),
+           headerLeading: nativeToolbar
+               ? null
+               : ListenableBuilder(

@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-01",
+  "validate": {
+    "status": "PASS",
+    "command": "python3 blueprint.py validate",
+    "log": "validate-final.log",
+    "coverage": {
+      "hit": 4448,
+      "total": 4970,
+      "percent": 89.5,
+      "minimum": 80,
+      "unmeasuredCountedUncovered": true
+    }
+  },
+  "uiKitTests": {
+    "status": "PASS",
+    "count": 16,
+    "log": "material-controls-tests.log"
+  },
+  "uiLabTests": {
+    "status": "PASS",
+    "count": 14,
+    "log": "ui-lab-tests.log"
+  },
+  "macosRelease": {
+    "status": "PASS",
+    "log": "build-macos-final.log",
+    "codesign": "PASS",
+    "runtime": "See runtime-evidence.json"
+  },
+  "uiLabDirectWeb": {
+    "status": "PASS",
+    "log": "build-ui-lab-direct.log",
+    "runtime": "Chrome loaded from repo build; standard catalog and compact toggle verified"
+  },
+  "templateCreation": {
+    "minimal": "PASS",
+    "workbench": "PASS",
+    "evidence": "template-inheritance.json"
+  },
+  "notRun": [
+    "Android",
+    "iOS",
+    "Windows",
+    "Linux",
+    "Safari",
+    "Full screen reader and physical touch matrix"
+  ],
+  "preview": {
+    "url": "http://127.0.0.1:8791/",
+    "directory": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/build/web",
+    "scope": "Loopback only; session-local service"
+  }
+}

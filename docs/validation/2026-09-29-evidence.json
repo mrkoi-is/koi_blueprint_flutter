@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-29",
+  "host": "macOS",
+  "flutter": "3.47.2",
+  "scope": "Local verification; output excerpts with machine paths replaced. Remote CI, Windows and Linux builds not run.",
+  "checks": [
+    {
+      "check": "source_validate",
+      "status": "passed",
+      "original_log_bytes": 58997,
+      "original_log_sha256": "ada0cb66a3931f05b1a7dae7e40e659c91281ee87f96846cd8ab1bb3fc5aec22",
+      "output_excerpt": "00:00 +2: query failure renders an error instead of empty success\n00:00 +3: All tests passed!\n+ <flutter-sdk>/bin/dart run tool/check_coverage_sources.dart examples/module_showcase/modules/beta <blueprint>/examples/module_showcase/modules/beta/coverage/lcov.info\nHandwritten Dart coverage: 92.41% (1145/1239), minimum 80%\n+ <flutter-sdk>/bin/dart compile js <blueprint>/packages/koi_api_bootstrap/test/web_compile_smoke.dart -o <temporary-web-check>/smoke.js\nCompiled 10,780,217 input bytes (5,332,283 characters source) to 156,960 characters JavaScript in 0.40 seconds\n+ node <temporary-web-check>/smoke.js\nValidation passed; platform builds are separate and must run on their matching hosts."
+    },
+    {
+      "check": "generator_smoke",
+      "status": "passed",
+      "original_log_bytes": 40804,
+      "original_log_sha256": "70eef90640171b5f7764cc8eb39b19473a74376c1cb4320ca3d094efddac2a0d",
+      "output_excerpt": "00:02 +5: All tests passed!\n+ <flutter-sdk>/bin/dart run tool/check_coverage_sources.dart modules/warehouse_ops <smoke-project>/modules/warehouse_ops/coverage/lcov.info\nHandwritten Dart coverage: 96.52% (388/402), minimum 80%\nValidation passed; platform builds are separate and must run on their matching hosts.\nGenerator smoke passed: renamed project, three features, module and module API feature."
+    },
+    {
+      "check": "web_macos_ios_unsigned_build",
+      "status": "passed",
+      "original_log_bytes": 2376,
+      "original_log_sha256": "26defb3af71f580f844459507a0da8b4c7a9a34418be61aef12de30fa6594ec9",
+      "output_excerpt": "Use --no-wasm-dry-run to disable these warnings.\nExpected to find fonts for (MaterialIcons, packages/cupertino_icons/CupertinoIcons), but found (MaterialIcons). This usually means you are referring to font families in an IconData class but not including them in the assets section of your pubspec.yaml, are missing the package that would include them, or are missing \"uses-material-design: true\".\nFont asset \"MaterialIcons-Regular.otf\" was tree-shaken, reducing it from 1645184 to 7736 bytes (99.5% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.\nCompiling lib/main.dart for the Web...                             38.6s\n✓ Built build/web\n+ <flutter-sdk>/bin/flutter build macos --release --no-pub\nBuilding macOS application...                                   \nXcode 27 no longer requires macOS binaries to support the x86_64 architecture. To build ARM-only macOS apps now, run: \"flutter config --enable-macos-arm64-only\". This will become the default behavior in a future Flutter release.\nwarning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking \"Based on dependency analysis\" in the script phase. (in target 'Flutter Assemble' from project 'Runner')\n✓ Built build/macos/Build/Products/Release/final_probe_app.app (40.7MB)\n+ <flutter-sdk>/bin/flutter build ios --release --no-pub --no-codesign\nWarning: Building for device with codesigning disabled. You will have to manually codesign before deploying to device.\nBuilding dev.mrkoi.finalProbeApp for device (ios-release)...\nRunning Xcode build...                                          \nXcode build done.                                           25.6s\n✓ Built build/ios/iphoneos/Runner.app (15.4MB)"
+    },
+    {
+      "check": "android_dependency_acquisition",
+      "status": "failed",
+      "original_log_bytes": 4690,
+      "original_log_sha256": "be5e99a9eebce160fd4e691734811323ee0a82c8957cae08ec175f171c83c901",
+      "output_excerpt": "\n* What went wrong:\nExecution failed for task ':gradle:compileKotlin'.\n> Could not isolate parameters org.jetbrains.kotlin.gradle.internal.transforms.BuildToolsApiClasspathEntrySnapshotTransform$Parameters_Decorated@716d50d8 of artifact transform BuildToolsApiClasspathEntrySnapshotTransform\n   > Could not isolate value org.jetbrains.kotlin.gradle.internal.transforms.BuildToolsApiClasspathEntrySnapshotTransform$Parameters_Decorated@716d50d8 of type BuildToolsApiClasspathEntrySnapshotTransform.Parameters\n      > Could not resolve all files for configuration ':gradle:kotlinBuildToolsApiClasspath'.\n         > Could not resolve org.jetbrains.kotlin:kotlin-build-tools-impl:2.2.21.\n           Required by:\n               project ':gradle'\n            > Could not resolve org.jetbrains.kotlin:kotlin-build-tools-impl:2.2.21.\n               > Could not get resource 'https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-impl/2.2.21/kotlin-build-tools-impl-2.2.21.pom'.\n                  > Could not GET 'https://repo.maven.apache.org/maven2/org/jetbrains/kotlin/kotlin-build-tools-impl/2.2.21/kotlin-build-tools-impl-2.2.21.pom'.\n                     > The server may not support the client's requested TLS protocol versions: (TLSv1.2, TLSv1.3). You may need to configure the client to allow other protocols to be used. For more on this, please refer to https://docs.gradle.org/9.3.1/userguide/build_environment.html#sec:gradle_system_properties in the Gradle documentation.\n                        > Remote host terminated the handshake\n\n* Try:\n> Run the 'artifactTransforms' report task to view details about registered transforms.\n> Review the documentation on Artifact Transforms at https://docs.gradle.org/9.3.1/userguide/artifact_transforms.html.\n> Run with --stacktrace option to get the stack trace.\n> Run with --info or --debug option to get more log output.\n> Run with --scan to get full insights from a Build Scan (powered by Develocity).\n> Get more help at https://help.gradle.org.\n\nBUILD FAILED in 14s\nRunning Gradle task 'assembleRelease'...                           14.8s\n[!] Gradle threw an error while downloading artifacts from the network.\nGradle task assembleRelease failed with exit code 1\nblueprint: Command failed (1)"
+    },
+    {
+      "check": "independent_ai_recheck",
+      "status": "passed",
+      "original_log_bytes": 24013,
+      "original_log_sha256": "0b06f4f29e5e8ed016a9711f1571c965b24cc3694656ae08356c8e1e916acf2f",
+      "output_excerpt": "00:00 +6: <ai-project>/modules/warehouse_ops/test/features/stock/stock_test.dart: initial failure is not empty; refresh failure keeps rendered items\n00:00 +7: <ai-project>/modules/warehouse_ops/test/features/stock/stock_test.dart: initial failure is not empty; refresh failure keeps rendered items\n00:01 +8: All tests passed!\n+ <flutter-sdk>/bin/dart run tool/check_coverage_sources.dart modules/warehouse_ops <ai-project>/modules/warehouse_ops/coverage/lcov.info\nHandwritten Dart coverage: 96.79% (483/499), minimum 80%\nValidation passed; platform builds are separate and must run on their matching hosts.\n\nexit_code: 0"
+    },
+    {
+      "check": "browser_persistence",
+      "status": "passed",
+      "original_log_bytes": 254,
+      "original_log_sha256": "45b7e50ac5fc54d02df21fdf86688f88bc1e1f06f882f800b3efed709488b3f9",
+      "output_excerpt": "00:00 +0: loading <ai-project>/apps/ocean_notes_app/test/browser_persistence_test.dart\n00:00 +0: real browser storage survives recreation of preferences, repository and provider scope\n00:00 +1: All tests passed!"
+    }
+  ]
+}

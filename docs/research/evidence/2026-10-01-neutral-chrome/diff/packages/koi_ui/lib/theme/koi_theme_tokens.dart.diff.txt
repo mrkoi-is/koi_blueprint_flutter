@@ -1,0 +1,17 @@
+--- before/packages/koi_ui/lib/theme/koi_theme_tokens.dart
++++ after/packages/koi_ui/lib/theme/koi_theme_tokens.dart
+@@ -22,6 +22,14 @@
+   static const double medium = 12;
+   static const double dialog = 16;
+   static const double large = 24;
++}
++
++/// Desktop shell geometry; navigation hit targets remain at least 48 px.
++abstract final class KoiWorkbenchMetrics {
++  static const double railWidth = 56;
++  static const double contentInset = 4;
++  static const double contentRadius = 16;
++  static const double navigationIndicatorSize = 32;
+ }
+ 
+ @immutable

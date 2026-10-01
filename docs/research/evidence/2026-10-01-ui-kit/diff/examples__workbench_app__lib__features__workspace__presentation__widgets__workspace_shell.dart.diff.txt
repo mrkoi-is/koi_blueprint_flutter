@@ -1,0 +1,25 @@
+--- examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart (turn baseline)
++++ examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart
+@@ -176,6 +176,7 @@
+               items: [
+                 KoiMenuItem(
+                   label: '跟随系统主题',
++                  checked: preferences().themeMode == WorkspaceThemeMode.system,
+                   onSelected: () => session.updatePreferences(
+                     preferences().copyWith(
+                       themeMode: WorkspaceThemeMode.system,
+@@ -184,12 +185,14 @@
+                 ),
+                 KoiMenuItem(
+                   label: '明亮主题',
++                  checked: preferences().themeMode == WorkspaceThemeMode.light,
+                   onSelected: () => session.updatePreferences(
+                     preferences().copyWith(themeMode: WorkspaceThemeMode.light),
+                   ),
+                 ),
+                 KoiMenuItem(
+                   label: '深色主题',
++                  checked: preferences().themeMode == WorkspaceThemeMode.dark,
+                   onSelected: () => session.updatePreferences(
+                     preferences().copyWith(themeMode: WorkspaceThemeMode.dark),
+                   ),

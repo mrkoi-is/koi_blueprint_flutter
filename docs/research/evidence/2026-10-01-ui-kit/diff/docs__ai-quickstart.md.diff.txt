@@ -1,0 +1,11 @@
+--- docs/ai-quickstart.md (turn baseline)
++++ docs/ai-quickstart.md
+@@ -34,6 +34,8 @@
+ 
+ 编写主题、共享控件或页面时，先读 [Flutter 设计规范](../DESIGN.md)，再从样例地图选实际消费宿主。视觉角色和尺寸维护在 koi_ui，业务状态由 App 拥有。设计目标与已验收结果分开记录；生成项目继承设计规范后可以明确记录产品差异。
+ 
++标准按钮、输入、选择、菜单、表格和反馈直接使用 Flutter Material 控件，由 `AppTheme` 提供样式。先检查 DESIGN 的标准控件映射和 UI Lab 分类目录；仅在标准控件无法表达布局或交互时增加 Koi 组合组件，不创建平行的 Button/Dialog/Checkbox 引擎。
++
+ ## 参照代码
+ 
+ 从 [样例地图](examples.md) 选择最小宿主、三类 Feature、认证或模块会话样例。完整源码只在受测样例维护，Skill 不复制第二份实现。

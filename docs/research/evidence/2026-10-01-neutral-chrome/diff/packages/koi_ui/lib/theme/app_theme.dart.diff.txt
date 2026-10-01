@@ -1,0 +1,68 @@
+--- before/packages/koi_ui/lib/theme/app_theme.dart
++++ after/packages/koi_ui/lib/theme/app_theme.dart
+@@ -21,28 +21,37 @@
+           secondary: dark ? const Color(0xFFE4B269) : AppColors.amber,
+           // The custom amber replaces the seed color, so pair its foreground
+           // explicitly instead of retaining the seed's white onSecondary.
+-          onSecondary: dark ? AppColors.ink : const Color(0xFF202623),
++          onSecondary: dark ? AppColors.ink : const Color(0xFF242424),
+           surface: dark ? AppColors.nightPanel : AppColors.content,
+-          onSurface: dark ? const Color(0xFFE8ECE9) : const Color(0xFF202623),
++          surfaceDim: dark ? AppColors.nightPanel : const Color(0xFFDEDEDE),
++          surfaceBright: dark ? const Color(0xFF383838) : AppColors.content,
++          surfaceContainerLowest: dark ? const Color(0xFF111111) : Colors.white,
++          surfaceContainerHigh: dark
++              ? const Color(0xFF303030)
++              : const Color(0xFFEEEEEE),
++          surfaceContainerHighest: dark
++              ? const Color(0xFF363636)
++              : const Color(0xFFE5E5E5),
++          onSurface: dark ? const Color(0xFFECECEC) : const Color(0xFF242424),
+           onSurfaceVariant: dark
+-              ? const Color(0xFFB5BDB7)
+-              : const Color(0xFF5F6963),
++              ? const Color(0xFFB8B8B8)
++              : const Color(0xFF626262),
+           surfaceContainerLow: dark
+-              ? const Color(0xFF232A25)
+-              : const Color(0xFFF5F6F4),
+-          surfaceContainer: dark ? const Color(0xFF252B27) : Colors.white,
+-          outline: dark ? const Color(0xFF66756A) : const Color(0xFF757F78),
++              ? const Color(0xFF232323)
++              : const Color(0xFFF5F5F5),
++          surfaceContainer: dark ? const Color(0xFF292929) : Colors.white,
++          outline: dark ? const Color(0xFF767676) : const Color(0xFF787878),
+           outlineVariant: dark
+-              ? const Color(0xFF414D44)
+-              : const Color(0xFFD7DED8),
++              ? const Color(0xFF3B3B3B)
++              : const Color(0xFFDDDDDD),
+         );
+     final tokens = KoiThemeTokens.fromScheme(colors, density: density).copyWith(
+       chromeBackground: dark ? AppColors.night : AppColors.chrome,
+       contentBackground: colors.surface,
+       selectedBackground: dark
+-          ? const Color(0xFF2C3630)
+-          : const Color(0xFFE8EDE9),
+-      hoverBackground: dark ? const Color(0xFF273029) : const Color(0xFFEFF2EF),
++          ? const Color(0xFF303030)
++          : const Color(0xFFEBEBEB),
++      hoverBackground: dark ? const Color(0xFF262626) : const Color(0xFFF0F0F0),
+       overlayBackground: colors.surfaceContainer,
+     );
+     // Keep Flutter's platform font and locale fallbacks, then define Koi roles.
+@@ -222,11 +231,11 @@
+       ),
+       navigationRailTheme: NavigationRailThemeData(
+         useIndicator: true,
+-        minWidth: 64,
++        minWidth: KoiWorkbenchMetrics.railWidth,
+         indicatorColor: tokens.selectedBackground,
+-        selectedIconTheme: IconThemeData(size: 22, color: colors.primary),
++        selectedIconTheme: IconThemeData(size: 20, color: colors.onSurface),
+         unselectedIconTheme: IconThemeData(
+-          size: 22,
++          size: 20,
+           color: colors.onSurfaceVariant,
+         ),
+       ),

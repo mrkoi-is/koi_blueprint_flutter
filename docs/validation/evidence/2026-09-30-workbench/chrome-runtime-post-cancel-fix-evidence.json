@@ -1,0 +1,120 @@
+{
+  "storage": "Web isolated IndexedDB + Blob",
+  "file_picker": "NOT_EXERCISED_fixture_adapter",
+  "imported_bytes": 86249,
+  "image_dimensions": [
+    160,
+    96
+  ],
+  "image_source_colors": 15360,
+  "image_thumbnail_error": null,
+  "images": [
+    {
+      "name": "gradient.png",
+      "thumbnail_bytes": 406,
+      "thumbnail_colors": 15360,
+      "thumbnail_dimensions": [
+        160,
+        96
+      ]
+    },
+    {
+      "name": "gradient.jpg",
+      "thumbnail_bytes": 9806,
+      "thumbnail_colors": 12706,
+      "thumbnail_dimensions": [
+        160,
+        96
+      ]
+    }
+  ],
+  "videos": [
+    {
+      "name": "landscape.mp4",
+      "first_frame_probe": {
+        "elements": [
+          {
+            "readyState": 4,
+            "networkState": 1,
+            "currentTime": 0.001,
+            "paused": true,
+            "ended": false,
+            "videoWidth": 160,
+            "videoHeight": 96,
+            "currentSrc": "blob:http://localhost:63157/7ac8475c-5851-4819-baa5-b03de338a940",
+            "error": null,
+            "canvas_colors": 5558
+          }
+        ]
+      },
+      "preview_error": null,
+      "screenshot_bytes": 5358,
+      "first_screenshot_colors": 7437,
+      "after_play_seek_probe": {
+        "elements": [
+          {
+            "readyState": 4,
+            "networkState": 1,
+            "currentTime": 1,
+            "paused": true,
+            "ended": false,
+            "videoWidth": 160,
+            "videoHeight": 96,
+            "currentSrc": "blob:http://localhost:63157/7ac8475c-5851-4819-baa5-b03de338a940",
+            "error": null,
+            "canvas_colors": 7562
+          }
+        ]
+      },
+      "first_frame": true,
+      "play_pause_seek_volume": true,
+      "thumbnail_bytes": 19250,
+      "thumbnail_colors": 7437,
+      "lease_released": true
+    },
+    {
+      "name": "portrait.mp4",
+      "first_frame_probe": {
+        "elements": [
+          {
+            "readyState": 4,
+            "networkState": 1,
+            "currentTime": 0.001,
+            "paused": true,
+            "ended": false,
+            "videoWidth": 96,
+            "videoHeight": 160,
+            "currentSrc": "blob:http://localhost:63157/07aca0cd-4fab-4623-9b0b-e53971c9e1dc",
+            "error": null,
+            "canvas_colors": 4830
+          }
+        ]
+      },
+      "preview_error": null,
+      "screenshot_bytes": 4984,
+      "first_screenshot_colors": 6927,
+      "after_play_seek_probe": {
+        "elements": [
+          {
+            "readyState": 4,
+            "networkState": 1,
+            "currentTime": 1,
+            "paused": true,
+            "ended": false,
+            "videoWidth": 96,
+            "videoHeight": 160,
+            "currentSrc": "blob:http://localhost:63157/07aca0cd-4fab-4623-9b0b-e53971c9e1dc",
+            "error": null,
+            "canvas_colors": 5875
+          }
+        ]
+      },
+      "first_frame": true,
+      "play_pause_seek_volume": true,
+      "thumbnail_bytes": 18196,
+      "thumbnail_colors": 6927,
+      "lease_released": true
+    }
+  ],
+  "reopened_snapshot_and_content": true
+}

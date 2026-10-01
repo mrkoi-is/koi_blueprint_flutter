@@ -1,0 +1,9 @@
+Analyzing lib...
+
+  error - theme/koi_material_theme.dart:68:7 - The named parameter 'materialTapTargetSize' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'materialTapTargetSize'. - undefined_named_parameter
+  error - theme/koi_material_theme.dart:72:7 - The named parameter 'hoverColor' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'hoverColor'. - undefined_named_parameter
+  error - theme/koi_material_theme.dart:73:7 - The named parameter 'focusColor' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'focusColor'. - undefined_named_parameter
+  error - theme/koi_material_theme.dart:74:7 - The named parameter 'disabledColor' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'disabledColor'. - undefined_named_parameter
+  error - theme/koi_material_theme.dart:204:9 - The named parameter 'materialTapTargetSize' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'materialTapTargetSize'. - undefined_named_parameter
+
+5 issues found.

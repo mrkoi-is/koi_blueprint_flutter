@@ -1,0 +1,60 @@
+{
+  "method": "CUA Chrome DOM/AX inspection and actual locator keyboard/click actions",
+  "url": "http://127.0.0.1:8786/#/text",
+  "source": "Final generated Web build after explicit source refresh listed in generated-runtime.json",
+  "viewport_css": {
+    "width": 1710,
+    "height": 863
+  },
+  "navigation_buttons": [
+    "文本资料 Tab 1 of 3",
+    "媒体素材 Tab 2 of 3",
+    "任务 Tab 3 of 3",
+    "设置"
+  ],
+  "sidebar_controls": [
+    "文本资料 搜索资料",
+    "设计规范.md",
+    "跨平台检查清单.md",
+    "媒体与任务.md"
+  ],
+  "content_controls": [
+    "新建资料",
+    "导入文本",
+    "重命名当前资料",
+    "editable textbox"
+  ],
+  "splitters": [
+    {
+      "name": "调整侧栏宽度",
+      "comfortable_input_rect": {
+        "width": 48,
+        "height": 787
+      },
+      "aria_valuetext_before": "280",
+      "aria_valuetext_after_ArrowRight": "290",
+      "compact_width": 12
+    },
+    {
+      "name": "调整详情宽度",
+      "comfortable_input_rect": {
+        "width": 48,
+        "height": 787
+      },
+      "aria_valuetext": "280",
+      "compact_width": 12
+    }
+  ],
+  "menu": "设置 opens once with expanded=true; clicking 深色主题 closes menu and updates rendered dark surfaces",
+  "todo_dialog": {
+    "item": "检查中文重命名与空白提示",
+    "role": "alertdialog",
+    "background_controls_exported": false,
+    "default_focused_button": "取消",
+    "Enter_result": "dialog closed; 2 todos remain incomplete"
+  },
+  "limits": [
+    "DOM/AX evidence is not an actual VoiceOver/TalkBack/Narrator announcement test",
+    "No media decoder playback was exercised in this browser pass"
+  ]
+}

@@ -1,0 +1,145 @@
+{
+  "captured_at": "2026-09-30T21:52:46.740071+08:00",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "9930a7f2f5b22bde3169575eda84dab634b3107eca14be8884acd24c9ca1b32a",
+      "copy": "baseline/README.md.txt"
+    },
+    {
+      "path": "docs/ai-quickstart.md",
+      "sha256": "eff164b419005ad381fa9011b168e52eef3c059f60641d302973dab2dc8ace19",
+      "copy": "baseline/docs__ai-quickstart.md.txt"
+    },
+    {
+      "path": "docs/architecture/ui-and-adaptive.md",
+      "sha256": "79ed2429d8e6923c61a8a7efbaf8574c57ea73f99c413129ef875c68d0d4d3a7",
+      "copy": "baseline/docs__architecture__ui-and-adaptive.md.txt"
+    },
+    {
+      "path": "packages/koi_ui/README.md",
+      "sha256": "94406c130c3f3fcbd3479fed34cabbc064b77b9bbbd49f8c0f8d4d86fef9f6d7",
+      "copy": "baseline/packages__koi_ui__README.md.txt"
+    },
+    {
+      "path": "blueprint.py",
+      "sha256": "19d438c8be4200c8a6488f2e41d97c7f2539fc5643a846b904af2a16cccc4cd1",
+      "copy": "baseline/blueprint.py.txt"
+    },
+    {
+      "path": "scripts/tests/test_blueprint.py",
+      "sha256": "a7e35f9eb83fa98d10275232d5bd45b422c8ff73a4c825fe5e2f7967725f2226",
+      "copy": "baseline/scripts__tests__test_blueprint.py.txt"
+    },
+    {
+      "path": "tool/check_ai_assets.py",
+      "sha256": "fc144afd386d3468b0a712700a58fb74e18d105e2a36cf3dae49685ecb8b555d",
+      "copy": "baseline/tool__check_ai_assets.py.txt"
+    },
+    {
+      "path": "tool/tests/test_ai_assets.py",
+      "sha256": "e436cab31a6a827d305933a2d6fbb9fcd77e16100e519883ac92502ab69a6a4b",
+      "copy": "baseline/tool__tests__test_ai_assets.py.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/app_theme.dart",
+      "sha256": "68ae52839069422c49ad15d0725ef6ee9623a45997453a7717ed12ea5389838b",
+      "copy": "baseline/packages__koi_ui__lib__theme__app_theme.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/app_colors.dart",
+      "sha256": "f9644e385667d594b633f1a3564bde7a47a3d60218fc100c6b72c96422123266",
+      "copy": "baseline/packages__koi_ui__lib__theme__app_colors.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+      "sha256": "809e1fa32f77ce9d502b2a11aaa497a6aebe43b65825adda8d542e092338b427",
+      "copy": "baseline/packages__koi_ui__lib__theme__koi_theme_tokens.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/koi_ui.dart",
+      "sha256": "f7febeea95d741361430379d39f3902012150b8580b01d1d466cb2ec7561b30f",
+      "copy": "baseline/packages__koi_ui__lib__koi_ui.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_selectable_list_tile.dart",
+      "sha256": "2bd3c61c9de6a7a76e4edeb835d3da2b7512aa5387eb9af83bdfc957bfe4e0d0",
+      "copy": "baseline/packages__koi_ui__lib__widgets__koi_selectable_list_tile.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_section.dart",
+      "sha256": "461bed14d7b144063014640c73a5d90f933b6343ff617e07c617ce27878a5c09",
+      "copy": "baseline/packages__koi_ui__lib__widgets__koi_section.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "sha256": "90099a917dfdd9a09bb274f7a9684515e89bc9efe1eccfceef9f3b2fb76c6743",
+      "copy": "baseline/packages__koi_ui__lib__widgets__koi_workbench_frame.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/test/koi_components_test.dart",
+      "sha256": "08105c05c0896f8a0fef4f89e4802a754f80b875af2c2cc02a2cd352a8c285b2",
+      "copy": "baseline/packages__koi_ui__test__koi_components_test.dart.txt"
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/text_page.dart",
+      "sha256": "0444f5bc7dc470c22582a29b940c6a48fd479e22c796dd5b2483b40adf594729",
+      "copy": "baseline/examples__workbench_app__lib__features__workspace__presentation__screens__text_page.dart.txt"
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/media_page.dart",
+      "sha256": "f2a08c5c2f3dbcf4e69d0cf0ec28fff05217590c0a14d359dbfd8a4d395b3bd5",
+      "copy": "baseline/examples__workbench_app__lib__features__workspace__presentation__screens__media_page.dart.txt"
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/tasks_page.dart",
+      "sha256": "02a0e0cea7bcfc6c4d2c5918d2f21a48e9fdaf6527bf31ecd8b3c90fc0924f09",
+      "copy": "baseline/examples__workbench_app__lib__features__workspace__presentation__screens__tasks_page.dart.txt"
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_panels.dart",
+      "sha256": "eaaf2934b6fd62197ae3ba2d679a6b0efef86c9d272669732741ab7b65b4be95",
+      "copy": "baseline/examples__workbench_app__lib__features__workspace__presentation__widgets__workspace_panels.dart.txt"
+    },
+    {
+      "path": "examples/ui_lab/lib/main.dart",
+      "sha256": "237246a4761ffb0e0ce9bd4fd4a728f06d494e41d0f2c18afe60014299334482",
+      "copy": "baseline/examples__ui_lab__lib__main.dart.txt"
+    },
+    {
+      "path": "tool/platform_configuration.py",
+      "sha256": "630ea2368341f7ae31f45d1fb52b75f3186dd1c2e814ac43fbede929f60c4947",
+      "copy": "baseline/tool__platform_configuration.py.txt"
+    },
+    {
+      "path": "examples/workbench_app/lib/core/window/workbench_window_chrome.dart",
+      "sha256": "7a4ddf92b949a80b0cc972e4d38cd4701f40240de70a19dceb6407bd12bd3752",
+      "copy": "baseline/examples__workbench_app__lib__core__window__workbench_window_chrome.dart.txt"
+    },
+    {
+      "path": "examples/workbench_app/test/workbench_window_chrome_test.dart",
+      "sha256": "c2aa6dbe5d5f58946c50fcb5da0da946e537bbeebb77efa1becc22a45662efcb",
+      "copy": "baseline/examples__workbench_app__test__workbench_window_chrome_test.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_popover.dart",
+      "sha256": "196ac037ba571952a7b19c230949b36861ac44c2e4df1650b9c76dfa1ba5529e",
+      "copy": "baseline/packages__koi_ui__lib__widgets__koi_popover.dart.txt"
+    },
+    {
+      "path": "examples/ui_lab/test/ui_lab_test.dart",
+      "sha256": "6db0985a8ea750bfe4583e5b52bad9b794616b7a3d67668d42f09b3f545a1b46",
+      "copy": "baseline/examples__ui_lab__test__ui_lab_test.dart.txt"
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_menu.dart",
+      "sha256": "b99d00e519affcc9aedfcf89f6fcd5a09ff3adc7e2d657bfcd6a5311d4511615",
+      "copy": "baseline/packages__koi_ui__lib__widgets__koi_menu.dart.txt",
+      "provenance": "Original fixture copy predating this refinement; preserves the originally inspected menu implementation."
+    }
+  ],
+  "new_files": [
+    "DESIGN.md",
+    "docs/research/desktop-ui-design-comparison-2026-09-30.md"
+  ]
+}

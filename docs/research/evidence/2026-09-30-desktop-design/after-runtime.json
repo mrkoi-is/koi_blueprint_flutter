@@ -1,0 +1,128 @@
+{
+  "fixture_root": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4",
+  "project": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project",
+  "main_only_override": "Seed three Chinese documents and explicitly select compact/light for the fixture. Native uses the generated test bundle application-support directory; Web uses a dedicated IndexedDB name. No shared theme, UI component or runner override.",
+  "build_app": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app",
+  "builds": {
+    "macos_release": "PASS",
+    "web_release": "PASS"
+  },
+  "shared_sources": [
+    {
+      "path": "packages/koi_ui/lib/koi_ui.dart",
+      "sha256": "fbae9021870d5deb0aefd064716688ee7f73b231ff381069b26b90967853bb0f",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+      "sha256": "48aa13795048cae419d88f3f655a394a5f6014bc69b9eb675746425a4c980be1",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/app_theme.dart",
+      "sha256": "7168410d1d93d969aa3ca72a44fb889cab6949f291b7b99d61307e875a92113f",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/app_colors.dart",
+      "sha256": "b82ffb13680333523b7d620a4ebc7fa62fab7c4a0cd81284a0b24ad1d9b65014",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_menu.dart",
+      "sha256": "0d1db451c423f98fadf8873ff2617b3ea85b7e48ca4cbe403dee36114a2f8591",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_error_state.dart",
+      "sha256": "41379773c5b0186e34bde80ffe8b5dc8b34688bcaa1127411457867e9bc971ae",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_loading_state.dart",
+      "sha256": "66ba8b6587f2392a2b07ff6dc5a5162ce1b8a3f654948b052733987af3bdd24f",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_property_row.dart",
+      "sha256": "b8253a2921e1bff3d9ffa07d1e0859717461ba184c6796b3c757f35f057787ae",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_popover.dart",
+      "sha256": "4a28baba1a9cfa383f970b3e3c3482448a8b5847658ea84830134dc6985985c5",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_navigation_history_controls.dart",
+      "sha256": "d05895065d2f855d0da64966135ecd79161931989f6f13a4ff29a62ae197d550",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_resizable_split_view.dart",
+      "sha256": "81b5e6760a85babf16d924dee5ce5d5ea9463d0edb59e089295f455e7fb9b422",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_toolbar.dart",
+      "sha256": "9e921cee1ede66d81f579e64b28e1d3d6419b6b8169ecb896647f09f6ea0ec46",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_section.dart",
+      "sha256": "9576d47955ef8528b8355bc246411f5263208fd273dd775ce8eac4c4d2c84f3b",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_reading_pane.dart",
+      "sha256": "314a459b5f00e812fe920a66547b5650b9a37a65b5d5f2c54b76a935007b3293",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_selectable_list_tile.dart",
+      "sha256": "09cacdc602c4f0d9d905171c77a516801c0e7457d9881307a7ddfa75cd029486",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_search_field.dart",
+      "sha256": "161b8f9fe60af3e639a7ae522a4b29296da122ea929e26af4759796a449a2cb2",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "sha256": "76bda17ee9e1b986008896eccae7728e89c4bcfaf9f95446a5a3f1d211c15da7",
+      "generated_matches": true
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_empty_state.dart",
+      "sha256": "5ed3a94670f1f16f76072c2ea0ad074d26695d7f0c1a04bb551087a342ecf383",
+      "generated_matches": true
+    }
+  ],
+  "runtime": {
+    "macos_release": "Observed light/dark document display, native back navigation and task empty state; not complete business flow.",
+    "fixture_bundle": "com.mrkoi.designfixture.shellReviewApp",
+    "fixture_storage": "Named app sandbox application-support directory. Original global-temp override was rejected and corrected before final builds.",
+    "appearance_preparation": "Closed the fixture, selected its first document and changed only its stored theme preference, then relaunched. This is not settings-menu validation.",
+    "final_code": "Dark at 1710x1007 and light at 800x600 reflect final sidebar alignment/Tooltip changes. The earlier wide light/task screenshots remain labeled as first refinement.",
+    "automation_limit": "CUA connected to final dark app; after restarting into light, repeated connection attempts timed out despite a valid running window. Exact-window OS capture confirmed visible light state. Full interaction remains unverified."
+  },
+  "artifact_verification": "Clean rebuilt macOS and Web Release; final codesign --verify --deep --strict exit 0.",
+  "template_view_sources": [
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_panels.dart",
+      "source_sha256": "2677055b5cada27501ecbc37934f688b2ba338aaa0f42fd343724e2f07d36244",
+      "generated_matches_after_package_rename": true
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/text_page.dart",
+      "source_sha256": "7e7e00b8fb63087651315cb042303509b40a1a92e16acfab8e3aa306851f3da8",
+      "generated_matches_after_package_rename": true
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/media_page.dart",
+      "source_sha256": "beeb8bae7f0e94d5903d41b5dfd48a0a9dfe0c4808876f06c822587572f4d51b",
+      "generated_matches_after_package_rename": true
+    }
+  ]
+}

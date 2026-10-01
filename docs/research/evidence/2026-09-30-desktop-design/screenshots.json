@@ -1,0 +1,101 @@
+{
+  "screenshots": [
+    {
+      "path": "koi-after-light-tasks.png",
+      "sha256": "d4dad8ea0231ec41d09bc7ee8873fef42bf9f5ef79cdf51f5b8ba15ca95cde72",
+      "capture_file_mtime": "2026-09-30T22:36:25.176307+08:00",
+      "pixel_dimensions": [
+        3556,
+        2150
+      ],
+      "logical_window_size": [
+        1710,
+        1007
+      ],
+      "dpr": 2,
+      "text_scale": 1,
+      "theme": "light",
+      "density": "compact",
+      "state": "task empty state",
+      "window_id": 21199,
+      "source": "OS exact window-ID screenshot; opened and inspected saved file",
+      "window_title": "ShellReview 工作区",
+      "inactive_titlebar": true,
+      "includes_window_shadow": true,
+      "revision_note": "First refinement; task page unchanged by final sidebar detail edit."
+    },
+    {
+      "path": "koi-after-light-text.png",
+      "sha256": "f6b48ad6f4f8c1912677552dfe6884a4b33bb404a5fa08bf08371649d49bbfe0",
+      "capture_file_mtime": "2026-09-30T22:47:33.277876+08:00",
+      "pixel_dimensions": [
+        3556,
+        2150
+      ],
+      "logical_window_size": [
+        1710,
+        1007
+      ],
+      "dpr": 2,
+      "text_scale": 1,
+      "theme": "light",
+      "density": "compact",
+      "state": "设计规范.md; 82 chars; version 1; saved",
+      "window_id": 21384,
+      "source": "OS exact window-ID screenshot; opened and inspected saved file",
+      "window_title": "ShellReview 工作区",
+      "inactive_titlebar": true,
+      "includes_window_shadow": true,
+      "revision_note": "First refinement; before final sidebar padding/Tooltip edit."
+    },
+    {
+      "path": "koi-after-dark-text.png",
+      "sha256": "7df7450c338c86d0b767fed4acf906f6085a9387c3949b48475c04c2e4dc8165",
+      "capture_file_mtime": "2026-09-30T23:08:14.650003+08:00",
+      "pixel_dimensions": [
+        3556,
+        2150
+      ],
+      "logical_window_size": [
+        1710,
+        1007
+      ],
+      "dpr": 2,
+      "text_scale": 1,
+      "theme": "dark",
+      "density": "compact",
+      "state": "设计规范.md; 82 chars; version 1; saved",
+      "window_id": 21544,
+      "source": "OS exact window-ID screenshot; opened and inspected saved file",
+      "window_title": "ShellReview 工作区",
+      "inactive_titlebar": true,
+      "includes_window_shadow": true,
+      "revision_note": "Final executable code; matched fresh CUA screenshot and AX data."
+    },
+    {
+      "path": "koi-after-light-narrow.png",
+      "sha256": "be4325ef0f8676a48903641ade289832d55b378d2da9f8f1abb8969ac67e8479",
+      "capture_file_mtime": "2026-09-30T23:12:01.864529+08:00",
+      "pixel_dimensions": [
+        1736,
+        1336
+      ],
+      "logical_window_size": [
+        800,
+        600
+      ],
+      "dpr": 2,
+      "text_scale": 1,
+      "theme": "light",
+      "density": "compact",
+      "state": "设计规范.md; 82 chars; saved; sidebar/details on demand",
+      "window_id": 21554,
+      "source": "OS exact window-ID screenshot; opened and inspected saved file",
+      "window_title": "ShellReview 工作区",
+      "inactive_titlebar": true,
+      "includes_window_shadow": true,
+      "revision_note": "Final executable code; CUA connection timed out; exact OS window ID and inspected image establish visible state only."
+    }
+  ],
+  "fixture_theme_preparation": "App closed; only named test bundle snapshot appearance and selection were prepared; no UI settings verification."
+}

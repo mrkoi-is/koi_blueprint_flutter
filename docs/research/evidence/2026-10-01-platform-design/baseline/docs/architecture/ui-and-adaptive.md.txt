@@ -1,0 +1,35 @@
+# UI 与自适应工作区
+
+所有新项目使用 `koi_ui` 的 Material 3 明暗主题。保留 Koi 品牌色；通用文字、错误、控件状态使用 ColorScheme/TextTheme，产品面板、边框、选中与拖放语义由 KoiThemeTokens 补充。token、spacing、radius、density 的唯一来源是该包手写源码。
+
+视觉目标、文字角色、控件尺寸和页面配方见 [Flutter 设计规范](../../DESIGN.md)。本文件负责展示/平台/状态边界。
+
+## 展示边界
+
+UI 包仅依赖 Flutter。组件接收不可变展示数据、槽位和回调，不装配 repository、Riverpod、路由或模块。标准按钮、输入框优先使用 Material 组件及主题；自定义组件需具备键盘、焦点、disabled、hover 与语义反馈。普通 Material 主题下也能使用组件。
+
+工作区壳根据局部 LayoutBuilder 约束切换：小于 600 为紧凑导航，600–1023 为 rail 与主体，1024 起显示可调整侧栏、主体及详情。OS 判断只用于平台服务；密度是明确设置，不从窗口宽度推断输入方式。窄窗口、长中文及 200% 字号必须可操作。
+
+宽屏使用 64px 固定图标栏，导航入口靠上，`navigationTrailing` 槽位固定底部。工作台在此装配主题与密度设置菜单；小于 600 时该入口移到顶部标题区。固定图标栏和标题区共用 `chromeBackground` 外壳底色，标题区不叠加滚动色调。资料侧栏（标题、搜索和列表）、主体和详情共用 `contentBackground`，一起组成一个有 8px 外边距、24px 圆角和弱边框的内容面板，真实裁剪其子内容；两条可调整分隔条都在面板内部。窄窗口的资料及详情抽屉也使用内容底色。两组颜色随明暗主题同步，普通 Material 宿主使用 ColorScheme 回退。短窗口允许导航入口滚动，底部设置仍保持可见。
+
+结构边线单独使用 onSurface 的 6% 透明度，不复用输入框等控件的 outlineVariant。可调整面板保留 12px 全高命中区和键盘/语义操作；默认隐藏拖动条，悬停显示 48px 短提示，键盘焦点及拖动期间使用品牌指示色。鼠标离开或操作结束后收起提示，内容边界主要由底色和留白表达。
+
+生成 workbench 的 macOS runner 增加确定性的窗口桥接：保留原生红黄绿按钮和拖动标题栏，使用 fullSizeContentView、透明标题栏与 unifiedCompact NSToolbar。后退、前进、标题和保存由原生工具栏提供，位于红黄绿右侧同一行。App 的 `WorkbenchWindowChrome` 同步主题、项目标题和历史可用状态，并把原生命令连接到同一个工作区历史及保存回调。原生宿主报告工具栏就绪后，宽窗口通过 `showHeader: false` 去掉重复的 Flutter 标题区；窄窗口保留抽屉等内容操作。工作区内容预留原生工具栏高度，背景与图标栏一致。桥接仅由 App 拥有，不进入 domain 或 koi_ui；Web 和其他平台不调用该 macOS 通道。Windows/Linux 的系统标题栏融合需各自平台实现及运行验收。
+
+其他平台及不可用原生宿主通过 `headerLeading` 槽位装配 `KoiNavigationHistoryControls`。两个 Material IconButton 仅接收后退/前进回调；回调为空时禁用，保留 tooltip、Tab、Enter/Space 行为。宽屏放在标题左侧；小于 600 时使用独立的 48px 控制行，避免窄窗口及 200% 字号挤压标题和操作按钮。
+
+工作台的 `WorkbenchNavigationHistory` 由 bootstrap 持有，记录当前会话内的 URI 与资料/素材 ID，最多 100 条。后退/前进恢复视图和内容选择，跳过已删除的内容；后退后打开新页面或新内容清空前进分支。编辑、自动保存、任务进度、主题和面板尺寸变化不增加记录。历史不复制草稿、不持久化，不替换原有类型化路由或 indexedStack。关闭时先移除监听，再释放 router、provider container 与其余会话。
+
+## 状态与拥有者
+
+业务状态与任务在 workspace session；文本控制器和播放器位于布局分支上方的稳定拥有者。普通视图切换不触发互斥 module session 切换，不取消工作区任务。播放器离开媒体视图暂停，返回不自动播放；resize 不重建 controller。焦点、hover、drawer 和临时浮层留在 Widget。
+
+Page Shortcuts/Actions 连接语义命令；Cmd/Ctrl+O 导入、Cmd/Ctrl+S 保存；Cmd+[ / Cmd+] 后退/前进，非 macOS 另提供 Alt+Left / Alt+Right。macOS 的 Option+方向键保留文本编辑行为。文本编辑保留正常输入。Escape 关闭弹层并恢复触发者焦点；宿主销毁不残留 overlay。
+
+## 样例与验证
+
+使用 [UI Lab](../examples.md) 查看主题、密度、长文本、字号和组件行为；使用 Workbench 查看文本、媒体、待办与真实 IO 任务。样例源码与测试不能替代目标端运行结果。
+
+工作台的 Native 存储、Web IndexedDB/Blob、文件导入和媒体引擎留在 App 的 data/core，通过 bootstrap 注入。domain 只包含模型和端口。导入为副本；Blob URL 只用于当前预览，先关闭播放器再释放 URL。首帧截图失败保留素材并提供重试，不写假缩略图。任务的字节进度来自实际读取/写入，解码阶段使用不确定进度；取消机制与迟到结果隔离分别实现。
+
+目标媒体基线为 JPEG/PNG 与 MP4/H.264 8-bit 4:2:0/AAC-LC。文本、图片、视频默认上限分别为 256 KiB、20 MiB、100 MiB。首次成功预览生成真实视频缩略图；Native/Web 持久化、重开恢复、取消清理、换片释放须独立记录证据。

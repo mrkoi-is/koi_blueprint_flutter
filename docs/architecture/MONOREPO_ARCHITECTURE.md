@@ -1,46 +1,26 @@
-# Koi Flutter Monorepo 架构
+# Monorepo 契约
 
-> 基线来源：`jiejing` 的技术栈选择 + `learning_officer_oa` 对目录组织和历史迁移的经验
-
-## 顶层结构
+根 `pubspec.yaml` 的 workspace 是成员清单的唯一来源；成员设置 `resolution: workspace`。新增 App、module 或 package 必须登记、解析依赖，并确认生成/分析/测试发现它。不要另写一份脚本硬编码清单。
 
 ```text
-koi_blueprint_flutter/
-├── apps/
-├── packages/
-├── docs/
-├── legacy/
-├── scripts/
-├── tool/
-└── pubspec.yaml
+apps/       宿主与组合根
+modules/    独立业务模块（按需）
+packages/   公共契约、基础设施、UI 等稳定共享能力
+examples/   蓝图维护用的可运行示范
 ```
 
-## 依赖规则
+## 依赖方向
 
-- App 可以依赖任意 `packages/*`
-- Package 只能依赖更底层 package
-- Package 不允许反向依赖 App
-- App 之间不直接依赖
-- 公共 Package API 不向 App 泄漏 Dio 等底层实现类型
+- App 可以依赖 module 和 package；多个 App 通过 package 共享，不互相引用。
+- module 依赖公共契约/基础包，不互相 import 业务实现，也不依赖宿主 App。
+- domain 契约不依赖 IO、UI 或实现；实现依赖契约，由宿主注入。
+- UI 包不依赖业务 repository、router 或运行时；业务专用 Widget 留在 Feature。
+- 包的公开 API 只暴露消费方需要的类型，不把 Dio、平台句柄等实现细节外泄。
 
-## 推荐包分层
+`koi_auth` 的认证模型保持独立；`koi_modules` 提供模块会话契约，不负责实际 App UI。两者均是按场景引入的能力，而不是创建空项目的必选依赖。
 
-```text
-apps/<app>
-  ├── koi_ui
-  ├── koi_domain
-  ├── koi_core
-  └── koi_api_bootstrap / <project>_api / <project>_network
+## 自动化范围
 
-koi_auth  # 独立包：与上述分层平级，不依赖 koi_core 等任何分层内 package
-```
+质量工具从 workspace 获取成员，区分 Dart/Flutter 包、生成器和目标平台。每个可执行成员都提供测试；生成源码排除覆盖率，手写源码不能靠漏导入测试躲过覆盖率检查。样例不是发布产品，但同样需要独立解析、分析和测试。
 
-`koi_auth` 刻意保持独立：不依赖 `koi_core`，只依赖 `freezed_annotation`，
-让认证状态模型自包含、可被任意端独立复用，不被分层规则强制挂载。
-
-## 适合 Koi 的原因
-
-- 可以把 `koi_network`、`koi_swagger_parser`、未来 `koi_blueprint_flutter` 的能力串起来
-- 共享 UI、共享领域对象、共享认证模型可以自然沉淀到 package
-- 后续接新端时，不需要再拆仓库或大规模搬代码
-- 平台专属实现通过条件导入隔离，Web 编译不遍历 Native `dart:io` 代码
+跨平台 Python 入口为 `blueprint.py`，Makefile 和 shell wrapper 作为已有用户的便捷入口。CI 和本地调用同一逻辑，平台构建由匹配的 runner 执行。

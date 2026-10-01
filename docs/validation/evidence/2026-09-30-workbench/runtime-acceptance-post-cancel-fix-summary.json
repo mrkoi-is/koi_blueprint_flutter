@@ -1,0 +1,60 @@
+{
+  "completed_at": "2026-09-30T05:24:49.469823+00:00",
+  "runtime_app": "apps/runtimeaccept_app",
+  "runtime_package": "runtimeaccept_app",
+  "source_files_verified": 60,
+  "source_manifest": "runtime-source-post-cancel-fix-manifest.json",
+  "workspace_session_sha256": "16bca3ce3ea7ca26091247b5cdd376bfc1f84e43220e7757dad1ca446e2594a7",
+  "synced_implementation_files": [
+    "lib/features/workspace/application/workspace_session.dart"
+  ],
+  "macos": {
+    "result": "PASS",
+    "exit_code": 0,
+    "log": "macos-runtime-post-cancel-fix.log",
+    "evidence": "macos-runtime-post-cancel-fix-evidence.json"
+  },
+  "chrome": {
+    "result": "PASS",
+    "exit_code": 0,
+    "log": "chrome-runtime-post-cancel-fix.log",
+    "evidence": "chrome-runtime-post-cancel-fix-evidence.json"
+  },
+  "scope": [
+    "actual Native/IndexedDB persistence",
+    "original PNG/JPEG images and real persisted thumbnails",
+    "H264 yuv420p AAC-LC landscape/portrait Player",
+    "paused first-frame nonblank JPEG",
+    "play/pause/seek/volume",
+    "actual resource lease release",
+    "Web Blob URL fetch fails after revoke",
+    "Chinese content/material/todo reopen recovery"
+  ],
+  "file_picker": {
+    "result": "NOT_RUN",
+    "reason": "Input adapter streams bundled fixtures; OS/browser file selector is not exercised"
+  },
+  "cancellation_specific_runtime_case": "NOT_EXERCISED_normal_fixture_smoke; cancellation windows verified by Core Native regressions",
+  "owned_chromedriver": {
+    "pid": 52940,
+    "port": 4445,
+    "stopped_and_port_closed": true,
+    "log": "chromedriver-post-cancel-fix.log"
+  },
+  "prior_final_evidence_preserved": [
+    "macos-runtime-final.log",
+    "macos-runtime-final-evidence.json",
+    "chrome-runtime-final-1.log",
+    "chrome-runtime-final-1-evidence.json",
+    "chrome-runtime-final-2.log",
+    "chrome-runtime-final-2-evidence.json"
+  ],
+  "intermediate_evidence_preserved": [
+    "macos-runtime-post-cancel-fix-intermediate.log",
+    "macos-runtime-post-cancel-fix-intermediate-evidence.json",
+    "chrome-runtime-post-cancel-fix-intermediate.log",
+    "chrome-runtime-post-cancel-fix-intermediate-evidence.json",
+    "runtime-source-post-cancel-fix-intermediate-manifest.json"
+  ],
+  "host_available_for_normal_app_picker": true
+}

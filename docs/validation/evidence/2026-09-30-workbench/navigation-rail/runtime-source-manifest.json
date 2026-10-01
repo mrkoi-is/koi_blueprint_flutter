@@ -1,0 +1,26 @@
+{
+  "packages/koi_ui/lib/widgets/koi_workbench_frame.dart": {
+    "host": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "source_sha256": "4d79c6737c8f5de48e42af54ad7858d6d720c1f4142fc3577ee217e1fd7e2eb0",
+    "host_sha256": "4d79c6737c8f5de48e42af54ad7858d6d720c1f4142fc3577ee217e1fd7e2eb0"
+  },
+  "examples/workbench_app/lib/app.dart": {
+    "host": "apps/runtimeaccept_app/lib/app.dart",
+    "source_sha256": "8a9b64f1bdd8fd6def1a6ba927ba42c3d15f8db7eb0f1e36cd907260c2e1e419",
+    "host_sha256": "da397f203012c06ca88bc6a6c5decf4c247426e5e33a3b33025380878ecc1bf3"
+  },
+  "examples/workbench_app/lib/core/window/workbench_window_chrome.dart": {
+    "host": "apps/runtimeaccept_app/lib/core/window/workbench_window_chrome.dart",
+    "source_sha256": "1504566e51ffb922148b300b3ce39d54ebf1415c14a7916b648e537ee3ac3729",
+    "host_sha256": "1504566e51ffb922148b300b3ce39d54ebf1415c14a7916b648e537ee3ac3729"
+  },
+  "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart": {
+    "host": "apps/runtimeaccept_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+    "source_sha256": "a60b58f26f604f2892f6ec141ef8ffd1300010a9015f5d10007846da9e6e9bfb",
+    "host_sha256": "539671a480ec31436a234c4fe412f90501b74825eb7dbaa54e00f7bb7398b87a"
+  },
+  "identity_replacements": {
+    "package:workbench_app/": "package:runtimeaccept_app/",
+    "WorkbenchApp": "RuntimeacceptApp"
+  }
+}

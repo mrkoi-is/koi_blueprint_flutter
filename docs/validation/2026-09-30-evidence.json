@@ -1,0 +1,177 @@
+{
+  "date": "2026-09-30",
+  "scope": "Local remediation code committed on an unpushed review branch; original checkout remains dirty. No remote CI or Linux/Windows host build has run.",
+  "source": {
+    "base_head": "c9b77656684bb0034ab73d19bdb28a9855574c9e",
+    "dirty": true,
+    "files": {
+      "blueprint.py": "19265a042eb4e6c2f29d1b1b27adac23dc819a75246ddf1b795bb6ae3844054e",
+      "pubspec.lock": "815ec5a3e7966d733c02c03782e0439970ab0d3f6c7b2f0c72518d36cbf759b4",
+      "tool/check_ai_assets.py": "93f003d271b0c3fca4bd3771ac75a5d508b1d6f22f3f87e962d7665f5c426a53",
+      "tool/architecture/checker.dart": "e7b566f44da27f6be3c1d4c0f2b05b4ec08729a367922e6ee3ad259ad7fa5af1"
+    },
+    "review_branch": "codex/blueprint-remediation-20260930",
+    "code_commit": "85fb2cbdf54a00ecdda37dfe08da1faebb1769c8",
+    "review_worktree_clean_at_code_commit": true
+  },
+  "environment": {
+    "host": "Darwin arm64",
+    "flutter": "3.47.2",
+    "dart": "3.13.2",
+    "xcode": "27.0",
+    "java": "Temurin 17",
+    "python_current": "3.14.5",
+    "python_floor_tested": "3.11.15",
+    "python_ci_tested": "3.12"
+  },
+  "logs": {
+    "red_behavior": {
+      "status": "expected_failure",
+      "bytes": 8415,
+      "sha256": "8aaffd6841ddb8fedfececa1a21828f4cbd45f12b4076e8dfabb01a822ddfab9"
+    },
+    "red_ai": {
+      "status": "expected_failure",
+      "bytes": 1367,
+      "sha256": "f376e5cf39c1b8477202c2bfc5da6e654518bd631e4045d41716eace59bd17d2"
+    },
+    "red_architecture": {
+      "status": "expected_failure",
+      "bytes": 2418,
+      "sha256": "0c1d3d6b743bd7e5f90846e8a850b629c038a4c51d74f214d6169f53996ee0f6"
+    },
+    "source_validate": {
+      "status": "passed",
+      "bytes": 62894,
+      "sha256": "a7d99c8b1f809da9c51cc76e1f745419dbfbfa794db9d41dfb1bd28445b8eff6"
+    },
+    "generator_smoke": {
+      "status": "passed",
+      "bytes": 53198,
+      "sha256": "3a87023bb344eea53c5c585ea3de7a6c53b9edd88401c74dfedd4d32b6e66d9d"
+    },
+    "six_platform_create": {
+      "status": "passed",
+      "bytes": 4761,
+      "sha256": "c6f3d8ba9a4f86e5013757598d9cf8265f5a059fdfdaa38d319dcc89eb03f13d"
+    },
+    "six_platform_validate": {
+      "status": "passed",
+      "bytes": 10404,
+      "sha256": "61dfc25e5eaef39441df758ccf2066945668921e3cbe090a749ead595a244283"
+    },
+    "web_macos_ios_build": {
+      "status": "passed",
+      "bytes": 2384,
+      "sha256": "b03d9b46b901cfa8675f324f8f91bad68480b820ac8df36fd0db76697f5c8c57"
+    },
+    "android_apk_build": {
+      "status": "passed",
+      "bytes": 929,
+      "sha256": "de2d027643ab145dbcfca8101200d75974fcb65857cb2c7accb9662681bb6730"
+    },
+    "review_commit_hook": {
+      "status": "passed",
+      "bytes": 68467,
+      "sha256": "992ed60cfa0892ac48cdbfb33a40e4fb5130af1baf6073d569983c87185601b0"
+    },
+    "ai_contracts_unchanged": {
+      "status": "passed",
+      "bytes": 251,
+      "sha256": "74034eb5d43897bf8190d5b767cc6fc55491920d75992f25015f12342e2e5540"
+    },
+    "ai_browser_persistence": {
+      "status": "passed",
+      "bytes": 538,
+      "sha256": "252ca198f4790fbb285f21823b68621f48bc2895043a66bd8aa99e58a51d476e"
+    },
+    "ai_full_validate": {
+      "status": "passed",
+      "bytes": 31657,
+      "sha256": "f5ee4266d382f01b9e42975b47b673bd3dc558bc352f8c46cc7fbd63ae0be313"
+    },
+    "ai_web_build": {
+      "status": "passed",
+      "bytes": 1419,
+      "sha256": "6f01e64126d71ddef92fa65e24bc0a655d375544e767afc3ff42845ce595aafe"
+    },
+    "ai_web_build_final": {
+      "status": "passed",
+      "bytes": 962,
+      "sha256": "5a0b81c92587e7eeb727b70b04e4fd5652ee639f98ab525f1117f94087d6dae7"
+    },
+    "ai_analyze_after_icon_dependency": {
+      "status": "passed",
+      "bytes": 281,
+      "sha256": "ffc6175735b75c7c23841b344e89113505cb8b53e2ece3cdd5a0ed5122f8d0fb"
+    }
+  },
+  "checks": {
+    "source_validate": {
+      "flutter_tests": 133,
+      "python_generator_tests": 25,
+      "python_ai_tests": 19,
+      "architecture_cases": 40,
+      "coverage_source_cases": 3,
+      "handwritten_lines": "1178/1276",
+      "handwritten_percent": 92.32
+    },
+    "generator_smoke": {
+      "flutter_tests": 49,
+      "handwritten_lines": "424/442",
+      "handwritten_percent": 95.93
+    },
+    "six_platform_validate": {
+      "flutter_tests": 9,
+      "handwritten_lines": "46/50",
+      "handwritten_percent": 92.0
+    }
+  },
+  "artifacts": {
+    "web_js": {
+      "path_within_app": "build/web/main.dart.js",
+      "sha256": "564598c27fe912ed53ea696fd939723c5f19e14d16dd4f52d4d5a5c8a4facbfb",
+      "bytes": 2321916
+    },
+    "macos_executable": {
+      "path_within_app": "build/macos/Build/Products/Release/remediation_qa_app.app/Contents/MacOS/remediation_qa_app",
+      "sha256": "69ae5015a5a417474b93f67bb929abb1144d6188e4465c5e0e440f71d34a5864",
+      "bytes": 167600
+    },
+    "ios_unsigned_executable": {
+      "path_within_app": "build/ios/iphoneos/Runner.app/Runner",
+      "sha256": "1cb8b0cc82ca7f42dcb8367d57a5624477a9209ac446ffd1a75b69690b601e48",
+      "bytes": 93656
+    },
+    "android_apk": {
+      "path_within_app": "build/app/outputs/flutter-apk/app-release.apk",
+      "sha256": "5e7b7e6c07262bf28898a750e5f8bb6664c26e6a4c55a4523f7aa846913d4fc2",
+      "bytes": 47073490
+    }
+  },
+  "platforms": {
+    "web": "PASS",
+    "android": "PASS",
+    "ios_unsigned": "PASS",
+    "macos": "PASS",
+    "linux": "NOT_RUN",
+    "windows": "NOT_RUN",
+    "remote_ci": "NOT_RUN"
+  },
+  "independent_ai": {
+    "status": "PASS",
+    "workspace_members": 4,
+    "flutter_tests": 60,
+    "python_generator_tests": 25,
+    "python_ai_tests": 19,
+    "architecture_cases": 40,
+    "handwritten_lines": "657/689",
+    "handwritten_percent": 95.36,
+    "chrome_persistence_test": "PASS",
+    "web_release_build": "PASS",
+    "web_js_sha256": "08968ec730e8307be624d44d167898d8cce78958b8cf99cdd73ec865300fe3d2",
+    "supplied_contract_files_unchanged": 54,
+    "real_backend": "NOT_RUN",
+    "final_dependency_analysis": "PASS"
+  }
+}

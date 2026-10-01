@@ -1,0 +1,76 @@
+[
+  {
+    "file": "text-light.png",
+    "size": [
+      3644,
+      2238
+    ],
+    "samples": {
+      "titlebar": "#F2F3F1",
+      "rail": "#F2F3F1",
+      "sidebar": "#F2F3F2",
+      "body_surface": "#FFFBF6",
+      "detail": "#FFFBF6"
+    },
+    "coordinates": {
+      "titlebar": [
+        1100,
+        115
+      ],
+      "rail": [
+        180,
+        1200
+      ],
+      "sidebar": [
+        450,
+        1400
+      ],
+      "body_surface": [
+        2200,
+        300
+      ],
+      "detail": [
+        3300,
+        1200
+      ]
+    },
+    "shell_max_rgb_delta": 1
+  },
+  {
+    "file": "text-dark.png",
+    "size": [
+      3644,
+      2238
+    ],
+    "samples": {
+      "titlebar": "#121B18",
+      "rail": "#121B18",
+      "sidebar": "#121B19",
+      "body_surface": "#1D2622",
+      "detail": "#1D2622"
+    },
+    "coordinates": {
+      "titlebar": [
+        1100,
+        115
+      ],
+      "rail": [
+        180,
+        1200
+      ],
+      "sidebar": [
+        450,
+        1400
+      ],
+      "body_surface": [
+        2200,
+        300
+      ],
+      "detail": [
+        3300,
+        1200
+      ]
+    },
+    "shell_max_rgb_delta": 1
+  }
+]

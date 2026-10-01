@@ -1,0 +1,7 @@
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart
+00:00 +0: host panel commands at 320.0 need no second bar
+00:00 +1: host panel commands at 800.0 need no second bar
+00:00 +2: host panel commands at 1440.0 need no second bar
+00:01 +3: Material bottom bar adds the safe inset only once
+00:01 +4: Flutter fallback has panel icons in one compact header
+00:01 +5: All tests passed!

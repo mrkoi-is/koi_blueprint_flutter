@@ -1,0 +1,85 @@
+ M .agent/skills/add-feature-module/SKILL.md
+ M .agent/skills/add-generated-api-package/SKILL.md
+ M .agent/skills/add-routing/SKILL.md
+ M .agent/skills/add-shared-package/SKILL.md
+ M .agent/skills/architecture-review/SKILL.md
+ M .agent/skills/index.yaml
+ M .agent/skills/testing-scaffold/SKILL.md
+ M .agent/skills/workspace-init/SKILL.md
+ M .cursor/rules/koi-workspace.mdc
+ M .githooks/pre-commit
+ M .github/workflows/quality.yml
+ M .gitignore
+ M AGENTS.md
+ M CHANGELOG.md
+ M Makefile
+ M README.md
+ M docs/agent-skill-rule-discovery.md
+ M docs/ai-quickstart.md
+ M docs/architecture/ARCHITECTURE.md
+ M docs/architecture/MONOREPO_ARCHITECTURE.md
+ M docs/architecture/PROJECT_STRUCTURE.md
+ M docs/how-other-ai-use-this-project.md
+ M docs/test_strategy.md
+ M packages/koi_ui/lib/koi_ui.dart
+ M packages/koi_ui/lib/theme/app_colors.dart
+ M packages/koi_ui/lib/theme/app_theme.dart
+ M pubspec.lock
+ M pubspec.yaml
+ M scripts/check_coverage.sh
+ M scripts/check_generated.sh
+ M scripts/create_feature.py
+ M scripts/tests/test_create_feature.py
+ M scripts/validate_workspace.sh
+ M tool/check_coverage_sources.dart
+ M tool/melos
+?? .agent/skills/GOVERNANCE.md
+?? .agent/skills/add-business-module/
+?? .agent/skills/add-feature-module/references/
+?? .agent/skills/add-generated-api-package/references/
+?? .agent/skills/state-management/
+?? .agent/skills/workspace-init/references/
+?? .agents/
+?? .github/ISSUE_TEMPLATE/
+?? .github/PULL_REQUEST_TEMPLATE.md
+?? CLAUDE.md
+?? CONTRIBUTING.md
+?? DESIGN.md
+?? REMEDIATION_PLAN_2026-09-30.md
+?? blueprint.py
+?? docs/architecture/local-first-desktop.md
+?? docs/architecture/modules.md
+?? docs/architecture/references.md
+?? docs/architecture/state-management.md
+?? docs/architecture/ui-and-adaptive.md
+?? docs/examples.md
+?? docs/new-project.md
+?? docs/research/
+?? docs/validation/
+?? examples/
+?? packages/koi_modules/
+?? packages/koi_ui/README.md
+?? packages/koi_ui/lib/theme/koi_theme_tokens.dart
+?? packages/koi_ui/lib/widgets/koi_menu.dart
+?? packages/koi_ui/lib/widgets/koi_navigation_history_controls.dart
+?? packages/koi_ui/lib/widgets/koi_popover.dart
+?? packages/koi_ui/lib/widgets/koi_property_row.dart
+?? packages/koi_ui/lib/widgets/koi_reading_pane.dart
+?? packages/koi_ui/lib/widgets/koi_resizable_split_view.dart
+?? packages/koi_ui/lib/widgets/koi_search_field.dart
+?? packages/koi_ui/lib/widgets/koi_section.dart
+?? packages/koi_ui/lib/widgets/koi_selectable_list_tile.dart
+?? packages/koi_ui/lib/widgets/koi_toolbar.dart
+?? packages/koi_ui/lib/widgets/koi_workbench_frame.dart
+?? packages/koi_ui/test/koi_components_test.dart
+?? packages/koi_ui/test/koi_design_behavior_test.dart
+?? scripts/tests/test_blueprint.py
+?? tool/architecture/
+?? tool/architecture_exceptions.json
+?? tool/check_ai_assets.py
+?? tool/check_architecture.dart
+?? tool/create_media_fixtures.py
+?? tool/generator_smoke.py
+?? tool/include_browser_coverage.dart
+?? tool/platform_configuration.py
+?? tool/tests/

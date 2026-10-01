@@ -16,9 +16,20 @@ workspace:
   - packages/koi_core
   - packages/koi_domain
   - packages/koi_ui
+  - packages/koi_modules
+  - examples/starter_app
+  - examples/ui_lab
+  - examples/workbench_app
+  - examples/minimal_module
+  - examples/feature_lab
+  - examples/module_showcase
+  - examples/module_showcase/packages/showcase_contracts
+  - examples/module_showcase/modules/alpha
+  - examples/module_showcase/modules/beta
 
 dev_dependencies:
   analyzer: 14.4.0
+  yaml: ^3.1.3
   flutter_lints: ^6.0.0
   melos: ^8.9.0
 
@@ -30,65 +41,23 @@ melos:
 
   scripts:
     get:
-      description: 初始化所有包依赖
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/flutterw pub get"
-
+      run: python blueprint.py check bootstrap
     analyze:
-      description: 分析全部 package 和 app
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/dartw analyze --fatal-infos"
-
+      run: python blueprint.py check analyze
     format:check:
-      description: 检查格式化
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/dartw format --output=none --set-exit-if-changed ."
-
+      run: python blueprint.py check format-check
     format:fix:
-      description: 自动格式化
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/dartw format ."
-
-    fix:apply:
-      description: 自动修复 lint
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/dartw fix --apply"
-
+      run: python blueprint.py check format
     generate:
-      description: 运行代码生成
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/dartw run build_runner build"
-      packageFilters:
-        dependsOn: build_runner
-
+      run: python blueprint.py check generate
     generate:watch:
-      description: watch 模式代码生成
       exec:
-        command: "$MELOS_ROOT_PATH/tool/dartw run build_runner watch"
+        command: dart run build_runner watch
       packageFilters:
         dependsOn: build_runner
-
     test:
-      description: 运行全部测试
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/flutterw test"
-        concurrency: 1
-      packageFilters:
-        dirExists: test
-
+      run: python blueprint.py check test
     coverage:
-      description: 检查每个 workspace 成员的测试与合并行覆盖率
-      run: "$MELOS_ROOT_PATH/scripts/check_coverage.sh"
-
-    clean:
-      description: 清理工作区
-      exec:
-        command: "$MELOS_ROOT_PATH/tool/flutterw clean"
-
+      run: python blueprint.py check coverage
     precommit:
-      description: 提交前检查
-      run: >-
-        "$MELOS_ROOT_PATH/tool/melos" run format:check --no-select &&
-        "$MELOS_ROOT_PATH/scripts/check_generated.sh" &&
-        "$MELOS_ROOT_PATH/tool/melos" run analyze --no-select &&
-        "$MELOS_ROOT_PATH/tool/melos" run test --no-select
+      run: python blueprint.py validate

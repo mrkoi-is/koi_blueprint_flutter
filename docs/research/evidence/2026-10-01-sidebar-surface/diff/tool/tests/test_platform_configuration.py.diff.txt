@@ -1,0 +1,13 @@
+--- before/tool/tests/test_platform_configuration.py
++++ after/tool/tests/test_platform_configuration.py
+@@ -50,8 +50,8 @@
+                     self.assertIn('sidebar.left', data.decode())
+                     self.assertIn('sidebar.right', data.decode())
+                     self.assertIn('updatePanels', data.decode())
+-                    self.assertIn('NSStackView(views: [back, forward])', data.decode())
+-                    self.assertIn('group.spacing = 4', data.decode())
++                    self.assertNotIn('NSStackView(views: [back, forward])', data.decode())
++                    self.assertIn('return [koiBackItem, koiForwardItem, koiSidebarItem', data.decode())
+                     self.assertIn('.byTruncatingTail', data.decode())
+                     self.assertIn('contentTintColor = sidebarOpen ? .labelColor : .secondaryLabelColor', data.decode())
+                     self.assertEqual(data.decode().count('extension MainFlutterWindow: NSToolbarDelegate'), 1)

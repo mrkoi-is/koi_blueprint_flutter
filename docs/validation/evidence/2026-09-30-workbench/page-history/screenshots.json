@@ -1,0 +1,24 @@
+{
+  "runtime": "Actual macOS Debug app, com.mrkoi.fixture.runtimeacceptApp",
+  "screenshots": [
+    {
+      "file": "text-dark.png",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_15-38-58.png",
+      "sha256": "1d63d2918eeafd4ccb636e082aeeb02957340ddfe121f253eb890e226f1e1b04",
+      "unmodified": true
+    },
+    {
+      "file": "image-forward-disabled.png",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_15-40-27.png",
+      "sha256": "85b1ebffcefedc7d4618ed828ddd586ff5535a09ee13cc8ca3235d973422761c",
+      "unmodified": true
+    },
+    {
+      "file": "video-restored.png",
+      "original": "/Users/max/Desktop/screenshot-2026-09-30_15-42-08.png",
+      "sha256": "7a62b089e876e40b8d5c18f8a923857a6bfc7bf9580c239e06da80ad4690ac30",
+      "unmodified": true
+    }
+  ],
+  "status": "SUPERSEDED: controls below native traffic lights; replaced by native unified toolbar"
+}

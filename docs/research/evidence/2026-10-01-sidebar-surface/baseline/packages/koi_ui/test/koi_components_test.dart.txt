@@ -1,0 +1,618 @@
+import 'dart:ui' show PointerDeviceKind;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:koi_ui/koi_ui.dart';
+
+void main() {
+  test('tokens support themes, fallback, copy and interpolation', () {
+    final light = AppTheme.light.extension<KoiThemeTokens>()!;
+    final dark = AppTheme.dark.extension<KoiThemeTokens>()!;
+    final compact = AppTheme.build(density: KoiDensity.compact)
+        .extension<KoiThemeTokens>()!;
+    expect(compact.itemPadding, lessThan(light.itemPadding));
+    expect(compact.density, KoiDensity.compact);
+    expect(light.lerp(null, .5), same(light));
+    expect(light.lerp(dark, 0).panelBackground, light.panelBackground);
+    expect(light.lerp(dark, 1).panelBackground, dark.panelBackground);
+    expect(light.lerp(dark, 0).chromeBackground, light.chromeBackground);
+    expect(light.lerp(dark, 1).contentBackground, dark.contentBackground);
+    expect(light.chromeBackground, isNot(light.contentBackground));
+    expect(dark.chromeBackground, isNot(dark.contentBackground));
+    expect(light.lerp(compact, .8).density, KoiDensity.compact);
+    final copy = light.copyWith(
+      panelBackground: Colors.red,
+      chromeBackground: Colors.purple,
+      contentBackground: Colors.white,
+      weakBorder: Colors.blue,
+      selectedBackground: Colors.green,
+      dropIndicator: Colors.orange,
+      density: KoiDensity.compact,
+      itemPadding: 3,
+    );
+    expect(copy.panelBackground, Colors.red);
+    expect(copy.chromeBackground, Colors.purple);
+    expect(copy.contentBackground, Colors.white);
+    expect(copy.weakBorder, Colors.blue);
+    expect(copy.selectedBackground, Colors.green);
+    expect(copy.dropIndicator, Colors.orange);
+    expect(copy.density, KoiDensity.compact);
+    expect(copy.itemPadding, 3);
+    expect(light.copyWith().itemPadding, light.itemPadding);
+  });
+
+  testWidgets('regular Material host supplies fallback tokens', (tester) async {
+    late KoiThemeTokens tokens;
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Builder(
+          builder: (context) {
+            tokens = KoiThemeTokens.of(context);
+            return const KoiSection(
+              title: Text('Fallback'),
+              child: Text('Content'),
+            );
+          },
+        ),
+      ),
+    );
+    expect(tokens.density, KoiDensity.comfortable);
+    expect(tokens.chromeBackground, isNot(tokens.contentBackground));
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'tile activates once by mouse, Enter and Space; disabled ignores',
+    (tester) async {
+      var count = 0;
+      final focus = FocusNode();
+      addTearDown(focus.dispose);
+      await tester.pumpWidget(
+        _app(
+          Column(
+            children: [
+              KoiSelectableListTile(
+                title: const Text('选择资料'),
+                subtitle: const Text('资料说明'),
+                leading: const Icon(Icons.description),
+                trailing: const Icon(Icons.chevron_right),
+                selected: true,
+                focusNode: focus,
+                onTap: () => count++,
+              ),
+              KoiSelectableListTile(
+                title: const Text('禁用资料'),
+                enabled: false,
+                onTap: () => count++,
+              ),
+            ],
+          ),
+        ),
+      );
+      await tester.tap(find.text('选择资料'));
+      expect(count, 1);
+      focus.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      expect(count, 2);
+      await tester.sendKeyEvent(LogicalKeyboardKey.space);
+      expect(count, 3);
+      await tester.tap(find.text('禁用资料'));
+      expect(count, 3);
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  testWidgets('menu executes enabled item once and closes', (tester) async {
+    var count = 0;
+    await tester.pumpWidget(
+      _app(
+        KoiMenu(
+          items: [
+            KoiMenuItem(label: '执行', onSelected: () => count++),
+            const KoiMenuItem(label: '禁用', enabled: false),
+          ],
+          child: const Text('菜单触发器'),
+        ),
+      ),
+    );
+    await tester.tap(find.text('菜单触发器'));
+    await tester.pumpAndSettle();
+    expect(find.text('禁用'), findsOneWidget);
+    await tester.tap(find.text('执行'));
+    await tester.pumpAndSettle();
+    expect(count, 1);
+    expect(find.text('执行'), findsNothing);
+    await tester.tap(find.text('菜单触发器'));
+    await tester.pumpAndSettle();
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('执行'), findsNothing);
+  });
+
+  testWidgets('popover Escape and outside close restore focus; owner cleanup', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      _app(
+        KoiPopover(
+          child: const Text('触发器'),
+          builder: (context, close) =>
+              TextButton(onPressed: close, child: const Text('浮层关闭')),
+        ),
+      ),
+    );
+    final trigger = tester.widget<TextButton>(
+      find.widgetWithText(TextButton, '触发器'),
+    );
+    await tester.tap(find.text('触发器'));
+    await tester.pumpAndSettle();
+    expect(find.text('浮层关闭'), findsOneWidget);
+    await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+    await tester.pumpAndSettle();
+    expect(find.text('浮层关闭'), findsNothing);
+    expect(trigger.focusNode!.hasFocus, isTrue);
+    await tester.tap(find.text('触发器'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('浮层关闭'));
+    await tester.pumpAndSettle();
+    expect(find.text('浮层关闭'), findsNothing);
+    await tester.tap(find.text('触发器'));
+    await tester.pumpAndSettle();
+    await tester.tapAt(const Offset(790, 590));
+    await tester.pumpAndSettle();
+    expect(find.text('浮层关闭'), findsNothing);
+    await tester.tap(find.text('触发器'));
+    await tester.pumpAndSettle();
+    await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+    await tester.pumpAndSettle();
+    expect(find.text('浮层关闭'), findsNothing);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets(
+    'split supports pointer, keyboard, bounds and controlled updates',
+    (tester) async {
+      var changed = 0.0;
+      Widget split(double width) => _app(
+        SizedBox(
+          width: 800,
+          height: 400,
+          child: KoiResizableSplitView(
+            width: width,
+            primary: const ColoredBox(color: Colors.red),
+            secondary: const ColoredBox(color: Colors.blue),
+            onWidthChanged: (value) => changed = value,
+          ),
+        ),
+      );
+      await tester.pumpWidget(split(280));
+      final handle = find.bySemanticsLabel('调整侧栏宽度');
+      final grip = find.byKey(const ValueKey('koi-split-grip'));
+      Color gripColor() =>
+          (tester.widget<AnimatedContainer>(grip).decoration! as BoxDecoration)
+              .color!;
+      expect(gripColor(), Colors.transparent);
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: const Offset(10, 10));
+      await mouse.moveTo(tester.getCenter(handle));
+      await tester.pumpAndSettle();
+      expect(gripColor(), isNot(Colors.transparent));
+      expect(
+        tester.getSize(grip).height,
+        lessThan(tester.getSize(handle).height),
+      );
+      await mouse.moveTo(const Offset(10, 10));
+      await tester.pumpAndSettle();
+      expect(gripColor(), Colors.transparent);
+      await mouse.removePointer();
+      await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+      await tester.pumpAndSettle();
+      expect(
+        gripColor(),
+        AppTheme.light.extension<KoiThemeTokens>()!.dropIndicator,
+      );
+      await tester.drag(handle, const Offset(50, 0));
+      await tester.pump();
+      expect(changed, 330);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+      await tester.pump();
+      expect(changed, 320);
+      await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+      await tester.pump();
+      expect(changed, 330);
+      await tester.sendKeyEvent(LogicalKeyboardKey.home);
+      await tester.pump();
+      expect(changed, 160);
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pump();
+      expect(changed, 480);
+      await tester.sendKeyEvent(LogicalKeyboardKey.end);
+      await tester.pump();
+      expect(changed, 480);
+      await tester.pumpWidget(split(200));
+      expect(
+        tester
+            .getSize(
+              find.byWidgetPredicate(
+                (widget) => widget is ColoredBox && widget.color == Colors.red,
+              ),
+            )
+            .width,
+        200,
+      );
+      expect(tester.takeException(), isNull);
+    },
+  );
+
+  for (final width in [320.0, 600.0, 1024.0, 1440.0]) {
+    testWidgets('workbench $width at 200% keeps external editor state', (
+      tester,
+    ) async {
+      await tester.binding.setSurfaceSize(Size(width, 800));
+      addTearDown(() => tester.binding.setSurfaceSize(null));
+      final controller = TextEditingController(text: '中文草稿');
+      addTearDown(controller.dispose);
+      var selected = 'text';
+      var settingsActivated = 0;
+      var backActivated = 0;
+      await tester.pumpWidget(
+        _app(
+          KoiWorkbenchFrame(
+            title: const Text('工作区'),
+            headerLeading: KoiNavigationHistoryControls(
+              onBack: () => backActivated++,
+            ),
+            navigationTrailing: KoiMenu(
+              key: const ValueKey('settings'),
+              label: '设置',
+              items: [
+                KoiMenuItem(
+                  label: '设置操作',
+                  onSelected: () => settingsActivated++,
+                ),
+              ],
+              child: const Icon(Icons.settings_outlined),
+            ),
+            selectedId: 'text',
+            onDestinationSelected: (value) => selected = value,
+            destinations: const [
+              KoiNavigationDestination(
+                id: 'text',
+                label: '文本',
+                icon: Icons.description,
+              ),
+              KoiNavigationDestination(
+                id: 'media',
+                label: '素材',
+                icon: Icons.image,
+              ),
+            ],
+            sidebar: const Text('侧栏'),
+            detail: const Text('详情'),
+            body: TextField(controller: controller),
+          ),
+          scale: 2,
+        ),
+      );
+      expect(controller.text, '中文草稿');
+      final contentSurface = find.byKey(
+        const ValueKey('koi-workbench-content-surface'),
+      );
+      final surface = tester.widget<Material>(contentSurface);
+      final tokens = AppTheme.light.extension<KoiThemeTokens>()!;
+      expect(surface.color, tokens.contentBackground);
+      expect(surface.clipBehavior, Clip.antiAlias);
+      expect(
+        find.descendant(of: contentSurface, matching: find.byType(TextField)),
+        findsOneWidget,
+      );
+      expect(
+        find.descendant(
+          of: contentSurface,
+          matching: find.byType(NavigationRail),
+        ),
+        findsNothing,
+      );
+      await tester.tap(find.byTooltip('后退'));
+      await tester.tap(find.byTooltip('前进'));
+      await tester.pump();
+      expect(backActivated, 1);
+      if (width < 600) {
+        expect(find.byType(NavigationBar), findsOneWidget);
+        expect(find.byType(NavigationRail), findsNothing);
+      } else {
+        expect(find.byType(NavigationRail), findsOneWidget);
+        final rail = tester.getRect(find.byType(NavigationRail));
+        final railWidget = tester.widget<NavigationRail>(
+          find.byType(NavigationRail),
+        );
+        expect(railWidget.backgroundColor, tokens.chromeBackground);
+        final settings = tester.getRect(find.byKey(const ValueKey('settings')));
+        expect(rail.width, KoiWorkbenchMetrics.railWidth);
+        expect(rail.bottom - settings.bottom, lessThanOrEqualTo(16));
+      }
+      final settingsButton = tester.widget<TextButton>(
+        find.descendant(
+          of: find.byKey(const ValueKey('settings')),
+          matching: find.byType(TextButton),
+        ),
+      );
+      settingsButton.focusNode!.requestFocus();
+      await tester.pump();
+      await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+      await tester.pumpAndSettle();
+      expect(find.text('设置操作'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('设置操作'), findsNothing);
+      expect(settingsButton.focusNode!.hasFocus, isTrue);
+      await tester.tap(find.byKey(const ValueKey('settings')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('设置操作'));
+      await tester.pumpAndSettle();
+      expect(settingsActivated, 1);
+      await tester.tap(find.byIcon(Icons.image).first);
+      await tester.pumpAndSettle();
+      expect(selected, 'media');
+      if (width < 1024) {
+        await tester.tap(find.byTooltip('切换资料侧栏'));
+        await tester.pumpAndSettle();
+        expect(find.text('侧栏'), findsOneWidget);
+        final sidebarDrawer = tester.widget<Drawer>(
+          find.ancestor(of: find.text('侧栏'), matching: find.byType(Drawer)),
+        );
+        expect(sidebarDrawer.backgroundColor, tokens.contentBackground);
+        Navigator.of(tester.element(find.text('侧栏'))).pop();
+        await tester.pumpAndSettle();
+        await tester.tap(find.byTooltip('切换详情面板'));
+        await tester.pumpAndSettle();
+        expect(find.text('详情'), findsOneWidget);
+      } else {
+        for (final label in ['侧栏', '详情']) {
+          expect(
+            find.descendant(of: contentSurface, matching: find.text(label)),
+            findsOneWidget,
+          );
+        }
+      }
+      expect(tester.takeException(), isNull);
+    });
+  }
+
+  testWidgets('history arrows activate once by Enter and Space', (
+    tester,
+  ) async {
+    var backs = 0;
+    var forwards = 0;
+    await tester.pumpWidget(
+      _app(
+        KoiNavigationHistoryControls(
+          onBack: () => backs++,
+          onForward: () => forwards++,
+        ),
+      ),
+    );
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.enter);
+    await tester.pump();
+    expect(backs, 1);
+    await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+    await tester.pump();
+    await tester.sendKeyEvent(LogicalKeyboardKey.space);
+    await tester.pump();
+    expect(forwards, 1);
+    await tester.pumpWidget(_app(const KoiNavigationHistoryControls()));
+    await tester.tap(find.byTooltip('后退'));
+    await tester.tap(find.byTooltip('前进'));
+    expect(backs, 1);
+    expect(forwards, 1);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('short rail scrolls destinations while settings remain fixed', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(600, 260));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    for (final theme in [AppTheme.light, AppTheme.dark]) {
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: theme,
+          home: KoiWorkbenchFrame(
+            title: const Text('工作区'),
+            selectedId: '0',
+            onDestinationSelected: (_) {},
+            destinations: [
+              for (var i = 0; i < 8; i++)
+                KoiNavigationDestination(
+                  id: '$i',
+                  label: '入口 $i',
+                  icon: Icons.description,
+                ),
+            ],
+            navigationTrailing: IconButton(
+              tooltip: '设置',
+              onPressed: () {},
+              icon: const Icon(Icons.settings_outlined),
+            ),
+            body: const SizedBox(),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final settings = tester.getRect(find.byTooltip('设置'));
+      final railMaterial = tester.widget<Material>(
+        find
+            .descendant(
+              of: find.byType(NavigationRail),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      final appBarMaterial = tester.widget<Material>(
+        find
+            .descendant(
+              of: find.byType(AppBar),
+              matching: find.byType(Material),
+            )
+            .first,
+      );
+      expect(railMaterial.color, appBarMaterial.color);
+      final surface = tester.widget<Material>(
+        find.byKey(const ValueKey('koi-workbench-content-surface')),
+      );
+      expect(surface.color, isNot(railMaterial.color));
+      await tester.drag(find.byType(NavigationRail), const Offset(0, -200));
+      await tester.pumpAndSettle();
+      expect(tester.getRect(find.byTooltip('设置')), settings);
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('trailing pane drag and arrows follow divider direction', (
+    tester,
+  ) async {
+    var changed = 0.0;
+    await tester.pumpWidget(
+      _app(
+        SizedBox(
+          width: 800,
+          height: 400,
+          child: KoiResizableSplitView(
+            primary: const ColoredBox(color: Colors.red),
+            secondary: const ColoredBox(color: Colors.blue),
+            primaryOnTrailing: true,
+            resizeLabel: '调整详情宽度',
+            onWidthChanged: (value) => changed = value,
+          ),
+        ),
+      ),
+    );
+    final handle = find.bySemanticsLabel('调整详情宽度');
+    await tester.drag(handle, const Offset(-50, 0));
+    await tester.pump();
+    expect(changed, 330);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
+    await tester.pump();
+    expect(changed, 320);
+    await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
+    await tester.pump();
+    expect(changed, 330);
+    await tester.sendKeyEvent(LogicalKeyboardKey.home);
+    await tester.pump();
+    expect(changed, 160);
+    await tester.sendKeyEvent(LogicalKeyboardKey.end);
+    await tester.pump();
+    expect(changed, 480);
+    final primary = find.byWidgetPredicate(
+      (widget) => widget is ColoredBox && widget.color == Colors.red,
+    );
+    expect(tester.getTopLeft(primary).dx, 320);
+  });
+
+  testWidgets('resize preserves external editor across layout branches', (
+    tester,
+  ) async {
+    final controller = TextEditingController(text: '保存中的草稿');
+    addTearDown(controller.dispose);
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.binding.setSurfaceSize(const Size(1440, 800));
+    await tester.pumpWidget(
+      _app(
+        KoiWorkbenchFrame(
+          title: const Text('工作区'),
+          selectedId: 'text',
+          onDestinationSelected: (_) {},
+          destinations: const [
+            KoiNavigationDestination(
+              id: 'text',
+              label: '文本',
+              icon: Icons.description,
+            ),
+            KoiNavigationDestination(
+              id: 'media',
+              label: '素材',
+              icon: Icons.image,
+            ),
+          ],
+          sidebar: const Text('侧栏'),
+          body: TextField(controller: controller),
+        ),
+      ),
+    );
+    await tester.enterText(find.byType(TextField), '调整布局时继续编辑');
+    for (final width in [600.0, 320.0, 1024.0, 1440.0]) {
+      await tester.binding.setSurfaceSize(Size(width, 800));
+      await tester.pumpAndSettle();
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller,
+        same(controller),
+      );
+      expect(controller.text, '调整布局时继续编辑');
+      expect(tester.takeException(), isNull);
+    }
+  });
+
+  testWidgets('split clamps inside narrower available width', (tester) async {
+    await tester.pumpWidget(
+      _app(
+        const Align(
+          alignment: Alignment.topLeft,
+          child: SizedBox(
+            width: 200,
+            height: 200,
+            child: KoiResizableSplitView(
+              primary: ColoredBox(color: Colors.red),
+              secondary: ColoredBox(color: Colors.blue),
+            ),
+          ),
+        ),
+      ),
+    );
+    expect(
+      tester
+          .getSize(
+            find.byWidgetPredicate(
+              (widget) => widget is ColoredBox && widget.color == Colors.red,
+            ),
+          )
+          .width,
+      0,
+    );
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('section wraps actions and long Chinese in narrow host', (
+    tester,
+  ) async {
+    await tester.binding.setSurfaceSize(const Size(320, 800));
+    addTearDown(() => tester.binding.setSurfaceSize(null));
+    await tester.pumpWidget(
+      _app(
+        const SingleChildScrollView(
+          child: KoiSection(
+            title: Text('这是需要换行的长中文标题用来验证布局'),
+            description: Text('说明文字'),
+            actions: [Text('附加操作')],
+            child: Text('内容'),
+          ),
+        ),
+        scale: 2,
+      ),
+    );
+    expect(find.text('附加操作'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+}
+
+Widget _app(Widget child, {double scale = 1}) => MaterialApp(
+  theme: AppTheme.light,
+  builder: (context, child) => MediaQuery(
+    data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(scale)),
+    child: child!,
+  ),
+  home: Scaffold(body: child),
+);

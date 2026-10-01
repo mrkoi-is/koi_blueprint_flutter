@@ -1,0 +1,85 @@
+import importlib.util
+from pathlib import Path
+import plistlib
+import tempfile
+import unittest
+
+SPEC = importlib.util.spec_from_file_location('platform_configuration', Path(__file__).parents[1] / 'platform_configuration.py')
+MODULE = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(MODULE)
+
+WINDOW = '''import Cocoa
+import FlutterMacOS
+
+class MainFlutterWindow: NSWindow {
+  override func awakeFromNib() {
+    let flutterViewController = FlutterViewController()
+    let windowFrame = self.frame
+    self.contentViewController = flutterViewController
+    self.setFrame(windowFrame, display: true)
+    RegisterGeneratedPlugins(registry: flutterViewController)
+    super.awakeFromNib()
+  }
+}
+'''
+
+
+class PlatformConfigurationTest(unittest.TestCase):
+    def test_merge_is_deterministic_and_preserves_sdk_keys(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            app = Path(temporary)
+            runner = app / 'macos/Runner'
+            runner.mkdir(parents=True)
+            for name in ('DebugProfile.entitlements', 'Release.entitlements'):
+                (runner / name).write_bytes(plistlib.dumps({'com.apple.security.app-sandbox': True, 'custom.sdk.key': 'keep'}))
+            (runner / 'MainFlutterWindow.swift').write_text(WINDOW)
+            MODULE.configure_workbench(app, ['macos'])
+            first = {p.name: p.read_bytes() for p in runner.iterdir()}
+            MODULE.configure_workbench(app, ['macos'])
+            self.assertEqual(first, {p.name: p.read_bytes() for p in runner.iterdir()})
+            for name, data in first.items():
+                if name.endswith('.swift'):
+                    self.assertIn('self.setFrame(windowFrame, display: true)', data.decode())
+                    self.assertIn('.fullSizeContentView', data.decode())
+                    self.assertIn('koi/workbench_window', data.decode())
+                    self.assertIn('toolbarStyle = .unifiedCompact', data.decode())
+                    self.assertIn('updateNavigation', data.decode())
+                    self.assertIn('navigateBack', data.decode())
+                    self.assertEqual(data.decode().count('extension MainFlutterWindow: NSToolbarDelegate'), 1)
+                    continue
+                values = plistlib.loads(data)
+                self.assertEqual(values['custom.sdk.key'], 'keep')
+                self.assertTrue(values['com.apple.security.files.user-selected.read-only'])
+
+    def test_unknown_structure_fails_instead_of_replacing(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            app = Path(temporary)
+            runner = app / 'macos/Runner'
+            runner.mkdir(parents=True)
+            target = runner / 'DebugProfile.entitlements'
+            target.write_bytes(plistlib.dumps({'user': 'keep'}))
+            before = target.read_bytes()
+            with self.assertRaises(ValueError):
+                MODULE.configure_workbench(app, ['macos'])
+            self.assertEqual(before, target.read_bytes())
+
+    def test_unselected_platform_needs_no_runner(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            MODULE.configure_workbench(Path(temporary), ['web', 'android'])
+
+    def test_unknown_window_preserves_all_runner_files(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            app = Path(temporary)
+            runner = app / 'macos/Runner'
+            runner.mkdir(parents=True)
+            for name in ('DebugProfile.entitlements', 'Release.entitlements'):
+                (runner / name).write_bytes(plistlib.dumps({'com.apple.security.app-sandbox': True}))
+            (runner / 'MainFlutterWindow.swift').write_text('custom window')
+            before = {p.name: p.read_bytes() for p in runner.iterdir()}
+            with self.assertRaisesRegex(ValueError, 'MainFlutterWindow'):
+                MODULE.configure_workbench(app, ['macos'])
+            self.assertEqual(before, {p.name: p.read_bytes() for p in runner.iterdir()})
+
+
+if __name__ == '__main__':
+    unittest.main()

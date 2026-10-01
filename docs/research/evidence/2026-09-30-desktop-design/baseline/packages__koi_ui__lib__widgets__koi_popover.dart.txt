@@ -1,0 +1,133 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:koi_ui/theme/koi_theme_tokens.dart';
+
+/// A bounded, modal popover. The trigger owns its focus and overlay lifetime.
+class KoiPopover extends StatefulWidget {
+  const KoiPopover({
+    required this.builder,
+    required this.child,
+    this.label = '打开面板',
+    super.key,
+  });
+
+  final Widget Function(BuildContext context, VoidCallback close) builder;
+  final Widget child;
+  final String label;
+
+  @override
+  State<KoiPopover> createState() => _KoiPopoverState();
+}
+
+class _KoiPopoverState extends State<KoiPopover> {
+  final _controller = OverlayPortalController();
+  final _anchor = GlobalKey();
+  final _triggerFocus = FocusNode();
+  final _scope = FocusScopeNode(
+    traversalEdgeBehavior: TraversalEdgeBehavior.closedLoop,
+  );
+
+  void _close() {
+    _controller.hide();
+    _triggerFocus.requestFocus();
+  }
+
+  void _toggle() {
+    if (_controller.isShowing) {
+      _close();
+    } else {
+      _controller.show();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _controller.isShowing) {
+          _scope.requestFocus();
+          _scope.nextFocus();
+        }
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _scope.dispose();
+    _triggerFocus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => OverlayPortal(
+    controller: _controller,
+    overlayLocation: OverlayChildLocation.rootOverlay,
+    overlayChildBuilder: (context) => LayoutBuilder(
+      builder: (context, constraints) {
+        final box = _anchor.currentContext?.findRenderObject() as RenderBox?;
+        if (box == null || !box.hasSize) return const SizedBox.shrink();
+        final anchor = box.localToGlobal(Offset.zero) & box.size;
+        final width = math.min(360.0, math.max(0.0, constraints.maxWidth - 32));
+        final left = anchor.left.clamp(
+          16.0,
+          math.max(16.0, constraints.maxWidth - width - 16),
+        );
+        final below = constraints.maxHeight - anchor.bottom - 24;
+        final above = anchor.top - 24;
+        final placeBelow = below >= 160 || below >= above;
+        final available = math.max(0.0, placeBelow ? below : above);
+        return Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: _close,
+                child: Semantics(
+                  label: '关闭面板',
+                  onTap: _close,
+                  child: const ColoredBox(color: Colors.transparent),
+                ),
+              ),
+            ),
+            Positioned(
+              left: left.toDouble(),
+              top: placeBelow ? anchor.bottom + 8 : null,
+              bottom: placeBelow
+                  ? null
+                  : constraints.maxHeight - anchor.top + 8,
+              width: width,
+              child: FocusScope(
+                node: _scope,
+                autofocus: true,
+                onKeyEvent: (node, event) {
+                  if (event is KeyDownEvent &&
+                      event.logicalKey == LogicalKeyboardKey.escape) {
+                    _close();
+                    return KeyEventResult.handled;
+                  }
+                  return KeyEventResult.ignored;
+                },
+                child: Material(
+                  elevation: 8,
+                  color: KoiThemeTokens.of(context).panelBackground,
+                  borderRadius: BorderRadius.circular(KoiRadius.medium),
+                  clipBehavior: Clip.antiAlias,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: available),
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(KoiSpace.md),
+                      child: widget.builder(context, _close),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ),
+    child: TextButton(
+      key: _anchor,
+      focusNode: _triggerFocus,
+      onPressed: _toggle,
+      child: Semantics(label: widget.label, child: widget.child),
+    ),
+  );
+}

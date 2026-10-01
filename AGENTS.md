@@ -1,45 +1,36 @@
-# Koi Flutter 蓝图 — Agent 说明
+# Koi Flutter 蓝图 — Agent 入口
 
-本文件供 Codex、Claude Code、Cursor、Antigravity 等工具在仓库根目录自动加载。
+先读 [AI Quickstart](docs/ai-quickstart.md)，再从 [.agent/skills/index.yaml](.agent/skills/index.yaml) 选择当前任务的一个或少量技能。需要细节时才读其 references；不要全量加载技能。
 
-## 必读
+## 架构契约
 
-- AI 最短入口：`docs/ai-quickstart.md`
-- 架构权威说明：`docs/architecture/ARCHITECTURE.md`
-- Monorepo 设计：`docs/architecture/MONOREPO_ARCHITECTURE.md`
-- 目录与迁移策略：`docs/architecture/PROJECT_STRUCTURE.md`
+- 新项目使用 Dart Workspace + Melos；App 内按 `core / features / shared` 组织。
+- `packages/` 放稳定共享能力；需要独立业务边界时使用 `modules/`。App/宿主负责装配，底层不得反向依赖 App，业务模块不互相导入实现。
+- `domain` 是纯 Dart 契约与模型；`data` 是 IO/仓库实现；`application` 是用例、状态与编排；`presentation` 是 UI。`data` 与 `application` 可以共存，按职责建层。
+- 新状态默认注解式 Riverpod 3。业务容器通过 provider 取数；展示组件可以接收不可变数据和回调。本地瞬态 UI 状态可以留在 Widget。
+- 路由默认类型化 go_router；模型默认 Freezed/json_serializable。认证、网络、数据库按产品需求加入，最小新项目不继承演示登录。
+- 架构权威入口：[ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md)。写 provider 前读 [状态管理规范](docs/architecture/state-management.md)；本地 IO/后台任务读 [桌面补充](docs/architecture/local-first-desktop.md)。
 
-## 技术栈基线
+## 任务路由
 
-- Flutter Workspace + Melos 8
-- Riverpod 3 + `riverpod_generator`
-- go_router + `go_router_builder`
-- Freezed + `json_serializable`
-- `koi_network`
-- Feature-first：`core / features / shared / packages`
-
-## Agent Skills（单一事实源）
-
-- 位置：`.agent/skills/<skill-id>/SKILL.md`
-- 索引：`.agent/skills/index.yaml`
-- Cursor 提示：`.cursor/rules/`
-
-### Skill 索引（任务 → 目录）
-
-| 用户意图 | Skill |
-|---|---|
-| 新建 workspace / 初始化项目 | `workspace-init` |
+| 任务 | Skill |
+| --- | --- |
+| 创建项目、初始化 workspace | `workspace-init` |
 | 新增业务 Feature | `add-feature-module` |
+| 编写页面与 provider | `state-management` |
 | 新增共享 package | `add-shared-package` |
-| 接入 Swagger 生成 API 包 | `add-generated-api-package` |
+| 新增独立业务 module、切换会话 | `add-business-module` |
+| 接入生成 API | `add-generated-api-package` |
 | 新增或重构路由 | `add-routing` |
-| 架构审查 | `architecture-review` |
-| 补测试 | `testing-scaffold` |
+| 审查架构边界 | `architecture-review` |
+| 补充测试 | `testing-scaffold` |
 
-## 默认执行顺序
+## 执行与验证
 
-1. 先读 `docs/ai-quickstart.md`
-2. 再读 `AGENTS.md`
-3. 再读 `.agent/skills/index.yaml`
-4. 只加载当前任务对应的少数 Skill
-5. 最后跑 `format-check / generate-check / analyze / test / coverage`
+优先使用 `python3 blueprint.py --help` 和各子命令帮助。Windows 使用 `py -3 blueprint.py`。完整门禁为 `python3 blueprint.py validate`，包含架构/AI 资产检查、生成、格式、分析、测试和手写代码覆盖率，覆盖率目标为 80%。目标平台构建需单独报告，不能用其他平台构建代替。
+
+先检查工作区变化，保留用户已有修改。交付说明区分“修改完成”“本地验证通过”“目标平台验证”“未执行项”。不要把样例、规划或说明文档写成已完成的真实业务能力。
+
+## AI 资产单一来源
+
+正文只维护 `.agent/skills/`。`.agents/skills/` 是 Codex 原生发现适配文件，`CLAUDE.md` 与 `.cursor/rules/` 只指向入口。发现不等于已执行；不支持自动发现的工具直接按路径读取。见 [发现机制](docs/agent-skill-rule-discovery.md)。

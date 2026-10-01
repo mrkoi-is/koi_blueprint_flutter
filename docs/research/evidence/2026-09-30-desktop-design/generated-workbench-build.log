@@ -1,0 +1,132 @@
++ ['/Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter', 'clean']
+Cleaning Xcode workspace...                                        17.0s
+Deleting build...                                                  855ms
+Deleting .dart_tool...                                              76ms
+Deleting ephemeral...                                                5ms
+Deleting .flutter-plugins-dependencies...                            1ms
++ ['/Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter', 'pub', 'get']
+Resolving dependencies...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
++ ['python3', '/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/blueprint.py', 'build', '--app', '/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app', '--platforms', 'macos,web']
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter build macos --release --no-pub
+The following plugins do not support Swift Package Manager for macos:
+  - media_kit_libs_macos_video
+  - media_kit_video
+This will become an error in a future version of Flutter. Please contact the plugin maintainers to request Swift Package Manager adoption.
+Running pod install...                                           1,160ms
+Building macOS application...                                   
+Xcode 27 no longer requires macOS binaries to support the x86_64 architecture. To build ARM-only macOS apps now, run: "flutter config --enable-macos-arm64-only". This will become the default behavior in a future Flutter release.
+error: the following command failed with exit code 0 but produced no further output
+SwiftCompile normal x86_64 (in target 'file_selector_macos' from project 'file_selector_macos')
+/Users/max/Workspace/env/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.5+1/macos/file_selector_macos/Sources/file_selector_macos/FileSelectorPlugin.swift:127:17: warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+125 |         allowedTypes.append(contentsOf: acceptedTypes.utis.map({ $0 }))
+126 |         if !allowedTypes.isEmpty {
+127 |           panel.allowedFileTypes = allowedTypes
+    |                 `- warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+128 |         }
+129 |       }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/max/Workspace/env/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.5+1/macos/file_selector_macos/Sources/file_selector_macos/FileSelectorPlugin.swift:127:17: warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+125 |         allowedTypes.append(contentsOf: acceptedTypes.utis.map({ $0 }))
+126 |         if !allowedTypes.isEmpty {
+127 |           panel.allowedFileTypes = allowedTypes
+    |                 `- warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+128 |         }
+129 |       }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:818:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+816 | SWIFT_CLASS("_TtC15media_kit_video20SafeResizableTexture")
+817 | @interface SafeResizableTexture : NSObject <FlutterTexture>
+818 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+819 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+820 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:825:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+823 | SWIFT_CLASS("_TtC15media_kit_video9TextureHW")
+824 | @interface TextureHW : NSObject <FlutterTexture>
+825 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+826 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+827 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+3 warnings generated.
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:832:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+830 | SWIFT_CLASS("_TtC15media_kit_video9TextureSW")
+831 | @interface TextureSW : NSObject <FlutterTexture>
+832 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+833 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+834 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:387:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+385 | SWIFT_CLASS("_TtC15media_kit_video20SafeResizableTexture")
+386 | @interface SafeResizableTexture : NSObject <FlutterTexture>
+387 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+388 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+389 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:394:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+392 | SWIFT_CLASS("_TtC15media_kit_video9TextureHW")
+393 | @interface TextureHW : NSObject <FlutterTexture>
+394 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+395 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+396 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+3 warnings generated.
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-desktop-design-runtime-ym5__iw4/project/apps/shell_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:401:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+399 | SWIFT_CLASS("_TtC15media_kit_video9TextureSW")
+400 | @interface TextureSW : NSObject <FlutterTexture>
+401 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+402 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+403 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+warning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'Flutter Assemble' from project 'Runner')
+✓ Built build/macos/Build/Products/Release/shell_review_app.app (94.9MB)
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter build web --release --no-pub
+Compiling lib/main.dart for the Web...                          
+Wasm dry run succeeded. Consider building and testing your application with the `--wasm` flag. See docs for more info: https://docs.flutter.dev/platform-integration/web/wasm
+Use --no-wasm-dry-run to disable these warnings.
+Expected to find fonts for (MaterialIcons, packages/cupertino_icons/CupertinoIcons), but found (MaterialIcons). This usually means you are referring to font families in an IconData class but not including them in the assets section of your pubspec.yaml, are missing the package that would include them, or are missing "uses-material-design: true".
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 11508 bytes (99.3% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Compiling lib/main.dart for the Web...                             44.6s
+✓ Built build/web

@@ -1,0 +1,253 @@
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/presentation/models/text_view_state.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
+
+class TextPage extends ConsumerStatefulWidget {
+  const TextPage({super.key});
+  @override
+  ConsumerState<TextPage> createState() => _TextPageState();
+}
+
+class _TextPageState extends ConsumerState<TextPage> {
+  final _editors = <String, TextEditingController>{};
+  final _scrolls = <String, ScrollController>{};
+  final _focus = <String, FocusNode>{};
+  @override
+  void dispose() {
+    for (final controller in _editors.values) {
+      controller.dispose();
+    }
+    for (final controller in _scrolls.values) {
+      controller.dispose();
+    }
+    for (final node in _focus.values) {
+      node.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _rename(WorkspaceDocument document) async {
+    final title = await showDialog<String>(
+      context: context,
+      builder: (_) => _DocumentTitleDialog(title: document.title),
+    );
+    if (mounted && title != null && title.trim().isNotEmpty) {
+      ref
+          .read(workspaceSessionProvider)
+          .renameDocument(document.id, title.trim());
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final session = ref.watch(workspaceSessionProvider);
+    final state = ref.watch(
+      workspaceStateProvider.select(
+        (value) => TextViewState(
+          documents:
+              value.value?.snapshot.documents ??
+              session.state.snapshot.documents,
+          selectedId:
+              value.value?.snapshot.preferences.selectedDocumentId ??
+              session.state.snapshot.preferences.selectedDocumentId,
+          sidebarWidth: 0,
+        ),
+      ),
+    );
+    final selected =
+        state.documents
+            .where((document) => document.id == state.selectedId)
+            .firstOrNull ??
+        state.documents.firstOrNull;
+    final editor = selected == null
+        ? null
+        : _editors.putIfAbsent(
+            selected.id,
+            () => TextEditingController(text: selected.text),
+          );
+    ref.listen(
+      workspaceStateProvider.select((value) => value.value?.snapshot.documents),
+      (_, next) {
+        for (final document in next ?? <WorkspaceDocument>[]) {
+          final controller = _editors[document.id];
+          if (controller == null ||
+              controller.text == document.text ||
+              !controller.value.composing.isCollapsed) {
+            continue;
+          }
+          final selection = controller.selection;
+          controller.value = TextEditingValue(
+            text: document.text,
+            selection: TextSelection.collapsed(
+              offset: selection.isValid
+                  ? selection.extentOffset.clamp(0, document.text.length)
+                  : document.text.length,
+            ),
+          );
+        }
+      },
+    );
+    final theme = Theme.of(context).textTheme;
+    final scaler = MediaQuery.textScalerOf(context);
+    double lineHeight(TextStyle? style, double fallback) =>
+        scaler.scale(style?.fontSize ?? fallback) * (style?.height ?? 1.4);
+    final minimumHeight =
+        160 +
+        lineHeight(theme.titleLarge, 22) * 2 +
+        lineHeight(theme.bodyLarge, 16) * 3 +
+        lineHeight(theme.bodySmall, 12);
+    return KoiReadingPane(
+      child: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          child: SizedBox(
+            height: math.max(constraints.maxHeight, minimumHeight),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                KoiToolbar(
+                  padding: const EdgeInsets.only(bottom: 16),
+                  actions: [
+                    TextButton.icon(
+                      key: const ValueKey('new-document'),
+                      onPressed: session.createDocument,
+                      icon: const Icon(Icons.add),
+                      label: const Text('新建资料'),
+                    ),
+                    TextButton.icon(
+                      onPressed: () =>
+                          unawaited(session.importFiles(ImportKind.text)),
+                      icon: const Icon(Icons.file_open_outlined),
+                      label: const Text('导入文本'),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: selected == null
+                      ? const KoiEmptyState(
+                          title: '暂无文本资料',
+                          description: '新建资料，或导入 UTF-8 TXT/Markdown 文件',
+                        )
+                      : Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    selected.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleLarge,
+                                  ),
+                                ),
+                                IconButton(
+                                  tooltip: '重命名当前资料',
+                                  onPressed: () => unawaited(_rename(selected)),
+                                  icon: const Icon(Icons.edit_outlined),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            Expanded(
+                              child: TextField(
+                                key: ValueKey('editor-${selected.id}'),
+                                controller: editor,
+                                focusNode: _focus.putIfAbsent(
+                                  selected.id,
+                                  FocusNode.new,
+                                ),
+                                scrollController: _scrolls.putIfAbsent(
+                                  selected.id,
+                                  ScrollController.new,
+                                ),
+                                expands: true,
+                                maxLines: null,
+                                minLines: null,
+                                style: Theme.of(context).textTheme.bodyLarge,
+                                textAlignVertical: TextAlignVertical.top,
+                                decoration: const InputDecoration(
+                                  hintText: '写下内容…',
+                                  filled: false,
+                                  contentPadding: EdgeInsets.zero,
+                                  border: InputBorder.none,
+                                  enabledBorder: InputBorder.none,
+                                  focusedBorder: InputBorder.none,
+                                  disabledBorder: InputBorder.none,
+                                ),
+                                onChanged: (text) =>
+                                    session.editDocument(selected.id, text),
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            Text(
+                              '${selected.text.length} 字 · ${selected.dirty ? '未保存' : '已保存'}',
+                              style: Theme.of(context).textTheme.bodySmall,
+                            ),
+                          ],
+                        ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DocumentTitleDialog extends StatefulWidget {
+  const _DocumentTitleDialog({required this.title});
+  final String title;
+  @override
+  State<_DocumentTitleDialog> createState() => _DocumentTitleDialogState();
+}
+
+class _DocumentTitleDialogState extends State<_DocumentTitleDialog> {
+  late final _controller = TextEditingController(text: widget.title);
+  String? _error;
+
+  void _submit() {
+    final title = _controller.text.trim();
+    if (title.isEmpty) {
+      setState(() => _error = '请输入资料名称');
+      return;
+    }
+    Navigator.pop(context, title);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('重命名资料'),
+    content: TextField(
+      controller: _controller,
+      autofocus: true,
+      decoration: InputDecoration(labelText: '资料名称', errorText: _error),
+      onChanged: (_) {
+        if (_error != null) setState(() => _error = null);
+      },
+      onSubmitted: (_) => _submit(),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('取消'),
+      ),
+      FilledButton(onPressed: _submit, child: const Text('确定')),
+    ],
+  );
+}

@@ -1,0 +1,81 @@
+--- before/examples/workbench_app/test/workspace_presentation_test.dart
++++ after/examples/workbench_app/test/workspace_presentation_test.dart
+@@ -12,6 +12,7 @@
+ import 'package:workbench_app/features/workspace/presentation/screens/media_page.dart';
+ import 'package:workbench_app/features/workspace/presentation/widgets/workspace_panels.dart';
+ import 'package:workbench_app/main.dart';
++import 'package:workbench_app/core/window/workbench_window_chrome.dart';
+ 
+ import 'presentation_support.dart';
+ 
+@@ -78,6 +79,10 @@
+       );
+       await tester.pumpWidget(WorkbenchApp(bootstrap: bootstrap));
+       await tester.pumpAndSettle();
++      String contextTitle() => tester
++          .widget<WorkbenchWindowChrome>(find.byType(WorkbenchWindowChrome))
++          .title;
++      expect(contextTitle(), '资料 A');
+       IconButton arrow(IconData icon) =>
+           tester.widget<IconButton>(find.widgetWithIcon(IconButton, icon));
+       expect(arrow(Icons.arrow_back).onPressed, isNull);
+@@ -91,8 +96,10 @@
+       );
+       await tester.tap(find.text('资料 B').first);
+       await tester.pumpAndSettle();
++      expect(contextTitle(), '资料 B');
+       await tester.tap(find.byIcon(Icons.perm_media_outlined).first);
+       await tester.pumpAndSettle();
++      expect(contextTitle(), 'A.mp4');
+       final player = bootstrap.preview.playback;
+       expect(players, hasLength(1));
+       await tester.tap(find.byTooltip('后退'));
+@@ -107,6 +114,7 @@
+         same(editor),
+       );
+       expect(editor!.text, '导航后仍保留的草稿');
++      expect(contextTitle(), '资料 A');
+       await tester.tap(find.byTooltip('前进'));
+       await tester.pumpAndSettle();
+       await tester.tap(find.byTooltip('前进'));
+@@ -119,6 +127,7 @@
+       await tester.tap(find.byIcon(Icons.task_alt_outlined).first);
+       await tester.pumpAndSettle();
+       expect(arrow(Icons.arrow_forward).onPressed, isNull);
++      expect(contextTitle(), '任务');
+       final router = bootstrap.router;
+       tester.view.physicalSize = const Size(320, 1000);
+       await tester.pumpAndSettle();
+@@ -225,6 +234,16 @@
+       await tester.pumpAndSettle();
+       expect(find.byType(AppBar), findsNothing);
+       expect(find.byTooltip('后退'), findsNothing);
++      String windowTitle() =>
++          calls
++                  .where((call) => call.method == 'applyChrome')
++                  .last
++                  .arguments['title']
++              as String;
++      expect(windowTitle(), '资料');
++      bootstrap.session.renameDocument('doc', '重命名资料.md');
++      await tester.pumpAndSettle();
++      expect(windowTitle(), '重命名资料.md');
+       final editor = tester
+           .widget<TextField>(find.byKey(const ValueKey('editor-doc')))
+           .controller;
+@@ -255,6 +274,7 @@
+       );
+       bootstrap.router.go('/tasks');
+       await tester.pumpAndSettle();
++      expect(windowTitle(), '任务');
+       expect(
+         calls
+             .where((call) => call.method == 'updatePanels')
+@@ -284,6 +304,7 @@
+         same(editor),
+       );
+       expect(editor!.text, '同一标题栏下保留的草稿');
++      expect(windowTitle(), '重命名资料.md');
+       expect(
+         calls.where((call) => call.method == 'updateNavigation').last.arguments,
+         {'canGoBack': false, 'canGoForward': true},

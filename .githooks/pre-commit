@@ -11,6 +11,11 @@ export PATH="$ROOT_DIR/tool:$PATH"
 printf '%b\n' "${YELLOW}Running pre-commit hooks...${NC}"
 cd "$ROOT_DIR"
 
+# Git exports repository-specific variables to hooks. Flutter invokes Git in
+# its own SDK checkout while resolving package versions; inherited GIT_DIR and
+# GIT_INDEX_FILE make that checkout appear as this worktree (0.0.0-unknown).
+unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_COMMON_DIR GIT_PREFIX
+
 printf '%b\n' "${YELLOW}Running Koi workspace precommit...${NC}"
 "$ROOT_DIR/tool/melos" run precommit --no-select
 

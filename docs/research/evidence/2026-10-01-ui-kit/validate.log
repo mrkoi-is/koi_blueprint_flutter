@@ -1,0 +1,138 @@
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter pub get --enforce-lockfile
+Resolving dependencies...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 27 inputs; lib/app.dart
+  7s riverpod_generator on 27 inputs: 5 skipped, 1 same; spent 6s analyzing, 1s resolving; lib/core/router/app_routes.dart
+  7s riverpod_generator on 27 inputs: 25 skipped, 1 same, 1 no-op; spent 6s analyzing, 1s resolving
+  0s go_router_builder on 27 inputs; lib/app.dart
+  1s go_router_builder on 27 inputs: 1 no-op; lib/bootstrap.dart
+  1s go_router_builder on 27 inputs: 13 skipped, 1 same, 13 no-op
+  0s source_gen:combining_builder on 27 inputs; lib/app.dart
+  0s source_gen:combining_builder on 27 inputs: 25 skipped, 2 same
+  0s freezed on 54 inputs; lib/app.dart
+  0s freezed on 54 inputs: 52 skipped, 2 no-op
+  Built with build_runner/aot in 9s; wrote 4 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s freezed on 3 inputs; lib/koi_auth.dart
+  0s freezed on 3 inputs: 3 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s freezed on 7 inputs; lib/error/app_failure.dart
+  0s freezed on 7 inputs: 7 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s freezed on 5 inputs; lib/entities/koi_user.dart
+  0s freezed on 5 inputs: 5 skipped
+  0s json_serializable on 10 inputs; lib/entities/koi_user.dart
+  0s json_serializable on 10 inputs: 10 skipped
+  0s source_gen:combining_builder on 10 inputs; lib/entities/koi_user.dart
+  0s source_gen:combining_builder on 10 inputs: 10 skipped
+  Built with build_runner/aot in 1s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 5 inputs; lib/app.dart
+  0s riverpod_generator on 5 inputs: 5 skipped
+  0s freezed on 5 inputs; lib/app.dart
+  0s freezed on 5 inputs: 5 skipped
+  0s json_serializable on 10 inputs; lib/app.dart
+  5s json_serializable on 10 inputs: 1 no-op; spent 4s analyzing; lib/app.freezed.dart
+  7s json_serializable on 10 inputs: 5 skipped, 2 no-op; spent 5s analyzing, 1s resolving; lib/main.freezed.dart
+  7s json_serializable on 10 inputs: 7 skipped, 3 no-op; spent 5s analyzing, 1s resolving
+  0s go_router_builder on 10 inputs; lib/app.dart
+  0s go_router_builder on 10 inputs: 7 skipped, 3 no-op
+  0s source_gen:combining_builder on 10 inputs; lib/app.dart
+  0s source_gen:combining_builder on 10 inputs: 10 skipped
+  Built with build_runner/aot in 7s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 60 inputs; integration_test/support/fixture_import_port.dart
+  0s riverpod_generator on 60 inputs: 1 skipped; integration_test/support/runtime_driver.dart
+  11s riverpod_generator on 60 inputs: 15 skipped, 1 no-op; spent 9s analyzing, 2s resolving; lib/core/router/workbench_navigation_history.dart
+  11s riverpod_generator on 60 inputs: 58 skipped, 2 no-op; spent 9s analyzing, 2s resolving
+  0s freezed on 60 inputs; integration_test/support/fixture_import_port.dart
+  0s freezed on 60 inputs: 58 skipped, 2 no-op
+  0s json_serializable on 120 inputs; integration_test/support/fixture_import_port.dart
+  0s json_serializable on 120 inputs: 102 skipped, 18 no-op
+  0s go_router_builder on 120 inputs; integration_test/support/fixture_import_port.dart
+  0s go_router_builder on 120 inputs: 102 skipped, 1 same, 17 no-op
+  0s source_gen:combining_builder on 120 inputs; integration_test/support/fixture_import_port.dart
+  0s source_gen:combining_builder on 120 inputs: 119 skipped, 1 same
+  Built with build_runner/aot in 12s; wrote 2 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s go_router_builder on 6 inputs; lib/minimal_module.dart
+  0s go_router_builder on 6 inputs: 6 skipped
+  0s source_gen:combining_builder on 6 inputs; lib/minimal_module.dart
+  0s source_gen:combining_builder on 6 inputs: 6 skipped
+  Built with build_runner/aot in 1s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 22 inputs; lib/feature_lab.dart
+  0s riverpod_generator on 22 inputs: 22 skipped
+  0s freezed on 22 inputs; lib/feature_lab.dart
+  0s freezed on 22 inputs: 22 skipped
+  0s json_serializable on 44 inputs; lib/feature_lab.dart
+  0s json_serializable on 44 inputs: 44 skipped
+  0s go_router_builder on 44 inputs; lib/feature_lab.dart
+  0s go_router_builder on 44 inputs: 44 skipped
+  0s source_gen:combining_builder on 44 inputs; lib/feature_lab.dart
+  0s source_gen:combining_builder on 44 inputs: 44 skipped
+  Built with build_runner/aot in 1s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 8 inputs; lib/app.dart
+  0s riverpod_generator on 8 inputs: 8 skipped
+  0s source_gen:combining_builder on 8 inputs; lib/app.dart
+  0s source_gen:combining_builder on 8 inputs: 8 skipped
+  Built with build_runner/aot in 1s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 4 inputs; lib/showcase_contracts.dart
+  0s riverpod_generator on 4 inputs: 4 skipped
+  0s source_gen:combining_builder on 4 inputs; lib/showcase_contracts.dart
+  0s source_gen:combining_builder on 4 inputs: 4 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 7 inputs; lib/showcase_alpha.dart
+  0s riverpod_generator on 7 inputs: 7 skipped
+  0s go_router_builder on 7 inputs; lib/showcase_alpha.dart
+  0s go_router_builder on 7 inputs: 7 skipped
+  0s source_gen:combining_builder on 7 inputs; lib/showcase_alpha.dart
+  0s source_gen:combining_builder on 7 inputs: 7 skipped
+  Built with build_runner/aot in 1s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 7 inputs; lib/showcase_beta.dart
+  0s riverpod_generator on 7 inputs: 7 skipped
+  0s go_router_builder on 7 inputs; lib/showcase_beta.dart
+  0s go_router_builder on 7 inputs: 7 skipped
+  0s source_gen:combining_builder on 7 inputs; lib/showcase_beta.dart
+  0s source_gen:combining_builder on 7 inputs: 7 skipped
+  Built with build_runner/aot in 1s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart format --output=none --set-exit-if-changed tool/include_browser_coverage.dart tool/check_architecture.dart tool/check_coverage_sources.dart tool/tests/coverage_sources_test.dart tool/tests/browser_coverage_test.dart tool/tests/architecture_test.dart tool/architecture/checker.dart apps/koi_admin_app/lib apps/koi_admin_app/test packages/koi_api_bootstrap/lib packages/koi_api_bootstrap/test packages/koi_auth/lib packages/koi_auth/test packages/koi_core/lib packages/koi_core/test packages/koi_domain/lib packages/koi_domain/test packages/koi_ui/lib packages/koi_ui/test packages/koi_modules/lib packages/koi_modules/test examples/starter_app/lib examples/starter_app/test examples/ui_lab/lib examples/ui_lab/test examples/workbench_app/lib examples/workbench_app/test examples/workbench_app/integration_test examples/minimal_module/lib examples/minimal_module/test examples/feature_lab/lib examples/feature_lab/test examples/module_showcase/lib examples/module_showcase/test examples/module_showcase/packages/showcase_contracts/lib examples/module_showcase/packages/showcase_contracts/test examples/module_showcase/modules/alpha/lib examples/module_showcase/modules/alpha/test examples/module_showcase/modules/beta/lib examples/module_showcase/modules/beta/test
+Formatted 247 files (0 changed) in 1.51 seconds.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run tool/check_architecture.dart --root /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter
+Architecture checks passed (16 workspace members).
++ /opt/homebrew/opt/python@3.14/bin/python3.14 tool/check_ai_assets.py --root /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart analyze --fatal-infos
+Analyzing koi_blueprint_flutter...
+
+   info - examples/ui_lab/test/standard_component_catalog_test.dart:220:5 - Don't invoke 'print' in production code. Try using a logging framework. - avoid_print
+
+1 issue found.
+blueprint: Command failed (1)

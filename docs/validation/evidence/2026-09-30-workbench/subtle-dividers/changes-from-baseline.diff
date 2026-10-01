@@ -1,0 +1,234 @@
+--- before/packages/koi_ui/lib/widgets/koi_resizable_split_view.dart
++++ after/packages/koi_ui/lib/widgets/koi_resizable_split_view.dart
+@@ -38,6 +38,8 @@
+ class _KoiResizableSplitViewState extends State<KoiResizableSplitView> {
+   late double _width = widget.width;
+   bool _focused = false;
++  bool _hovered = false;
++  bool _dragging = false;
+   final _focus = FocusNode();
+ 
+   @override
+@@ -74,50 +76,70 @@
+       final direction = widget.primaryOnTrailing ? -1.0 : 1.0;
+       final primary = SizedBox(width: width, child: widget.primary);
+       final secondary = Expanded(child: widget.secondary);
+-      final handle = FocusableActionDetector(
+-        focusNode: _focus,
+-        mouseCursor: SystemMouseCursors.resizeLeftRight,
+-        onShowFocusHighlight: (value) => setState(() => _focused = value),
+-        shortcuts: const {
+-          SingleActivator(LogicalKeyboardKey.arrowLeft): _ResizeIntent(-10),
+-          SingleActivator(LogicalKeyboardKey.arrowRight): _ResizeIntent(10),
+-          SingleActivator(LogicalKeyboardKey.home): _ResizeIntent(
+-            -1e9,
+-            bound: true,
+-          ),
+-          SingleActivator(LogicalKeyboardKey.end): _ResizeIntent(
+-            1e9,
+-            bound: true,
+-          ),
+-        },
+-        actions: {
+-          _ResizeIntent: CallbackAction<_ResizeIntent>(
+-            onInvoke: (intent) {
+-              change(width + intent.delta * (intent.bound ? 1 : direction));
+-              return null;
+-            },
+-          ),
+-        },
+-        child: Semantics(
+-          label: widget.resizeLabel,
+-          value: '${width.round()}',
+-          increasedValue: '${(width + 10).clamp(min, max).round()}',
+-          decreasedValue: '${(width - 10).clamp(min, max).round()}',
+-          onIncrease: () => change(width + 10),
+-          onDecrease: () => change(width - 10),
+-          child: GestureDetector(
+-            behavior: HitTestBehavior.opaque,
+-            dragStartBehavior: DragStartBehavior.down,
+-            onTap: _focus.requestFocus,
+-            onHorizontalDragStart: (_) => _focus.requestFocus(),
+-            onHorizontalDragUpdate: (event) =>
+-                change(_width.clamp(min, max) + event.delta.dx * direction),
+-            child: SizedBox(
+-              width: handleWidth,
+-              child: Center(
+-                child: Container(
+-                  width: _focused ? 3 : 1,
+-                  color: _focused ? tokens.dropIndicator : tokens.weakBorder,
++      final handle = MouseRegion(
++        onEnter: (_) => setState(() => _hovered = true),
++        onExit: (_) => setState(() => _hovered = false),
++        child: FocusableActionDetector(
++          focusNode: _focus,
++          mouseCursor: SystemMouseCursors.resizeLeftRight,
++          onShowFocusHighlight: (value) => setState(() => _focused = value),
++          shortcuts: const {
++            SingleActivator(LogicalKeyboardKey.arrowLeft): _ResizeIntent(-10),
++            SingleActivator(LogicalKeyboardKey.arrowRight): _ResizeIntent(10),
++            SingleActivator(LogicalKeyboardKey.home): _ResizeIntent(
++              -1e9,
++              bound: true,
++            ),
++            SingleActivator(LogicalKeyboardKey.end): _ResizeIntent(
++              1e9,
++              bound: true,
++            ),
++          },
++          actions: {
++            _ResizeIntent: CallbackAction<_ResizeIntent>(
++              onInvoke: (intent) {
++                change(width + intent.delta * (intent.bound ? 1 : direction));
++                return null;
++              },
++            ),
++          },
++          child: Semantics(
++            label: widget.resizeLabel,
++            value: '${width.round()}',
++            increasedValue: '${(width + 10).clamp(min, max).round()}',
++            decreasedValue: '${(width - 10).clamp(min, max).round()}',
++            onIncrease: () => change(width + 10),
++            onDecrease: () => change(width - 10),
++            child: GestureDetector(
++              behavior: HitTestBehavior.opaque,
++              dragStartBehavior: DragStartBehavior.down,
++              onTap: _focus.requestFocus,
++              onHorizontalDragStart: (_) {
++                _focus.requestFocus();
++                setState(() => _dragging = true);
++              },
++              onHorizontalDragUpdate: (event) =>
++                  change(_width.clamp(min, max) + event.delta.dx * direction),
++              onHorizontalDragEnd: (_) => setState(() => _dragging = false),
++              onHorizontalDragCancel: () => setState(() => _dragging = false),
++              child: SizedBox(
++                width: handleWidth,
++                child: Center(
++                  child: AnimatedContainer(
++                    key: const ValueKey('koi-split-grip'),
++                    duration: const Duration(milliseconds: 120),
++                    width: 2,
++                    height: 48,
++                    decoration: BoxDecoration(
++                      borderRadius: BorderRadius.circular(2),
++                      color: _focused || _dragging
++                          ? tokens.dropIndicator
++                          : _hovered
++                          ? Theme.of(context).colorScheme.onSurface
++                                .withValues(alpha: .2)
++                          : Colors.transparent,
++                    ),
++                  ),
+                 ),
+               ),
+             ),
+--- before/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
++++ after/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
+@@ -71,6 +71,8 @@
+       final expanded = constraints.maxWidth >= 1024;
+       final tokens = KoiThemeTokens.of(context);
+       final chromeBackground = tokens.chromeBackground;
++      final separatorColor = Theme.of(context).colorScheme.onSurface
++          .withValues(alpha: .06);
+       final selected = destinations.indexWhere((item) => item.id == selectedId);
+       final selectedIndex = selected < 0 ? 0 : selected;
+       void select(int index) => onDestinationSelected(destinations[index].id);
+@@ -94,7 +96,7 @@
+           surfaceTintColor: Colors.transparent,
+           shape: RoundedRectangleBorder(
+             borderRadius: BorderRadius.circular(KoiRadius.large),
+-            side: BorderSide(color: tokens.weakBorder.withValues(alpha: .5)),
++            side: BorderSide(color: separatorColor),
+           ),
+           clipBehavior: Clip.antiAlias,
+           child: content,
+@@ -142,7 +144,7 @@
+                   ),
+               ],
+             ),
+-            const VerticalDivider(width: 1),
++            VerticalDivider(width: 1, thickness: 1, color: separatorColor),
+             Expanded(child: content),
+           ],
+         );
+--- before/packages/koi_ui/test/koi_components_test.dart
++++ after/packages/koi_ui/test/koi_components_test.dart
+@@ -1,3 +1,5 @@
++import 'dart:ui' show PointerDeviceKind;
++
+ import 'package:flutter/material.dart';
+ import 'package:flutter/services.dart';
+ import 'package:flutter_test/flutter_test.dart';
+@@ -187,8 +189,30 @@
+       );
+       await tester.pumpWidget(split(280));
+       final handle = find.bySemanticsLabel('调整侧栏宽度');
++      final grip = find.byKey(const ValueKey('koi-split-grip'));
++      Color gripColor() =>
++          (tester.widget<AnimatedContainer>(grip).decoration! as BoxDecoration)
++              .color!;
++      expect(gripColor(), Colors.transparent);
++      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
++      await mouse.addPointer(location: const Offset(10, 10));
++      await mouse.moveTo(tester.getCenter(handle));
++      await tester.pumpAndSettle();
++      expect(gripColor(), isNot(Colors.transparent));
++      expect(
++        tester.getSize(grip).height,
++        lessThan(tester.getSize(handle).height),
++      );
++      await mouse.moveTo(const Offset(10, 10));
++      await tester.pumpAndSettle();
++      expect(gripColor(), Colors.transparent);
++      await mouse.removePointer();
+       await tester.sendKeyEvent(LogicalKeyboardKey.tab);
+-      await tester.pump();
++      await tester.pumpAndSettle();
++      expect(
++        gripColor(),
++        AppTheme.light.extension<KoiThemeTokens>()!.dropIndicator,
++      );
+       await tester.drag(handle, const Offset(50, 0));
+       await tester.pump();
+       expect(changed, 330);
+--- before/docs/architecture/ui-and-adaptive.md
++++ after/docs/architecture/ui-and-adaptive.md
+@@ -9,6 +9,8 @@
+ 工作区壳根据局部 LayoutBuilder 约束切换：小于 600 为紧凑导航，600–1023 为 rail 与主体，1024 起显示可调整侧栏、主体及详情。OS 判断只用于平台服务；密度是明确设置，不从窗口宽度推断输入方式。窄窗口、长中文及 200% 字号必须可操作。
+ 
+ 宽屏使用 64px 固定图标栏，导航入口靠上，`navigationTrailing` 槽位固定底部。工作台在此装配主题与密度设置菜单；小于 600 时该入口移到顶部标题区。图标栏、资料侧栏和标题区共用 `chromeBackground` 外壳底色，标题区不叠加滚动色调。主体和详情共用 `contentBackground`，组成一个有 8px 外边距、24px 圆角和弱边框的内容面板，真实裁剪其子内容；详情分隔条保留在面板内部。两组颜色随明暗主题同步，普通 Material 宿主使用 ColorScheme 回退。短窗口允许导航入口滚动，底部设置仍保持可见。
++
++结构边线单独使用 onSurface 的 6% 透明度，不复用输入框等控件的 outlineVariant。可调整面板保留 12px 全高命中区和键盘/语义操作；默认隐藏拖动条，悬停显示 48px 短提示，键盘焦点及拖动期间使用品牌指示色。鼠标离开或操作结束后收起提示，内容边界主要由底色和留白表达。
+ 
+ 生成 workbench 的 macOS runner 增加确定性的窗口桥接：保留原生红黄绿按钮和拖动标题栏，使用 fullSizeContentView、透明标题栏与 unifiedCompact NSToolbar。后退、前进、标题和保存由原生工具栏提供，位于红黄绿右侧同一行。App 的 `WorkbenchWindowChrome` 同步主题、项目标题和历史可用状态，并把原生命令连接到同一个工作区历史及保存回调。原生宿主报告工具栏就绪后，宽窗口通过 `showHeader: false` 去掉重复的 Flutter 标题区；窄窗口保留抽屉等内容操作。工作区内容预留原生工具栏高度，背景与图标栏一致。桥接仅由 App 拥有，不进入 domain 或 koi_ui；Web 和其他平台不调用该 macOS 通道。Windows/Linux 的系统标题栏融合需各自平台实现及运行验收。
+ 
+--- before/packages/koi_ui/README.md
++++ after/packages/koi_ui/README.md
+@@ -30,6 +30,9 @@
+ The main body and inline details share `contentBackground` inside one clipped,
+ rounded surface with a small outer inset. Both light and dark themes provide
+ distinct surfaces; ordinary Material hosts fall back to their ColorScheme.
++Structural edges use a subtle color independent of control outlines. Split
++dividers keep their full-height hit target while showing a short grip only on
++hover, keyboard focus or active drag.
+ 
+ `KoiPopover` owns its OverlayPortal and focus scope, supports Escape and outside
+ click, returns focus to its trigger and removes its overlay on disposal.
+--- before/docs/validation/2026-09-30-workbench.md
++++ after/docs/validation/2026-09-30-workbench.md
+@@ -131,3 +131,13 @@
+ 最终完整 `python3 blueprint.py validate`：PASS，手写覆盖率 **87.21%，3408/3908 行**，Workbench 72 项 VM 与 8 项 Chrome 存储行为通过。[本轮 manifest](evidence/2026-09-30-workbench/content-surface/manifest.json) 保存完整门禁、构建、生成、原图与源码核对记录。
+ 
+ 本轮其他平台构建与真实运行为 NOT_RUN；模板生成 macos/web 不代表对应平台构建或运行。首次回归发现 ColoredBox 会遮住侧栏的 Material ink 反馈，已替换为 Material 并重新通过；失败轮次未计入最终通过结果。
++
++## 参照 Codex 弱化分割线
++
++只读检查本机 `/Applications/ChatGPT.app/Contents/Resources/app.asar` 中 Codex 的打包 CSS，发现 border-light 使用明亮黑色/深色白色的 `0d` alpha（约 5.1%），border-subtle 引用该弱边框，主内容区边框宽度引用 hairline。选取的样式定义、资源路径与 SHA 保存到 [本机样式核对](evidence/2026-09-30-workbench/subtle-dividers/codex-style-reference.json)。这是当前客户端打包资源的证据，未据此断言每处侧栏具体使用哪个 token，或将它视为公开源码仓库。
++
++工作台结构边线改用 onSurface 的 6% 透明度。两条可调整面板的默认全高线隐藏，保留 12px 全高命中区；鼠标悬停显示 48px 短拖动条，键盘焦点及拖动期间显示品牌色，收起有 120ms 过渡。内容外沿和图标栏分隔线使用同一弱结构色，继续通过底色与留白表达区域。
++
++组件 16 项、工作台展示 16 项定向行为通过，覆盖鼠标进入/离开、键盘焦点、拖动和方向键、尺寸边界、200% 字号及文本/播放器身份保持。首次悬停测试发现 FocusableActionDetector 的 hover 提示受输入高亮模式影响，已改为独立 MouseRegion 并复验通过。实际 macOS Debug 构建 PASS：拖动资料侧栏后边界移动，恢复原宽度后中文资料仍显示；切换深色再恢复明亮，默认长线保持隐藏。截图原图未修改：[明亮](evidence/2026-09-30-workbench/subtle-dividers/text-light.png)、[深色](evidence/2026-09-30-workbench/subtle-dividers/text-dark.png)。
++
++完整 `python3 blueprint.py validate`：PASS，手写覆盖率 **87.23%，3422/3923 行**；Workbench 72 项 VM 与 8 项 Chrome 存储行为通过。[manifest](evidence/2026-09-30-workbench/subtle-dividers/manifest.json) 保存日志、截图、运行源码核对及基线差异。本轮其他平台构建与真实运行为 NOT_RUN；未复跑新项目生成，生成器未修改，共享 UI 源仍由模板直接复制。

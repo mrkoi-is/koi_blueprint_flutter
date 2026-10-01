@@ -1,0 +1,52 @@
+{
+  "files": [
+    {
+      "path": "DESIGN.md",
+      "sha256": "a831b5aec9c20148840d70822333dd43d7691047d1472ad53cfb7caddcb765ec"
+    },
+    {
+      "path": "packages/koi_ui/README.md",
+      "sha256": "366f3a8ebd957434a9d3fffc32ed56a0edb9556440f80cc53af4ca6efe1c38b0"
+    },
+    {
+      "path": "packages/koi_ui/lib/koi_ui.dart",
+      "sha256": "fbae9021870d5deb0aefd064716688ee7f73b231ff381069b26b90967853bb0f"
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "sha256": "f27d4b342f68f4bd132b51676409aba282a4d51adbd47d256f4cd35adae454fb"
+    },
+    {
+      "path": "packages/koi_ui/test/koi_components_test.dart",
+      "sha256": "08105c05c0896f8a0fef4f89e4802a754f80b875af2c2cc02a2cd352a8c285b2"
+    },
+    {
+      "path": "examples/workbench_app/lib/app.dart",
+      "sha256": "ceb5445f44b96806ef94c9558305e97e78131a3f16b0cf58c6e16ff3574c4fc0"
+    },
+    {
+      "path": "examples/workbench_app/lib/core/window/workbench_window_chrome.dart",
+      "sha256": "b64337d8e4de06f5b735a2b78c11487d60e22fcda71898254380f73bed7f1f50"
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+      "sha256": "42cffb773962a8239f075f11010edfda0cc02fbc128786878e1c487f56179dd5"
+    },
+    {
+      "path": "examples/workbench_app/test/workbench_window_chrome_test.dart",
+      "sha256": "2482741060ef3e61c53e129a1f39d18400fce2b2735764763074bdcf2648f1ab"
+    },
+    {
+      "path": "examples/workbench_app/test/workspace_presentation_test.dart",
+      "sha256": "cfeb0fc0b6635a67bde073d4cac83fdc0a907ba8f310697bbb12c2840cd4a38c"
+    },
+    {
+      "path": "tool/platform_configuration.py",
+      "sha256": "f35e456815c8f313518815eae321e069bf54443019050b1048b2d19d5cda6b46"
+    },
+    {
+      "path": "tool/tests/test_platform_configuration.py",
+      "sha256": "2a06ad6aa9ed44cdf0cb528286c88e918bbb8399eedaccaff31f1f7f306e8194"
+    }
+  ]
+}

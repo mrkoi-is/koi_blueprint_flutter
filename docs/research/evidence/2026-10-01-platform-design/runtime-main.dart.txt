@@ -1,0 +1,96 @@
+import 'package:flutter/material.dart';
+import 'package:media_kit/media_kit.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:platform_review_app/app.dart';
+import 'package:platform_review_app/bootstrap.dart';
+import 'package:platform_review_app/features/workspace/domain/workspace_models.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(const WorkbenchLauncher());
+}
+
+/// Both decoder initialization and storage failures are handled by the launcher.
+Future<WorkbenchBootstrap> initializeWorkbench() async {
+  MediaKit.ensureInitialized();
+  final bootstrap = await WorkbenchBootstrap.create();
+  if (bootstrap.session.state.snapshot.documents.isEmpty) {
+    bootstrap.session.createDocument(title: '设计规范.md', text: 'Koi 工作区\n\n让内容成为主角。\n\n用统一的字体、控件与状态，让每个新 App 都有可靠的起点。\n\n选中资料有清晰标记；键盘焦点独立显示。界面适应文字缩放，保留安静的内容表面。');
+    bootstrap.session.createDocument(title: '跨平台检查清单.md', text: '检查触摸目标、Tab顺序、返回行为与中文缩放。');
+    bootstrap.session.createDocument(title: '媒体与任务.md', text: '图片、视频和真实任务继续复用稳定的工作区会话。');
+    bootstrap.session.addTodo('检查中文重命名与空白提示');
+    bootstrap.session.addTodo('验证放大文字下的触摸和键盘操作');
+    bootstrap.session.updatePreferences(bootstrap.session.state.snapshot.preferences.copyWith(
+      selectedDocumentId: bootstrap.session.state.snapshot.documents.first.id,
+      density: WorkspaceDensity.compact,
+      themeMode: WorkspaceThemeMode.light,
+    ));
+    await bootstrap.session.save();
+  }
+  return bootstrap;
+}
+
+class WorkbenchLauncher extends StatefulWidget {
+  const WorkbenchLauncher({
+    super.key,
+    this.createBootstrap = initializeWorkbench,
+  });
+  final Future<WorkbenchBootstrap> Function() createBootstrap;
+  @override
+  State<WorkbenchLauncher> createState() => _WorkbenchLauncherState();
+}
+
+class _WorkbenchLauncherState extends State<WorkbenchLauncher> {
+  late Future<WorkbenchBootstrap> _pending;
+  int _generation = 0;
+  @override
+  void initState() {
+    super.initState();
+    _pending = _create();
+  }
+
+  Future<WorkbenchBootstrap> _create() async {
+    final generation = ++_generation;
+    final bootstrap = await widget.createBootstrap();
+    if (!mounted || generation != _generation) {
+      await bootstrap.disposeAsync();
+      throw StateError('初始化已取消');
+    }
+    return bootstrap;
+  }
+
+  @override
+  void dispose() {
+    ++_generation;
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => FutureBuilder<WorkbenchBootstrap>(
+    future: _pending,
+    builder: (context, value) {
+      final bootstrap = value.data;
+      if (bootstrap != null) {
+        return PlatformReviewApp(bootstrap: bootstrap);
+      }
+      return MaterialApp(
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        home: Scaffold(
+          body: value.hasError
+              ? KoiErrorState(
+                  title: '工作区初始化失败',
+                  description: '${value.error}',
+                  onRetry: () {
+                    final pending = _create();
+                    setState(() {
+                      _pending = pending;
+                    });
+                  },
+                )
+              : const KoiLoadingState(message: '正在初始化本地工作区…'),
+        ),
+      );
+    },
+  );
+}

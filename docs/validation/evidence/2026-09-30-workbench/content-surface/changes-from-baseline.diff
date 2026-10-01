@@ -1,0 +1,307 @@
+--- before/packages/koi_ui/lib/theme/app_colors.dart
++++ after/packages/koi_ui/lib/theme/app_colors.dart
+@@ -8,4 +8,6 @@
+   static const amber = Color(0xFFC98324);
+   static const paper = Color(0xFFFFFBF5);
+   static const night = Color(0xFF101B18);
++  static const chrome = Color(0xFFF2F3F1);
++  static const nightPanel = Color(0xFF1A2622);
+ }
+--- before/packages/koi_ui/lib/theme/app_theme.dart
++++ after/packages/koi_ui/lib/theme/app_theme.dart
+@@ -20,7 +20,10 @@
+           secondary: isDark ? null : AppColors.amber,
+           surface: isDark ? AppColors.night : AppColors.paper,
+         );
+-    final tokens = KoiThemeTokens.fromScheme(colors, density: density);
++    final tokens = KoiThemeTokens.fromScheme(colors, density: density).copyWith(
++      chromeBackground: isDark ? AppColors.night : AppColors.chrome,
++      contentBackground: isDark ? AppColors.nightPanel : AppColors.paper,
++    );
+     final outline = OutlineInputBorder(
+       borderRadius: BorderRadius.circular(KoiRadius.medium),
+       borderSide: BorderSide(color: tokens.weakBorder),
+--- before/packages/koi_ui/lib/theme/koi_theme_tokens.dart
++++ after/packages/koi_ui/lib/theme/koi_theme_tokens.dart
+@@ -28,13 +28,18 @@
+     required this.dropIndicator,
+     required this.density,
+     required this.itemPadding,
+-  });
++    Color? chromeBackground,
++    Color? contentBackground,
++  }) : chromeBackground = chromeBackground ?? panelBackground,
++       contentBackground = contentBackground ?? panelBackground;
+ 
+   factory KoiThemeTokens.fromScheme(
+     ColorScheme colors, {
+     KoiDensity density = KoiDensity.comfortable,
+   }) => KoiThemeTokens(
+     panelBackground: colors.surface,
++    chromeBackground: colors.surfaceContainerLow,
++    contentBackground: colors.surface,
+     weakBorder: colors.outlineVariant,
+     selectedBackground: colors.secondaryContainer,
+     dropIndicator: colors.primary,
+@@ -50,6 +55,12 @@
+   }
+ 
+   final Color panelBackground;
++
++  /// Window title bar, navigation rail and content sidebar share this surface.
++  final Color chromeBackground;
++
++  /// Main workspace and details sit inside one rounded content surface.
++  final Color contentBackground;
+   final Color weakBorder;
+   final Color selectedBackground;
+   final Color dropIndicator;
+@@ -59,6 +70,8 @@
+   @override
+   KoiThemeTokens copyWith({
+     Color? panelBackground,
++    Color? chromeBackground,
++    Color? contentBackground,
+     Color? weakBorder,
+     Color? selectedBackground,
+     Color? dropIndicator,
+@@ -66,6 +79,8 @@
+     double? itemPadding,
+   }) => KoiThemeTokens(
+     panelBackground: panelBackground ?? this.panelBackground,
++    chromeBackground: chromeBackground ?? this.chromeBackground,
++    contentBackground: contentBackground ?? this.contentBackground,
+     weakBorder: weakBorder ?? this.weakBorder,
+     selectedBackground: selectedBackground ?? this.selectedBackground,
+     dropIndicator: dropIndicator ?? this.dropIndicator,
+@@ -78,6 +93,16 @@
+     if (other == null) return this;
+     return KoiThemeTokens(
+       panelBackground: Color.lerp(panelBackground, other.panelBackground, t)!,
++      chromeBackground: Color.lerp(
++        chromeBackground,
++        other.chromeBackground,
++        t,
++      )!,
++      contentBackground: Color.lerp(
++        contentBackground,
++        other.contentBackground,
++        t,
++      )!,
+       weakBorder: Color.lerp(weakBorder, other.weakBorder, t)!,
+       selectedBackground: Color.lerp(
+         selectedBackground,
+--- before/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
++++ after/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
+@@ -69,7 +69,8 @@
+     builder: (context, constraints) {
+       final compact = constraints.maxWidth < 600;
+       final expanded = constraints.maxWidth >= 1024;
+-      final chromeBackground = KoiThemeTokens.of(context).panelBackground;
++      final tokens = KoiThemeTokens.of(context);
++      final chromeBackground = tokens.chromeBackground;
+       final selected = destinations.indexWhere((item) => item.id == selectedId);
+       final selectedIndex = selected < 0 ? 0 : selected;
+       void select(int index) => onDestinationSelected(destinations[index].id);
+@@ -85,9 +86,23 @@
+           minSecondaryWidth: 320,
+         );
+       }
++      content = Padding(
++        padding: const EdgeInsets.all(KoiSpace.sm),
++        child: Material(
++          key: const ValueKey('koi-workbench-content-surface'),
++          color: tokens.contentBackground,
++          surfaceTintColor: Colors.transparent,
++          shape: RoundedRectangleBorder(
++            borderRadius: BorderRadius.circular(KoiRadius.large),
++            side: BorderSide(color: tokens.weakBorder.withValues(alpha: .5)),
++          ),
++          clipBehavior: Clip.antiAlias,
++          child: content,
++        ),
++      );
+       if (expanded && sidebar != null) {
+         content = KoiResizableSplitView(
+-          primary: sidebar!,
++          primary: Material(color: chromeBackground, child: sidebar!),
+           secondary: content,
+           width: sidebarWidth,
+           onWidthChanged: onSidebarWidthChanged,
+@@ -191,18 +206,21 @@
+         drawer: !expanded && sidebar != null
+             ? Drawer(
+                 width: drawerWidth,
++                backgroundColor: chromeBackground,
+                 child: SafeArea(child: sidebar!),
+               )
+             : null,
+         endDrawer: !expanded && detail != null
+             ? Drawer(
+                 width: drawerWidth,
++                backgroundColor: tokens.contentBackground,
+                 child: SafeArea(child: detail!),
+               )
+             : null,
+         body: SafeArea(top: false, child: content),
+         bottomNavigationBar: compact
+             ? NavigationBar(
++                backgroundColor: chromeBackground,
+                 selectedIndex: selectedIndex,
+                 onDestinationSelected: select,
+                 labelBehavior:
+--- before/packages/koi_ui/test/koi_components_test.dart
++++ after/packages/koi_ui/test/koi_components_test.dart
+@@ -14,9 +14,15 @@
+     expect(light.lerp(null, .5), same(light));
+     expect(light.lerp(dark, 0).panelBackground, light.panelBackground);
+     expect(light.lerp(dark, 1).panelBackground, dark.panelBackground);
++    expect(light.lerp(dark, 0).chromeBackground, light.chromeBackground);
++    expect(light.lerp(dark, 1).contentBackground, dark.contentBackground);
++    expect(light.chromeBackground, isNot(light.contentBackground));
++    expect(dark.chromeBackground, isNot(dark.contentBackground));
+     expect(light.lerp(compact, .8).density, KoiDensity.compact);
+     final copy = light.copyWith(
+       panelBackground: Colors.red,
++      chromeBackground: Colors.purple,
++      contentBackground: Colors.white,
+       weakBorder: Colors.blue,
+       selectedBackground: Colors.green,
+       dropIndicator: Colors.orange,
+@@ -24,6 +30,8 @@
+       itemPadding: 3,
+     );
+     expect(copy.panelBackground, Colors.red);
++    expect(copy.chromeBackground, Colors.purple);
++    expect(copy.contentBackground, Colors.white);
+     expect(copy.weakBorder, Colors.blue);
+     expect(copy.selectedBackground, Colors.green);
+     expect(copy.dropIndicator, Colors.orange);
+@@ -48,6 +56,7 @@
+       ),
+     );
+     expect(tokens.density, KoiDensity.comfortable);
++    expect(tokens.chromeBackground, isNot(tokens.contentBackground));
+     expect(tester.takeException(), isNull);
+   });
+ 
+@@ -264,6 +273,12 @@
+         ),
+       );
+       expect(controller.text, '中文草稿');
++      final surface = tester.widget<Material>(
++        find.byKey(const ValueKey('koi-workbench-content-surface')),
++      );
++      final tokens = AppTheme.light.extension<KoiThemeTokens>()!;
++      expect(surface.color, tokens.contentBackground);
++      expect(surface.clipBehavior, Clip.antiAlias);
+       await tester.tap(find.byTooltip('后退'));
+       await tester.tap(find.byTooltip('前进'));
+       await tester.pump();
+@@ -274,6 +289,10 @@
+       } else {
+         expect(find.byType(NavigationRail), findsOneWidget);
+         final rail = tester.getRect(find.byType(NavigationRail));
++        final railWidget = tester.widget<NavigationRail>(
++          find.byType(NavigationRail),
++        );
++        expect(railWidget.backgroundColor, tokens.chromeBackground);
+         final settings = tester.getRect(find.byKey(const ValueKey('settings')));
+         expect(rail.width, 64);
+         expect(rail.bottom - settings.bottom, lessThanOrEqualTo(16));
+@@ -398,6 +417,10 @@
+             .first,
+       );
+       expect(railMaterial.color, appBarMaterial.color);
++      final surface = tester.widget<Material>(
++        find.byKey(const ValueKey('koi-workbench-content-surface')),
++      );
++      expect(surface.color, isNot(railMaterial.color));
+       await tester.drag(find.byType(NavigationRail), const Offset(0, -200));
+       await tester.pumpAndSettle();
+       expect(tester.getRect(find.byTooltip('设置')), settings);
+--- before/examples/workbench_app/lib/core/window/workbench_window_chrome.dart
++++ after/examples/workbench_app/lib/core/window/workbench_window_chrome.dart
+@@ -122,7 +122,7 @@
+   void didChangeDependencies() {
+     super.didChangeDependencies();
+     if (!_isNative) return;
+-    final color = KoiThemeTokens.of(context).panelBackground;
++    final color = KoiThemeTokens.of(context).chromeBackground;
+     final brightness = Theme.of(context).brightness;
+     if (color == _lastColor && brightness == _lastBrightness) return;
+     _lastColor = color;
+@@ -178,7 +178,7 @@
+   Widget build(BuildContext context) => WorkbenchWindowInfo(
+     hasNativeToolbar: _ready,
+     child: ColoredBox(
+-      color: KoiThemeTokens.of(context).panelBackground,
++      color: KoiThemeTokens.of(context).chromeBackground,
+       child: Padding(
+         padding: EdgeInsets.only(
+           top: math.max(0, _titlebarHeight - MediaQuery.paddingOf(context).top),
+--- before/examples/workbench_app/test/workbench_window_chrome_test.dart
++++ after/examples/workbench_app/test/workbench_window_chrome_test.dart
+@@ -57,7 +57,7 @@
+     expect(calls.single.arguments, {
+       'color': AppTheme.light
+           .extension<KoiThemeTokens>()!
+-          .panelBackground
++          .chromeBackground
+           .toARGB32(),
+       'dark': false,
+       'title': 'Koi 工作区',
+@@ -72,7 +72,7 @@
+     expect(calls.last.arguments, {
+       'color': AppTheme.dark
+           .extension<KoiThemeTokens>()!
+-          .panelBackground
++          .chromeBackground
+           .toARGB32(),
+       'dark': true,
+       'title': 'Koi 工作区',
+--- before/docs/architecture/ui-and-adaptive.md
++++ after/docs/architecture/ui-and-adaptive.md
+@@ -8,7 +8,7 @@
+ 
+ 工作区壳根据局部 LayoutBuilder 约束切换：小于 600 为紧凑导航，600–1023 为 rail 与主体，1024 起显示可调整侧栏、主体及详情。OS 判断只用于平台服务；密度是明确设置，不从窗口宽度推断输入方式。窄窗口、长中文及 200% 字号必须可操作。
+ 
+-宽屏使用 64px 固定图标栏，导航入口靠上，`navigationTrailing` 槽位固定底部。工作台在此装配主题与密度设置菜单；小于 600 时该入口移到顶部标题区。图标栏与应用内标题区使用同一面板背景，标题区不叠加滚动色调。短窗口允许导航入口滚动，底部设置仍保持可见。
++宽屏使用 64px 固定图标栏，导航入口靠上，`navigationTrailing` 槽位固定底部。工作台在此装配主题与密度设置菜单；小于 600 时该入口移到顶部标题区。图标栏、资料侧栏和标题区共用 `chromeBackground` 外壳底色，标题区不叠加滚动色调。主体和详情共用 `contentBackground`，组成一个有 8px 外边距、24px 圆角和弱边框的内容面板，真实裁剪其子内容；详情分隔条保留在面板内部。两组颜色随明暗主题同步，普通 Material 宿主使用 ColorScheme 回退。短窗口允许导航入口滚动，底部设置仍保持可见。
+ 
+ 生成 workbench 的 macOS runner 增加确定性的窗口桥接：保留原生红黄绿按钮和拖动标题栏，使用 fullSizeContentView、透明标题栏与 unifiedCompact NSToolbar。后退、前进、标题和保存由原生工具栏提供，位于红黄绿右侧同一行。App 的 `WorkbenchWindowChrome` 同步主题、项目标题和历史可用状态，并把原生命令连接到同一个工作区历史及保存回调。原生宿主报告工具栏就绪后，宽窗口通过 `showHeader: false` 去掉重复的 Flutter 标题区；窄窗口保留抽屉等内容操作。工作区内容预留原生工具栏高度，背景与图标栏一致。桥接仅由 App 拥有，不进入 domain 或 koi_ui；Web 和其他平台不调用该 macOS 通道。Windows/Linux 的系统标题栏融合需各自平台实现及运行验收。
+ 
+--- before/packages/koi_ui/README.md
++++ after/packages/koi_ui/README.md
+@@ -26,6 +26,11 @@
+ `sidebarWidth/onSidebarWidthChanged` and `detailWidth/onDetailWidthChanged` so
+ hosts can persist both panel widths.
+ 
++The title bar, rail and sidebar share `KoiThemeTokens.chromeBackground`.
++The main body and inline details share `contentBackground` inside one clipped,
++rounded surface with a small outer inset. Both light and dark themes provide
++distinct surfaces; ordinary Material hosts fall back to their ColorScheme.
++
+ `KoiPopover` owns its OverlayPortal and focus scope, supports Escape and outside
+ click, returns focus to its trigger and removes its overlay on disposal.
+ `KoiMenu` delegates keyboard navigation, dismissal and item activation to Material.
+--- before/docs/validation/2026-09-30-workbench.md
++++ after/docs/validation/2026-09-30-workbench.md
+@@ -117,3 +117,17 @@
+ 最终未修改的实际窗口截图：[native-text-light.png](evidence/2026-09-30-workbench/page-history/native-text-light.png)。[manifest](evidence/2026-09-30-workbench/page-history/manifest.json) 保存截图、完整门禁、macOS 构建及生成日志的 SHA；运行宿主源码和原生配置在截图后再次核对。`page-history` 中早期三个截图是按钮位于系统标题栏下面的旧方案，已标为 superseded，不作为最终位置证据。
+ 
+ Cmd+[ / Cmd+] 及非 macOS Alt+方向键已有 Widget 回归；真实 macOS 快捷键激活本轮未确认。本次未重新构建 Android、iOS、Web，未完成 Windows/Linux 原生工具栏与 Safari 运行；这些项仍为 NOT_RUN，不能据本轮 macOS 或此前平台结果补认。
++
++## 顶部与侧栏同色、圆角内容面板
++
++按用户的新截图将顶部、固定图标栏和资料侧栏归为同一外壳底色，主体与详情使用另一层内容底色。新增 `chromeBackground` 与 `contentBackground` 语义 token，保留原 `panelBackground` 和构造接口兼容性；普通 Material 宿主从 ColorScheme 回退。明亮主题为灰白外壳与暖白内容，深色主题为深绿外壳与稍亮的内容。
++
++主区和详情共同放在一个 24px 圆角、8px 外边距的 Material 面板中，边框使用弱边框色并真实裁剪子内容。资料侧栏使用 Material 背景，以保留 ListTile 的选中及点击反馈；详情调整仍在内容面板内部。原生标题栏同步外壳 token，保持红黄绿右侧的真实历史控件；没有新增路由、provider 或播放器拥有者。
++
++定向组件 16 项及工作台展示/窗口桥接 22 项通过，包含 320/600/1024/1440、200% 字号、明暗区分、抽屉、面板调整、导航、编辑/播放身份保持及释放。macOS 实际 Debug 构建通过；真实窗口显示正确中文、圆角外沿与主题同步，切换深色再恢复明亮后资料保持不变。新建改名的 macos/web 工作台与 workbench→workbench 递归生成及分析通过，逐字核对配色/圆角源码、原生桥接和素材字节。
++
++实际原图未修图：[明亮](evidence/2026-09-30-workbench/content-surface/text-light.png)、[深色](evidence/2026-09-30-workbench/content-surface/text-dark.png)。截图采样中原生标题栏与图标栏 RGB 完全一致，资料侧栏最多差 1 个 RGB 步长；主体与详情一致且与外壳有明确色差，见 [颜色采样](evidence/2026-09-30-workbench/content-surface/surface-colors.json)。源码、原图和日志证据位于同一目录。
++
++最终完整 `python3 blueprint.py validate`：PASS，手写覆盖率 **87.21%，3408/3908 行**，Workbench 72 项 VM 与 8 项 Chrome 存储行为通过。[本轮 manifest](evidence/2026-09-30-workbench/content-surface/manifest.json) 保存完整门禁、构建、生成、原图与源码核对记录。
++
++本轮其他平台构建与真实运行为 NOT_RUN；模板生成 macos/web 不代表对应平台构建或运行。首次回归发现 ColoredBox 会遮住侧栏的 Material ink 反馈，已替换为 Material 并重新通过；失败轮次未计入最终通过结果。

@@ -1,0 +1,40 @@
+{
+  "date": "2026-09-30",
+  "macos_file_picker": {
+    "result": "PASS",
+    "scope": "Native system Open dialog, chosen Chinese Markdown file, actual plugin stream import, UI saved state and persisted snapshot content",
+    "ui_observed": [
+      "Native Open dialog appeared",
+      "中文资料.md selected through Go To dialog",
+      "Editor displays fixture content and 32 字 · 已保存"
+    ],
+    "document_content_matches_fixture": true,
+    "fixture_sha256": "903ba3d38177580955c5254f9e9a1b769c2b9b41db7efd15e1d449b585e7ad28",
+    "persisted_jobs": [
+      {
+        "id": "import_1790746213390119_0",
+        "kind": "importFiles",
+        "name": "导入文本资料",
+        "status": "succeeded",
+        "processedBytes": 86,
+        "indeterminate": true,
+        "totalBytes": 86,
+        "assetId": null,
+        "importKind": "text",
+        "error": null
+      }
+    ]
+  },
+  "chrome_file_picker": {
+    "result": "NOT_RUN_BLOCKED",
+    "reason": "Chrome extension chooser.setFiles requires Allow access to file URLs; current native fallback did not expose a system dialog; extension settings were not changed",
+    "runtime_fixture_scope": "Actual Chrome IndexedDB/media smoke passed separately"
+  },
+  "native_shortcuts": {
+    "result": "NOT_RUN",
+    "reason": "Native UI automation did not verify keyboard activation; page shortcut behavior is covered by Widget tests"
+  },
+  "owned_test_tab_and_http_server": "closed/stopped",
+  "native_window": "closed after saved state",
+  "original_fixture_modified": false
+}
