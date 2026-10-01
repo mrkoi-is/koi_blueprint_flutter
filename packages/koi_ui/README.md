@@ -98,3 +98,10 @@ The UI Lab standard catalog demonstrates six families with real form validation,
 selection, sorting, menu dismissal, confirmation/cancellation, undo and sheets.
 Custom Koi components remain small layout/interaction compositions where a
 standard widget is insufficient; there is no parallel Koi Button/Input engine.
+
+`KoiPanel` provides the shared fixed-heading, optional-search and scrolling-body
+recipe. Hosts supply list keys and own a stable PageStorageBucket when moving
+between inline panels and drawers. Status components center when space allows
+and scroll when needed. KoiSearchField supports clearing and a borrowed controller.
+A frame may have one primary destination: utility settings remains a trailing
+command, and the compact frame omits a bottom NavigationBar in that case.

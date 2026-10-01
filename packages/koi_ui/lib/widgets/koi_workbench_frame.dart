@@ -114,7 +114,7 @@ class KoiWorkbenchFrame extends StatefulWidget {
     this.detailWidth = 280,
     this.onDetailWidthChanged,
     super.key,
-  }) : assert(destinations.length >= 2);
+  }) : assert(destinations.length > 0);
 
   final List<KoiNavigationDestination> destinations;
   final String selectedId;
@@ -280,7 +280,7 @@ class _KoiWorkbenchFrameState extends State<KoiWorkbenchFrame> {
               indicatorShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(KoiRadius.small),
               ),
-              selectedIndex: selectedIndex,
+              selectedIndex: selected < 0 ? null : selectedIndex,
               onDestinationSelected: select,
               labelType: NavigationRailLabelType.none,
               destinations: [
@@ -371,7 +371,7 @@ class _KoiWorkbenchFrameState extends State<KoiWorkbenchFrame> {
               )
             : null,
         body: SafeArea(top: false, child: content),
-        bottomNavigationBar: compact
+        bottomNavigationBar: compact && widget.destinations.length >= 2
             ? Row(
                 children: [
                   Expanded(

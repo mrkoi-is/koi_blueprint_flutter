@@ -13,6 +13,7 @@ final class MemoryRepository implements WorkspaceRepository {
   int saves = 0;
   bool failLoad = false;
   bool failSave = false;
+  Future<void>? saveGate;
   @override
   Future<WorkspaceSnapshot> load() async {
     if (failLoad) {
@@ -23,6 +24,7 @@ final class MemoryRepository implements WorkspaceRepository {
 
   @override
   Future<void> save(WorkspaceSnapshot value) async {
+    await saveGate;
     if (failSave) {
       throw StateError('write failure');
     }

@@ -28,13 +28,20 @@ class ForwardWorkspaceIntent extends Intent {
   const ForwardWorkspaceIntent();
 }
 
-class WorkspaceShell extends ConsumerWidget {
+class WorkspaceShell extends ConsumerStatefulWidget {
   const WorkspaceShell({super.key, required this.navigationShell});
   final StatefulNavigationShell navigationShell;
+  @override
+  ConsumerState<WorkspaceShell> createState() => _WorkspaceShellState();
+}
+
+class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
+  final _panelStorage = PageStorageBucket();
+  StatefulNavigationShell get navigationShell => widget.navigationShell;
   static const _ids = ['text', 'media', 'tasks'];
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final session = ref.watch(workspaceSessionProvider);
     final history = ref.watch(navigationHistoryProvider);
     final nativeToolbar = WorkbenchWindowInfo.nativeToolbarOf(context);
@@ -115,12 +122,18 @@ class WorkspaceShell extends ConsumerWidget {
         },
         child: KoiWorkbenchFrame(
           controller: WorkbenchWindowInfo.panelsOf(context),
-          sidebar: WorkspaceSidebar(index: navigationShell.currentIndex),
+          sidebar: PageStorage(
+            bucket: _panelStorage,
+            child: WorkspaceSidebar(index: navigationShell.currentIndex),
+          ),
           // Each route supplies a detail surface only when it has useful data.
           // The task page already presents its explanations and job status.
           detail: navigationShell.currentIndex == 2
               ? null
-              : WorkspaceDetails(index: navigationShell.currentIndex),
+              : PageStorage(
+                  bucket: _panelStorage,
+                  child: WorkspaceDetails(index: navigationShell.currentIndex),
+                ),
           sidebarWidth: state.sidebarWidth,
           detailWidth: state.detailsWidth,
           onSidebarWidthChanged: (width) => session.updatePreferences(

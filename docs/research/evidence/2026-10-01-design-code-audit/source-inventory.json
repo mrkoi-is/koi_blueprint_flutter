@@ -1,0 +1,2294 @@
+{
+  "baseline": "511db2332c91e8de41ef8e4d7cae81f4c686ee31",
+  "files": 246,
+  "implementation_files": 175,
+  "ui_files": 54,
+  "records": [
+    {
+      "path": ".agent/skills/index.yaml",
+      "category": "implementation",
+      "lines": 37,
+      "sha256": "b3071da5d122794cb81f10e39e10a446cbdb62df1bda74d129e3ee09c4f18ff3",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "analysis_options.yaml",
+      "category": "implementation",
+      "lines": 16,
+      "sha256": "26d2246c025d304d3cce4c7c78ced7d065372f88f023625c71ed1d977c785867",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/app.dart",
+      "category": "implementation",
+      "lines": 33,
+      "sha256": "c439e0e408b9f96a1ee07d1939bab71f4b23c5fa9aeac7c0c93f6c0d82098f1b",
+      "ui": true,
+      "design_sensitive_lines": [
+        17,
+        21,
+        22
+      ]
+    },
+    {
+      "path": "apps/koi_admin_app/lib/bootstrap.dart",
+      "category": "implementation",
+      "lines": 105,
+      "sha256": "6e66de1b7d2eb6cd4cff3382223c624880f2d9d920ad94d65a2ba173bbc36966",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/core/bootstrap/bootstrap_failure_app.dart",
+      "category": "implementation",
+      "lines": 48,
+      "sha256": "a54c109dd213c4d766aa801e6628990934043bb5b2adc39b00bd891f9bf6fc93",
+      "ui": true,
+      "design_sensitive_lines": [
+        11,
+        18
+      ]
+    },
+    {
+      "path": "apps/koi_admin_app/lib/core/config/app_environment.dart",
+      "category": "implementation",
+      "lines": 70,
+      "sha256": "c144a2754b0f7bc87c904a53169708548628d931eb96ef557ebbde770a127254",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/core/router/app_navigation.dart",
+      "category": "implementation",
+      "lines": 10,
+      "sha256": "cda8de2641f7d3544b26161ba602ec0bf7074c81debf3a6576a2aa321b266ef1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/core/router/app_router.dart",
+      "category": "implementation",
+      "lines": 47,
+      "sha256": "87b46fc40d082a7916f3fe05703133c0bc13f4f9c591f7b3c4358169294cdc59",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/core/router/app_routes.dart",
+      "category": "implementation",
+      "lines": 51,
+      "sha256": "0abcb7bbfa591112c8c59f9410bac881473502b6cb74de63c288bba0c7ca6226",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/auth/data/datasources/auth_data_source.dart",
+      "category": "implementation",
+      "lines": 15,
+      "sha256": "6622ca1b75ee2c0929fe1d4964c1eba5d25dc832d983ff3fa291eb7be71971cf",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/auth/data/datasources/mock_auth_data_source.dart",
+      "category": "implementation",
+      "lines": 28,
+      "sha256": "bee94f9425e9b1848d60a9748ebf8e875d9167738d47062515479693ac9b5930",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/auth/data/repositories/auth_repository_impl.dart",
+      "category": "implementation",
+      "lines": 174,
+      "sha256": "a8cc6cd0a76a34a6e304b113ede01c35b54e199889b03789669103566c8dcf33",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/auth/domain/entities/auth_login_result.dart",
+      "category": "implementation",
+      "lines": 12,
+      "sha256": "2c58febe5322c7e44813edb4678fa998862ba9046bb5b2827f6200215f4dbed1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/auth/domain/repositories/auth_repository.dart",
+      "category": "implementation",
+      "lines": 14,
+      "sha256": "e8c46f009cfb95b86751c3a23826322bef340bc577e40b6fe1c418967b671ade",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/auth/presentation/providers/auth_providers.dart",
+      "category": "implementation",
+      "lines": 106,
+      "sha256": "ffba57d1cbe6412485ca8e5b37fcc938f63bfc43e54f5289447b2da17f5cc846",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/auth/presentation/screens/login_page.dart",
+      "category": "implementation",
+      "lines": 170,
+      "sha256": "befd2a96b7425aa8c3bab25bae57c7fd5c15144391aa42b7b7542144b49c8b83",
+      "ui": true,
+      "design_sensitive_lines": [
+        65,
+        70,
+        75
+      ]
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/home/presentation/screens/dashboard_page.dart",
+      "category": "implementation",
+      "lines": 129,
+      "sha256": "9fd13e16b449578f3b994e626c61b27a16b90572ff7d723c16462ffd2183ada1",
+      "ui": true,
+      "design_sensitive_lines": [
+        48,
+        54,
+        85,
+        103
+      ]
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/home/presentation/screens/settings_page.dart",
+      "category": "implementation",
+      "lines": 70,
+      "sha256": "4b94c394800b893df547ba614264e093a82fe5b78d0359e81c11750b9944c7ee",
+      "ui": true,
+      "design_sensitive_lines": [
+        20,
+        32
+      ]
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/home/presentation/widgets/home_shell_scaffold.dart",
+      "category": "implementation",
+      "lines": 73,
+      "sha256": "463567750fad79f3786db6e73a06011ff85da3a12c47497b424986b044928bd9",
+      "ui": true,
+      "design_sensitive_lines": [
+        18,
+        41,
+        44,
+        46,
+        50
+      ]
+    },
+    {
+      "path": "apps/koi_admin_app/lib/features/splash/presentation/screens/splash_page.dart",
+      "category": "implementation",
+      "lines": 43,
+      "sha256": "75c1df4f1fe3afe1b44a5a91b4e6452ea17719439eafcd920ad261bc05e8f42a",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/lib/main.dart",
+      "category": "implementation",
+      "lines": 19,
+      "sha256": "19a87b362783d8df824873d977fd94c1e2d70f735ad843a5aac954e7664bd2f9",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/pubspec.yaml",
+      "category": "implementation",
+      "lines": 40,
+      "sha256": "142a5e0e421926ffd568cd4c1c7ca31515c403b29c608c9a10270e4f6be329d1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/app_test.dart",
+      "category": "test",
+      "lines": 49,
+      "sha256": "b8182870cf34215129e4fa1a4868faba87966769f94b5ab3e85560fcf2959aaf",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart",
+      "category": "test",
+      "lines": 13,
+      "sha256": "cf5b63842eeda464e689baee3a123d53da400464bb768b8538c75c44d6b69f79",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart",
+      "category": "test",
+      "lines": 32,
+      "sha256": "07b0874c10111118c1fc692b500bec9d5dd23c155a55eb0296ecf9189e314181",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/core/config/app_environment_test.dart",
+      "category": "test",
+      "lines": 64,
+      "sha256": "bf676d613934636b5361e9481de07143e688342edb1300ef4bd574ca1840ed0a",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/core/router/app_router_test.dart",
+      "category": "test",
+      "lines": 248,
+      "sha256": "8bf4294c6784c449cca7fd071014771a29a58300e5f6ca8f450221a9bdbe4881",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/features/auth/data/repositories/auth_repository_impl_test.dart",
+      "category": "test",
+      "lines": 405,
+      "sha256": "f53cce3fe3cc900b21f06a4824d5f9e47c52f0ea88fe159541bdff5a3da00832",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/features/auth/presentation/providers/auth_controller_test.dart",
+      "category": "test",
+      "lines": 189,
+      "sha256": "0aa8961fd2129187741644db634caf626e14b737239f7970d1475dd011507bf6",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "apps/koi_admin_app/test/features/home/presentation/screens/dashboard_page_test.dart",
+      "category": "test",
+      "lines": 22,
+      "sha256": "9062cdeee4abb738b2e04ac7c5eb1135f1331f5bccdcea1e00f1a6644663abda",
+      "ui": false,
+      "design_sensitive_lines": [
+        15
+      ]
+    },
+    {
+      "path": "blueprint.py",
+      "category": "implementation",
+      "lines": 702,
+      "sha256": "66203d79040a7dbab146c10139d3d4d027a5be271deac2f85377f69b64eab11b",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/feature_lab.dart",
+      "category": "implementation",
+      "lines": 3,
+      "sha256": "8b5deb4dc8b835c9b8e6fb8ccb3720fe7466e3294296155d935e5835d7cdf2fc",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/catalog.dart",
+      "category": "implementation",
+      "lines": 6,
+      "sha256": "5b053aa547ab746dff06e1175fe66f2acf4974a924cde9ab8a047aa2dfcc0e57",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/data/catalog_data_source.dart",
+      "category": "implementation",
+      "lines": 7,
+      "sha256": "0fd96769b4af302bf8589f10b04a9d013b2ed3023a9d6426bd3dee0d7e705366",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/data/catalog_repository_impl.dart",
+      "category": "implementation",
+      "lines": 26,
+      "sha256": "930d660f2803350d7cf7600c68848354e6222284eaf2cc7ca78e59df3e8f5029",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/domain/catalog_item.dart",
+      "category": "implementation",
+      "lines": 12,
+      "sha256": "303853f616e06db6e53a239cd2db8c20c977d266d657c9fe66db35eefd61448c",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/domain/catalog_repository.dart",
+      "category": "implementation",
+      "lines": 6,
+      "sha256": "80a65cbe626a6be4916ac53466db283634f36dcfdf197a0c77cd6fd58f33af3f",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/presentation/models/catalog_view_state.dart",
+      "category": "implementation",
+      "lines": 14,
+      "sha256": "8aea3d9e0303498e321f542c881b947258a7fad47acb87cb3f59ca99ab5b4892",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/presentation/providers/catalog_providers.dart",
+      "category": "implementation",
+      "lines": 73,
+      "sha256": "450202a3464bf9091b375cb323f10b43169e37f23e4d0708986d8f4920db4f9f",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/catalog/presentation/screens/catalog_page.dart",
+      "category": "implementation",
+      "lines": 47,
+      "sha256": "aa7629065bd10c28b78f54217e04fa02db3f037505db964358df8663faa65bf4",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/data/file_draft_repository.dart",
+      "category": "implementation",
+      "lines": 2,
+      "sha256": "cba204d31fc322b37a0d3122a72bc6e71d67132ab9cd1e1b05a4f11eb7ca6468",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/data/file_draft_repository_native.dart",
+      "category": "implementation",
+      "lines": 53,
+      "sha256": "ff563a038eb6394041fd6ed3b01052802c3bdfa39911af281f9d52e3c42fd725",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/data/file_draft_repository_stub.dart",
+      "category": "implementation",
+      "lines": 21,
+      "sha256": "5c12c17649e085de0645cc926479ade7f66d39268f1d44806bf0ed486f481abc",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/domain/draft_repository.dart",
+      "category": "implementation",
+      "lines": 10,
+      "sha256": "61837e8f783bea36b3c562300d3db6335276264b90992f07848fd5370c6a2cb4",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/draft.dart",
+      "category": "implementation",
+      "lines": 4,
+      "sha256": "82129cdc5c4a465ed9ab6fbf3202807eb1400d51e9afbbb1256cb5cc881bd0d9",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/presentation/models/draft_editor_state.dart",
+      "category": "implementation",
+      "lines": 13,
+      "sha256": "c4ab1b13cf93c827e4bec35f52ab0c27fea08ad31a6f0005ffbfb9af9ef6b291",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/presentation/providers/draft_providers.dart",
+      "category": "implementation",
+      "lines": 69,
+      "sha256": "87f22e724ca728c502ecaab7d56a96bd1e0d93cf3a716a637645665b7751c97b",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/draft/presentation/screens/draft_page.dart",
+      "category": "implementation",
+      "lines": 99,
+      "sha256": "ac408a4a0915b655e940a327da3881c7e6150a6320bd645fb47e8885793980c0",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/welcome/presentation/screens/welcome_page.dart",
+      "category": "implementation",
+      "lines": 11,
+      "sha256": "e1a9dbd5e2b285f849223866bbf656b2050a50cbea4c1e6ece17b27489615fb5",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/lib/features/welcome/welcome.dart",
+      "category": "implementation",
+      "lines": 1,
+      "sha256": "e6f6e71a740e6f26106c82db21e39d9c52148ff3b102fbfe5fd26001ae7cbc43",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/pubspec.yaml",
+      "category": "implementation",
+      "lines": 28,
+      "sha256": "571a63032cc0ab3cda77a65bb941acb3a07140512972a5f98075f827840589fb",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/feature_lab/test/features/catalog/catalog_test.dart",
+      "category": "test",
+      "lines": 258,
+      "sha256": "67f40de62da39a55d8f29be67ab7e76a99504f9ef33a1dc9836875a4c73efa47",
+      "ui": false,
+      "design_sensitive_lines": [
+        241
+      ]
+    },
+    {
+      "path": "examples/feature_lab/test/features/draft/draft_test.dart",
+      "category": "test",
+      "lines": 201,
+      "sha256": "9c60239052b09311daa7002e3d023acc385d4ee2983385c20c69f79db96e0f6e",
+      "ui": false,
+      "design_sensitive_lines": [
+        146,
+        170
+      ]
+    },
+    {
+      "path": "examples/feature_lab/test/features/welcome/welcome_test.dart",
+      "category": "test",
+      "lines": 10,
+      "sha256": "eb1b42eebbf56a32955dc0c1eb8c273e03a3654365f032ac8214a259bbbf7f97",
+      "ui": false,
+      "design_sensitive_lines": [
+        7
+      ]
+    },
+    {
+      "path": "examples/minimal_module/lib/minimal_module.dart",
+      "category": "implementation",
+      "lines": 2,
+      "sha256": "978bea54bbef9ca7f189a453f57254d88710d87d14894ef6e27f543073a8ef68",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/minimal_module/lib/src/core/router/app_routes.dart",
+      "category": "implementation",
+      "lines": 13,
+      "sha256": "a0f871218a945107d058dbb74c04a434bc64c1edab334c3d79cca61c6caaeb5b",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/minimal_module/lib/src/features/home/presentation/screens/home_page.dart",
+      "category": "implementation",
+      "lines": 9,
+      "sha256": "49b9e514d174fe7733ead8dd44d5061ac3410e38803b6de9231e96bdb5475a4e",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/minimal_module/lib/src/module.dart",
+      "category": "implementation",
+      "lines": 16,
+      "sha256": "03e78158e53867516affaef3f14329131ecc555908d509bf470e09c162672e20",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/minimal_module/pubspec.yaml",
+      "category": "implementation",
+      "lines": 21,
+      "sha256": "2938762c302877f688913f1f711ea67d3077c4f2ce2010f752f2cfa96312cb09",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/minimal_module/test/fixtures/host_routes.dart",
+      "category": "test",
+      "lines": 2,
+      "sha256": "6e36539ed3868edd75a98af80319b4955fc1bf57222e90b60d6333707141c7ab",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/minimal_module/test/minimal_module_test.dart",
+      "category": "test",
+      "lines": 33,
+      "sha256": "db1e38828b87a0a049c0803800b8f589f8f96d92fc507bfe2506e9b565f01a8a",
+      "ui": false,
+      "design_sensitive_lines": [
+        30
+      ]
+    },
+    {
+      "path": "examples/module_showcase/lib/app.dart",
+      "category": "implementation",
+      "lines": 33,
+      "sha256": "6a4b1b11848a146be45532aad86eba772a6762fe0c85ef72311cf57bc580c313",
+      "ui": true,
+      "design_sensitive_lines": [
+        27,
+        28,
+        29
+      ]
+    },
+    {
+      "path": "examples/module_showcase/lib/bootstrap.dart",
+      "category": "implementation",
+      "lines": 149,
+      "sha256": "89d731d29e010cc74dd766ff9dc8a647f550fbf6b4410fc232b78ee5dc43961e",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/lib/core/providers/module_providers.dart",
+      "category": "implementation",
+      "lines": 63,
+      "sha256": "7a9d7c893839e9eee334c41d07e50a5158ed2b6b40cd0fef1dcbbf32f3ff553e",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/lib/core/services/showcase_services.dart",
+      "category": "implementation",
+      "lines": 30,
+      "sha256": "1d498eab1d7bca6ab5f36b3655956e30f68daade69b3e984784eb132ed902aec",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/lib/main.dart",
+      "category": "implementation",
+      "lines": 9,
+      "sha256": "da24c9841a9f1b8316f1813aa1db7ed2326e27853a0a487c72306f78cf9ec667",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/lib/shared/showcase_shell.dart",
+      "category": "implementation",
+      "lines": 58,
+      "sha256": "e9c369cbbdaf26a8433a2e20efa58a04f9a3e9b5e6a47d985054954100efcd21",
+      "ui": true,
+      "design_sensitive_lines": [
+        43
+      ]
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/lib/showcase_alpha.dart",
+      "category": "implementation",
+      "lines": 2,
+      "sha256": "5352b8f267b38103c52e83bf4e1d7bd45c11421b56490630775df15f45f41005",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/lib/src/core/router/app_routes.dart",
+      "category": "implementation",
+      "lines": 25,
+      "sha256": "5a72c35b92caadb056300712cb6f7b5943c35a0f5584340d76f183d40dddcd70",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/lib/src/features/welcome/data/alpha_repository.dart",
+      "category": "implementation",
+      "lines": 53,
+      "sha256": "4a534494959718cebb11fcf0c02909d2286ded495c2b8bd74cf60c743e15c3ca",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/lib/src/features/welcome/presentation/providers/alpha_providers.dart",
+      "category": "implementation",
+      "lines": 8,
+      "sha256": "945fbd601d0f2faba73a067313a3c9dabc1e067f22187a8c224f996df1be96f9",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/lib/src/features/welcome/presentation/screens/alpha_page.dart",
+      "category": "implementation",
+      "lines": 35,
+      "sha256": "cdf826f2ade605306f50a03ccdf816cedf1fdeccfb61cd263b958df2f5e05b91",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/lib/src/module.dart",
+      "category": "implementation",
+      "lines": 18,
+      "sha256": "77735cba3845a56eddcef86101d19e6a2fa45bba5a55bc138809c82621845b60",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/pubspec.yaml",
+      "category": "implementation",
+      "lines": 25,
+      "sha256": "c53584c7384ee39dcc848eac0f7c9520fc69429b7808079c779c3f45b0907539",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/alpha/test/module_api_test.dart",
+      "category": "test",
+      "lines": 138,
+      "sha256": "965f884ba4264073dccc1b1c7ccdb4717d23f3690c21273240bcd8610b138394",
+      "ui": false,
+      "design_sensitive_lines": [
+        95,
+        131
+      ]
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/lib/showcase_beta.dart",
+      "category": "implementation",
+      "lines": 2,
+      "sha256": "0d4b936660625f816e53ccee9f341452370140ac40555373938b60f7dbf02977",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/lib/src/core/router/app_routes.dart",
+      "category": "implementation",
+      "lines": 25,
+      "sha256": "7dd8f4f99b5d021213349fe1fd0c7b575e6d2ca38b94bebb6eeec71eefdf8102",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/lib/src/features/welcome/data/beta_repository.dart",
+      "category": "implementation",
+      "lines": 53,
+      "sha256": "95d38c4f1a34f6c253292db731282a92851984424fdf4d90a3f630f7cd07fdb4",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/lib/src/features/welcome/presentation/providers/beta_providers.dart",
+      "category": "implementation",
+      "lines": 8,
+      "sha256": "7fc3e5ee0959dfb9c2e54dde5d6135bd589dfaab1f101468f1a5fa4346942504",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/lib/src/features/welcome/presentation/screens/beta_page.dart",
+      "category": "implementation",
+      "lines": 35,
+      "sha256": "0ad0993ecd753a5ff128752b6bb7161401bd524fe3644b68fd74ce0729acc822",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/lib/src/module.dart",
+      "category": "implementation",
+      "lines": 18,
+      "sha256": "16d30487e357d1a6e9ff4da629d373591e719b22358287a37db99e05d05e6614",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/pubspec.yaml",
+      "category": "implementation",
+      "lines": 25,
+      "sha256": "f26ee8f75ff772dae3adaada93c1a6a49c6ff784d78621b86b28a98f5718bdea",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/modules/beta/test/module_api_test.dart",
+      "category": "test",
+      "lines": 138,
+      "sha256": "93745751eb79fe91269d8f3be79f35ba2577557391ccaab44c917b12627a551a",
+      "ui": false,
+      "design_sensitive_lines": [
+        95,
+        131
+      ]
+    },
+    {
+      "path": "examples/module_showcase/packages/showcase_contracts/lib/showcase_contracts.dart",
+      "category": "implementation",
+      "lines": 2,
+      "sha256": "93a1b716df0705517fff3b8b1e50a3908699e0db3ee4e0e99a6fe4f8453c2572",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/packages/showcase_contracts/lib/src/domain/showcase_repository.dart",
+      "category": "implementation",
+      "lines": 12,
+      "sha256": "a696b8fe844bfa7b6fec79f332c1cda225ffe967afba8e755767b77f4b761da3",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/packages/showcase_contracts/lib/src/presentation/providers/showcase_providers.dart",
+      "category": "implementation",
+      "lines": 10,
+      "sha256": "ba8a27aaf81f590029393ee74c77738d00c1b6d5c26c363bc647f8059bd1be86",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/packages/showcase_contracts/pubspec.yaml",
+      "category": "implementation",
+      "lines": 18,
+      "sha256": "941309518aba6983a0f8a6559e4d7b4c9ca3ceffdd21a36a79bb08a9abd466a0",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/packages/showcase_contracts/test/provider_contract_test.dart",
+      "category": "test",
+      "lines": 42,
+      "sha256": "8fbf20641119965d6ae65268e2ab2dc54f86fddc3b0eaea466f9cc966f8ca22f",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/pubspec.yaml",
+      "category": "implementation",
+      "lines": 30,
+      "sha256": "9dae005f41a24066d0d2316cfbe41e533c1a74c1cc20a7726f435fe38daefc9c",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/test/bootstrap_failure_test.dart",
+      "category": "test",
+      "lines": 93,
+      "sha256": "9b95675e99197ffd7118d4e87807112f3b71f44c1f1001b05ad061757d012953",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/module_showcase/test/showcase_test.dart",
+      "category": "test",
+      "lines": 222,
+      "sha256": "d8119ab438611b62beb0e411a6e7b83cb00ae447cc4d5aadbc4ae598a060c1d1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/starter_app/lib/app.dart",
+      "category": "implementation",
+      "lines": 29,
+      "sha256": "f891ec395e6f986c71fd1c7076ae22c4757acec77cd3b7169e714b051ef74c90",
+      "ui": true,
+      "design_sensitive_lines": [
+        23,
+        25,
+        26
+      ]
+    },
+    {
+      "path": "examples/starter_app/lib/core/router/app_routes.dart",
+      "category": "implementation",
+      "lines": 13,
+      "sha256": "5f953941141c053e43161588d3a947aa58e716b1e441f594aee0f2ce47b03efa",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/starter_app/lib/features/home/presentation/screens/home_page.dart",
+      "category": "implementation",
+      "lines": 11,
+      "sha256": "231c9846753853ec236ee1c7880f1560c6938f218f28ee1b0217ecaaad7d22af",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/starter_app/lib/main.dart",
+      "category": "implementation",
+      "lines": 5,
+      "sha256": "c2d157865662831badb3e74eb805838d202d83e390004b59b4250a9ccfd68307",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/starter_app/pubspec.yaml",
+      "category": "implementation",
+      "lines": 29,
+      "sha256": "59a2e195fad8566b7e841edb101c2f16b2f7088a8b79d25a9e4cad42157834b6",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/starter_app/test/app_test.dart",
+      "category": "test",
+      "lines": 15,
+      "sha256": "a2370f5f4892be903ff73025292b2cfb5d4a523911dc490ab128679bdfb1ea7d",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/ui_lab/lib/main.dart",
+      "category": "implementation",
+      "lines": 343,
+      "sha256": "3c0ecd3fdb742c687ead74bba1a4728725b6ddfc7d32f7dd5420442f3410be5a",
+      "ui": true,
+      "design_sensitive_lines": [
+        39,
+        41,
+        45,
+        46,
+        57,
+        63,
+        210,
+        237,
+        252,
+        258,
+        318
+      ]
+    },
+    {
+      "path": "examples/ui_lab/lib/standard_component_catalog.dart",
+      "category": "implementation",
+      "lines": 622,
+      "sha256": "498f1d170f409b0fb0e41dd0f18ed566799036034667f9c141f62751ba19552d",
+      "ui": true,
+      "design_sensitive_lines": [
+        81,
+        92,
+        94,
+        210,
+        406
+      ]
+    },
+    {
+      "path": "examples/ui_lab/pubspec.yaml",
+      "category": "implementation",
+      "lines": 18,
+      "sha256": "d61569a080635b9cd2723693cf7e0d66fb7bdc9d987cd2cfa85b46fc50fc219e",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/ui_lab/test/standard_component_catalog_test.dart",
+      "category": "test",
+      "lines": 362,
+      "sha256": "ebd315939664897617cc28945d823d475624a1938a455c2808041725cd45bf8a",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/ui_lab/test/ui_lab_test.dart",
+      "category": "test",
+      "lines": 118,
+      "sha256": "8020dc16e75a4f0ab049d619650f92d720bf9603a5dd2b9f08db9433f83fb83c",
+      "ui": false,
+      "design_sensitive_lines": [
+        32,
+        44,
+        70
+      ]
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/fixture_import_port.dart",
+      "category": "test",
+      "lines": 53,
+      "sha256": "14f843cdc2a71dfe003fb57a43d396acc5c0cfbc9878a6b2cdbe5f5426559302",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_driver.dart",
+      "category": "test",
+      "lines": 6,
+      "sha256": "d1ab0dd0705e54891bee0fb87274abefa1ebd74e4cf96df21a5936616c7cf154",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_frame_probe.dart",
+      "category": "test",
+      "lines": 2,
+      "sha256": "25d92059b086b77b775bce92c46f25d9b07319c58bb985213a3456fff354c885",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_frame_probe_stub.dart",
+      "category": "test",
+      "lines": 1,
+      "sha256": "c77928fe731cb5b5ce5a97d8ca91a6e6b8cf6fa5498cedc02889ad876e163b39",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_frame_probe_web.dart",
+      "category": "test",
+      "lines": 63,
+      "sha256": "03068d4a76368472050c9123de7c10197d93fc9fa94976b7a7fcd02f1f78a4fe",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_sandbox.dart",
+      "category": "test",
+      "lines": 9,
+      "sha256": "1dc3c90ae4b939e612832bd39a3fb478704086059b075a2a8c8503ed5ef71a35",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_sandbox_native.dart",
+      "category": "test",
+      "lines": 33,
+      "sha256": "a82e3a2dd474c88e4b3bb15c55605c2da96bf6446501ced20850882528ce214d",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_sandbox_stub.dart",
+      "category": "test",
+      "lines": 4,
+      "sha256": "565a48d2c7c07312a68d739ae28ef37889df7c7a1f3ba81b1f97f32811a8bbfc",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_sandbox_types.dart",
+      "category": "test",
+      "lines": 8,
+      "sha256": "2871dcb2edd33de50bad24800e5eb39245c47bb880c7c9dab45cce810b185588",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/runtime_sandbox_web.dart",
+      "category": "test",
+      "lines": 44,
+      "sha256": "2f446f28f71b1e246d49620e7b68d5c9725ae5547facdf65bdf5f0918a478d30",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/support/tracking_storage.dart",
+      "category": "test",
+      "lines": 37,
+      "sha256": "bd3145cb4b553d7dc1c129a393dec69acdd4abf00a6b16a028e8390a5c3df337",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/integration_test/workbench_runtime_test.dart",
+      "category": "test",
+      "lines": 361,
+      "sha256": "f7045edf51bebdba0f91d28cde5e488053e130a0947c3b8e38059be12f19217a",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/app.dart",
+      "category": "implementation",
+      "lines": 174,
+      "sha256": "1c98824f61891cac4d398136b3c76349c77736d036722295e2f4a39021bca019",
+      "ui": true,
+      "design_sensitive_lines": [
+        73,
+        76,
+        77,
+        101
+      ]
+    },
+    {
+      "path": "examples/workbench_app/lib/bootstrap.dart",
+      "category": "implementation",
+      "lines": 177,
+      "sha256": "5893c5d87be829fc088d78e17a6e7913831fa65c763a9a24c0aaad1b9c424ee3",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/core/router/app_navigation.dart",
+      "category": "implementation",
+      "lines": 8,
+      "sha256": "fa0444221b0b2f7fded827bbe986fe193d34bb13e32c40ef77881d00a6fc7aef",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/core/router/app_routes.dart",
+      "category": "implementation",
+      "lines": 62,
+      "sha256": "73553a24783ee3ee3533940fce902e9b1fb350420f3547ac429ecd763b242094",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/core/router/workbench_navigation_history.dart",
+      "category": "implementation",
+      "lines": 150,
+      "sha256": "9e685eab9520dc605daba47895bc12177da02decf3dbcf15e3477bf831db00f7",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/core/window/workbench_window_chrome.dart",
+      "category": "implementation",
+      "lines": 260,
+      "sha256": "2ae48de05a933b2203be7a4ef8917170d4919b3d5d2bff58791c62cac2efc922",
+      "ui": true,
+      "design_sensitive_lines": [
+        253,
+        254
+      ]
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/application/workspace_session.dart",
+      "category": "implementation",
+      "lines": 940,
+      "sha256": "16bca3ce3ea7ca26091247b5cdd376bfc1f84e43220e7757dad1ca446e2594a7",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/file_selector_import_port.dart",
+      "category": "implementation",
+      "lines": 77,
+      "sha256": "1c1473409641f0f4beb90ca39231bffeea93533a86091a11ddc72572753ecf4c",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/image_thumbnail.dart",
+      "category": "implementation",
+      "lines": 73,
+      "sha256": "6d89d9a1f414a0c48839b8f3679e1fb44de27d0fb2f17f8de744fae8a75415b9",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/selected_source_cleanup.dart",
+      "category": "implementation",
+      "lines": 2,
+      "sha256": "7911391fcdc396fa381f9c6a7c27ba55e2cc763af24e125119631bea30ae57b5",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/selected_source_cleanup_stub.dart",
+      "category": "implementation",
+      "lines": 1,
+      "sha256": "b4cd79ca2cbe6b981e46fc9e608e0ac6b9d983353d7d12158f5f454a9bbcfde4",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/selected_source_cleanup_web.dart",
+      "category": "implementation",
+      "lines": 5,
+      "sha256": "95727415db98b5a624243795c448f0bbd3acfd6ede7959146cc948c7c2a77114",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/workspace_storage.dart",
+      "category": "implementation",
+      "lines": 15,
+      "sha256": "433e72d01d69d3d7539c34676e92254d1ee9c9a63d5b2436e98414987e682e2e",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/workspace_storage_native.dart",
+      "category": "implementation",
+      "lines": 240,
+      "sha256": "b00b4aa0bdf9425ce9df95690c9c686de26a600b391acef68cef0a0f9fd93f23",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/workspace_storage_stub.dart",
+      "category": "implementation",
+      "lines": 6,
+      "sha256": "8a2408130a5c47e726f5eb019f9812398c3d99397e0e7f3e8c76ee8ef92175f3",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/workspace_storage_types.dart",
+      "category": "implementation",
+      "lines": 15,
+      "sha256": "fe880cc3c12bb91938f184fcd6a43812fbe676ab651f165e98a0e0b534779d06",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/data/workspace_storage_web.dart",
+      "category": "implementation",
+      "lines": 268,
+      "sha256": "df24739777511712f22891184c8dff7d225d2c3e371a429c69a8b5a951dc2a81",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/domain/workspace_models.dart",
+      "category": "implementation",
+      "lines": 149,
+      "sha256": "d92c3bac9a2d32b9f710c1d6c4832dbc9686eb5c39346f6e5c2d19de2767b182",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/domain/workspace_ports.dart",
+      "category": "implementation",
+      "lines": 75,
+      "sha256": "85155cc531ee2fe1347e7a3571b9962a920ee297a57db7cace71154c47ecce58",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/models/text_view_state.dart",
+      "category": "implementation",
+      "lines": 14,
+      "sha256": "b87bb2bf358e8e0e83176f860f30d329f31794e67fe9e87809b6c12076e2a345",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/providers/navigation_providers.dart",
+      "category": "implementation",
+      "lines": 9,
+      "sha256": "b7d6298b5d51b6941d455f1475fcfb3e7f4b2407706fc7f0feb0bd815a29632b",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/providers/workspace_providers.dart",
+      "category": "implementation",
+      "lines": 67,
+      "sha256": "36e5b732fbb665ed0fb786d7902b3fc57412ac96e7a4a469bf79508f25adf0ad",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/media_page.dart",
+      "category": "implementation",
+      "lines": 545,
+      "sha256": "039ff814e3a13ab0d38f9e5e94e759cb3e5dd25ce171f56b4e0457aae6cd8196",
+      "ui": true,
+      "design_sensitive_lines": [
+        101,
+        105,
+        123,
+        124,
+        139,
+        227,
+        268,
+        315,
+        317,
+        366,
+        369,
+        419
+      ]
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/tasks_page.dart",
+      "category": "implementation",
+      "lines": 330,
+      "sha256": "afa55ea0d4c18194151aa6a16812603581b7c19bb682913353487cc03b63768f",
+      "ui": true,
+      "design_sensitive_lines": [
+        88,
+        89,
+        121,
+        164,
+        176,
+        214,
+        248
+      ]
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/screens/text_page.dart",
+      "category": "implementation",
+      "lines": 253,
+      "sha256": "26a702561bccfcf47595b6245775dc7a41b9b6a6023f4676c8e7eabbbf75fd2f",
+      "ui": true,
+      "design_sensitive_lines": [
+        97,
+        106,
+        115,
+        180
+      ]
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/services/media_frame_gate.dart",
+      "category": "implementation",
+      "lines": 2,
+      "sha256": "f55b89e932f360b5610d591394ead4505df491fe960b1fc45f5322b1c33f8ff1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/services/media_frame_gate_stub.dart",
+      "category": "implementation",
+      "lines": 8,
+      "sha256": "ca9e1bf808aebda1c883bc7a7a7afef7ec673285133afa2224b4ca02f17f4741",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/services/media_frame_gate_web.dart",
+      "category": "implementation",
+      "lines": 115,
+      "sha256": "97dd3828a32f0b9166a89da1b39b1aba88864a8e33ca95100a4bfef5e221eda8",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/services/media_preview_session.dart",
+      "category": "implementation",
+      "lines": 408,
+      "sha256": "4192014aa652d71d5f2a176bbdd7be5cf83753641df3e03cb9b32c180c632317",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/services/media_retry.dart",
+      "category": "implementation",
+      "lines": 35,
+      "sha256": "da36202436b7363e76765889447c72764af2db2fce6c728e90ca6f7c5101cce0",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_panels.dart",
+      "category": "implementation",
+      "lines": 322,
+      "sha256": "2677055b5cada27501ecbc37934f688b2ba338aaa0f42fd343724e2f07d36244",
+      "ui": true,
+      "design_sensitive_lines": [
+        35,
+        44,
+        56,
+        116,
+        174,
+        210,
+        247,
+        306,
+        312
+      ]
+    },
+    {
+      "path": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+      "category": "implementation",
+      "lines": 257,
+      "sha256": "8e9603b5dab4a272b2c7b1ba09bac4d18f960201aa33c9dbfc3dc951d9c1d987",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/lib/main.dart",
+      "category": "implementation",
+      "lines": 81,
+      "sha256": "752d482185ca8e915f5662c81d0b6b783dea64654727abd4b2dec03b1ee69758",
+      "ui": true,
+      "design_sensitive_lines": [
+        61,
+        62,
+        63
+      ]
+    },
+    {
+      "path": "examples/workbench_app/pubspec.yaml",
+      "category": "implementation",
+      "lines": 40,
+      "sha256": "a0e4e3121d85d2659838d1c1f2275550496e42b9e654b9b284915bdcdd3a9cc8",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/bootstrap_presentation_test.dart",
+      "category": "test",
+      "lines": 65,
+      "sha256": "27a12c0c691bc3a3944626265484aaf74f06c2b4ac193ed489fb065c3b0f27a5",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/browser/image_thumbnail_browser_test.dart",
+      "category": "test",
+      "lines": 9,
+      "sha256": "eb93a1857d3554e47edb41e0378ea11cd57ac251f8ae2a9995b33365fa0673e0",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/browser/workspace_storage_browser_test.dart",
+      "category": "test",
+      "lines": 150,
+      "sha256": "7e568a30bce8dac70ad897a2b3530423f638c32f40db2be7daa78b505c6532e3",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/features/workspace/application/workspace_session_test.dart",
+      "category": "test",
+      "lines": 911,
+      "sha256": "0e649f567ad47f4180aceabbfb6f2289486facd5bce8aa9e6c194fffb4bfaed5",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/features/workspace/data/file_selector_import_port_test.dart",
+      "category": "test",
+      "lines": 56,
+      "sha256": "7d4651f8395f99fd8918f92b218d1afe86f90ca6a858d2da007bb81945c1854b",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/features/workspace/data/image_thumbnail_test.dart",
+      "category": "test",
+      "lines": 52,
+      "sha256": "fe46ed471309d5b4b6087c21502513bf6587c59e78e90873af31850d32659a20",
+      "ui": false,
+      "design_sensitive_lines": [
+        16
+      ]
+    },
+    {
+      "path": "examples/workbench_app/test/features/workspace/data/native_workspace_storage_test.dart",
+      "category": "test",
+      "lines": 181,
+      "sha256": "e0785a8326862341546eba0ee1414b33a3c47c4065b1ba0242fe0f24a4f77161",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/features/workspace/domain/workspace_models_test.dart",
+      "category": "test",
+      "lines": 96,
+      "sha256": "5a9134a5125f20507c751ad5f56f162fed449ec6c9137832cb43aec4bd2cb9a5",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/media_frame_gate_test.dart",
+      "category": "test",
+      "lines": 26,
+      "sha256": "b88b19d81db4941b65c94e95e394fa9df8a61b548a7a636da220123bdb256707",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/media_preview_session_test.dart",
+      "category": "test",
+      "lines": 269,
+      "sha256": "697b2033adfbe40d0be179ab19083f4e44840c93c6a12715ea6515ef3d294793",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/presentation_support.dart",
+      "category": "test",
+      "lines": 210,
+      "sha256": "f8b18b6a83f2667639206349932c446b15710ecffe05b7aca6bb2731efba5407",
+      "ui": false,
+      "design_sensitive_lines": [
+        156
+      ]
+    },
+    {
+      "path": "examples/workbench_app/test/workbench_navigation_history_test.dart",
+      "category": "test",
+      "lines": 184,
+      "sha256": "888a15a058dd3d9ef102fa190a5cdc7696710585199d00ce6554086db53c2f97",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "examples/workbench_app/test/workbench_window_chrome_test.dart",
+      "category": "test",
+      "lines": 240,
+      "sha256": "455cf2aa852ed1c270fddc0c258343a696201311fca99a97f5f8ef9f2251e1d2",
+      "ui": false,
+      "design_sensitive_lines": [
+        20,
+        21,
+        23,
+        24,
+        25,
+        58,
+        75
+      ]
+    },
+    {
+      "path": "examples/workbench_app/test/workspace_accessibility_test.dart",
+      "category": "test",
+      "lines": 446,
+      "sha256": "42bd70687faafecfcacaca3981b14e82948caa96db168e932a88080f2b905263",
+      "ui": false,
+      "design_sensitive_lines": [
+        417
+      ]
+    },
+    {
+      "path": "examples/workbench_app/test/workspace_presentation_test.dart",
+      "category": "test",
+      "lines": 1169,
+      "sha256": "ca52bb45b2dea2b7c15c03acfa4437365fb9563b2c5a28b962ce74f3e6d34e76",
+      "ui": false,
+      "design_sensitive_lines": [
+        597,
+        609,
+        620,
+        1044,
+        1061
+      ]
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/koi_api_bootstrap.dart",
+      "category": "implementation",
+      "lines": 42,
+      "sha256": "317e97ffa241f866986a21bc0e2c76cf7a265467caf7f1f2350e8c12e095e2ca",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/backend/native_backend.dart",
+      "category": "implementation",
+      "lines": 259,
+      "sha256": "e1a2657b62a7319adeeb298f99531ffe3ae841affbc4983519d74b1024bd7494",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/backend/web_backend.dart",
+      "category": "implementation",
+      "lines": 51,
+      "sha256": "cecba386a3ce3773cff761bce7eec80ebc69aa777dfb115d8d109073e59b5d27",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/koi_api_bindings.dart",
+      "category": "implementation",
+      "lines": 152,
+      "sha256": "f3a82a2b0cae8ed3e160558eb8c8a1ecdcb5799529941981ceefd31e98c369c2",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/koi_api_bootstrap_options.dart",
+      "category": "implementation",
+      "lines": 36,
+      "sha256": "5dbba6ee35363a52341c8d4928d1bc7f353fabf4a1bfcaf0811c4c80f2e655c7",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/koi_api_log.dart",
+      "category": "implementation",
+      "lines": 8,
+      "sha256": "58dcbb1661fef87ecb584438cfb586ed59e5066902fd235d627fceac93fa5db8",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/koi_api_runtime.dart",
+      "category": "implementation",
+      "lines": 11,
+      "sha256": "e91f2fa6186394b38185a9dd08a389c0c2b5714ed308c53373d6d89e2cb5236c",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/koi_memory_token_session.dart",
+      "category": "implementation",
+      "lines": 142,
+      "sha256": "8144441bf9baa4b95b862540558e412b0bcdd8d8adf3b075f7beb330f5dc456c",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/koi_secure_token_session.dart",
+      "category": "implementation",
+      "lines": 51,
+      "sha256": "fb24bc257cfddada7c394c3f0cbb38ec5dedbb64bd277e89261030fc8cf485bc",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/token_storage/native_token_session.dart",
+      "category": "implementation",
+      "lines": 30,
+      "sha256": "eb2c2f7df793b90ba7bcf2b0b8d78797b8e4af0f3e98e69c6d79ddac2c8599d9",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/lib/src/token_storage/web_token_session.dart",
+      "category": "implementation",
+      "lines": 7,
+      "sha256": "98a8615b430151cd6d925b136e4c423e89eed816c3e8ef974f248653004cf2b6",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/pubspec.yaml",
+      "category": "implementation",
+      "lines": 22,
+      "sha256": "26d15e5f6756d104a8f05b56205d883b510fef32d053e9d3b5b18382b3a44c85",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart",
+      "category": "test",
+      "lines": 460,
+      "sha256": "6a9762b7331636d250bbbaef6634765aa8935bfaec4c5df1b3e9f4877bc70ffc",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/test/koi_secure_token_session_test.dart",
+      "category": "test",
+      "lines": 150,
+      "sha256": "619de2378e37352818207b2f7c262f93e5e75f3cc8a246250f81b50db410aafe",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_api_bootstrap/test/web_compile_smoke.dart",
+      "category": "test",
+      "lines": 17,
+      "sha256": "8d7a022f04eebd432336bf6aabf73594e25a3c47120b7b4eed5cd2709cce7bb4",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_auth/lib/koi_auth.dart",
+      "category": "implementation",
+      "lines": 1,
+      "sha256": "c125dc73b3a96736692bdadac836f473c09c3ecd78a31080c641aa51371df890",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_auth/lib/models/auth_session.dart",
+      "category": "implementation",
+      "lines": 23,
+      "sha256": "09c696de2127ace5183c5d6e531235c30e09fdf7b2c6690d3288a7dca3b21a1a",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_auth/pubspec.yaml",
+      "category": "implementation",
+      "lines": 20,
+      "sha256": "b86dbca33ab868ee1b449ed3cc7c2ac22c20280c62e84be699fb86924d9008d0",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_auth/test/auth_session_test.dart",
+      "category": "test",
+      "lines": 57,
+      "sha256": "c76bad21a2840d4bea617b7f9c7e79e4f0134144cd89359cdcadf81b1e0644c7",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/lib/error/app_failure.dart",
+      "category": "implementation",
+      "lines": 37,
+      "sha256": "e51c66581fb73b92fc709d8dd23b1373d1e4f0ef6e1e27622a764bcd679fe834",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/lib/extensions/string_extensions.dart",
+      "category": "implementation",
+      "lines": 5,
+      "sha256": "3f78f265e87fc4f3063bdb7a3b4c61d9342b273e00e22bff485f472009b8fbfe",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/lib/koi_core.dart",
+      "category": "implementation",
+      "lines": 4,
+      "sha256": "ac177713f9893cabacbc064d0594985b86695cb3a3caea4308a2f468613e5e5d",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/lib/logging/app_logger.dart",
+      "category": "implementation",
+      "lines": 69,
+      "sha256": "9dd5a00ea38a21e11e0915ce81877c552ce4f6850fdd37fed05dd21282197348",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/lib/typedefs.dart",
+      "category": "implementation",
+      "lines": 9,
+      "sha256": "0021baf1cc8b413aca1196f5ba9ba270df4adfe69ceb0ff0e6de6f8eaf218204",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/pubspec.yaml",
+      "category": "implementation",
+      "lines": 21,
+      "sha256": "5cf50ab9cf79ffedefb20b52023942e62402ba3b258584e56e91984e82703d8d",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/test/app_failure_test.dart",
+      "category": "test",
+      "lines": 86,
+      "sha256": "a9544f14850acedecfa6c6d01d7199878854a7d31b259b9064a34bfd78fe7b91",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_core/test/app_logger_test.dart",
+      "category": "test",
+      "lines": 42,
+      "sha256": "1233f0f656ab52114cf88fc0e59d4dbd3a5c35987d7bfb53e2740499eb18e242",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_domain/lib/entities/koi_user.dart",
+      "category": "implementation",
+      "lines": 39,
+      "sha256": "f09da0d5631dd9500f07fe6bbe74c3f3f0f73c722e4193a9989705c2b46deb90",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_domain/lib/koi_domain.dart",
+      "category": "implementation",
+      "lines": 1,
+      "sha256": "b0806029509817381aedd1f501a340fca017206a246cbe00d22b386632c0f5ff",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_domain/pubspec.yaml",
+      "category": "implementation",
+      "lines": 23,
+      "sha256": "00bdf6195dd486a48025d3e98b9bd2dbfdd6a8097366044d1ab63422eff2828b",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_domain/test/koi_user_test.dart",
+      "category": "test",
+      "lines": 56,
+      "sha256": "b6b361af8a0227c98af8bc2f91f4a686b2b013d56f5af664fc2df63c84b37051",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_modules/lib/koi_modules.dart",
+      "category": "implementation",
+      "lines": 6,
+      "sha256": "9e3d95719073b779979e103924708ce5ae204d19324bde1345df77b7ccb51ac1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_modules/lib/src/module_catalog.dart",
+      "category": "implementation",
+      "lines": 92,
+      "sha256": "d2e856b198690e08fc3b54354c7f60d5f30ed04e132deda138b33378445fcbb9",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_modules/lib/src/module_runtime.dart",
+      "category": "implementation",
+      "lines": 144,
+      "sha256": "57243c767c05b02a4113dc239fd4f9f494a074add361a11d4d523e05b46c9c79",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_modules/lib/src/module_session.dart",
+      "category": "implementation",
+      "lines": 96,
+      "sha256": "d67905ce0b9a830c06c4426afecaf76f465fc2d1e2ab2b7c484d3bfe57ab0ffa",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_modules/pubspec.yaml",
+      "category": "implementation",
+      "lines": 18,
+      "sha256": "364a43aefbdd929c984ea1724edddd4e5ea24ef93e31e2d3441ad79df6f7066f",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_modules/test/module_lifecycle_test.dart",
+      "category": "test",
+      "lines": 479,
+      "sha256": "294d7e48d3148d22c47485727212fa6f80016f0d2ac60f6b9509726bef4a3f11",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/koi_ui.dart",
+      "category": "implementation",
+      "lines": 18,
+      "sha256": "5590856783f1a77421f2e218889a06d8bc5230d46cc3f9c4558ee26f591d85b1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/app_colors.dart",
+      "category": "implementation",
+      "lines": 16,
+      "sha256": "0ddbe9e16c32d52f2ceaf6f2f0a17e0e24291aee44fc69d763afdc9ccb138023",
+      "ui": true,
+      "design_sensitive_lines": [
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/app_theme.dart",
+      "category": "implementation",
+      "lines": 115,
+      "sha256": "a7b38efb845d2960b6718a4b64798046fe4b826e2d9b005eec2c94d15646559d",
+      "ui": true,
+      "design_sensitive_lines": [
+        20,
+        22,
+        25,
+        27,
+        28,
+        29,
+        31,
+        32,
+        34,
+        35,
+        36,
+        38,
+        39,
+        41,
+        42,
+        44,
+        45,
+        46,
+        48,
+        49,
+        50,
+        51,
+        53,
+        54,
+        61,
+        62,
+        63,
+        70,
+        75,
+        80,
+        85,
+        90,
+        94,
+        99,
+        103,
+        108
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/koi_material_theme.dart",
+      "category": "implementation",
+      "lines": 526,
+      "sha256": "ea6cba7bd1fb08a0722499f432e773b53fe2a15b6ab38afa5520c53670b2c95c",
+      "ui": true,
+      "design_sensitive_lines": [
+        52,
+        185,
+        196,
+        217,
+        253,
+        264,
+        393,
+        437,
+        438,
+        461
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+      "category": "implementation",
+      "lines": 161,
+      "sha256": "ee94dd348dcc5aa3ae1897b58a79719b35f060197be2ca1546f337c02403f63f",
+      "ui": true,
+      "design_sensitive_lines": [
+        95,
+        99
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_empty_state.dart",
+      "category": "implementation",
+      "lines": 39,
+      "sha256": "5ed3a94670f1f16f76072c2ea0ad074d26695d7f0c1a04bb551087a342ecf383",
+      "ui": true,
+      "design_sensitive_lines": [
+        17
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_error_state.dart",
+      "category": "implementation",
+      "lines": 45,
+      "sha256": "41379773c5b0186e34bde80ffe8b5dc8b34688bcaa1127411457867e9bc971ae",
+      "ui": true,
+      "design_sensitive_lines": [
+        19
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_loading_state.dart",
+      "category": "implementation",
+      "lines": 21,
+      "sha256": "66ba8b6587f2392a2b07ff6dc5a5162ce1b8a3f654948b052733987af3bdd24f",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_menu.dart",
+      "category": "implementation",
+      "lines": 99,
+      "sha256": "c7fbc4c18631759dd7767a51bc756ea02915dbd7299d0090d6bb82ca03ece491",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_navigation_history_controls.dart",
+      "category": "implementation",
+      "lines": 26,
+      "sha256": "d05895065d2f855d0da64966135ecd79161931989f6f13a4ff29a62ae197d550",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_panel_icon.dart",
+      "category": "implementation",
+      "lines": 59,
+      "sha256": "9a083e63111f5627e8e3a061d68d6109727e46486f03127570c2a796fc777713",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_popover.dart",
+      "category": "implementation",
+      "lines": 164,
+      "sha256": "ec4eccfcdc939a4a89b0c8d3295ec14a6b564f433a8ec6da99b2933688012462",
+      "ui": true,
+      "design_sensitive_lines": [
+        68,
+        73,
+        139
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_property_row.dart",
+      "category": "implementation",
+      "lines": 24,
+      "sha256": "b8253a2921e1bff3d9ffa07d1e0859717461ba184c6796b3c757f35f057787ae",
+      "ui": true,
+      "design_sensitive_lines": [
+        11
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_reading_pane.dart",
+      "category": "implementation",
+      "lines": 24,
+      "sha256": "314a459b5f00e812fe920a66547b5650b9a37a65b5d5f2c54b76a935007b3293",
+      "ui": true,
+      "design_sensitive_lines": [
+        8
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_resizable_split_view.dart",
+      "category": "implementation",
+      "lines": 181,
+      "sha256": "91f80a7c5210ecc1079c6b5fdaae664b97d476572b445246fe7ede2cbaa2a764",
+      "ui": true,
+      "design_sensitive_lines": [
+        58,
+        145
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_search_field.dart",
+      "category": "implementation",
+      "lines": 27,
+      "sha256": "161b8f9fe60af3e639a7ae522a4b29296da122ea929e26af4759796a449a2cb2",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_section.dart",
+      "category": "implementation",
+      "lines": 46,
+      "sha256": "9576d47955ef8528b8355bc246411f5263208fd273dd775ce8eac4c4d2c84f3b",
+      "ui": true,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_selectable_list_tile.dart",
+      "category": "implementation",
+      "lines": 111,
+      "sha256": "cf52756a07bea4e15c1546952714a2bee941920a399a65c860cc68f25912ffe3",
+      "ui": true,
+      "design_sensitive_lines": [
+        78
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_toolbar.dart",
+      "category": "implementation",
+      "lines": 28,
+      "sha256": "9e921cee1ede66d81f579e64b28e1d3d6419b6b8169ecb896647f09f6ea0ec46",
+      "ui": true,
+      "design_sensitive_lines": [
+        8
+      ]
+    },
+    {
+      "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "category": "implementation",
+      "lines": 438,
+      "sha256": "470ef6a6442a70d55c862ce60cf1aa6b5cbffcf05928409420b42dfda8ab7dfd",
+      "ui": true,
+      "design_sensitive_lines": [
+        202,
+        240,
+        261,
+        270,
+        285,
+        288,
+        292
+      ]
+    },
+    {
+      "path": "packages/koi_ui/pubspec.yaml",
+      "category": "implementation",
+      "lines": 20,
+      "sha256": "49eac5f1f80a99aa9acd814ed21a1353d344d905f1970c508ee2d98da473bd04",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "packages/koi_ui/test/koi_accessible_theme_test.dart",
+      "category": "test",
+      "lines": 253,
+      "sha256": "c6e799924b8110b23279f5a43b858a2a135793381f6f98915c20e7123a184210",
+      "ui": false,
+      "design_sensitive_lines": [
+        11,
+        39,
+        116,
+        117,
+        160,
+        191,
+        213
+      ]
+    },
+    {
+      "path": "packages/koi_ui/test/koi_components_test.dart",
+      "category": "test",
+      "lines": 625,
+      "sha256": "3d173af7fa14272f5b145f6fbd93f0e6d304e396ad776431352192d926dab431",
+      "ui": false,
+      "design_sensitive_lines": [
+        10,
+        11,
+        12,
+        48,
+        168,
+        214,
+        304,
+        314,
+        324,
+        326,
+        327,
+        328,
+        329,
+        427,
+        429,
+        457,
+        475,
+        618,
+        619,
+        620,
+        621
+      ]
+    },
+    {
+      "path": "packages/koi_ui/test/koi_design_behavior_test.dart",
+      "category": "test",
+      "lines": 149,
+      "sha256": "3054f74618ac899092e53834bc15b16a67416745af52f839fb84999c07c7f75f",
+      "ui": false,
+      "design_sensitive_lines": [
+        16,
+        17,
+        18,
+        19,
+        77,
+        78,
+        114,
+        126
+      ]
+    },
+    {
+      "path": "packages/koi_ui/test/koi_material_controls_test.dart",
+      "category": "test",
+      "lines": 523,
+      "sha256": "d23da9da91c33e70087e5bc0892793a04d2bd2c827e96b81d61a79fe47bfcaa7",
+      "ui": false,
+      "design_sensitive_lines": [
+        9,
+        232,
+        329,
+        402,
+        485,
+        503,
+        505,
+        506,
+        512
+      ]
+    },
+    {
+      "path": "packages/koi_ui/test/koi_overlay_accessibility_test.dart",
+      "category": "test",
+      "lines": 284,
+      "sha256": "e8a864aa5dbe3c565a9cb23d0ffe1307a219019c430f2ebd228137bc9674daeb",
+      "ui": false,
+      "design_sensitive_lines": [
+        19,
+        20,
+        84,
+        85,
+        86,
+        87,
+        89,
+        130,
+        174,
+        207,
+        244
+      ]
+    },
+    {
+      "path": "packages/koi_ui/test/koi_platform_layout_test.dart",
+      "category": "test",
+      "lines": 349,
+      "sha256": "dbc32930abf2b9d64a3b93d50b5adcb4a89eedc71c1e2fb8452c0c7d17d93a37",
+      "ui": false,
+      "design_sensitive_lines": [
+        148,
+        149,
+        211,
+        228,
+        229,
+        331,
+        332,
+        333,
+        334
+      ]
+    },
+    {
+      "path": "packages/koi_ui/test/koi_ui_test.dart",
+      "category": "test",
+      "lines": 113,
+      "sha256": "d59c26131c6082525de3a13646c910a2eaaf4f20556aa11cc9e801c22d395ad8",
+      "ui": false,
+      "design_sensitive_lines": [
+        66,
+        67,
+        87,
+        88,
+        109,
+        110
+      ]
+    },
+    {
+      "path": "packages/koi_ui/test/koi_workbench_toolbar_test.dart",
+      "category": "test",
+      "lines": 145,
+      "sha256": "e18a5273af1ea27402da83aadc40c2a031a0075a36def98399e4964c9b0b3141",
+      "ui": false,
+      "design_sensitive_lines": [
+        11,
+        12,
+        13,
+        14,
+        15,
+        16
+      ]
+    },
+    {
+      "path": "pubspec.yaml",
+      "category": "implementation",
+      "lines": 63,
+      "sha256": "da11aefe34fd5ef98437d03327a040116d9de17f11ce525cb5477a962ecf7a13",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "scripts/create_feature.py",
+      "category": "implementation",
+      "lines": 12,
+      "sha256": "8298845b9a6fa48c5b7e334b60c06ff2fa07f3585f63d41b1f0b4dac6d9e6ca1",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "scripts/tests/test_blueprint.py",
+      "category": "test",
+      "lines": 433,
+      "sha256": "f37bfe217d5de9b626786b231b2333c889a1766ae4ba6f4256a2a9021c4323f8",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "scripts/tests/test_create_feature.py",
+      "category": "test",
+      "lines": 51,
+      "sha256": "e842ec4537175ef2a00317b1b1b4f1a8db5b9684db50209afe61df90ab3d1e58",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/architecture/checker.dart",
+      "category": "implementation",
+      "lines": 825,
+      "sha256": "a1c1bc2c904f72ee7edb4fecd4a317a879a2a796b1f25297191623eb9c287371",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/check_ai_assets.py",
+      "category": "implementation",
+      "lines": 292,
+      "sha256": "5f5a0385057696159096c774ce1edad8e5cb4bf806d9119571223a1a4420483b",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/check_architecture.dart",
+      "category": "implementation",
+      "lines": 64,
+      "sha256": "7aed31cd7c5c68a2a693d21090fe4a5fabadca6bc4c3c68d1c9a0ed188361d1d",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/check_coverage_sources.dart",
+      "category": "implementation",
+      "lines": 120,
+      "sha256": "ecd9d356e83d50de3dd40bb8288cb26ffe995333fa1439aefa53d13bfd8fffc8",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/create_media_fixtures.py",
+      "category": "implementation",
+      "lines": 71,
+      "sha256": "dbb00e756361d51257687e8edd5ee08e8e6ac6f63ecd0c569491ff161a187ec3",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/generator_smoke.py",
+      "category": "implementation",
+      "lines": 82,
+      "sha256": "fefc29cfcb916323a22d8e9d6d5b9043892ce3f5cd6fd3d27a1e5c091ebf05f4",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/include_browser_coverage.dart",
+      "category": "implementation",
+      "lines": 98,
+      "sha256": "1a2603ede8095d92e4549980c1cd18b6278c577421cd6cf081a2182e7282f379",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/platform_configuration.py",
+      "category": "implementation",
+      "lines": 240,
+      "sha256": "3da5b35246b9c890feb05ad346172554761dfcbdab95413216dabe1030e66fdb",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/tests/architecture_test.dart",
+      "category": "test",
+      "lines": 563,
+      "sha256": "0b3865002955655c7d92da6d15f932e04109d2c73403cad2e3166f5deb00afa2",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/tests/browser_coverage_test.dart",
+      "category": "test",
+      "lines": 61,
+      "sha256": "43a62b7d232bc6eaa8761dc4d126047ecc97cb2f4ca6cc45c6fe5495588e3f49",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/tests/coverage_sources_test.dart",
+      "category": "test",
+      "lines": 46,
+      "sha256": "085acbc8e2cdb583ffbd2ed64c89985174c591a7fafca2a4a62dbe47a20c708d",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/tests/test_ai_assets.py",
+      "category": "test",
+      "lines": 133,
+      "sha256": "2f223cf8b6ee832172b62f0dcfd5dc3d3b16f61854b3f9a1ff6074296a26f352",
+      "ui": false,
+      "design_sensitive_lines": []
+    },
+    {
+      "path": "tool/tests/test_platform_configuration.py",
+      "category": "test",
+      "lines": 94,
+      "sha256": "9a9f16e3aa059a7badda67bf759e4bf508f56c0939d71663abd8d49959fe8cab",
+      "ui": false,
+      "design_sensitive_lines": []
+    }
+  ]
+}

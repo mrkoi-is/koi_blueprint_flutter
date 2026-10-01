@@ -185,31 +185,52 @@ class _KoiUiLabAppState extends State<KoiUiLabApp> {
                                 setState(() => _detailWidth = value),
                             onSidebarWidthChanged: (value) =>
                                 setState(() => _sidebarWidth = value),
-                            sidebar: ListView(
-                              children: [
-                                KoiSelectableListTile(
-                                  title: Text(
-                                    _longText
-                                        ? '这是一段用来验证侧栏在长中文标题和放大字号下仍可阅读的文字'
-                                        : '可选择条目',
+                            sidebar: KoiPanel(
+                              title: '资料侧栏',
+                              search: KoiSearchField(
+                                hintText: '搜索资料',
+                                onChanged: (value) =>
+                                    setState(() => _message = value),
+                              ),
+                              child: ListView(
+                                children: [
+                                  KoiSelectableListTile(
+                                    title: Text(
+                                      _longText
+                                          ? '这是一段用来验证侧栏在长中文标题和放大字号下仍可阅读的文字'
+                                          : '可选择条目',
+                                    ),
+                                    selected: true,
+                                    leading: const Icon(
+                                      Icons.description_outlined,
+                                    ),
+                                    onTap: () =>
+                                        setState(() => _message = '条目已激活'),
                                   ),
-                                  selected: true,
-                                  leading: const Icon(
-                                    Icons.description_outlined,
+                                  const KoiSelectableListTile(
+                                    title: Text('已禁用条目'),
+                                    enabled: false,
                                   ),
-                                  onTap: () =>
-                                      setState(() => _message = '条目已激活'),
-                                ),
-                                const KoiSelectableListTile(
-                                  title: Text('已禁用条目'),
-                                  enabled: false,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                            detail: SingleChildScrollView(
-                              padding: const EdgeInsets.all(KoiSpace.md),
-                              child: Text(
-                                '当前侧栏：${_sidebarWidth.round()} px\n当前详情：${_detailWidth.round()} px\n$_message',
+                            detail: KoiPanel(
+                              title: '资料详情',
+                              child: ListView(
+                                children: [
+                                  KoiPropertyRow(
+                                    label: '侧栏宽度',
+                                    value: Text('${_sidebarWidth.round()} px'),
+                                  ),
+                                  KoiPropertyRow(
+                                    label: '详情宽度',
+                                    value: Text('${_detailWidth.round()} px'),
+                                  ),
+                                  KoiPropertyRow(
+                                    label: '状态',
+                                    value: Text('详情反馈：$_message'),
+                                  ),
+                                ],
                               ),
                             ),
                             body: _content(),

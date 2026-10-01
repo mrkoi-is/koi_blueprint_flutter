@@ -16,3 +16,4 @@ export 'widgets/koi_toolbar.dart';
 export 'widgets/koi_reading_pane.dart';
 export 'widgets/koi_property_row.dart';
 export 'widgets/koi_panel_icon.dart';
+export 'widgets/koi_panel.dart';

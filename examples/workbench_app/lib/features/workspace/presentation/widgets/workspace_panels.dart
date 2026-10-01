@@ -1,3 +1,5 @@
+import 'package:workbench_app/features/workspace/presentation/widgets/workspace_save_status.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -28,78 +30,56 @@ class WorkspaceSidebar extends ConsumerWidget {
       );
       final query = ref.watch(documentSearchProvider);
       final documents = searchDocuments(state.documents, query);
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(
-              KoiSpace.control,
-              KoiSpace.section,
-              KoiSpace.control,
-              KoiSpace.control,
-            ),
-            child: Text('文本资料', style: Theme.of(context).textTheme.titleMedium),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(KoiSpace.control),
-            child: KoiSearchField(
-              key: const ValueKey('document-search'),
-              initialValue: query,
-              hintText: '搜索资料',
-              onChanged: ref.read(documentSearchProvider.notifier).setQuery,
-            ),
-          ),
-          Expanded(
-            child: documents.isEmpty
-                ? const Center(child: Text('没有匹配的资料'))
-                : ListView(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: KoiSpace.control,
-                      vertical: KoiSpace.xs,
-                    ),
-                    children: [
-                      for (final document in documents)
-                        KoiSelectableListTile(
-                          title: Tooltip(
-                            message: document.title,
-                            excludeFromSemantics: true,
-                            child: Text(
-                              document.title,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          leading: const Icon(Icons.description_outlined),
-                          trailing: document.dirty
-                              ? Tooltip(
-                                  message: '未保存',
-                                  child: Icon(
-                                    Icons.circle,
-                                    size: 6,
-                                    semanticLabel: '未保存',
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .primary,
-                                  ),
-                                )
-                              : null,
-                          selected: document.id == state.selectedId,
-                          onTap: () {
-                            session.updatePreferences(
-                              session.state.snapshot.preferences.copyWith(
-                                selectedDocumentId: document.id,
-                              ),
-                            );
-                            if (Scaffold.maybeOf(context)?.isDrawerOpen ??
-                                false) {
-                              Navigator.of(context).pop();
-                            }
-                          },
-                        ),
-                    ],
+      return KoiPanel(
+        title: '文本资料',
+        search: KoiSearchField(
+          key: const ValueKey('document-search'),
+          initialValue: query,
+          hintText: '搜索资料',
+          onChanged: ref.read(documentSearchProvider.notifier).setQuery,
+        ),
+        child: ListView(
+          key: const PageStorageKey('sidebar-text-scroll'),
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          children: [
+            for (final document in documents)
+              KoiSelectableListTile(
+                title: Tooltip(
+                  message: document.title,
+                  excludeFromSemantics: true,
+                  child: Text(
+                    document.title,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
-          ),
-        ],
+                ),
+                leading: const Icon(Icons.description_outlined),
+                trailing: document.dirty
+                    ? Tooltip(
+                        message: '未保存',
+                        child: Icon(
+                          Icons.circle,
+                          size: 6,
+                          semanticLabel: '未保存',
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                      )
+                    : null,
+                selected: document.id == state.selectedId,
+                onTap: () {
+                  session.updatePreferences(
+                    session.state.snapshot.preferences.copyWith(
+                      selectedDocumentId: document.id,
+                    ),
+                  );
+                  if (Scaffold.maybeOf(context)?.isDrawerOpen ?? false) {
+                    Navigator.of(context).pop();
+                  }
+                },
+              ),
+            if (documents.isEmpty) const Text('没有匹配的资料'),
+          ],
+        ),
       );
     }
     if (index == 1) {
@@ -112,48 +92,51 @@ class WorkspaceSidebar extends ConsumerWidget {
           session.state.snapshot.assets;
       final kind = ref.watch(mediaFilterProvider);
       final query = ref.watch(mediaSearchProvider);
-      return ListView(
-        padding: const EdgeInsets.all(12),
-        children: [
-          Text('媒体分类', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 12),
-          KoiSearchField(
-            key: const ValueKey('media-search'),
-            initialValue: query,
-            hintText: '搜索素材',
-            onChanged: ref.read(mediaSearchProvider.notifier).setQuery,
-          ),
-          const SizedBox(height: 12),
-          KoiSelectableListTile(
-            title: const Text('全部'),
-            trailing: Text('${assets.length}'),
-            selected: kind == null,
-            onTap: () => ref.read(mediaFilterProvider.notifier).setKind(null),
-          ),
-          KoiSelectableListTile(
-            title: const Text('图片'),
-            trailing: Text(
-              '${assets.where((asset) => asset.kind == MediaKind.image).length}',
+      return KoiPanel(
+        title: '媒体分类',
+        search: KoiSearchField(
+          key: const ValueKey('media-search'),
+          initialValue: query,
+          hintText: '搜索素材',
+          onChanged: ref.read(mediaSearchProvider.notifier).setQuery,
+        ),
+        child: ListView(
+          key: const PageStorageKey('sidebar-media-scroll'),
+          padding: const EdgeInsets.symmetric(vertical: 4),
+          children: [
+            KoiSelectableListTile(
+              title: const Text('全部'),
+              trailing: Text('${assets.length}'),
+              selected: kind == null,
+              onTap: () => ref.read(mediaFilterProvider.notifier).setKind(null),
             ),
-            selected: kind == MediaKind.image,
-            onTap: () =>
-                ref.read(mediaFilterProvider.notifier).setKind(MediaKind.image),
-          ),
-          KoiSelectableListTile(
-            title: const Text('视频'),
-            trailing: Text(
-              '${assets.where((asset) => asset.kind == MediaKind.video).length}',
+            KoiSelectableListTile(
+              title: const Text('图片'),
+              trailing: Text(
+                '${assets.where((asset) => asset.kind == MediaKind.image).length}',
+              ),
+              selected: kind == MediaKind.image,
+              onTap: () => ref
+                  .read(mediaFilterProvider.notifier)
+                  .setKind(MediaKind.image),
             ),
-            selected: kind == MediaKind.video,
-            onTap: () =>
-                ref.read(mediaFilterProvider.notifier).setKind(MediaKind.video),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            '导入的素材副本保存在当前工作区；切换视图会暂停视频并保留播放位置。',
-            style: Theme.of(context).textTheme.bodySmall,
-          ),
-        ],
+            KoiSelectableListTile(
+              title: const Text('视频'),
+              trailing: Text(
+                '${assets.where((asset) => asset.kind == MediaKind.video).length}',
+              ),
+              selected: kind == MediaKind.video,
+              onTap: () => ref
+                  .read(mediaFilterProvider.notifier)
+                  .setKind(MediaKind.video),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              '导入的素材副本保存在当前工作区；切换视图会暂停视频并保留播放位置。',
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
+          ],
+        ),
       );
     }
     final counts = ref.watch(
@@ -170,20 +153,22 @@ class WorkspaceSidebar extends ConsumerWidget {
         ),
       ),
     );
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        Text('任务概览', style: Theme.of(context).textTheme.titleMedium),
-        const SizedBox(height: 16),
-        Text('${counts.todos} 项待办未完成'),
-        const SizedBox(height: 8),
-        Text('${counts.jobs} 项 IO 作业处理中'),
-        const SizedBox(height: 24),
-        Text(
-          '任务在切换视图时继续运行。取消会停止读取并清理暂存内容。',
-          style: Theme.of(context).textTheme.bodySmall,
-        ),
-      ],
+    return KoiPanel(
+      title: '任务概览',
+      child: ListView(
+        key: const PageStorageKey('sidebar-tasks-scroll'),
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        children: [
+          Text('${counts.todos} 项待办未完成'),
+          const SizedBox(height: 8),
+          Text('${counts.jobs} 项 IO 作业处理中'),
+          const SizedBox(height: 24),
+          Text(
+            '任务在切换视图时继续运行。取消会停止读取并清理暂存内容。',
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ],
+      ),
     );
   }
 }
@@ -206,30 +191,35 @@ class WorkspaceDetails extends ConsumerWidget {
               .firstOrNull;
         }),
       );
-      return ListView(
-        padding: const EdgeInsets.fromLTRB(16, 20, 16, 16),
-        children: [
-          Text('资料详情', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 20),
-          if (document == null)
-            const Text('尚未选择资料')
-          else ...[
-            KoiPropertyRow(label: '名称', value: Text(document.title)),
-            KoiPropertyRow(
-              label: '字数',
-              value: Text('${document.text.length} 字'),
-            ),
-            KoiPropertyRow(label: '版本', value: Text('版本 ${document.revision}')),
-            KoiPropertyRow(
-              label: '保存状态',
-              value: Text(document.dirty ? '未保存' : '已保存'),
-            ),
-            Text(
-              '停止输入 500 毫秒后自动保存',
-              style: Theme.of(context).textTheme.bodySmall,
-            ),
+      return KoiPanel(
+        title: '资料详情',
+        child: ListView(
+          key: const PageStorageKey('detail-text-scroll'),
+          padding: EdgeInsets.zero,
+          children: [
+            if (document == null)
+              const Text('尚未选择资料')
+            else ...[
+              KoiPropertyRow(label: '名称', value: Text(document.title)),
+              KoiPropertyRow(
+                label: '字数',
+                value: Text('${document.text.length} 字'),
+              ),
+              KoiPropertyRow(
+                label: '版本',
+                value: Text('版本 ${document.revision}'),
+              ),
+              KoiPropertyRow(
+                label: '保存状态',
+                value: WorkspaceSaveStatus(document: document),
+              ),
+              Text(
+                '停止输入 500 毫秒后自动保存',
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+            ],
           ],
-        ],
+        ),
       );
     }
     if (index == 1) {
@@ -243,47 +233,57 @@ class WorkspaceDetails extends ConsumerWidget {
               .firstOrNull;
         }),
       );
-      return ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          Text('素材详情', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 16),
-          if (asset == null)
-            const Text('尚未选择素材')
-          else ...[
-            Text(asset.name),
-            const SizedBox(height: 12),
-            Text('${asset.byteLength} 字节'),
-            Text(asset.kind == MediaKind.image ? '图片' : '视频'),
-            Text(switch (asset.thumbnailStatus) {
-              ThumbnailStatus.none => '缩略图待生成',
-              ThumbnailStatus.generating => '正在生成缩略图',
-              ThumbnailStatus.ready => '缩略图已保存',
-              ThumbnailStatus.failed => '缩略图失败',
-            }),
-            if (asset.thumbnailError != null) Text(asset.thumbnailError!),
-            if (asset.thumbnailStatus == ThumbnailStatus.failed)
-              TextButton(
-                onPressed: () {
-                  if (asset.kind == MediaKind.video) {
-                    unawaited(retryVideoThumbnail(context, ref, asset));
-                  } else {
-                    final job = session.state.snapshot.jobs
-                        .where(
-                          (job) =>
-                              job.assetId == asset.id &&
-                              job.kind == JobKind.thumbnail,
-                        )
-                        .lastOrNull;
-                    if (job != null) {
-                      unawaited(session.retryJob(job.id));
-                    }
-                  }
-                },
-                child: const Text('重试缩略图'),
+      return KoiPanel(
+        title: '素材详情',
+        child: ListView(
+          key: const PageStorageKey('detail-media-scroll'),
+          padding: EdgeInsets.zero,
+          children: [
+            if (asset == null)
+              const Text('尚未选择素材')
+            else ...[
+              KoiPropertyRow(label: '名称', value: Text(asset.name)),
+              KoiPropertyRow(
+                label: '大小',
+                value: Text('${asset.byteLength} 字节'),
               ),
+              KoiPropertyRow(
+                label: '类型',
+                value: Text(asset.kind == MediaKind.image ? '图片' : '视频'),
+              ),
+              KoiPropertyRow(
+                label: '缩略图状态',
+                value: Text(switch (asset.thumbnailStatus) {
+                  ThumbnailStatus.none => '缩略图待生成',
+                  ThumbnailStatus.generating => '正在生成缩略图',
+                  ThumbnailStatus.ready => '缩略图已保存',
+                  ThumbnailStatus.failed => '缩略图失败',
+                }),
+              ),
+              if (asset.thumbnailError != null) Text(asset.thumbnailError!),
+              if (asset.thumbnailStatus == ThumbnailStatus.failed)
+                TextButton(
+                  onPressed: () {
+                    if (asset.kind == MediaKind.video) {
+                      unawaited(retryVideoThumbnail(context, ref, asset));
+                    } else {
+                      final job = session.state.snapshot.jobs
+                          .where(
+                            (job) =>
+                                job.assetId == asset.id &&
+                                job.kind == JobKind.thumbnail,
+                          )
+                          .lastOrNull;
+                      if (job != null) {
+                        unawaited(session.retryJob(job.id));
+                      }
+                    }
+                  },
+                  child: const Text('重试缩略图'),
+                ),
+            ],
           ],
-        ],
+        ),
       );
     }
     return const _Information(
@@ -302,21 +302,22 @@ class _Information extends StatelessWidget {
   final String title;
   final List<String> lines;
   @override
-  Widget build(BuildContext context) => ListView(
-    padding: const EdgeInsets.all(16),
-    children: [
-      Text(title, style: Theme.of(context).textTheme.titleMedium),
-      const SizedBox(height: 16),
-      for (var i = 0; i < lines.length; i++)
-        Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Text(
-            lines[i],
-            style: i == lines.length - 1
-                ? Theme.of(context).textTheme.bodySmall
-                : Theme.of(context).textTheme.bodyMedium,
+  Widget build(BuildContext context) => KoiPanel(
+    title: title,
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: [
+        for (var i = 0; i < lines.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Text(
+              lines[i],
+              style: i == lines.length - 1
+                  ? Theme.of(context).textTheme.bodySmall
+                  : Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
-        ),
-    ],
+      ],
+    ),
   );
 }

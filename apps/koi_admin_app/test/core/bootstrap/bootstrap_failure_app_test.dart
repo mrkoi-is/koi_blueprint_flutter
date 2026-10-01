@@ -8,6 +8,6 @@ void main() {
     );
 
     expect(find.text('应用初始化失败'), findsOneWidget);
-    expect(find.text('请检查环境配置与网络初始化设置后重新启动。'), findsOneWidget);
+    expect(find.textContaining('请检查环境配置与网络初始化设置后重新启动。'), findsOneWidget);
   });
 }

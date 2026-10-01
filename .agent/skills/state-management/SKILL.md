@@ -22,6 +22,7 @@ description: 按 Koi Riverpod 3 契约实现页面、异步状态、派生计算
 - provider 释放自己创建的资源，借用共享资源只解除自己的订阅。
 - await 后检查 mounted 与操作代次，旧结果不能覆盖新状态。
 - data/application 可以共存；展示 props 和本地 setState 都有合法用途。
+- 同级内容侧栏/详情复用 koi_ui 的 KoiPanel；宿主持有跨抽屉/内联切换的滚动恢复范围，不把稳定 router 等同于局部滚动自动保持。
 - 工作区三视图共用会话，resize 不重建文本/媒体控制器；参照 [UI 与自适应](../../../docs/architecture/ui-and-adaptive.md) 和 Workbench。
 
 ## 验证

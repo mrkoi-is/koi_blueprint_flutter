@@ -1,3 +1,5 @@
+import 'package:workbench_app/features/workspace/presentation/widgets/workspace_save_status.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -188,9 +190,9 @@ class _TextPageState extends ConsumerState<TextPage> {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            Text(
-                              '${selected.text.length} 字 · ${selected.dirty ? '未保存' : '已保存'}',
-                              style: Theme.of(context).textTheme.bodySmall,
+                            WorkspaceSaveStatus(
+                              document: selected,
+                              includeCount: true,
                             ),
                           ],
                         ),

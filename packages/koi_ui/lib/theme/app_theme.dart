@@ -19,6 +19,12 @@ abstract final class AppTheme {
         ).copyWith(
           primary: dark ? const Color(0xFF88BCAC) : AppColors.moss,
           onPrimary: dark ? AppColors.ink : Colors.white,
+          secondaryContainer: dark
+              ? const Color(0xFF303030)
+              : const Color(0xFFEBEBEB),
+          onSecondaryContainer: dark
+              ? const Color(0xFFECECEC)
+              : const Color(0xFF242424),
           secondary: dark ? const Color(0xFFE4B269) : AppColors.amber,
           // The custom amber replaces the seed color, so pair its foreground
           // explicitly instead of retaining the seed's white onSecondary.

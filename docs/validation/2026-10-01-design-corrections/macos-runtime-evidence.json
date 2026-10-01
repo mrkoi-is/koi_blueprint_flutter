@@ -1,0 +1,68 @@
+{
+  "storage": "Native isolated temporary directory",
+  "file_picker": "NOT_EXERCISED_fixture_adapter",
+  "imported_bytes": 86249,
+  "image_dimensions": [
+    160,
+    96
+  ],
+  "image_source_colors": 15360,
+  "image_thumbnail_error": null,
+  "images": [
+    {
+      "name": "gradient.png",
+      "thumbnail_bytes": 393,
+      "thumbnail_colors": 15360,
+      "thumbnail_dimensions": [
+        160,
+        96
+      ]
+    },
+    {
+      "name": "gradient.jpg",
+      "thumbnail_bytes": 9793,
+      "thumbnail_colors": 12706,
+      "thumbnail_dimensions": [
+        160,
+        96
+      ]
+    }
+  ],
+  "videos": [
+    {
+      "name": "landscape.mp4",
+      "first_frame_probe": {
+        "surface": "native texture"
+      },
+      "preview_error": null,
+      "screenshot_bytes": 19640,
+      "first_screenshot_colors": 5714,
+      "after_play_seek_probe": {
+        "surface": "native texture"
+      },
+      "first_frame": true,
+      "play_pause_seek_volume": true,
+      "thumbnail_bytes": 18795,
+      "thumbnail_colors": 5714,
+      "lease_released": true
+    },
+    {
+      "name": "portrait.mp4",
+      "first_frame_probe": {
+        "surface": "native texture"
+      },
+      "preview_error": null,
+      "screenshot_bytes": 19781,
+      "first_screenshot_colors": 5020,
+      "after_play_seek_probe": {
+        "surface": "native texture"
+      },
+      "first_frame": true,
+      "play_pause_seek_volume": true,
+      "thumbnail_bytes": 17087,
+      "thumbnail_colors": 5020,
+      "lease_released": true
+    }
+  ],
+  "reopened_snapshot_and_content": true
+}
