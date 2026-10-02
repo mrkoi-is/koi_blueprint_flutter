@@ -28,8 +28,9 @@ void main(List<String> arguments) {
     if (!file.path.endsWith('.dart') || file.path.endsWith('.g.dart')) continue;
     final source = file.readAsStringSync();
     // This is platform classification, not a coverage exclusion.
-    if (!RegExp(r'''import\s+['"](?:dart:js_interop|package:web/[^'"]+)['"]''')
-        .hasMatch(source)) {
+    if (!RegExp(
+      r'''import\s+['"](?:dart:js_interop|package:web/[^'"]+|package:drift/wasm\.dart)['"]''',
+    ).hasMatch(source)) {
       continue;
     }
     final relative = file.path

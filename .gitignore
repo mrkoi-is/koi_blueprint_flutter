@@ -18,3 +18,6 @@ melos_*.iml
 # Python validation tooling
 __pycache__/
 *.pyc
+
+# Flutter localization output (regenerate from ARB)
+**/lib/l10n/generated/

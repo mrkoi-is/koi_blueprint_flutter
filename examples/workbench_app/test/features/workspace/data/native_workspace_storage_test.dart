@@ -26,7 +26,131 @@ void main() {
     await directory.delete(recursive: true);
   });
 
+  test('second owner cannot load, clean active staging or overwrite; retry after close succeeds', () async {
+    final key = await storage.stage(
+      Stream.value([1, 2, 3]),
+      name: 'active.png',
+    );
+    await storage.save(
+      const WorkspaceSnapshot(
+        documents: [WorkspaceDocument(id: 'a', title: '中文资料')],
+      ),
+    );
+    final second = NativeWorkspaceStorage(directory.path);
+    await expectLater(second.initialize(), throwsA(isA<WorkspaceInUse>()));
+    await expectLater(
+      second.cleanupStaging(),
+      throwsA(isA<WorkspaceStorageException>()),
+    );
+    expect(await storage.commit(key), key);
+    await storage.close();
+    await second.initialize();
+    expect((await second.load()).documents.single.title, '中文资料');
+    expect(await second.readBytes(key), [1, 2, 3]);
+    await second.close();
+  });
+
+  test(
+    'closed owner cannot reacquire a lock; a fresh owner remains usable',
+    () async {
+      await storage.close();
+      await expectLater(
+        storage.initialize(),
+        throwsA(isA<WorkspaceStorageException>()),
+      );
+      final fresh = NativeWorkspaceStorage(directory.path);
+      await fresh.initialize();
+      await fresh.save(const WorkspaceSnapshot(revision: 1));
+      await fresh.close();
+    },
+  );
+
+  test(
+    'legacy snapshot starts at storage version zero; conflicts preserve bytes',
+    () async {
+      final file = File('${directory.path}/workspace.json');
+      await file.writeAsString(
+        jsonEncode(const WorkspaceSnapshot(revision: 900).toJson()),
+      );
+      expect((await storage.load()).revision, 900);
+      expect(storage.persistedVersion, 0);
+      await storage.save(
+        const WorkspaceSnapshot(revision: 901),
+        expectedVersion: 0,
+      );
+      expect(storage.persistedVersion, 1);
+      final original = await file.readAsBytes();
+      await expectLater(
+        storage.save(
+          const WorkspaceSnapshot(revision: 999),
+          expectedVersion: 0,
+        ),
+        throwsA(isA<WorkspaceConflict>()),
+      );
+      expect(await file.readAsBytes(), original);
+    },
+  );
+
+  test(
+    'close waits for active streamed staging before releasing ownership',
+    () async {
+      final bytes = StreamController<List<int>>();
+      final entered = Completer<void>();
+      final staging = storage.stage(
+        bytes.stream,
+        name: 'stream.png',
+        onBytes: (_) {
+          if (!entered.isCompleted) entered.complete();
+        },
+      );
+      bytes.add([1, 2]);
+      await entered.future;
+      var closed = false;
+      final closing = storage.close().then((_) => closed = true);
+      await Future<void>.delayed(Duration.zero);
+      expect(closed, isFalse);
+      final second = NativeWorkspaceStorage(directory.path);
+      await expectLater(second.initialize(), throwsA(isA<WorkspaceInUse>()));
+      await bytes.close();
+      final key = await staging;
+      await closing;
+      await second.initialize();
+      await second.cleanupStaging();
+      await expectLater(
+        second.commit(key),
+        throwsA(isA<FileSystemException>()),
+      );
+      await second.close();
+    },
+  );
+
+  test(
+    'native ownership excludes another Dart process and releases on close',
+    () async {
+      final flutterRoot = Platform.environment['FLUTTER_ROOT'];
+      expect(
+        flutterRoot,
+        isNotNull,
+        reason: 'Flutter test must expose its selected SDK',
+      );
+      final dart = '$flutterRoot/bin/dart${Platform.isWindows ? '.exe' : ''}';
+      Future<String> probe() async {
+        final result = await Process.run(dart, [
+          'test/support/process_lock_probe.dart',
+          directory.path,
+        ]);
+        expect(result.exitCode, 0, reason: '${result.stderr}');
+        return '${result.stdout}'.trim();
+      }
+
+      expect(await probe(), 'busy');
+      await storage.close();
+      expect(await probe(), 'acquired');
+    },
+  );
+
   test('conditional factory opens injected native directory and unsupported target is explicit', () async {
+    await storage.close();
     final owner = await facade.openWorkspaceStorage(
       nativeDirectory: directory.path,
     );

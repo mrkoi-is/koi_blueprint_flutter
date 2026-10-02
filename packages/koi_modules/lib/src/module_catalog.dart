@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:go_router/go_router.dart';
+import 'package:koi_core/koi_core.dart';
 import 'package:koi_modules/src/module_session.dart';
 
 /// Navigation data supplied by a module's public, typed route entry point.
@@ -23,10 +24,19 @@ final class KoiModule<T extends Object> {
     required List<RouteBase> routes,
     required List<ModuleNavigationItem> navigation,
     required this.createSession,
-  }) : routes = List.unmodifiable(routes),
+    Set<String> capabilities = const {},
+    this.checkAvailability,
+  }) : capabilities = Set.unmodifiable(capabilities),
+       routes = List.unmodifiable(routes),
        navigation = List.unmodifiable(navigation);
 
   final String id;
+
+  /// Stable operation identifiers supported by this compiled implementation.
+  final Set<String> capabilities;
+
+  /// Rechecked before each new session; absence preserves existing behavior.
+  final FutureOr<CapabilityAvailability> Function()? checkAvailability;
   final List<RouteBase> routes;
   final List<ModuleNavigationItem> navigation;
   final FutureOr<T> Function(ModuleSessionContext context) createSession;
@@ -43,6 +53,11 @@ final class KoiModuleCatalog<T extends Object> {
     for (final module in modules) {
       if (module.id.isEmpty || !ids.add(module.id)) {
         throw ArgumentError('Empty or duplicate module id: ${module.id}');
+      }
+      if (module.capabilities.any(
+        (id) => !RegExp(r'^[a-z][a-z0-9_.-]*$').hasMatch(id),
+      )) {
+        throw ArgumentError('Invalid capability identifier in ${module.id}');
       }
       _validateRoutes(module.routes, '', paths, names);
       for (final item in module.navigation) {

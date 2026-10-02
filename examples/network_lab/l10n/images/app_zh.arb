@@ -1,0 +1,57 @@
+{
+  "@@locale": "zh",
+  "imagesTitle": "图片来源",
+  "imagesInputLabel": "HTTP(S) 图片 URL / 本地路径",
+  "imagesAsset": "内置资源",
+  "imagesMemory": "内存图片",
+  "imagesPickLocal": "选择本地图片",
+  "imagesReadPath": "读取本地路径",
+  "imagesNetwork": "网络图片",
+  "imagesInvalidUrl": "请输入有效的 HTTP(S) 图片 URL",
+  "imagesReadError": "无法读取图片：{error}",
+  "@imagesReadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesLayout": "布局 {width} dp · DPR {dpr} · 解码上限 {pixels} px",
+  "@imagesLayout": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "dpr": {
+        "type": "String"
+      },
+      "pixels": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesRetry": "重试",
+  "imagesCacheHit": "缓存命中，可离线读取",
+  "imagesValidated": "已读取并校验图像",
+  "imagesClearCache": "清理本页图片缓存并重试",
+  "imagesDecodeFailed": "图像解码失败：{error}",
+  "@imagesDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesDecodedSize": "实际解码 {width} × {height} px",
+  "@imagesDecodedSize": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "height": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesPreview": "图片预览"
+}

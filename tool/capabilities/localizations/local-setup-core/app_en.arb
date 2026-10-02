@@ -1,0 +1,41 @@
+{
+  "@@locale": "en",
+  "devicesSystemLanguage": "System",
+  "localSetupFirstSetup": "First setup",
+  "localSetupIncomingIntents": "Incoming intents",
+  "localSetupReconfigure": "Reconfigure",
+  "localSetupSetup": "Setup {value0} / 3",
+  "@localSetupSetup": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupNext": "Next",
+  "localSetupNoDirectoryWebUsesTheBrowser": "No directory; Web uses the browser file picker",
+  "localSetupChooseDirectory": "Choose directory",
+  "localSetupDocumentsStayLocalInstallTheLan": "Documents stay local. Install the LAN capability separately to pair devices.",
+  "localSetupFinish": "Finish",
+  "localSetupSkipForNow": "Skip for now",
+  "localSetupCurrentPage": "Current page",
+  "localSetupDocuments": "documents",
+  "localSetupDraftProtectedPendingIntents": "Draft protected: {value0} pending intents",
+  "@localSetupDraftProtectedPendingIntents": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupText": "Text",
+  "localSetupSave": "Save",
+  "localSetupDiscardDraft": "Discard draft",
+  "localSetupImportTextFile": "Import text file",
+  "localSetupIncomingUri": "Incoming URI",
+  "localSetupOpenIntent": "Open intent",
+  "localSetupSupportsKoiTasksKoiDocumentId": "Supports koi://tasks, koi://document?id=welcome, and local text files. Cold and warm starts share the draft-protection queue.",
+  "devicesRetry": "Retry",
+  "devicesDocumentsTab": "Documents",
+  "devicesTasksTab": "Tasks"
+}

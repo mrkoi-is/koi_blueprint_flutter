@@ -8,7 +8,10 @@ part 'catalog_view_state.freezed.dart';
 abstract class CatalogViewState with _$CatalogViewState {
   const factory CatalogViewState({
     required List<CatalogItem> items,
+    String? nextCursor,
+    int? total,
     @Default(false) bool isRefreshing,
+    @Default(false) bool isAppending,
     AppFailure? operationFailure,
   }) = _CatalogViewState;
 }

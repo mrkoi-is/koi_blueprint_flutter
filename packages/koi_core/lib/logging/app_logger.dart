@@ -13,6 +13,8 @@ typedef AppLogSink = void Function(
 abstract final class AppLogger {
   static AppLogSink _sink = _developerSink;
 
+  static AppLogSink get sink => _sink;
+
   /// 替换日志输出口；传 `null` 恢复默认的 `developer.log`。
   static set sink(AppLogSink? sink) {
     _sink = sink ?? _developerSink;

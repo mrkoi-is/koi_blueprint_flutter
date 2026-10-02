@@ -5,6 +5,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:workbench_app/features/workspace/application/workspace_session.dart';
+import 'package:workbench_app/features/workspace/application/snapshot_job_history_repository.dart';
 import 'package:workbench_app/features/workspace/data/workspace_storage_native.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
@@ -290,7 +291,7 @@ void main() {
     },
   );
 
-  test('retry requests new selection and retains the failed task', () async {
+  test('retry keeps task identity and archives the previous attempt', () async {
     picker.results.add(const ImportFailed('设备拒绝读取'));
     await session.importFiles(ImportKind.text);
     final failed = session.state.snapshot.jobs.single;
@@ -299,9 +300,91 @@ void main() {
     );
     await session.retryJob(failed.id);
     expect(picker.requests, 2);
-    expect(session.state.snapshot.jobs.first, failed);
-    expect(session.state.snapshot.jobs.last.id, isNot(failed.id));
+    expect(session.state.snapshot.jobs, hasLength(1));
+    expect(session.state.snapshot.jobs.last.id, failed.id);
+    expect(session.state.snapshot.jobs.last.currentAttempt, 2);
+    expect(session.state.snapshot.jobHistory.first, failed);
     expect(session.state.snapshot.jobs.last.status, JobStatus.succeeded);
+  });
+
+  test('UTC attempt timestamps and bounded history survive restart; clear only removes history', () async {
+    await session.dispose();
+    var now = DateTime.utc(2026, 10, 2, 10);
+    session = WorkspaceSession(
+      repository: storage,
+      assetStore: storage,
+      fileImportPort: picker,
+      clock: () => now,
+      historyLimit: 2,
+    );
+    await session.initialize();
+    final document = session.createDocument(title: '保留资料');
+    picker.results.add(const ImportFailed('first'));
+    await session.importFiles(ImportKind.text);
+    final id = session.state.snapshot.jobs.single.id;
+    expect(session.state.snapshot.jobs.single.startedAt, now);
+    expect(session.state.snapshot.jobs.single.finishedAt, now);
+    for (var attempt = 2; attempt <= 3; attempt++) {
+      now = now.add(const Duration(minutes: 1));
+      picker.results.add(ImportFailed('attempt $attempt'));
+      await session.retryJob(id);
+    }
+    final history = SnapshotJobHistoryRepository(session);
+    expect((await history.read(jobId: id)).map((job) => job.currentAttempt), [
+      3,
+      2,
+    ]);
+    expect(session.state.snapshot.jobs.single.startedAt!.isUtc, isTrue);
+    await session.dispose();
+    session = WorkspaceSession(
+      repository: storage,
+      assetStore: storage,
+      fileImportPort: picker,
+    );
+    await session.initialize();
+    expect(session.state.snapshot.jobs.single.currentAttempt, 3);
+    expect(session.state.snapshot.jobHistory, hasLength(2));
+    await SnapshotJobHistoryRepository(session).clear();
+    expect(session.state.snapshot.jobHistory, isEmpty);
+    expect(session.state.snapshot.jobs.single.id, id);
+    expect(session.state.snapshot.documents.single.id, document);
+    expect((await storage.load()).jobHistory, isEmpty);
+  });
+
+  test('10000 byte events retain exact totals with bounded observer and durable updates', () async {
+    await session.dispose();
+    final repository = _ControlledRepository()..block = false;
+    session = WorkspaceSession(
+      repository: repository,
+      assetStore: storage,
+      fileImportPort: picker,
+      debounce: const Duration(days: 1),
+      progressInterval: const Duration(days: 1),
+      checkpointInterval: const Duration(days: 1),
+      clock: () => DateTime.utc(2026, 10, 2),
+    );
+    await session.initialize();
+    var events = 0;
+    final sub = session.changes.listen((_) => events++);
+    picker.results.add(
+      FilesSelected([
+        _Source(
+          'large.txt',
+          [],
+          declaredLength: 10000,
+          customStream: Stream.fromIterable(List.generate(10000, (_) => [65])),
+        ),
+      ]),
+    );
+    await session.importFiles(ImportKind.text);
+    expect(session.state.snapshot.jobs.single.processedBytes, 10000);
+    expect(session.state.snapshot.jobs.single.status, JobStatus.succeeded);
+    expect(session.state.snapshot.documents.single.text.length, 10000);
+    expect(session.state.snapshot.revision, lessThan(20));
+    expect(events, lessThan(25));
+    expect(repository.saved.length, lessThan(10));
+    expect(repository.saved.last.jobs.single.processedBytes, 10000);
+    await sub.cancel();
   });
 
   test('cleanup failure does not leak later selected sources or throw an unhandled command', () async {
@@ -604,8 +687,8 @@ void main() {
           await session.retryJob(jobId);
           expect(session.state.snapshot.jobs.last.status, JobStatus.succeeded);
           expect(
-            session.state.snapshot.jobs
-                .firstWhere((job) => job.id == jobId)
+            session.state.snapshot.jobHistory
+                .firstWhere((job) => job.id == jobId && job.currentAttempt == 1)
                 .status,
             JobStatus.failed,
           );
@@ -803,18 +886,24 @@ final class _ControlledRepository implements WorkspaceRepository {
     : snapshot = initial;
   WorkspaceSnapshot snapshot;
   final List<WorkspaceSnapshot> saved = [];
+  @override
+  int persistedVersion = 0;
   Completer<void>? gate;
   bool fail = false;
   bool block = true;
   @override
   Future<WorkspaceSnapshot> load() async => snapshot;
   @override
-  Future<void> save(WorkspaceSnapshot value) async {
+  Future<void> save(WorkspaceSnapshot value, {int? expectedVersion}) async {
     if (fail) throw StateError('disk full');
     if (block) {
       gate = Completer<void>();
       await gate!.future;
     }
+    if (expectedVersion != null && expectedVersion != persistedVersion) {
+      throw const WorkspaceConflict();
+    }
+    ++persistedVersion;
     saved.add(value);
     snapshot = value;
   }
@@ -855,6 +944,8 @@ final class _BlockingAssetStore implements AssetStore {
 final class _GatedNativeRepository implements WorkspaceRepository {
   _GatedNativeRepository(this.delegate);
   final WorkspaceRepository delegate;
+  @override
+  int get persistedVersion => delegate.persistedVersion;
   final entered = Completer<void>();
   final release = Completer<void>();
   bool blockNext = false;
@@ -863,17 +954,17 @@ final class _GatedNativeRepository implements WorkspaceRepository {
   @override
   Future<WorkspaceSnapshot> load() => delegate.load();
   @override
-  Future<void> save(WorkspaceSnapshot snapshot) async {
+  Future<void> save(WorkspaceSnapshot snapshot, {int? expectedVersion}) async {
     if (failWrites) throw StateError('disk full during rollback');
     if (blockNext) {
       blockNext = false;
       entered.complete();
       await release.future;
-      await delegate.save(snapshot);
+      await delegate.save(snapshot, expectedVersion: expectedVersion);
       if (failAfterBlockedSave) failWrites = true;
       return;
     }
-    await delegate.save(snapshot);
+    await delegate.save(snapshot, expectedVersion: expectedVersion);
   }
 }
 

@@ -1,3 +1,4 @@
+import 'package:workbench_app/l10n/app_strings.dart';
 import 'package:workbench_app/features/workspace/presentation/widgets/workspace_save_status.dart';
 
 import 'dart:async';
@@ -8,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/presentation/models/text_view_state.dart';
+import 'package:workbench_app/features/workspace/presentation/widgets/document_text_editor.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
 
 class TextPage extends ConsumerStatefulWidget {
@@ -120,21 +122,21 @@ class _TextPageState extends ConsumerState<TextPage> {
                       key: const ValueKey('new-document'),
                       onPressed: session.createDocument,
                       icon: const Icon(Icons.add),
-                      label: const Text('新建资料'),
+                      label: Text(context.l10n.newDocument),
                     ),
                     TextButton.icon(
                       onPressed: () =>
                           unawaited(session.importFiles(ImportKind.text)),
                       icon: const Icon(Icons.file_open_outlined),
-                      label: const Text('导入文本'),
+                      label: Text(context.l10n.importText),
                     ),
                   ],
                 ),
                 Expanded(
                   child: selected == null
-                      ? const KoiEmptyState(
-                          title: '暂无文本资料',
-                          description: '新建资料，或导入 UTF-8 TXT/Markdown 文件',
+                      ? KoiEmptyState(
+                          title: context.l10n.noDocuments,
+                          description: context.l10n.documentsHint,
                         )
                       : Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -152,7 +154,7 @@ class _TextPageState extends ConsumerState<TextPage> {
                                   ),
                                 ),
                                 IconButton(
-                                  tooltip: '重命名当前资料',
+                                  tooltip: context.l10n.renameCurrentDocument,
                                   onPressed: () => unawaited(_rename(selected)),
                                   icon: const Icon(Icons.edit_outlined),
                                 ),
@@ -160,9 +162,10 @@ class _TextPageState extends ConsumerState<TextPage> {
                             ),
                             const SizedBox(height: 16),
                             Expanded(
-                              child: TextField(
-                                key: ValueKey('editor-${selected.id}'),
-                                controller: editor,
+                              child: DocumentTextEditor(
+                                key: ValueKey('document-body-${selected.id}'),
+                                documentId: selected.id,
+                                controller: editor!,
                                 focusNode: _focus.putIfAbsent(
                                   selected.id,
                                   FocusNode.new,
@@ -170,20 +173,6 @@ class _TextPageState extends ConsumerState<TextPage> {
                                 scrollController: _scrolls.putIfAbsent(
                                   selected.id,
                                   ScrollController.new,
-                                ),
-                                expands: true,
-                                maxLines: null,
-                                minLines: null,
-                                style: Theme.of(context).textTheme.bodyLarge,
-                                textAlignVertical: TextAlignVertical.top,
-                                decoration: const InputDecoration(
-                                  hintText: '写下内容…',
-                                  filled: false,
-                                  contentPadding: EdgeInsets.zero,
-                                  border: InputBorder.none,
-                                  enabledBorder: InputBorder.none,
-                                  focusedBorder: InputBorder.none,
-                                  disabledBorder: InputBorder.none,
                                 ),
                                 onChanged: (text) =>
                                     session.editDocument(selected.id, text),
@@ -220,7 +209,7 @@ class _DocumentTitleDialogState extends State<_DocumentTitleDialog> {
   void _submit() {
     final title = _controller.text.trim();
     if (title.isEmpty) {
-      setState(() => _error = '请输入资料名称');
+      setState(() => _error = context.l10n.documentNameRequired);
       return;
     }
     Navigator.pop(context, title);
@@ -234,11 +223,14 @@ class _DocumentTitleDialogState extends State<_DocumentTitleDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('重命名资料'),
+    title: Text(context.l10n.renameDocument),
     content: TextField(
       controller: _controller,
       autofocus: true,
-      decoration: InputDecoration(labelText: '资料名称', errorText: _error),
+      decoration: InputDecoration(
+        labelText: context.l10n.documentName,
+        errorText: _error,
+      ),
       onChanged: (_) {
         if (_error != null) setState(() => _error = null);
       },
@@ -247,9 +239,9 @@ class _DocumentTitleDialogState extends State<_DocumentTitleDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('取消'),
+        child: Text(context.l10n.cancel),
       ),
-      FilledButton(onPressed: _submit, child: const Text('确定')),
+      FilledButton(onPressed: _submit, child: Text(context.l10n.confirm)),
     ],
   );
 }

@@ -1,3 +1,5 @@
+import 'package:module_showcase/l10n/generated/app_localizations.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -25,6 +27,8 @@ class _ModuleShowcaseAppState extends State<ModuleShowcaseApp> {
   Widget build(BuildContext context) => UncontrolledProviderScope(
     container: widget.bootstrap.container,
     child: MaterialApp.router(
+      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: widget.bootstrap.router,

@@ -1,3 +1,5 @@
+import 'package:workbench_app/l10n/app_strings.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -38,18 +40,18 @@ class _TasksPageState extends ConsumerState<TasksPage> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('删除待办'),
+        title: Text(context.l10n.deleteTodo),
         scrollable: true,
-        content: Text('删除“${todo.title}”？此操作无法撤销。'),
+        content: Text(context.l10n.deleteTodoConfirm(todo.title)),
         actions: [
           TextButton(
             autofocus: true,
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('取消'),
+            child: Text(context.l10n.cancel),
           ),
           FilledButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('删除'),
+            child: Text(context.l10n.delete),
           ),
         ],
       ),
@@ -89,11 +91,11 @@ class _TasksPageState extends ConsumerState<TasksPage> {
       padding: const EdgeInsets.all(16),
       children: [
         KoiSection(
-          title: const Text('待办事项'),
-          description: const Text('待办与真实 IO 作业分别管理'),
+          title: Text(context.l10n.todos),
+          description: Text(context.l10n.todosDescription),
           actions: [
             FilterChip(
-              label: const Text('仅未完成'),
+              label: Text(context.l10n.incompleteOnly),
               selected: _onlyOpen,
               onSelected: (value) => setState(() => _onlyOpen = value),
             ),
@@ -106,12 +108,14 @@ class _TasksPageState extends ConsumerState<TasksPage> {
                     child: TextField(
                       key: const ValueKey('new-todo'),
                       controller: _newTodo,
-                      decoration: const InputDecoration(labelText: '添加待办'),
+                      decoration: InputDecoration(
+                        labelText: context.l10n.addTodo,
+                      ),
                       onSubmitted: (_) => _add(),
                     ),
                   ),
                   IconButton(
-                    tooltip: '添加待办',
+                    tooltip: context.l10n.addTodo,
                     onPressed: _add,
                     icon: const Icon(Icons.add),
                   ),
@@ -124,12 +128,12 @@ class _TasksPageState extends ConsumerState<TasksPage> {
                     final actions = Wrap(
                       children: [
                         IconButton(
-                          tooltip: '重命名待办：${todo.title}',
+                          tooltip: context.l10n.renameTodoNamed(todo.title),
                           onPressed: () => unawaited(_rename(todo)),
                           icon: const Icon(Icons.edit_outlined),
                         ),
                         IconButton(
-                          tooltip: '删除待办：${todo.title}',
+                          tooltip: context.l10n.deleteTodoNamed(todo.title),
                           onPressed: () => unawaited(_delete(todo)),
                           icon: const Icon(Icons.delete_outline),
                         ),
@@ -161,20 +165,23 @@ class _TasksPageState extends ConsumerState<TasksPage> {
                   },
                 ),
               if (todos.isEmpty)
-                const Padding(padding: EdgeInsets.all(16), child: Text('暂无待办')),
+                Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text(context.l10n.noTodos),
+                ),
             ],
           ),
         ),
         const SizedBox(height: 24),
         KoiSection(
-          title: const Text('IO 作业'),
-          description: const Text('导入字节与缩略图处理来自实际操作'),
+          title: Text(context.l10n.jobs),
+          description: Text(context.l10n.jobsDescription),
           child: Column(
             children: [
               if (state.jobCount == 0)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(16),
-                  child: Text('导入文本或媒体后，作业将显示在这里'),
+                  child: Text(context.l10n.noJobs),
                 ),
               for (final job in session.state.snapshot.jobs.reversed)
                 _JobTile(key: ValueKey(job.id), id: job.id),
@@ -186,14 +193,14 @@ class _TasksPageState extends ConsumerState<TasksPage> {
   }
 }
 
-String _status(JobStatus status) => switch (status) {
-  JobStatus.queued => '等待中',
-  JobStatus.running => '处理中',
-  JobStatus.cancelling => '正在取消',
-  JobStatus.succeeded => '完成',
-  JobStatus.failed => '失败',
-  JobStatus.cancelled => '已取消',
-  JobStatus.interrupted => '已中断',
+String _status(BuildContext context, JobStatus status) => switch (status) {
+  JobStatus.queued => context.l10n.queued,
+  JobStatus.running => context.l10n.running,
+  JobStatus.cancelling => context.l10n.cancelling,
+  JobStatus.succeeded => context.l10n.succeeded,
+  JobStatus.failed => context.l10n.failed,
+  JobStatus.cancelled => context.l10n.cancelled,
+  JobStatus.interrupted => context.l10n.interrupted,
 };
 
 class _JobTile extends ConsumerWidget {
@@ -218,7 +225,7 @@ class _JobTile extends ConsumerWidget {
             Row(
               children: [
                 Expanded(child: Text(job.name)),
-                Text(_status(job.status)),
+                Text(_status(context, job.status)),
               ],
             ),
             if (!job.terminal) ...[
@@ -227,8 +234,8 @@ class _JobTile extends ConsumerWidget {
                 container: true,
                 child: LinearProgressIndicator(
                   semanticsLabel:
-                      '${job.name}，${_status(job.status)}，'
-                      '${job.indeterminate || job.totalBytes == null || job.totalBytes == 0 ? '进度暂不可确定' : '${job.processedBytes} / ${job.totalBytes} 字节'}',
+                      '${job.name}，${_status(context, job.status)}，'
+                      '${job.indeterminate || job.totalBytes == null || job.totalBytes == 0 ? context.l10n.indeterminateProgress : '${context.l10n.byteCount(job.processedBytes)} / ${context.l10n.byteCount(job.totalBytes!)}'}',
                   value:
                       job.indeterminate ||
                           job.totalBytes == null ||
@@ -240,7 +247,7 @@ class _JobTile extends ConsumerWidget {
             ],
             const SizedBox(height: 4),
             Text(
-              '${job.processedBytes} 字节${job.totalBytes == null ? '' : ' / ${job.totalBytes} 字节'}',
+              '${context.l10n.byteCount(job.processedBytes)}${job.totalBytes == null ? '' : ' / ${context.l10n.byteCount(job.totalBytes!)}'}',
             ),
             if (job.error != null)
               Text(
@@ -253,7 +260,7 @@ class _JobTile extends ConsumerWidget {
                 if (!job.terminal && job.status != JobStatus.cancelling)
                   TextButton(
                     onPressed: () => session.cancelJob(job.id),
-                    child: const Text('取消作业'),
+                    child: Text(context.l10n.cancelJob),
                   ),
                 if (job.status == JobStatus.failed ||
                     job.status == JobStatus.interrupted ||
@@ -270,7 +277,7 @@ class _JobTile extends ConsumerWidget {
                         unawaited(session.retryJob(job.id));
                       }
                     },
-                    child: const Text('重试作业'),
+                    child: Text(context.l10n.retryJob),
                   ),
               ],
             ),
@@ -295,7 +302,7 @@ class _TodoTitleDialogState extends State<_TodoTitleDialog> {
   void _submit() {
     final title = _controller.text.trim();
     if (title.isEmpty) {
-      setState(() => _error = '请输入待办名称');
+      setState(() => _error = context.l10n.todoNameRequired);
       return;
     }
     Navigator.pop(context, title);
@@ -309,11 +316,14 @@ class _TodoTitleDialogState extends State<_TodoTitleDialog> {
 
   @override
   Widget build(BuildContext context) => AlertDialog(
-    title: const Text('重命名待办'),
+    title: Text(context.l10n.renameTodo),
     content: TextField(
       controller: _controller,
       autofocus: true,
-      decoration: InputDecoration(labelText: '待办名称', errorText: _error),
+      decoration: InputDecoration(
+        labelText: context.l10n.todoName,
+        errorText: _error,
+      ),
       onChanged: (_) {
         if (_error != null) setState(() => _error = null);
       },
@@ -322,9 +332,9 @@ class _TodoTitleDialogState extends State<_TodoTitleDialog> {
     actions: [
       TextButton(
         onPressed: () => Navigator.pop(context),
-        child: const Text('取消'),
+        child: Text(context.l10n.cancel),
       ),
-      FilledButton(onPressed: _submit, child: const Text('确定')),
+      FilledButton(onPressed: _submit, child: Text(context.l10n.confirm)),
     ],
   );
 }

@@ -12,7 +12,9 @@ Future<void> retryVideoThumbnail(
 ) async {
   final session = ref.read(workspaceSessionProvider);
   final preview = ref.read(mediaPreviewSessionProvider);
-  final previousJobs = session.state.snapshot.jobs.map((job) => job.id).toSet();
+  final previousAttempts = {
+    for (final job in session.state.snapshot.jobs) job.id: job.currentAttempt,
+  };
   session.updatePreferences(
     session.state.snapshot.preferences.copyWith(selectedAssetId: asset.id),
   );
@@ -27,7 +29,7 @@ Future<void> retryVideoThumbnail(
     (job) =>
         job.assetId == asset.id &&
         job.kind == JobKind.thumbnail &&
-        !previousJobs.contains(job.id),
+        previousAttempts[job.id] != job.currentAttempt,
   );
   if (!attempted) {
     await preview.retryThumbnail(asset);

@@ -13,6 +13,7 @@ _WINDOW_MEMBERS = '''
   private var koiTitleLabel: NSTextField?
   private var koiSidebarButton: NSButton?
   private var koiDetailButton: NSButton?
+  private var koiLabels: [String: String] = [:]
   private let koiBackItem = NSToolbarItem.Identifier("koi.back")
   private let koiForwardItem = NSToolbarItem.Identifier("koi.forward")
   private let koiTitleItem = NSToolbarItem.Identifier("koi.title")
@@ -48,6 +49,17 @@ _WINDOW_MEMBERS = '''
               let title = arguments["title"] as? String else {
           result(FlutterError(code: "INVALID_CHROME", message: "Invalid window chrome", details: nil))
           return
+        }
+        if let labels = arguments["labels"] as? [String: String] {
+          window.koiLabels = labels
+          for item in window.toolbar?.items ?? [] {
+            let key = item.itemIdentifier.rawValue.replacingOccurrences(of: "koi.", with: "")
+            if let label = labels[key] {
+              item.label = label
+              item.view?.setAccessibilityLabel(label)
+              item.view?.toolTip = label
+            }
+          }
         }
         window.title = title
         window.koiTitleLabel?.stringValue = title
@@ -129,15 +141,15 @@ _WINDOW_MEMBERS = '''
     let action: Selector
     switch identifier {
     case koiBackItem:
-      symbol = "arrow.left"; label = "后退"; action = #selector(koiNavigateBack)
+      symbol = "arrow.left"; label = koiLabels["back"] ?? "后退"; action = #selector(koiNavigateBack)
     case koiForwardItem:
-      symbol = "arrow.right"; label = "前进"; action = #selector(koiNavigateForward)
+      symbol = "arrow.right"; label = koiLabels["forward"] ?? "前进"; action = #selector(koiNavigateForward)
     case koiSaveItem:
-      symbol = "square.and.arrow.down"; label = "保存工作区"; action = #selector(koiSaveWorkspace)
+      symbol = "square.and.arrow.down"; label = koiLabels["save"] ?? "保存工作区"; action = #selector(koiSaveWorkspace)
     case koiSidebarItem:
-      symbol = "sidebar.left"; label = "切换资料侧栏"; action = #selector(koiToggleSidebar)
+      symbol = "sidebar.left"; label = koiLabels["sidebar"] ?? "切换资料侧栏"; action = #selector(koiToggleSidebar)
     case koiDetailItem:
-      symbol = "sidebar.right"; label = "切换详情面板"; action = #selector(koiToggleDetail)
+      symbol = "sidebar.right"; label = koiLabels["detail"] ?? "切换详情面板"; action = #selector(koiToggleDetail)
     default:
       return nil
     }

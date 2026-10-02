@@ -1,0 +1,1043 @@
+{
+  "schema": 1,
+  "capabilities": [
+    {
+      "id": "diagnostics",
+      "version": 1,
+      "directions": [
+        2
+      ],
+      "title": "错误诊断",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "tool/capabilities/recipes/diagnostics",
+      "status": "implemented_pending_validation",
+      "pubspecDependencies": {
+        "path_provider": "^2.1.5",
+        "web": "1.1.1"
+      },
+      "page": {
+        "import": "features/diagnostics/presentation/diagnostics_page.dart",
+        "title": "Diagnostics",
+        "builder": "buildDiagnosticsPage"
+      },
+      "initializer": {
+        "import": "features/diagnostics/data/persistent_diagnostics.dart",
+        "function": "initializePersistentDiagnostics"
+      },
+      "disposer": {
+        "import": "features/diagnostics/data/persistent_diagnostics.dart",
+        "function": "disposePersistentDiagnostics"
+      }
+    },
+    {
+      "id": "network",
+      "version": 1,
+      "directions": [
+        3,
+        4,
+        18,
+        19,
+        20,
+        22
+      ],
+      "title": "网络与传输",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/network_lab/lib/features/network",
+      "localizationSources": {
+        "en": "examples/network_lab/l10n/network/app_en.arb",
+        "zh": "examples/network_lab/l10n/network/app_zh.arb",
+        "zh_Hant": "examples/network_lab/l10n/network/app_zh_Hant.arb"
+      },
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/network",
+      "sourcePackage": "network_lab",
+      "pubspecDependencies": {
+        "dio": "^5.11.1",
+        "web": "1.1.1",
+        "crypto": "^3.0.7",
+        "path_provider": "^2.1.5",
+        "freezed_annotation": "^3.1.0"
+      },
+      "page": {
+        "import": "features/network/network_capability.dart",
+        "title": "Network",
+        "titleKey": "networkTitle",
+        "builder": "buildNetworkCapabilityPage"
+      },
+      "extraSources": [
+        {
+          "source": "examples/network_lab/lib/shared/network",
+          "destination": "lib/shared/network"
+        },
+        {
+          "source": "examples/network_lab/test/application",
+          "destination": "test/application"
+        },
+        {
+          "source": "examples/network_lab/test/data",
+          "destination": "test/data"
+        },
+        {
+          "source": "examples/network_lab/test/support",
+          "destination": "test/support"
+        },
+        {
+          "source": "examples/network_lab/test/browser/network_browser_test.dart",
+          "destination": "test/browser/network_browser_test.dart"
+        },
+        {
+          "source": "examples/network_lab/test/presentation/network_capability_test.dart",
+          "destination": "test/presentation/network_capability_test.dart"
+        },
+        {
+          "source": "examples/network_lab/test/http/network_http_test.dart",
+          "destination": "test/http/network_http_test.dart"
+        },
+        {
+          "source": "examples/network_lab/tool/http_fixture.py",
+          "destination": "tool/http_fixture.py"
+        },
+        {
+          "source": "examples/network_lab/tool/run_http_smoke.py",
+          "destination": "tool/run_http_smoke.py"
+        }
+      ]
+    },
+    {
+      "id": "database",
+      "version": 1,
+      "directions": [
+        21
+      ],
+      "title": "数据库",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/database_lab/lib/features/library",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/library",
+      "sourcePackage": "database_lab",
+      "extraSources": [
+        {
+          "source": "examples/database_lab/lib/core/database",
+          "destination": "lib/core/database"
+        },
+        {
+          "source": "examples/database_lab/lib/capability.dart",
+          "destination": "lib/capabilities/database_capability.dart"
+        },
+        {
+          "source": "examples/database_lab/web/sqlite3.wasm",
+          "destination": "web/sqlite3.wasm"
+        },
+        {
+          "source": "examples/database_lab/web/drift_worker.dart.js",
+          "destination": "web/drift_worker.dart.js"
+        },
+        {
+          "source": "examples/database_lab/web/drift-assets.json",
+          "destination": "web/drift-assets.json"
+        },
+        {
+          "source": "examples/database_lab/test/features/library",
+          "destination": "test/features/library"
+        },
+        {
+          "source": "examples/database_lab/test/browser/library_browser_test.dart",
+          "destination": "test/browser/library_browser_test.dart"
+        },
+        {
+          "source": "examples/database_lab/test/fixtures",
+          "destination": "test/fixtures"
+        }
+      ],
+      "pubspecDependencies": {
+        "drift": "2.35.1",
+        "sqlite3": "3.7.0",
+        "path_provider": "2.1.6",
+        "path": "^1.9.1",
+        "web": "1.1.1"
+      },
+      "pubspecDevDependencies": {
+        "drift_dev": "2.35.0"
+      },
+      "page": {
+        "import": "capabilities/database_capability.dart",
+        "builder": "buildDatabaseLabCapability",
+        "title": "数据库",
+        "titleKey": "databaseTitle"
+      },
+      "localizationSources": {
+        "en": "tool/capabilities/localizations/database/app_en.arb",
+        "zh": "tool/capabilities/localizations/database/app_zh.arb",
+        "zh_Hant": "tool/capabilities/localizations/database/app_zh_Hant.arb"
+      }
+    },
+    {
+      "id": "directory-index",
+      "version": 1,
+      "directions": [
+        23
+      ],
+      "title": "目录索引",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "workbench"
+      ],
+      "recipe": null,
+      "status": "tested_source_pending_generated_validation",
+      "providedByTemplate": true,
+      "page": {
+        "import": "features/workspace/presentation/screens/directory_index_page.dart",
+        "title": "资料索引",
+        "builder": "buildDirectoryIndexPage"
+      }
+    },
+    {
+      "id": "task-history",
+      "version": 1,
+      "directions": [
+        24
+      ],
+      "title": "任务历史",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "workbench"
+      ],
+      "recipe": null,
+      "status": "tested_source_pending_generated_validation",
+      "providedByTemplate": true,
+      "page": {
+        "import": "features/workspace/presentation/screens/job_history_page.dart",
+        "title": "任务历史",
+        "builder": "buildJobHistoryPage"
+      }
+    },
+    {
+      "id": "settings",
+      "version": 1,
+      "directions": [
+        13,
+        14
+      ],
+      "title": "应用设置",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/platform_lab/lib/features/settings",
+      "status": "implemented_pending_generated_validation",
+      "destination": "lib/features/settings",
+      "sourcePackage": "platform_lab",
+      "pubspecDependencies": {
+        "path_provider": "^2.1.5",
+        "web": "1.1.1"
+      },
+      "page": {
+        "import": "features/settings/presentation/settings_page.dart",
+        "title": "应用设置",
+        "builder": "buildSettingsPage"
+      },
+      "initializer": {
+        "import": "features/settings/presentation/providers/settings_providers.dart",
+        "function": "initializeSettingsPreferences"
+      },
+      "prepareCloser": {
+        "import": "features/settings/presentation/providers/settings_providers.dart",
+        "function": "prepareSettingsPreferences"
+      },
+      "disposer": {
+        "import": "features/settings/presentation/providers/settings_providers.dart",
+        "function": "disposeSettingsPreferences"
+      },
+      "extraSources": [
+        {
+          "source": "examples/platform_lab/test/features/settings",
+          "destination": "test/features/settings"
+        }
+      ]
+    },
+    {
+      "id": "bulk-selection",
+      "version": 1,
+      "directions": [
+        16
+      ],
+      "title": "批量选择",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "workbench"
+      ],
+      "recipe": null,
+      "status": "tested_source_pending_generated_validation",
+      "providedByTemplate": true,
+      "page": {
+        "import": "features/workspace/presentation/screens/bulk_documents_page.dart",
+        "title": "批量选择",
+        "builder": "buildBulkDocumentsPage"
+      }
+    },
+    {
+      "id": "images",
+      "version": 1,
+      "directions": [
+        17
+      ],
+      "title": "图片来源",
+      "dependencies": [
+        "network"
+      ],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/network_lab/lib/features/images",
+      "localizationSources": {
+        "en": "examples/network_lab/l10n/images/app_en.arb",
+        "zh": "examples/network_lab/l10n/images/app_zh.arb",
+        "zh_Hant": "examples/network_lab/l10n/images/app_zh_Hant.arb"
+      },
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/images",
+      "sourcePackage": "network_lab",
+      "extraSources": [
+        {
+          "source": "examples/network_lab/assets/images/sample.png",
+          "destination": "assets/images/sample.png"
+        },
+        {
+          "source": "examples/network_lab/test/images",
+          "destination": "test/images"
+        },
+        {
+          "source": "examples/network_lab/test/browser/images_browser_test.dart",
+          "destination": "test/browser/images_browser_test.dart"
+        },
+        {
+          "source": "examples/network_lab/test/http/images_http_test.dart",
+          "destination": "test/http/images_http_test.dart"
+        }
+      ],
+      "assets": [
+        "assets/images/sample.png"
+      ],
+      "pubspecDependencies": {
+        "file_selector": "^1.1.0"
+      },
+      "page": {
+        "import": "features/images/images_capability.dart",
+        "builder": "buildImagesCapabilityPage",
+        "titleKey": "imagesTitle",
+        "title": "图片来源"
+      }
+    },
+    {
+      "id": "module-capabilities",
+      "version": 1,
+      "directions": [
+        25,
+        26
+      ],
+      "title": "模块与引擎",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/module_showcase/lib/features/module_capabilities",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/module_capabilities",
+      "sourcePackage": "module_showcase",
+      "packages": [
+        "koi_modules"
+      ],
+      "page": {
+        "import": "features/module_capabilities/presentation/screens/module_capabilities_page.dart",
+        "builder": "buildModuleCapabilitiesPage",
+        "title": "模块与引擎",
+        "titleKey": "moduleCapabilitiesTitle"
+      },
+      "extraSources": [
+        {
+          "source": "examples/module_showcase/test/features/module_capabilities",
+          "destination": "test/features/module_capabilities"
+        }
+      ],
+      "localizationSources": {
+        "en": "tool/capabilities/localizations/module-capabilities/app_en.arb",
+        "zh": "tool/capabilities/localizations/module-capabilities/app_zh.arb",
+        "zh_Hant": "tool/capabilities/localizations/module-capabilities/app_zh_Hant.arb"
+      },
+      "pubspecDependencies": {
+        "koi_modules": ""
+      }
+    },
+    {
+      "id": "desktop-window",
+      "version": 1,
+      "directions": [
+        27
+      ],
+      "title": "桌面窗口",
+      "dependencies": [],
+      "platforms": [
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/platform_lab/lib/features/desktop_window",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/desktop_window",
+      "sourcePackage": "platform_lab",
+      "pubspecDependencies": {
+        "window_manager": "^0.5.2",
+        "screen_retriever": "^0.2.2",
+        "path_provider": "^2.1.5"
+      },
+      "page": {
+        "import": "features/desktop_window/presentation/desktop_window_page.dart",
+        "builder": "buildDesktopWindowPage",
+        "title": "桌面窗口"
+      },
+      "initializer": {
+        "import": "features/desktop_window/presentation/providers/desktop_window_providers.dart",
+        "function": "initializeDesktopWindow"
+      },
+      "prepareCloser": {
+        "import": "features/desktop_window/presentation/providers/desktop_window_providers.dart",
+        "function": "prepareDesktopWindow"
+      },
+      "disposer": {
+        "import": "features/desktop_window/presentation/providers/desktop_window_providers.dart",
+        "function": "disposeDesktopWindow"
+      },
+      "extraSources": [
+        {
+          "source": "examples/platform_lab/test/features/desktop_window",
+          "destination": "test/features/desktop_window"
+        }
+      ]
+    },
+    {
+      "id": "tray",
+      "version": 1,
+      "directions": [
+        28
+      ],
+      "title": "托盘",
+      "dependencies": [
+        "desktop-window"
+      ],
+      "platforms": [
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/platform_lab/lib/features/tray",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/tray",
+      "sourcePackage": "platform_lab",
+      "pubspecDependencies": {
+        "tray_manager": "^0.7.0"
+      },
+      "page": {
+        "import": "features/tray/presentation/tray_page.dart",
+        "builder": "buildTrayPage",
+        "title": "托盘"
+      },
+      "initializer": {
+        "import": "features/tray/presentation/providers/tray_providers.dart",
+        "function": "initializeTray"
+      },
+      "prepareCloser": {
+        "import": "features/tray/presentation/providers/tray_providers.dart",
+        "function": "prepareTray"
+      },
+      "disposer": {
+        "import": "features/tray/presentation/providers/tray_providers.dart",
+        "function": "disposeTray"
+      },
+      "extraSources": [
+        {
+          "source": "examples/platform_lab/test/features/tray",
+          "destination": "test/features/tray"
+        }
+      ]
+    },
+    {
+      "id": "system-media",
+      "version": 1,
+      "directions": [
+        26,
+        29
+      ],
+      "title": "系统媒体",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/platform_lab/lib/features/system_media",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/system_media",
+      "sourcePackage": "platform_lab",
+      "pubspecDependencies": {
+        "audio_service": "^0.18.19",
+        "audio_service_mpris": "^0.2.1",
+        "smtc_windows": "^1.1.0",
+        "audio_session": "^0.2.4",
+        "media_kit": "^1.2.6",
+        "media_kit_libs_video": "^1.0.7",
+        "file_selector": "^1.1.0",
+        "web": "1.1.1",
+        "audioplayers": "6.8.1"
+      },
+      "page": {
+        "import": "features/system_media/presentation/system_media_page.dart",
+        "builder": "buildSystemMediaPage",
+        "title": "系统媒体"
+      },
+      "initializer": {
+        "import": "features/system_media/presentation/providers/system_media_providers.dart",
+        "function": "initializeSystemMedia"
+      },
+      "prepareCloser": {
+        "import": "features/system_media/presentation/providers/system_media_providers.dart",
+        "function": "prepareSystemMedia"
+      },
+      "disposer": {
+        "import": "features/system_media/presentation/providers/system_media_providers.dart",
+        "function": "disposeSystemMedia"
+      },
+      "extraSources": [
+        {
+          "source": "examples/platform_lab/test/features/system_media",
+          "destination": "test/features/system_media"
+        }
+      ],
+      "pubspecDevDependencies": {
+        "audioplayers_platform_interface": "7.2.0"
+      },
+      "localizationSources": {
+        "en": "tool/capabilities/localizations/system-media/app_en.arb",
+        "zh": "tool/capabilities/localizations/system-media/app_zh.arb",
+        "zh_Hant": "tool/capabilities/localizations/system-media/app_zh_Hant.arb"
+      }
+    },
+    {
+      "id": "mini-player",
+      "version": 1,
+      "directions": [
+        30
+      ],
+      "title": "迷你模式",
+      "dependencies": [
+        "desktop-window",
+        "system-media"
+      ],
+      "platforms": [
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/platform_lab/lib/features/mini_player",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/mini_player",
+      "sourcePackage": "platform_lab",
+      "pubspecDependencies": {},
+      "page": {
+        "import": "features/mini_player/presentation/mini_player_page.dart",
+        "builder": "buildMiniPlayerPage",
+        "title": "迷你模式"
+      },
+      "extraSources": [
+        {
+          "source": "examples/platform_lab/test/features/mini_player",
+          "destination": "test/features/mini_player"
+        }
+      ]
+    },
+    {
+      "id": "home-widget",
+      "version": 1,
+      "directions": [
+        31
+      ],
+      "title": "主屏组件",
+      "dependencies": [],
+      "platforms": [
+        "android",
+        "ios"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/platform_lab/lib/features/home_widget",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/features/home_widget",
+      "sourcePackage": "platform_lab",
+      "pubspecDependencies": {
+        "home_widget": "^0.10.0"
+      },
+      "page": {
+        "import": "features/home_widget/presentation/home_widget_page.dart",
+        "builder": "buildHomeWidgetPage",
+        "title": "主屏组件"
+      },
+      "extraSources": [
+        {
+          "source": "examples/platform_lab/test/features/home_widget",
+          "destination": "test/features/home_widget"
+        }
+      ]
+    },
+    {
+      "id": "onboarding",
+      "version": 1,
+      "directions": [
+        32
+      ],
+      "title": "首次配置",
+      "dependencies": [
+        "local-setup-core"
+      ],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/device_lab/lib/onboarding_capability.dart",
+      "status": "tested_source_pending_generated_validation",
+      "sourcePackage": "device_lab",
+      "extraSources": [
+        {
+          "source": "examples/device_lab/test/onboarding",
+          "destination": "test/onboarding"
+        }
+      ],
+      "page": {
+        "import": "onboarding_capability.dart",
+        "builder": "buildOnboardingCapability",
+        "title": "首次配置",
+        "titleKey": "localSetupFirstSetup"
+      },
+      "destination": "lib/onboarding_capability.dart"
+    },
+    {
+      "id": "incoming-intents",
+      "version": 1,
+      "directions": [
+        33
+      ],
+      "title": "外部入口",
+      "dependencies": [
+        "local-setup-core"
+      ],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/device_lab/lib/incoming_capability.dart",
+      "status": "tested_source_pending_generated_validation",
+      "sourcePackage": "device_lab",
+      "extraSources": [
+        {
+          "source": "examples/device_lab/lib/features/devices/data/incoming_links.dart",
+          "destination": "lib/features/devices/data/incoming_links.dart"
+        },
+        {
+          "source": "examples/device_lab/test/incoming",
+          "destination": "test/incoming"
+        }
+      ],
+      "page": {
+        "import": "incoming_capability.dart",
+        "builder": "buildIncomingIntentsCapability",
+        "title": "外部入口",
+        "titleKey": "localSetupIncomingIntents"
+      },
+      "pubspecDependencies": {
+        "app_links": "7.2.1"
+      },
+      "initializer": {
+        "import": "incoming_capability.dart",
+        "function": "initializeIncomingIntents"
+      },
+      "disposer": {
+        "import": "incoming_capability.dart",
+        "function": "disposeIncomingIntents"
+      },
+      "destination": "lib/incoming_capability.dart"
+    },
+    {
+      "id": "lan",
+      "version": 1,
+      "directions": [
+        34
+      ],
+      "title": "局域网协作",
+      "dependencies": [
+        "local-setup-core"
+      ],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/device_lab/lib/capability.dart",
+      "status": "tested_source_pending_generated_validation",
+      "destination": "lib/capabilities/device_capability.dart",
+      "sourcePackage": "device_lab",
+      "extraSources": [
+        {
+          "source": "examples/device_lab/lib/features/devices/application/device_protocol.dart",
+          "destination": "lib/features/devices/application/device_protocol.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/application/device_lab_session.dart",
+          "destination": "lib/features/devices/application/device_lab_session.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_host.dart",
+          "destination": "lib/features/devices/data/device_host.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_host_native.dart",
+          "destination": "lib/features/devices/data/device_host_native.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_host_web.dart",
+          "destination": "lib/features/devices/data/device_host_web.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_client.dart",
+          "destination": "lib/features/devices/data/device_client.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_discovery.dart",
+          "destination": "lib/features/devices/data/device_discovery.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_discovery_native.dart",
+          "destination": "lib/features/devices/data/device_discovery_native.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_discovery_web.dart",
+          "destination": "lib/features/devices/data/device_discovery_web.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/presentation",
+          "destination": "lib/features/devices/presentation"
+        },
+        {
+          "source": "examples/device_lab/test/application/device_protocol_test.dart",
+          "destination": "test/application/device_protocol_test.dart"
+        },
+        {
+          "source": "examples/device_lab/test/application/device_lab_session_test.dart",
+          "destination": "test/application/device_lab_session_test.dart"
+        },
+        {
+          "source": "examples/device_lab/test/data/device_socket_test.dart",
+          "destination": "test/data/device_socket_test.dart"
+        },
+        {
+          "source": "examples/device_lab/test/lan",
+          "destination": "test/lan"
+        },
+        {
+          "source": "examples/device_lab/test/browser/device_availability_browser_test.dart",
+          "destination": "test/browser/device_availability_browser_test.dart"
+        }
+      ],
+      "pubspecDependencies": {
+        "bonsoir": "7.1.5",
+        "web_socket_channel": "^3.0.3"
+      },
+      "page": {
+        "import": "capabilities/device_capability.dart",
+        "builder": "buildDeviceLabCapability",
+        "title": "局域网协作",
+        "titleKey": "devicesDevicesAndIncomingEvents"
+      },
+      "localizationSources": {
+        "en": "tool/capabilities/localizations/lan/app_en.arb",
+        "zh": "tool/capabilities/localizations/lan/app_zh.arb",
+        "zh_Hant": "tool/capabilities/localizations/lan/app_zh_Hant.arb"
+      }
+    },
+    {
+      "id": "typed-assets",
+      "version": 1,
+      "directions": [
+        11
+      ],
+      "title": "类型化资源",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": null,
+      "status": "tested_source_pending_generated_validation",
+      "tool": "typed-assets"
+    },
+    {
+      "id": "branding",
+      "version": 1,
+      "directions": [
+        12
+      ],
+      "title": "品牌图标",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": null,
+      "status": "tested_source_pending_generated_validation",
+      "tool": "branding"
+    },
+    {
+      "id": "local-setup-core",
+      "version": 1,
+      "directions": [],
+      "title": "本地配置与入站队列基础",
+      "dependencies": [],
+      "platforms": [
+        "web",
+        "android",
+        "ios",
+        "macos",
+        "windows",
+        "linux"
+      ],
+      "templates": [
+        "minimal",
+        "workbench"
+      ],
+      "recipe": "examples/device_lab/lib/features/local_setup",
+      "destination": "lib/features/local_setup",
+      "sourcePackage": "device_lab",
+      "status": "tested_source_pending_generated_validation",
+      "pubspecDependencies": {
+        "path_provider": "2.1.6",
+        "web": "1.1.1",
+        "file_selector": "^1.1.0"
+      },
+      "extraSources": [
+        {
+          "source": "examples/device_lab/lib/features/devices/domain/device_contracts.dart",
+          "destination": "lib/features/devices/domain/device_contracts.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/application/onboarding.dart",
+          "destination": "lib/features/devices/application/onboarding.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/application/incoming_intents.dart",
+          "destination": "lib/features/devices/application/incoming_intents.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_settings.dart",
+          "destination": "lib/features/devices/data/device_settings.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_settings_native.dart",
+          "destination": "lib/features/devices/data/device_settings_native.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/device_settings_web.dart",
+          "destination": "lib/features/devices/data/device_settings_web.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/incoming_file.dart",
+          "destination": "lib/features/devices/data/incoming_file.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/incoming_file_native.dart",
+          "destination": "lib/features/devices/data/incoming_file_native.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/incoming_file_web.dart",
+          "destination": "lib/features/devices/data/incoming_file_web.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/features/devices/data/pick_directory.dart",
+          "destination": "lib/features/devices/data/pick_directory.dart"
+        },
+        {
+          "source": "examples/device_lab/lib/local_capabilities.dart",
+          "destination": "lib/local_capabilities.dart"
+        },
+        {
+          "source": "examples/device_lab/test/local_setup",
+          "destination": "test/local_setup"
+        },
+        {
+          "source": "examples/device_lab/test/support.dart",
+          "destination": "test/support.dart"
+        },
+        {
+          "source": "examples/device_lab/test/data/device_settings_test.dart",
+          "destination": "test/data/device_settings_test.dart"
+        },
+        {
+          "source": "examples/device_lab/test/browser/device_settings_browser_test.dart",
+          "destination": "test/browser/device_settings_browser_test.dart"
+        },
+        {
+          "source": "examples/device_lab/test/browser/local_setup_availability_browser_test.dart",
+          "destination": "test/browser/local_setup_availability_browser_test.dart"
+        }
+      ],
+      "localizationSources": {
+        "en": "tool/capabilities/localizations/local-setup-core/app_en.arb",
+        "zh": "tool/capabilities/localizations/local-setup-core/app_zh.arb",
+        "zh_Hant": "tool/capabilities/localizations/local-setup-core/app_zh_Hant.arb"
+      }
+    }
+  ]
+}

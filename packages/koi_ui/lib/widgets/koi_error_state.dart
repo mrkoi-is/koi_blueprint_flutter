@@ -1,3 +1,4 @@
+import 'package:koi_ui/l10n/koi_ui_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:koi_ui/widgets/koi_status_layout.dart';
 
@@ -38,7 +39,10 @@ class KoiErrorState extends StatelessWidget {
           ),
           if (onRetry != null) ...[
             const SizedBox(height: 16),
-            FilledButton(onPressed: onRetry, child: const Text('重试')),
+            FilledButton(
+              onPressed: onRetry,
+              child: Text(KoiUiStrings.of(context).retry),
+            ),
           ],
         ],
       ),

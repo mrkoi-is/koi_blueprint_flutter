@@ -1,3 +1,5 @@
+import 'package:workbench_app/l10n/generated/app_localizations.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -17,6 +19,7 @@ Widget _host(
   VoidCallback? onBack,
   VoidCallback? onForward,
   VoidCallback? onSave,
+  bool Function()? canExecuteCommand,
 }) => MaterialApp(
   theme: AppTheme.build(brightness: brightness),
   themeAnimationDuration: Duration.zero,
@@ -31,6 +34,7 @@ Widget _host(
     onBack: onBack,
     onForward: onForward,
     onSave: onSave,
+    canExecuteCommand: canExecuteCommand,
     child: const ColoredBox(key: _content, color: Colors.green),
   ),
 );
@@ -40,6 +44,50 @@ void main() {
   tearDown(() {
     binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, null);
   });
+
+  testWidgets(
+    'native labels update when locale changes without replacing toolbar',
+    (tester) async {
+      final calls = <MethodCall>[];
+      binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, (
+        call,
+      ) async {
+        calls.add(call);
+        return {
+          'titlebarHeight': 28,
+          'nativeToolbar': true,
+          'panelToolbar': true,
+        };
+      });
+      Widget host(Locale locale) => MaterialApp(
+        locale: locale,
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          KoiUiLocalizations.delegate,
+          ...AppLocalizations.localizationsDelegates,
+        ],
+        home: const WorkbenchWindowChrome(child: SizedBox()),
+      );
+      await tester.pumpWidget(host(const Locale('en')));
+      await tester.pumpAndSettle();
+      expect(
+        (calls.firstWhere((c) => c.method == 'applyChrome').arguments
+            as Map)['labels'],
+        containsPair('back', 'Back'),
+      );
+      await tester.pumpWidget(
+        host(const Locale.fromSubtags(languageCode: 'zh', scriptCode: 'Hant')),
+      );
+      await tester.pumpAndSettle();
+      final updates = calls.where((c) => c.method == 'applyChrome').toList();
+      expect(updates, hasLength(2));
+      expect(
+        (updates.last.arguments as Map)['labels'],
+        containsPair('save', '儲存工作區'),
+      );
+    },
+    variant: const TargetPlatformVariant({TargetPlatform.macOS}),
+  );
 
   testWidgets('native theme and safe inset follow the rendered app theme', (
     tester,
@@ -61,6 +109,13 @@ void main() {
           .toARGB32(),
       'dark': false,
       'title': 'Koi 工作区',
+      'labels': {
+        'back': '后退',
+        'forward': '前进',
+        'save': '保存工作区',
+        'sidebar': '切换资料侧栏',
+        'detail': '切换详情面板',
+      },
       'titleFontSize': 14.0,
       'titleFontWeight': 500,
     });
@@ -78,6 +133,13 @@ void main() {
           .toARGB32(),
       'dark': true,
       'title': 'Koi 工作区',
+      'labels': {
+        'back': '后退',
+        'forward': '前进',
+        'save': '保存工作区',
+        'sidebar': '切换资料侧栏',
+        'detail': '切换详情面板',
+      },
       'titleFontSize': 14.0,
       'titleFontWeight': 500,
     });
@@ -181,6 +243,19 @@ void main() {
       expect(calls.last.arguments, {'canGoBack': true, 'canGoForward': false});
       await command('navigateBack');
       await command('navigateForward');
+      await command('saveWorkspace');
+      expect((back, forward, saves), (1, 0, 1));
+      await tester.pumpWidget(
+        _host(
+          Brightness.light,
+          canGoBack: true,
+          canExecuteCommand: () => false,
+          onBack: () => back++,
+          onSave: () => saves++,
+        ),
+      );
+      await tester.pumpAndSettle();
+      await command('navigateBack');
       await command('saveWorkspace');
       expect((back, forward, saves), (1, 0, 1));
       await tester.pumpWidget(

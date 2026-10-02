@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 from pathlib import Path
 import subprocess
 import shutil
@@ -16,10 +17,13 @@ def main() -> None:
     args = parser.parse_args()
     source = args.source.resolve()
 
-    def run(script: Path, *arguments: str, cwd: Path) -> None:
+    def run(script: Path, *arguments: str, cwd: Path, without_chrome: bool = False) -> None:
         command = [sys.executable, str(script), *map(str, arguments)]
         print("+ " + " ".join(command), flush=True)
-        subprocess.run(command, cwd=cwd, check=True)
+        environment = dict(os.environ)
+        if without_chrome:
+            environment['CHROME_EXECUTABLE'] = str(Path(temporary) / 'unavailable-chrome')
+        subprocess.run(command, cwd=cwd, env=environment, check=True)
 
     temporary = tempfile.mkdtemp(prefix="koi-generator-smoke-")
     try:
@@ -60,7 +64,12 @@ def main() -> None:
             ("local_draft", "local"),
             ("welcome_panel", "presentation"),
         ):
-            run(generated, "feature", str(app), name, "--kind", kind, cwd=output)
+            if kind == 'local':
+                run(output / 'scripts/create_feature.py', str(app), name, '--kind', kind, cwd=output)
+                if not (app / f'lib/features/{name}/data/file_{name}_repository_native.dart').is_file():
+                    raise AssertionError('Inherited compatibility entry did not preserve local kind')
+            else:
+                run(generated, "feature", str(app), name, "--kind", kind, cwd=output)
         run(generated, "module", "warehouse_ops", "--workspace", str(output), cwd=output)
         run(
             generated, "feature", str(output / "modules/warehouse_ops"),
@@ -68,7 +77,7 @@ def main() -> None:
         )
         run(generated, "check", "bootstrap", "--workspace", str(output), cwd=output)
         run(generated, "check", "generate-check", "--workspace", str(output), cwd=output)
-        run(generated, "validate", "--workspace", str(output), cwd=output)
+        run(generated, "validate", "--workspace", str(output), cwd=output, without_chrome=True)
         print("Generator smoke passed: both templates, four recursive combinations, three features, module and module API feature.")
 
     except BaseException:

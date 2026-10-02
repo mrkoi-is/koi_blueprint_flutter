@@ -1,3 +1,5 @@
+import 'package:workbench_app/l10n/app_strings.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -86,10 +88,10 @@ class _MediaPageState extends ConsumerState<MediaPage> {
             TextButton.icon(
               onPressed: () => unawaited(session.importFiles(ImportKind.media)),
               icon: const Icon(Icons.add_photo_alternate_outlined),
-              label: const Text('导入图片 / 视频'),
+              label: Text(context.l10n.importMedia),
             ),
             IconButton(
-              tooltip: _grid ? '切换列表' : '切换网格',
+              tooltip: _grid ? context.l10n.showList : context.l10n.showGrid,
               onPressed: () => setState(() => _grid = !_grid),
               icon: Icon(
                 _grid ? Icons.view_list_outlined : Icons.grid_view_outlined,
@@ -112,10 +114,10 @@ class _MediaPageState extends ConsumerState<MediaPage> {
                     math.max(48, scaler.scale(18) + 24),
               );
               final library = assets.isEmpty
-                  ? const SingleChildScrollView(
+                  ? SingleChildScrollView(
                       child: KoiEmptyState(
-                        title: '暂无匹配素材',
-                        description: '导入 PNG/JPEG 图片或 MP4 视频',
+                        title: context.l10n.noMatchingMedia,
+                        description: context.l10n.mediaImportHint,
                       ),
                     )
                   : _grid
@@ -143,7 +145,7 @@ class _MediaPageState extends ConsumerState<MediaPage> {
                         return KoiSelectableListTile(
                           title: Text(asset.name),
                           subtitle: Text(
-                            '${asset.kind == MediaKind.image ? '图片' : '视频'} · ${asset.byteLength} 字节',
+                            '${asset.kind == MediaKind.image ? context.l10n.image : context.l10n.video} · ${context.l10n.byteCount(asset.byteLength)}',
                           ),
                           selected: selected?.id == asset.id,
                           leading: SizedBox(
@@ -194,13 +196,15 @@ class _AssetTile extends ConsumerWidget {
         thumbnailKey != null &&
         ref.watch(assetBytesProvider(thumbnailKey)).hasError;
     final status = readFailed
-        ? '缩略图读取失败'
+        ? context.l10n.thumbnailReadFailed
         : switch (asset.thumbnailStatus) {
             ThumbnailStatus.none =>
-              asset.kind == MediaKind.video ? '打开预览生成缩略图' : '缩略图待生成',
-            ThumbnailStatus.generating => '正在生成缩略图',
+              asset.kind == MediaKind.video
+                  ? context.l10n.openForThumbnail
+                  : context.l10n.thumbnailPending,
+            ThumbnailStatus.generating => context.l10n.thumbnailGenerating,
             ThumbnailStatus.ready => null,
-            ThumbnailStatus.failed => '缩略图失败',
+            ThumbnailStatus.failed => context.l10n.thumbnailFailed,
           };
     return Card(
       color: selected ? KoiThemeTokens.of(context).selectedBackground : null,
@@ -213,7 +217,7 @@ class _AssetTile extends ConsumerWidget {
                 button: true,
                 selected: selected,
                 label:
-                    '${asset.kind == MediaKind.image ? '图片' : '视频'}，${asset.name}',
+                    '${asset.kind == MediaKind.image ? context.l10n.image : context.l10n.video}，${asset.name}',
                 value: status,
                 child: Tooltip(
                   message: asset.name,
@@ -288,9 +292,9 @@ class _AssetTile extends ConsumerWidget {
             TextButton(
               onPressed: () => ref.invalidate(assetBytesProvider(thumbnailKey)),
               child: Semantics(
-                label: '重试读取缩略图：${asset.name}',
+                label: context.l10n.retryThumbnailNamed(asset.name),
                 excludeSemantics: true,
-                child: const Text('重试读取'),
+                child: Text(context.l10n.retryRead),
               ),
             ),
         ],
@@ -327,7 +331,8 @@ class _StoredImage extends ConsumerWidget {
                 policy: ResizeImagePolicy.fit,
               ),
               fit: fit,
-              errorBuilder: (_, error, _) => Text('图片解码失败：$error'),
+              errorBuilder: (_, error, _) =>
+                  Text(context.l10n.imageDecodeFailed(error.toString())),
             );
           },
         ),
@@ -336,11 +341,11 @@ class _StoredImage extends ConsumerWidget {
             : Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('图片读取失败：$error'),
+                  Text(context.l10n.imageReadFailed(error.toString())),
                   TextButton(
                     onPressed: () =>
                         ref.invalidate(assetBytesProvider(storageKey)),
-                    child: const Text('重试读取'),
+                    child: Text(context.l10n.retryRead),
                   ),
                 ],
               ),
@@ -356,10 +361,10 @@ class _MediaViewer extends StatelessWidget {
   Widget build(BuildContext context) {
     final selected = asset;
     if (selected == null) {
-      return const SingleChildScrollView(
+      return SingleChildScrollView(
         child: KoiEmptyState(
-          title: '选择素材',
-          description: '图片支持缩放；视频支持播放、暂停和拖动进度',
+          title: context.l10n.selectMedia,
+          description: context.l10n.mediaPreviewHint,
         ),
       );
     }
@@ -424,8 +429,8 @@ class _MediaViewer extends StatelessWidget {
                           children: [
                             IconButton(
                               tooltip: player?.playing == true
-                                  ? '暂停视频'
-                                  : '播放视频',
+                                  ? context.l10n.pauseVideo
+                                  : context.l10n.playVideo,
                               onPressed: player == null
                                   ? null
                                   : () => unawaited(preview.togglePlaying()),
@@ -438,11 +443,19 @@ class _MediaViewer extends StatelessWidget {
                             Expanded(
                               child: MergeSemantics(
                                 child: Semantics(
-                                  label: '播放进度',
+                                  label: context.l10n.playbackPosition,
                                   child: Slider(
                                     semanticFormatterCallback: (value) =>
-                                        '已播放 ${_playbackTime(Duration(milliseconds: value.round()))}，'
-                                        '共 ${_playbackTime(player?.duration ?? Duration.zero)}',
+                                        context.l10n.playbackTime(
+                                          _playbackTime(
+                                            Duration(
+                                              milliseconds: value.round(),
+                                            ),
+                                          ),
+                                          _playbackTime(
+                                            player?.duration ?? Duration.zero,
+                                          ),
+                                        ),
                                     value:
                                         player == null ||
                                             player.duration.inMilliseconds <= 0
@@ -485,7 +498,7 @@ class _MediaViewer extends StatelessWidget {
                             Expanded(
                               child: MergeSemantics(
                                 child: Semantics(
-                                  label: '音量',
+                                  label: context.l10n.volume,
                                   child: Slider(
                                     semanticFormatterCallback: (value) =>
                                         '${value.round()}%',
@@ -506,7 +519,7 @@ class _MediaViewer extends StatelessWidget {
                           TextButton(
                             onPressed: () =>
                                 unawaited(preview.retryThumbnail(selected)),
-                            child: const Text('重试视频预览 / 缩略图'),
+                            child: Text(context.l10n.retryVideo),
                           ),
                       ],
                     );
@@ -517,7 +530,7 @@ class _MediaViewer extends StatelessWidget {
                   onPressed: () => selected.kind == MediaKind.video
                       ? unawaited(preview.retryThumbnail(selected))
                       : unawaited(refRetryThumbnail(context, selected.id)),
-                  child: const Text('重试缩略图'),
+                  child: Text(context.l10n.retryThumbnail),
                 ),
             ],
           ),

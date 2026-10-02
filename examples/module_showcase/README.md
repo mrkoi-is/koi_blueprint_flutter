@@ -19,3 +19,5 @@
 ```
 
 宿主测试验证公开 capability 替换、直接打开详情、稳定路由、连续切换、旧结果拒绝和共享资源存活；各模块自己的测试验证取消、关闭、类型化路由和错误呈现。
+
+Alpha/Beta 都声明 `message.read` 与 `refresh.observe`，通过同一 `ShowcaseRepository` 的真实实现被宿主注入。Beta 的“停用/启用配置”作用于会话 preflight；缺配置时工厂不会运行、宿主服务仍活着。恢复后可重新切换，保留原 GoRouter。活跃 Beta 配置变更使用 restart，释放旧订阅/任务。契约测试另覆盖平台 unsupported、工厂初始化失败与释放、修复重试、迟到 preflight 被拒绝。

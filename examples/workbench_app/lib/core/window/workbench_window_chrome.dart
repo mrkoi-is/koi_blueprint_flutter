@@ -1,3 +1,5 @@
+import 'package:workbench_app/l10n/app_strings.dart';
+
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -48,6 +50,9 @@ class WorkbenchWindowChrome extends StatefulWidget {
     this.onBack,
     this.onForward,
     this.onSave,
+    this.onToggleSidebar,
+    this.onToggleDetail,
+    this.canExecuteCommand,
     this.panels,
   });
   final Widget child;
@@ -57,6 +62,9 @@ class WorkbenchWindowChrome extends StatefulWidget {
   final VoidCallback? onBack;
   final VoidCallback? onForward;
   final VoidCallback? onSave;
+  final VoidCallback? onToggleSidebar;
+  final VoidCallback? onToggleDetail;
+  final bool Function()? canExecuteCommand;
   final KoiWorkbenchController? panels;
 
   @override
@@ -66,6 +74,7 @@ class WorkbenchWindowChrome extends StatefulWidget {
 class _WorkbenchWindowChromeState extends State<WorkbenchWindowChrome> {
   static const _channel = MethodChannel('koi/workbench_window');
   Color? _lastColor;
+  Map<String, String>? _lastLabels;
   Brightness? _lastBrightness;
   TextStyle? _lastTitleStyle;
   double _titlebarHeight = 0;
@@ -84,7 +93,7 @@ class _WorkbenchWindowChromeState extends State<WorkbenchWindowChrome> {
   }
 
   Future<void> _handleNativeCall(MethodCall call) async {
-    if (!mounted) return;
+    if (!mounted || !(widget.canExecuteCommand?.call() ?? true)) return;
     switch (call.method) {
       case 'navigateBack':
         if (widget.canGoBack) widget.onBack?.call();
@@ -93,9 +102,9 @@ class _WorkbenchWindowChromeState extends State<WorkbenchWindowChrome> {
       case 'saveWorkspace':
         widget.onSave?.call();
       case 'toggleSidebar':
-        widget.panels?.toggleSidebar();
+        (widget.onToggleSidebar ?? widget.panels?.toggleSidebar)?.call();
       case 'toggleDetail':
-        widget.panels?.toggleDetail();
+        (widget.onToggleDetail ?? widget.panels?.toggleDetail)?.call();
       default:
         throw MissingPluginException('Unknown window command: ${call.method}');
     }
@@ -178,11 +187,20 @@ class _WorkbenchWindowChromeState extends State<WorkbenchWindowChrome> {
     final color = KoiThemeTokens.of(context).chromeBackground;
     final brightness = Theme.of(context).brightness;
     final titleStyle = Theme.of(context).textTheme.titleSmall;
+    final labels = <String, String>{
+      'back': context.l10n.back,
+      'forward': context.l10n.forward,
+      'save': context.l10n.save,
+      'sidebar': KoiUiStrings.of(context).toggleSidebar,
+      'detail': KoiUiStrings.of(context).toggleDetail,
+    };
     if (color == _lastColor &&
         brightness == _lastBrightness &&
-        titleStyle == _lastTitleStyle) {
+        titleStyle == _lastTitleStyle &&
+        mapEquals(labels, _lastLabels)) {
       return;
     }
+    _lastLabels = labels;
     _lastTitleStyle = titleStyle;
     _lastColor = color;
     _lastBrightness = brightness;
@@ -204,6 +222,7 @@ class _WorkbenchWindowChromeState extends State<WorkbenchWindowChrome> {
         'color': color.toARGB32(),
         'dark': brightness == Brightness.dark,
         'title': widget.title,
+        'labels': _lastLabels,
         'titleFontSize': _lastTitleStyle?.fontSize ?? 14,
         'titleFontWeight': _lastTitleStyle?.fontWeight?.value ?? 500,
       });

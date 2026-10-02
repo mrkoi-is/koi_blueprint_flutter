@@ -48,6 +48,9 @@ void main(List<String> arguments) {
     final relativeSource = entity.path
         .substring(memberPath.length)
         .replaceAll(Platform.pathSeparator, '/');
+    // Match blueprint.coverage's generated-directory boundary. A generated
+    // export may live outside this directory, but contains no executable body.
+    if (relativeSource.split('/').contains('generated')) continue;
     if (coveredSources.contains(relativeSource)) {
       continue;
     }

@@ -108,6 +108,9 @@ jobs:
           channel: stable
           cache: true
 
+      - name: Record platform source provenance
+        run: python tool/platform_evidence.py --output "${{ runner.temp }}/koi-platform-evidence/source.json"
+
       - name: Generate a new six-platform project
         run: python blueprint.py create ci_blueprint --output "${{ runner.temp }}/koi-blueprint-generated" --org com.example --template "${{ matrix.template }}"
 
@@ -158,3 +161,21 @@ jobs:
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
           if-no-files-found: ignore
+
+      - name: Preserve platform provenance and build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: platform-${{ matrix.template }}-${{ runner.os }}
+          path: |
+            ${{ runner.temp }}/koi-platform-evidence/source.json
+            ${{ runner.temp }}/koi-blueprint-generated/blueprint.json
+            ${{ runner.temp }}/koi-blueprint-generated/pubspec.lock
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/web
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/app/outputs/flutter-apk/*.apk
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/ios/iphoneos/*.app
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/macos/Build/Products/Release/*.app
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/windows/x64/runner/Release
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/linux/x64/release/bundle
+          if-no-files-found: warn
+          retention-days: 7

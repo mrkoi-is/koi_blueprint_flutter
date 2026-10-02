@@ -1,32 +1,23 @@
+import 'package:workbench_app/core/preferences/appearance_providers.dart';
+import 'package:workbench_app/core/commands/workbench_commands.dart';
+import 'package:workbench_app/core/capabilities/app_capabilities.dart';
+import 'package:workbench_app/core/router/app_routes.dart';
+import 'package:workbench_app/features/workspace/presentation/widgets/appearance_dialog.dart';
+import 'package:workbench_app/l10n/app_strings.dart';
+
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:koi_core/koi_core.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/core/window/workbench_window_chrome.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/navigation_providers.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
 import 'package:workbench_app/features/workspace/presentation/widgets/workspace_panels.dart';
-
-class SaveWorkspaceIntent extends Intent {
-  const SaveWorkspaceIntent();
-}
-
-class OpenWorkspaceIntent extends Intent {
-  const OpenWorkspaceIntent();
-}
-
-class BackWorkspaceIntent extends Intent {
-  const BackWorkspaceIntent();
-}
-
-class ForwardWorkspaceIntent extends Intent {
-  const ForwardWorkspaceIntent();
-}
 
 class WorkspaceShell extends ConsumerStatefulWidget {
   const WorkspaceShell({super.key, required this.navigationShell});
@@ -43,6 +34,9 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
   @override
   Widget build(BuildContext context) {
     final session = ref.watch(workspaceSessionProvider);
+    final appearance = ref.watch(appAppearanceProvider).value;
+    final appearanceActions = ref.read(appAppearanceProvider.notifier);
+    final commands = WorkbenchCommandScope.of(context);
     final history = ref.watch(navigationHistoryProvider);
     final nativeToolbar = WorkbenchWindowInfo.nativeToolbarOf(context);
     final state = ref.watch(
@@ -64,58 +58,30 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
       ),
     );
     WorkspacePreferences preferences() => session.state.snapshot.preferences;
+    final effectiveTheme =
+        appearance?.themeMode ??
+        switch (preferences().themeMode) {
+          WorkspaceThemeMode.system => ThemeMode.system,
+          WorkspaceThemeMode.light => ThemeMode.light,
+          WorkspaceThemeMode.dark => ThemeMode.dark,
+        };
+    final compact = KoiThemeTokens.of(context).density == KoiDensity.compact;
+    void changeTheme(WorkspaceThemeMode mode) {
+      appearanceActions.setThemeMode(switch (mode) {
+        WorkspaceThemeMode.system => ThemeMode.system,
+        WorkspaceThemeMode.light => ThemeMode.light,
+        WorkspaceThemeMode.dark => ThemeMode.dark,
+      });
+      session.updatePreferences(preferences().copyWith(themeMode: mode));
+    }
+
     return Shortcuts(
-      shortcuts: {
-        const SingleActivator(LogicalKeyboardKey.bracketLeft, meta: true):
-            const BackWorkspaceIntent(),
-        const SingleActivator(LogicalKeyboardKey.bracketRight, meta: true):
-            const ForwardWorkspaceIntent(),
-        if (defaultTargetPlatform != TargetPlatform.macOS) ...{
-          const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
-              const BackWorkspaceIntent(),
-          const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
-              const ForwardWorkspaceIntent(),
-        },
-        const SingleActivator(LogicalKeyboardKey.keyS, control: true):
-            const SaveWorkspaceIntent(),
-        const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
-            const SaveWorkspaceIntent(),
-        const SingleActivator(LogicalKeyboardKey.keyO, control: true):
-            const OpenWorkspaceIntent(),
-        const SingleActivator(LogicalKeyboardKey.keyO, meta: true):
-            const OpenWorkspaceIntent(),
-      },
+      shortcuts: WorkbenchCommands.bindings(defaultTargetPlatform),
       child: Actions(
         actions: {
-          BackWorkspaceIntent: CallbackAction<BackWorkspaceIntent>(
-            onInvoke: (_) {
-              history.goBack();
-              return null;
-            },
-          ),
-          ForwardWorkspaceIntent: CallbackAction<ForwardWorkspaceIntent>(
-            onInvoke: (_) {
-              history.goForward();
-              return null;
-            },
-          ),
-          OpenWorkspaceIntent: CallbackAction<OpenWorkspaceIntent>(
-            onInvoke: (_) {
-              if (navigationShell.currentIndex < 2) {
-                unawaited(
-                  session.importFiles(
-                    navigationShell.currentIndex == 0
-                        ? ImportKind.text
-                        : ImportKind.media,
-                  ),
-                );
-              }
-              return null;
-            },
-          ),
-          SaveWorkspaceIntent: CallbackAction<SaveWorkspaceIntent>(
-            onInvoke: (_) {
-              unawaited(session.save());
+          WorkbenchCommandIntent: CallbackAction<WorkbenchCommandIntent>(
+            onInvoke: (intent) {
+              unawaited(commands.invoke(intent.id));
               return null;
             },
           ),
@@ -155,24 +121,32 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
               : ListenableBuilder(
                   listenable: history,
                   builder: (context, _) => KoiNavigationHistoryControls(
-                    onBack: history.canGoBack ? history.goBack : null,
-                    onForward: history.canGoForward ? history.goForward : null,
+                    onBack: commands.enabled(WorkbenchCommandId.back)
+                        ? () => unawaited(
+                            commands.invoke(WorkbenchCommandId.back),
+                          )
+                        : null,
+                    onForward: commands.enabled(WorkbenchCommandId.forward)
+                        ? () => unawaited(
+                            commands.invoke(WorkbenchCommandId.forward),
+                          )
+                        : null,
                   ),
                 ),
-          destinations: const [
+          destinations: [
             KoiNavigationDestination(
               id: 'text',
-              label: '文本资料',
+              label: context.l10n.text,
               icon: Icons.description_outlined,
             ),
             KoiNavigationDestination(
               id: 'media',
-              label: '媒体素材',
+              label: context.l10n.media,
               icon: Icons.perm_media_outlined,
             ),
             KoiNavigationDestination(
               id: 'tasks',
-              label: '任务',
+              label: context.l10n.tasks,
               icon: Icons.task_alt_outlined,
             ),
           ],
@@ -182,45 +156,133 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
             navigationShell.goBranch(_ids.indexOf(id));
           },
           navigationTrailing: Tooltip(
-            message: '设置',
+            message: context.l10n.settings,
             child: KoiMenu(
               key: const ValueKey('workspace-settings'),
-              label: '设置',
+              label: context.l10n.settings,
               items: [
                 KoiMenuItem(
-                  label: '跟随系统主题',
-                  checked: preferences().themeMode == WorkspaceThemeMode.system,
-                  onSelected: () => session.updatePreferences(
-                    preferences().copyWith(
-                      themeMode: WorkspaceThemeMode.system,
+                  label: context.l10n.aboutTitle,
+                  icon: Icons.info_outline,
+                  onSelected: () {
+                    const info = BuildInfo.current;
+                    showAboutDialog(
+                      context: context,
+                      applicationName: context.l10n.appTitle,
+                      applicationVersion: '${info.version}+${info.build}',
+                      children: [
+                        SelectableText(
+                          '${context.l10n.aboutSource}: ${info.source}\n'
+                          '${context.l10n.aboutChannel}: ${info.channel}\n'
+                          '${context.l10n.aboutPlatform}: ${info.platform} / ${info.architecture}',
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                KoiMenuItem(
+                  label: '${context.l10n.language} / ${context.l10n.accent}',
+                  icon: Icons.palette_outlined,
+                  onSelected: () =>
+                      unawaited(showAppearanceDialog(context, ref)),
+                ),
+                KoiMenuItem(
+                  label: context.l10n.keyboardShortcuts,
+                  icon: Icons.keyboard_outlined,
+                  onSelected: () => unawaited(
+                    showDialog<void>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: Text(context.l10n.keyboardShortcuts),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            for (final id in WorkbenchCommandId.values)
+                              if (WorkbenchCommands.shortcut(
+                                    id,
+                                    defaultTargetPlatform,
+                                  )
+                                  case final shortcut?)
+                                ListTile(
+                                  title: Text(
+                                    WorkbenchCommands.label(context, id),
+                                  ),
+                                  trailing: Text(
+                                    WorkbenchCommands.shortcutLabel(shortcut),
+                                  ),
+                                ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: Text(context.l10n.confirm),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                KoiMenuItem(
-                  label: '明亮主题',
-                  checked: preferences().themeMode == WorkspaceThemeMode.light,
-                  onSelected: () => session.updatePreferences(
-                    preferences().copyWith(themeMode: WorkspaceThemeMode.light),
+                for (final capability in appCapabilities)
+                  KoiMenuItem(
+                    label: capability.titleFor(context),
+                    onSelected: () =>
+                        CapabilityRoute(id: capability.id).push<void>(context),
                   ),
-                ),
-                KoiMenuItem(
-                  label: '深色主题',
-                  checked: preferences().themeMode == WorkspaceThemeMode.dark,
-                  onSelected: () => session.updatePreferences(
-                    preferences().copyWith(themeMode: WorkspaceThemeMode.dark),
-                  ),
-                ),
-                KoiMenuItem(
-                  label: state.density == WorkspaceDensity.compact
-                      ? '舒适密度'
-                      : '紧凑密度',
-                  onSelected: () => session.updatePreferences(
-                    preferences().copyWith(
-                      density: state.density == WorkspaceDensity.compact
-                          ? WorkspaceDensity.comfortable
-                          : WorkspaceDensity.compact,
+                for (final id in [
+                  WorkbenchCommandId.save,
+                  WorkbenchCommandId.importFiles,
+                  WorkbenchCommandId.back,
+                  WorkbenchCommandId.forward,
+                  WorkbenchCommandId.quit,
+                ])
+                  KoiMenuItem(
+                    label: WorkbenchCommands.label(context, id),
+                    enabled: commands.enabled(id),
+                    shortcut: WorkbenchCommands.shortcut(
+                      id,
+                      defaultTargetPlatform,
                     ),
+                    onSelected: () => unawaited(commands.invoke(id)),
                   ),
+                for (final item in <(String, WorkspaceThemeMode, ThemeMode)>[
+                  (
+                    context.l10n.systemTheme,
+                    WorkspaceThemeMode.system,
+                    ThemeMode.system,
+                  ),
+                  (
+                    context.l10n.lightTheme,
+                    WorkspaceThemeMode.light,
+                    ThemeMode.light,
+                  ),
+                  (
+                    context.l10n.darkTheme,
+                    WorkspaceThemeMode.dark,
+                    ThemeMode.dark,
+                  ),
+                ])
+                  KoiMenuItem(
+                    label: item.$1,
+                    checked: effectiveTheme == item.$3,
+                    onSelected: () => changeTheme(item.$2),
+                  ),
+                KoiMenuItem(
+                  label: compact
+                      ? context.l10n.comfortable
+                      : context.l10n.compact,
+                  onSelected: () {
+                    appearanceActions.setDensity(
+                      compact ? KoiDensity.comfortable : KoiDensity.compact,
+                    );
+                    session.updatePreferences(
+                      preferences().copyWith(
+                        density: compact
+                            ? WorkspaceDensity.comfortable
+                            : WorkspaceDensity.compact,
+                      ),
+                    );
+                  },
                 ),
               ],
               child: const Icon(Icons.settings_outlined),
@@ -235,9 +297,11 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
               ),
             if (!nativeToolbar)
               IconButton(
-                tooltip: '保存工作区 (⌘/Ctrl+S)',
+                tooltip: context.l10n.saveShortcut,
                 icon: const Icon(Icons.save_outlined),
-                onPressed: () => unawaited(session.save()),
+                onPressed: commands.enabled(WorkbenchCommandId.save)
+                    ? () => unawaited(commands.invoke(WorkbenchCommandId.save))
+                    : null,
               ),
           ],
           body: Column(
@@ -252,13 +316,13 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
                             ? session.save()
                             : session.initialize(),
                       ),
-                      child: const Text('重试'),
+                      child: Text(context.l10n.retry),
                     ),
                   ],
                 ),
               Expanded(
                 child: !state.initialized
-                    ? const KoiLoadingState(message: '正在恢复工作区…')
+                    ? KoiLoadingState(message: context.l10n.restoring)
                     : navigationShell,
               ),
             ],

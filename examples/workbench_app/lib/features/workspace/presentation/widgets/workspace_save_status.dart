@@ -1,3 +1,4 @@
+import 'package:workbench_app/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
@@ -23,14 +24,14 @@ class WorkspaceSaveStatus extends ConsumerWidget {
         ),
       ),
     );
-    final revision = document.dirty ? '未保存' : '已保存';
+    final revision = document.dirty ? context.l10n.unsaved : context.l10n.saved;
     final activityLabel = activity.saving
-        ? ' · 工作区保存中'
+        ? ' · ${context.l10n.saving}'
         : activity.error?.startsWith('保存失败：') == true
-        ? ' · 工作区保存失败'
+        ? ' · ${context.l10n.saveFailed}'
         : '';
     return Text(
-      '${includeCount ? '${document.text.length} 字 · ' : ''}$revision$activityLabel',
+      '${includeCount ? '${context.l10n.characterCount(document.text.length)} · ' : ''}$revision$activityLabel',
       style: includeCount ? Theme.of(context).textTheme.bodySmall : null,
     );
   }

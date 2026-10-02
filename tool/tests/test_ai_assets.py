@@ -36,6 +36,22 @@ class AiAssetsTest(unittest.TestCase):
     def test_valid_discovery_graph(self):
         self.assertEqual(CHECKER.validate_assets(self.root), [])
 
+    def test_maintenance_and_tool_documents_cannot_be_orphans(self):
+        for target in ('.agents/skills/GOVERNANCE.md', 'MELOS_USAGE.md', 'docs/tools.md', 'docs/platform-acceptance.md'):
+            with self.subTest(target=target):
+                self.write(target, '# Contract\n')
+                self.assertIn('AI_DISCOVERY', self.rules())
+                self.write('README.md', f'[Contract]({target})\n')
+                self.assertNotIn('AI_DISCOVERY', self.rules())
+                (self.root / target).unlink()
+
+    def test_orphan_cycle_does_not_count_as_document_discovery(self):
+        self.write('docs/tools.md', '[Melos](<../MELOS_USAGE.md>)\n')
+        self.write('MELOS_USAGE.md', '[Tools](docs/tools.md)\n')
+        self.assertIn('AI_DISCOVERY', self.rules())
+        self.write('README.md', '[Tools](docs/tools.md "Tool index")\n')
+        self.assertNotIn('AI_DISCOVERY', self.rules())
+
     def test_unknown_and_duplicate_index_fields_fail(self):
         path = self.root / ".agents/skills/index.yaml"
         path.write_text(path.read_text() + "    surprise: value\n")

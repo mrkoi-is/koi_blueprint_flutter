@@ -17,3 +17,5 @@ export 'widgets/koi_reading_pane.dart';
 export 'widgets/koi_property_row.dart';
 export 'widgets/koi_panel_icon.dart';
 export 'widgets/koi_panel.dart';
+export 'widgets/koi_input_density.dart';
+export 'l10n/koi_ui_strings.dart';

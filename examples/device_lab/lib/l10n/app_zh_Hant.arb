@@ -1,0 +1,108 @@
+{
+  "@@locale": "zh_Hant",
+  "devicesDevicesAndIncomingEvents": "設備與入站事件",
+  "devicesSetupAgain": "重新配置",
+  "devicesDocumentsStayOnThisDevicePairing": "文檔保存在本機。配對只提供摘要讀取與暫停/恢復摘要刷新任務。",
+  "devicesLocalDocuments": "本機資料",
+  "devicesImportText": "導入文本",
+  "devicesIncomingEventOpenedTasksSummaryRefresh": "入站事件已打開任務：摘要刷新",
+  "devicesDocument": "資料",
+  "devicesContents": "正文",
+  "devicesSave": "保存",
+  "devicesDiscardDraftAndContinue": "放棄草稿並繼續",
+  "devicesDismissIncomingEvents": "忽略入站事件",
+  "devicesIncomingEventsAwaitDraftResolution": "有 {value0} 個入站事件等待草稿處理",
+  "@devicesIncomingEventsAwaitDraftResolution": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesIncomingLinks": "入站鏈接",
+  "devicesOpenLink": "打開鏈接",
+  "devicesPairDevices": "設備配對",
+  "devicesHostOnLocalhost": "開啓本機測試",
+  "devicesAllowLanPairing": "允許局域網配對",
+  "devicesStopHosting": "停止服務",
+  "devicesThisPlatformIsAForegroundClient": "此平台作為前台客戶端，服務由桌面設備開啓。",
+  "devicesPairingCode": "配對碼",
+  "devicesDiscoverLanDevices": "查找局域網設備",
+  "devicesDeviceWebsocketAddress": "設備 WebSocket 地址",
+  "devicesPairAndReadSummary": "配對並讀取摘要",
+  "devicesConnection": "連接狀態",
+  "devicesRefreshSummary": "刷新摘要",
+  "devicesPauseTask": "暫停任務",
+  "devicesResumeTask": "恢復任務",
+  "devicesLocalSummaryRefresh": "本機摘要刷新",
+  "devicesPaused": "已暫停",
+  "devicesRunning": "運行中",
+  "devicesFirstSetup": "首次設置 {value0} / 3",
+  "@devicesFirstSetup": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesLanguage": "語言",
+  "devicesNext": "下一步",
+  "devicesOptionalChooseADefaultDirectoryThis": "可選：選擇默認目錄；之後仍可修改。",
+  "devicesChooseDirectory": "選擇目錄",
+  "devicesPairingIsOptionalAfterSetupSelect": "配對是可選項。完成設置後，手動選擇設備並輸入配對碼；不會自動監聽。",
+  "devicesFinishSetup": "完成設置",
+  "devicesSkipAndSetUpLater": "跳過，稍後設置",
+  "devicesSystemLanguage": "跟隨系統",
+  "localSetupFirstSetup": "首次配置",
+  "localSetupIncomingIntents": "外部入口",
+  "localSetupReconfigure": "重新配置",
+  "localSetupSetup": "配置 {value0} / 3",
+  "@localSetupSetup": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupNext": "下一步",
+  "localSetupNoDirectoryWebUsesTheBrowser": "未選擇目錄；Web 使用瀏覽器文件選擇器",
+  "localSetupChooseDirectory": "選擇目錄",
+  "localSetupDocumentsStayLocalInstallTheLan": "此能力保留本機資料；如需配對設備，可另裝局域網能力。",
+  "localSetupFinish": "完成",
+  "localSetupSkipForNow": "跳過，稍後設置",
+  "localSetupCurrentPage": "當前頁面",
+  "localSetupDocuments": "份資料",
+  "localSetupDraftProtectedPendingIntents": "草稿保護中：{value0} 個待處理入口",
+  "@localSetupDraftProtectedPendingIntents": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupText": "正文",
+  "localSetupSave": "保存",
+  "localSetupDiscardDraft": "放棄草稿",
+  "localSetupImportTextFile": "導入文本文件",
+  "localSetupIncomingUri": "入口 URI",
+  "localSetupOpenIntent": "打開入口",
+  "localSetupSupportsKoiTasksKoiDocumentId": "支持 koi://tasks、koi://document?id=welcome 與本地文本文件。冷啓動和運行時入口使用同一草稿保護隊列。",
+  "devicesRetry": "重試",
+  "devicesOpenFailed": "無法恢復資料：{error}",
+  "@devicesOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "devicesConnectionDisconnected": "未連接",
+  "devicesConnectionConnecting": "連接中",
+  "devicesConnectionPaired": "已配對",
+  "devicesConnectionReconnecting": "重新連接中",
+  "devicesConnectionFailed": "連接失敗",
+  "devicesConnectionClosed": "已關閉",
+  "devicesIncomingReceived": "入站事件已接收",
+  "devicesDocumentsTab": "資料",
+  "devicesTasksTab": "任務"
+}

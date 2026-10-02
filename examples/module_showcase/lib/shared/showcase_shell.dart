@@ -29,6 +29,20 @@ class ShowcaseShell extends ConsumerWidget {
                   child: Text('切换 ${module.navigation.first.label}'),
                 ),
               OutlinedButton(
+                onPressed: () => unawaited(
+                  ref
+                      .read(moduleControlsProvider.notifier)
+                      .setBetaConfigured(
+                        !ref.read(showcaseServicesProvider).betaConfigured,
+                      ),
+                ),
+                child: Text(
+                  ref.read(showcaseServicesProvider).betaConfigured
+                      ? '停用 Beta 配置'
+                      : '启用 Beta 配置',
+                ),
+              ),
+              OutlinedButton(
                 onPressed: snapshot.session == null
                     ? null
                     : () => unawaited(
@@ -41,6 +55,9 @@ class ShowcaseShell extends ConsumerWidget {
             ],
           ),
           Padding(padding: const EdgeInsets.all(12), child: Text(status)),
+          if (snapshot.availability case final availability?
+              when !availability.isAvailable)
+            Text(availability.reason ?? '模块不可用'),
           if (snapshot.error != null) Text('装载失败：${snapshot.error}'),
           Expanded(
             child: snapshot.session == null

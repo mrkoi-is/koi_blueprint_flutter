@@ -51,6 +51,86 @@ class BlueprintTest(unittest.TestCase):
     def snapshot(self):
         return {str(path.relative_to(self.root)): path.read_bytes() for path in self.root.rglob('*') if path.is_file()}
 
+    def test_launch_uses_active_app_and_selected_workspace_sdk(self):
+        write(self.app / 'lib/main.dart', 'void main() {}')
+        with patch.object(blueprint, 'run') as run:
+            blueprint.launch(argparse.Namespace(app=str(self.app), device='chrome'))
+            self.assertEqual(run.call_args.args, (['flutter', 'run', '-d', 'chrome'], self.app))
+        with self.assertRaises(blueprint.BlueprintError):
+            blueprint.launch(argparse.Namespace(app=str(self.root / 'not_an_app'), device='chrome'))
+
+    def test_release_build_refreshes_platform_plugin_registrants(self):
+        (self.app / 'android').mkdir()
+        import zipfile
+        write(self.root / '.fvmrc', '{"flutter":"3.47.2"}')
+        write(self.root / 'pubspec.lock', '# test lock\n')
+        def produce(command, cwd):
+            if command[1:3] == ['pub', 'get']:
+                self.assertIn('--enforce-lockfile', command)
+                write(self.app / '.flutter-plugins-dependencies', '{}')
+                return
+            self.assertTrue((self.app / '.flutter-plugins-dependencies').is_file())
+            if '--config-only' in command:
+                self.assertIn('--pub', command)
+                self.assertNotIn('--no-pub', command)
+                return
+            target = self.app / 'build/app/outputs/flutter-apk/app-release.apk'
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with zipfile.ZipFile(target, 'w') as archive:
+                native = bytearray(64)
+                native[:6] = b'\x7fELF\x02\x01'
+                native[18:20] = (183).to_bytes(2, 'little')
+                archive.writestr('lib/arm64-v8a/libapp.so', native)
+        with patch.object(blueprint, 'run', side_effect=produce) as run:
+            blueprint.build(argparse.Namespace(app=str(self.app), platforms='android'))
+            command, cwd = run.call_args.args
+            self.assertEqual(command[:4], ['flutter', 'build', 'apk', '--release'])
+            self.assertIn('--no-pub', command)
+            self.assertEqual(len(run.call_args_list), 3)
+            self.assertEqual(run.call_args_list[0].args, (['flutter', 'pub', 'get', '--enforce-lockfile'], self.app))
+            self.assertIn('--config-only', run.call_args_list[1].args[0])
+            self.assertEqual(cwd, self.app)
+            manifest = json.loads((self.app / 'build/blueprint/android-release.json').read_text())
+            self.assertEqual(manifest['status'], 'PASS')
+            self.assertEqual(manifest['runtime'], 'NOT_RUN')
+            self.assertEqual(manifest['actualArchitectures'], ['arm64-v8a'])
+            artifact = manifest['artifacts'][0]
+            self.assertEqual(artifact['path'], 'apps/demo/build/app/outputs/flutter-apk/app-release.apk')
+            import hashlib
+            self.assertEqual(artifact['sha256'], hashlib.sha256((self.root / artifact['path']).read_bytes()).hexdigest())
+
+    def test_doctor_does_not_require_source_only_node_for_minimal(self):
+        with patch.object(blueprint, 'run'), patch.dict(os.environ, {'CHROME_EXECUTABLE': str(self.app / 'chrome')}), patch.object(blueprint.shutil, 'which', return_value=None):
+            blueprint.doctor(argparse.Namespace(workspace=str(self.root), purpose='validate'))
+            write(self.root / 'packages/koi_api_bootstrap/test/web_compile_smoke.dart', 'void main() {}')
+            with self.assertRaisesRegex(blueprint.BlueprintError, 'Node'):
+                blueprint.doctor(argparse.Namespace(workspace=str(self.root), purpose='validate'))
+
+    def test_chrome_is_required_only_for_active_browser_tests(self):
+        write(self.root / '.blueprint/reference/examples/workbench_app/test/browser/storage_test.dart', '// inert')
+        with patch.object(blueprint.shutil, 'which', return_value=None), patch.dict(os.environ, {'CHROME_EXECUTABLE': str(self.root / 'missing-chrome')}):
+            blueprint.validation_prerequisites(self.root, [self.app])
+            write(self.app / 'test/browser/storage_test.dart', '// active')
+            with self.assertRaisesRegex(blueprint.BlueprintError, 'Chrome'):
+                blueprint.validation_prerequisites(self.root, [self.app])
+            write(self.root / 'chrome', 'fixture executable')
+            with patch.dict(os.environ, {'CHROME_EXECUTABLE': str(self.root / 'chrome')}):
+                blueprint.validation_prerequisites(self.root, [self.app])
+
+    def test_generated_readme_uses_the_workspace_sdk_pin(self):
+        write(self.root / '.fvmrc', json.dumps({'flutter': '9.8.7'}))
+        with patch.object(blueprint, 'ROOT', self.root):
+            readme = blueprint.generated_readme('demo', 'minimal', ['web'])
+        self.assertIn('fvm use 9.8.7', readme)
+        self.assertNotIn('3.47.2', readme)
+
+    def test_cli_help_explains_commands_and_phase_semantics(self):
+        for arguments, phrase in (([], 'Launch an active App'), (['check'], 'reproducibility'), (['doctor'], 'active members'), (['feature'], 'persistent draft')):
+            with self.subTest(arguments=arguments), contextlib.redirect_stdout(io.StringIO()) as output, self.assertRaises(SystemExit) as result:
+                blueprint.main([*arguments, '--help'])
+            self.assertEqual(result.exception.code, 0)
+            self.assertIn(phrase, ' '.join(output.getvalue().split()))
+
     def test_name_and_platform_validation(self):
         for value in ['../bad', 'Bad', 'a-b', 'class', 'enum', 'extends', 'void', 'await', 'con', 'lpt1', '']:
             with self.subTest(value=value), self.assertRaises(blueprint.BlueprintError):
@@ -252,6 +332,8 @@ class BlueprintTest(unittest.TestCase):
         write(source / 'examples/workbench_app/pubspec.yaml', 'name: workbench_app\nresolution: workspace\n')
         write(source / 'examples/workbench_app/lib/main.dart', 'class WorkbenchApp {}\n// workbench_app\n// Koi 工作区\n')
         write(source / 'examples/workbench_app/test/main_test.dart', '// workbench_app test\n')
+        for template in ('starter_app', 'workbench_app'):
+            write(source / f'examples/{template}/lib/core/capabilities/installed_capabilities.dart', '// source-only demonstration must be cleared\n')
         fixture = source / 'examples/workbench_app/assets/sample.mp4'
         fixture.parent.mkdir(parents=True, exist_ok=True)
         fixture.write_bytes(b'workbench_app\x00\xff\xfe')

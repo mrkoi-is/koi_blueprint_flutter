@@ -331,7 +331,7 @@ void main() {
     progress = tester
         .getSemantics(find.byType(LinearProgressIndicator))
         .getSemanticsData();
-    expect(progress.label, '导入文本资料，处理中，2 / 4 字节');
+    expect(progress.label, '导入文本资料，处理中，2 字节 / 4 字节');
     expect(progress.value, '50');
     source.chunks.add([67, 68]);
     final streamClosed = source.chunks.close();

@@ -12,4 +12,16 @@ void main() {
     expect(find.text('Ready to build'), findsOneWidget);
     await tester.pumpWidget(const SizedBox.shrink());
   });
+
+  testWidgets('about dialog exposes the same build identity as the manifest', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ProviderScope(child: StarterApp()));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byIcon(Icons.info_outline));
+    await tester.pumpAndSettle();
+    expect(find.textContaining('Source: unknown'), findsOneWidget);
+    expect(find.textContaining('Channel: local'), findsOneWidget);
+    await tester.pumpWidget(const SizedBox.shrink());
+  });
 }

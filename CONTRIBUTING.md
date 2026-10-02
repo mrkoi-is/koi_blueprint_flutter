@@ -12,6 +12,8 @@
 
 生成器更改应在临时目录生成真实项目/Feature，而不是只测字符串和目录。AI 入口更新要检查技能正文、索引和文档链接一致。
 
+修改 Skill 时遵循 [Skill 维护契约](.agents/skills/GOVERNANCE.md)。辅助命令与适用范围见 [工具清单](docs/tools.md)；目标端的证据口径见 [平台验收](docs/platform-acceptance.md)。
+
 ## 工具链与依赖
 
 脚手架要求 Python 3.11 或更新版本，Flutter 版本由 `.fvmrc` 固定。依赖从 pubspec/lock 解析，代码生成组合一起升级。新 workspace 成员必须登记并提供测试；默认手写覆盖率门槛 80%。不要提交构建产物、生成的 Dart part 文件或本机绝对路径。

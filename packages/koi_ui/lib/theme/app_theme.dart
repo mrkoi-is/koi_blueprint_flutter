@@ -3,6 +3,8 @@ import 'package:koi_ui/theme/app_colors.dart';
 import 'package:koi_ui/theme/koi_material_theme.dart';
 import 'package:koi_ui/theme/koi_theme_tokens.dart';
 
+enum KoiAccent { moss, blue, violet }
+
 abstract final class AppTheme {
   static ThemeData get light => build(brightness: Brightness.light);
   static ThemeData get dark => build(brightness: Brightness.dark);
@@ -10,14 +12,20 @@ abstract final class AppTheme {
   static ThemeData build({
     Brightness brightness = Brightness.light,
     KoiDensity density = KoiDensity.comfortable,
+    KoiAccent accent = KoiAccent.moss,
   }) {
     final dark = brightness == Brightness.dark;
+    final (lightAccent, darkAccent) = switch (accent) {
+      KoiAccent.moss => (AppColors.moss, const Color(0xFF88BCAC)),
+      KoiAccent.blue => (const Color(0xFF33589A), const Color(0xFFA8C7FA)),
+      KoiAccent.violet => (const Color(0xFF7050A0), const Color(0xFFD0BCFF)),
+    };
     final colors =
         ColorScheme.fromSeed(
-          seedColor: AppColors.moss,
+          seedColor: lightAccent,
           brightness: brightness,
         ).copyWith(
-          primary: dark ? const Color(0xFF88BCAC) : AppColors.moss,
+          primary: dark ? darkAccent : lightAccent,
           onPrimary: dark ? AppColors.ink : Colors.white,
           secondaryContainer: dark
               ? const Color(0xFF303030)
@@ -49,7 +57,7 @@ abstract final class AppTheme {
           onInverseSurface: dark
               ? const Color(0xFF242424)
               : const Color(0xFFF5F5F5),
-          inversePrimary: dark ? AppColors.moss : const Color(0xFF88BCAC),
+          inversePrimary: dark ? lightAccent : darkAccent,
           surfaceContainerLow: dark
               ? const Color(0xFF232323)
               : const Color(0xFFF5F5F5),

@@ -12,6 +12,9 @@ Future<void> main() async {
     File('${lib.path}/web_only.dart').writeAsStringSync(
       "import 'package:web/web.dart';\nvoid release() => URL.revokeObjectURL('blob:x');\n",
     );
+    File('${lib.path}/drift_wasm.dart').writeAsStringSync(
+      "import 'package:drift/wasm.dart';\nFuture<void> open() async => WasmDatabase.open(databaseName: 'test');\n",
+    );
     File('${lib.path}/native.dart').writeAsStringSync('int value() => 2;\n');
     final report = File('${temporary.path}/lcov.info')
       ..writeAsStringSync('SF:lib/native.dart\nDA:1,3\nend_of_record\n');
@@ -31,6 +34,7 @@ Future<void> main() async {
     final first = report.readAsStringSync();
     if (!first.contains('SF:lib/browser.dart\nDA:2,0') ||
         !first.contains('SF:lib/web_only.dart\nDA:2,0') ||
+        !first.contains('SF:lib/drift_wasm.dart\nDA:2,0') ||
         !first.contains('DA:1,3')) {
       throw StateError(
         'Browser source must count as uncovered without altering measured hits: $first',

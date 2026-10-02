@@ -81,6 +81,11 @@ abstract class WorkspaceJob with _$WorkspaceJob {
     String? assetId,
     ImportKind? importKind,
     String? error,
+
+    /// Zero identifies an imported v1 task whose earlier attempts are unknown.
+    @Default(1) int currentAttempt,
+    DateTime? startedAt,
+    DateTime? finishedAt,
   }) = _WorkspaceJob;
   factory WorkspaceJob.fromJson(Map<String, dynamic> json) =>
       _$WorkspaceJobFromJson(json);
@@ -111,12 +116,13 @@ abstract class WorkspacePreferences with _$WorkspacePreferences {
 @freezed
 abstract class WorkspaceSnapshot with _$WorkspaceSnapshot {
   const factory WorkspaceSnapshot({
-    @Default(1) int schemaVersion,
+    @Default(2) int schemaVersion,
     @Default(0) int revision,
     @Default(<WorkspaceDocument>[]) List<WorkspaceDocument> documents,
     @Default(<WorkspaceAsset>[]) List<WorkspaceAsset> assets,
     @Default(<WorkspaceTodo>[]) List<WorkspaceTodo> todos,
     @Default(<WorkspaceJob>[]) List<WorkspaceJob> jobs,
+    @Default(<WorkspaceJob>[]) List<WorkspaceJob> jobHistory,
     @Default(WorkspacePreferences()) WorkspacePreferences preferences,
   }) = _WorkspaceSnapshot;
   factory WorkspaceSnapshot.fromJson(Map<String, dynamic> json) =>

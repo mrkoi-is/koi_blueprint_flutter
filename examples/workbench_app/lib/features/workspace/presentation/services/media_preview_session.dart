@@ -208,7 +208,7 @@ final class MediaPreviewSession extends ChangeNotifier {
         playback = player;
         player.addListener(_notify);
         _errorSubscription = player.errors.listen((message) {
-          if (_current(generation)) {
+          if (!_closed && identical(playback, player)) {
             error = '视频预览失败：$message';
             _notify();
           }
@@ -299,6 +299,17 @@ final class MediaPreviewSession extends ChangeNotifier {
 
   Future<void> retryThumbnail(WorkspaceAsset selected) =>
       select(selected, retryThumbnail: true);
+
+  /// Pause and finish capture work without disposing a usable preview owner.
+  Future<void> prepareToClose() async {
+    ++_generation;
+    _interruptCapture();
+    final id = _thumbnailJobId;
+    if (id != null && !workspace.preparingToClose) workspace.cancelJob(id);
+    await _queue;
+    await pause();
+  }
+
   Future<void> pause() async {
     await playback?.pause();
   }
@@ -380,7 +391,7 @@ final class MediaPreviewSession extends ChangeNotifier {
     _closed = true;
     ++_generation;
     final jobId = _thumbnailJobId;
-    if (jobId != null) {
+    if (jobId != null && !workspace.preparingToClose) {
       workspace.cancelJob(jobId);
     }
     _interruptCapture();

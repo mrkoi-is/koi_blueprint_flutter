@@ -8,11 +8,19 @@ class CatalogPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final value = ref.watch(catalogControllerProvider);
-    final busy = value.isLoading || (value.value?.isRefreshing ?? false);
+    final busy =
+        value.isLoading ||
+        ((value.value?.isRefreshing ?? false) ||
+            (value.value?.isAppending ?? false));
     return Scaffold(
       appBar: AppBar(title: const Text('Catalog')),
       body: Column(
         children: [
+          TextField(
+            decoration: const InputDecoration(labelText: 'Search catalog'),
+            onChanged: (query) =>
+                ref.read(catalogQueryProvider.notifier).setQuery(query),
+          ),
           if (busy) const LinearProgressIndicator(),
           if (value.hasError || value.value?.operationFailure != null)
             const Text('Unable to load catalog'),
@@ -35,7 +43,8 @@ class CatalogPage extends ConsumerWidget {
             child: const Text('Refresh'),
           ),
           TextButton(
-            onPressed: busy || !value.hasValue
+            onPressed:
+                busy || !value.hasValue || value.value?.nextCursor == null
                 ? null
                 : () => ref.read(catalogControllerProvider.notifier).loadMore(),
             child: const Text('Load more'),

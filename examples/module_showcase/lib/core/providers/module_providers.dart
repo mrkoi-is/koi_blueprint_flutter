@@ -1,8 +1,13 @@
 import 'package:koi_modules/koi_modules.dart';
+import 'package:module_showcase/core/services/showcase_services.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:showcase_contracts/showcase_contracts.dart';
 
 part 'module_providers.g.dart';
+
+@Riverpod(keepAlive: true)
+HostShowcaseServices showcaseServices(Ref ref) =>
+    throw UnimplementedError('Bootstrap must inject shared services');
 
 /// Bootstrap owns runtime shutdown; this provider only injects it.
 @Riverpod(keepAlive: true)
@@ -24,6 +29,19 @@ ModuleRuntimeState<ShowcaseRepository> moduleSnapshot(Ref ref) {
 class ModuleControls extends _$ModuleControls {
   @override
   String build() => '模块资源由会话拥有，共享事件总线由宿主拥有。';
+
+  Future<void> setBetaConfigured(bool enabled) async {
+    ref.read(showcaseServicesProvider).betaConfigured = enabled;
+    final runtime = ref.read(moduleRuntimeProvider);
+    if (runtime.state.session?.moduleId == 'beta') {
+      try {
+        await runtime.activate('beta', restart: true);
+      } catch (_) {}
+    }
+    if (ref.mounted) {
+      state = enabled ? 'Beta 已配置，可以重新切换' : 'Beta 暂未配置，切换会给出恢复提示';
+    }
+  }
 
   Future<void> select(String id) async {
     try {

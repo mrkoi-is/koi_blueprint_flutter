@@ -1,0 +1,41 @@
+{
+  "@@locale": "zh",
+  "devicesSystemLanguage": "跟随系统",
+  "localSetupFirstSetup": "首次配置",
+  "localSetupIncomingIntents": "外部入口",
+  "localSetupReconfigure": "重新配置",
+  "localSetupSetup": "配置 {value0} / 3",
+  "@localSetupSetup": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupNext": "下一步",
+  "localSetupNoDirectoryWebUsesTheBrowser": "未选择目录；Web 使用浏览器文件选择器",
+  "localSetupChooseDirectory": "选择目录",
+  "localSetupDocumentsStayLocalInstallTheLan": "此能力保留本机资料；如需配对设备，可另装局域网能力。",
+  "localSetupFinish": "完成",
+  "localSetupSkipForNow": "跳过，稍后设置",
+  "localSetupCurrentPage": "当前页面",
+  "localSetupDocuments": "份资料",
+  "localSetupDraftProtectedPendingIntents": "草稿保护中：{value0} 个待处理入口",
+  "@localSetupDraftProtectedPendingIntents": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupText": "正文",
+  "localSetupSave": "保存",
+  "localSetupDiscardDraft": "放弃草稿",
+  "localSetupImportTextFile": "导入文本文件",
+  "localSetupIncomingUri": "入口 URI",
+  "localSetupOpenIntent": "打开入口",
+  "localSetupSupportsKoiTasksKoiDocumentId": "支持 koi://tasks、koi://document?id=welcome 与本地文本文件。冷启动和运行时入口使用同一草稿保护队列。",
+  "devicesRetry": "重试",
+  "devicesDocumentsTab": "资料",
+  "devicesTasksTab": "任务"
+}

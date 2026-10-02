@@ -21,14 +21,21 @@
 python3 blueprint.py create acme --output ../acme --org com.example --platforms web --dry-run
 python3 blueprint.py create acme --output ../acme --org com.example --platforms web
 python3 blueprint.py create studio --output ../studio --org com.example --template workbench --platforms web,macos
+python3 blueprint.py create studio --output ../studio --config project.json --dry-run
+python3 blueprint.py capability list --app apps/studio_app
+python3 blueprint.py capability add diagnostics --app apps/studio_app --config project.json --dry-run
 python3 blueprint.py feature apps/acme_app catalog --kind api
 python3 blueprint.py module orders --workspace .
 python3 blueprint.py check generate-check
+python3 blueprint.py doctor --purpose validate
 python3 blueprint.py validate
 python3 blueprint.py build --app apps/acme_app --platforms web
+python3 blueprint.py build --app apps/studio_app --profile web-local
+python3 blueprint.py package --app apps/studio_app --profile web-local
+python3 blueprint.py upgrade-report --app apps/studio_app --source /path/to/new-blueprint
 ```
 
-创建完成后进入生成项目再运行后续命令。Windows 将 `python3` 替换为 `py -3`。命令细节以 `--help` 为准；见 [创建项目](new-project.md)。
+`project.json` 须先按 [创建项目](new-project.md) 写成 schema 1 配置；这里的 `web-local` 仅在配置含同名 build profile 时可用。创建完成后进入生成项目，安装或指定 `.fvmrc` 对应 SDK；用 `python3 blueprint.py devices` 查看设备，再运行 `python3 blueprint.py run --app <App路径> --device <设备ID>`。看到首页后执行验证。Windows 将 `python3` 替换为 `py -3`。命令细节以 `--help` 为准；见 [工具清单](tools.md)。
 
 ## UI 设计入口
 
@@ -45,3 +52,5 @@ API、本地 IO、认证、持久化都是按需能力。不要从认证样例�
 ## 规则优先级
 
 明确的用户要求和当前有效决策确定目标；可运行代码与测试证明现状。若二者不一致，记录差异并修复或登记有理由的例外，不把既有违规自动升级为规范。架构文档负责边界，Skill 负责执行步骤，模板和测试验证可执行性。历史项目和外部资料是设计参考，不是任务前置依赖。
+
+辅助命令见 [工具清单](tools.md)，平台构建与实际运行分别按 [平台验收](platform-acceptance.md) 记录。`doctor --purpose validate` 只对活动浏览器测试检查 Chrome，对 API Web 冒烟入口检查 Node。

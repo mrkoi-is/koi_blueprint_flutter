@@ -1,3 +1,6 @@
+import 'package:koi_ui/widgets/koi_menu.dart';
+import 'package:koi_ui/l10n/koi_ui_strings.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -220,7 +223,7 @@ class _KoiWorkbenchFrameState extends State<KoiWorkbenchFrame> {
           primary: _panelSurface(widget.detail!, 'detail'),
           secondary: content,
           primaryOnTrailing: true,
-          resizeLabel: '调整详情宽度',
+          resizeLabel: KoiUiStrings.of(context).resizeDetail,
           width: widget.detailWidth,
           onWidthChanged: widget.onDetailWidthChanged,
           minSecondaryWidth: 320,
@@ -310,94 +313,104 @@ class _KoiWorkbenchFrameState extends State<KoiWorkbenchFrame> {
         );
       }
       final drawerWidth = math.min(360.0, constraints.maxWidth * .85);
-      return Scaffold(
-        backgroundColor: chromeBackground,
-        key: _controller._scaffoldKey,
-        onDrawerChanged: _controller._drawerChanged,
-        onEndDrawerChanged: (open) =>
-            _controller._drawerChanged(open, trailing: true),
-        appBar: widget.showHeader
-            ? AppBar(
-                backgroundColor: chromeBackground,
-                surfaceTintColor: Colors.transparent,
-                elevation: 0,
-                scrolledUnderElevation: 0,
-                title: compact && widget.headerLeading != null
-                    ? widget.headerLeading
-                    : widget.title,
-                centerTitle: false,
-                titleSpacing: compact ? 0 : null,
-                automaticallyImplyLeading: false,
-                leading: compact
-                    ? (widget.sidebar == null ? null : _sidebarButton())
-                    : Row(
-                        children: [
-                          if (widget.headerLeading != null)
-                            SizedBox(
-                              width: widget.headerLeadingWidth,
-                              child: widget.headerLeading,
-                            ),
-                          if (widget.sidebar != null) _sidebarButton(),
-                        ],
-                      ),
-                leadingWidth: compact
-                    ? null
-                    : (widget.headerLeading == null
-                              ? 0
-                              : widget.headerLeadingWidth) +
-                          (widget.sidebar == null ? 0 : 48),
-                actions: [
-                  ...widget.actions,
-                  if (compact && widget.navigationTrailing != null)
-                    widget.navigationTrailing!,
-                  if (widget.detail != null) _detailButton(),
-                ],
-              )
-            : null,
-        drawer: !expanded && widget.sidebar != null
-            ? Drawer(
-                width: drawerWidth,
-                backgroundColor: tokens.panelBackground,
-                child: SafeArea(
-                  child: _panelSurface(widget.sidebar!, 'sidebar'),
-                ),
-              )
-            : null,
-        endDrawer: !expanded && widget.detail != null
-            ? Drawer(
-                width: drawerWidth,
-                backgroundColor: tokens.panelBackground,
-                child: SafeArea(child: _panelSurface(widget.detail!, 'detail')),
-              )
-            : null,
-        body: SafeArea(top: false, child: content),
-        bottomNavigationBar: compact && widget.destinations.length >= 2
-            ? Row(
-                children: [
-                  Expanded(
-                    child: NavigationBar(
-                      backgroundColor: chromeBackground,
-                      selectedIndex: selectedIndex,
-                      onDestinationSelected: select,
-                      labelBehavior:
-                          NavigationDestinationLabelBehavior.onlyShowSelected,
-                      destinations: [
-                        for (final destination in widget.destinations)
-                          NavigationDestination(
-                            icon: Icon(destination.icon),
-                            selectedIcon: Icon(
-                              destination.selectedIcon ?? destination.icon,
-                            ),
-                            label: destination.label,
-                          ),
-                      ],
-                    ),
+      return KoiMenuLayout(
+        width: constraints.maxWidth,
+        child: Scaffold(
+          backgroundColor: chromeBackground,
+          key: _controller._scaffoldKey,
+          onDrawerChanged: _controller._drawerChanged,
+          onEndDrawerChanged: (open) =>
+              _controller._drawerChanged(open, trailing: true),
+          appBar: widget.showHeader
+              ? AppBar(
+                  backgroundColor: chromeBackground,
+                  surfaceTintColor: Colors.transparent,
+                  elevation: 0,
+                  scrolledUnderElevation: 0,
+                  title: compact && widget.headerLeading != null
+                      ? widget.headerLeading
+                      : widget.title,
+                  centerTitle: false,
+                  titleSpacing: compact ? 0 : null,
+                  automaticallyImplyLeading: false,
+                  leading: compact
+                      ? (widget.sidebar == null ? null : _sidebarButton())
+                      : Row(
+                          children: [
+                            if (widget.headerLeading != null)
+                              SizedBox(
+                                width: widget.headerLeadingWidth,
+                                child: widget.headerLeading,
+                              ),
+                            if (widget.sidebar != null) _sidebarButton(),
+                          ],
+                        ),
+                  leadingWidth: compact
+                      ? null
+                      : (widget.headerLeading == null
+                                ? 0
+                                : widget.headerLeadingWidth) +
+                            (widget.sidebar == null ? 0 : 48),
+                  actions: [
+                    ...widget.actions,
+                    if (compact && widget.navigationTrailing != null)
+                      widget.navigationTrailing!,
+                    if (widget.detail != null) _detailButton(),
+                  ],
+                )
+              : null,
+          drawer: !expanded && widget.sidebar != null
+              ? Drawer(
+                  width: drawerWidth,
+                  backgroundColor: tokens.panelBackground,
+                  child: SafeArea(
+                    child: _panelSurface(widget.sidebar!, 'sidebar'),
                   ),
-                  if (!widget.showHeader && widget.navigationTrailing != null)
-                    SafeArea(top: false, child: widget.navigationTrailing!),
-                ],
-              )
-            : null,
+                )
+              : null,
+          endDrawer: !expanded && widget.detail != null
+              ? Drawer(
+                  width: drawerWidth,
+                  backgroundColor: tokens.panelBackground,
+                  child: SafeArea(
+                    child: _panelSurface(widget.detail!, 'detail'),
+                  ),
+                )
+              : null,
+          body: SafeArea(top: false, child: content),
+          bottomNavigationBar:
+              compact &&
+                  (widget.destinations.length >= 2 ||
+                      (!widget.showHeader && widget.navigationTrailing != null))
+              ? Row(
+                  children: [
+                    if (widget.destinations.length >= 2)
+                      Expanded(
+                        child: NavigationBar(
+                          backgroundColor: chromeBackground,
+                          selectedIndex: selectedIndex,
+                          onDestinationSelected: select,
+                          labelBehavior: NavigationDestinationLabelBehavior
+                              .onlyShowSelected,
+                          destinations: [
+                            for (final destination in widget.destinations)
+                              NavigationDestination(
+                                icon: Icon(destination.icon),
+                                selectedIcon: Icon(
+                                  destination.selectedIcon ?? destination.icon,
+                                ),
+                                label: destination.label,
+                              ),
+                          ],
+                        ),
+                      ),
+                    if (widget.destinations.length < 2) const Spacer(),
+                    if (!widget.showHeader && widget.navigationTrailing != null)
+                      SafeArea(top: false, child: widget.navigationTrailing!),
+                  ],
+                )
+              : null,
+        ),
       );
     },
   );
@@ -422,7 +435,7 @@ class _KoiWorkbenchFrameState extends State<KoiWorkbenchFrame> {
 
   Widget _sidebarButton() => IconButton(
     style: _panelStyle(),
-    tooltip: '切换资料侧栏',
+    tooltip: KoiUiStrings.of(context).toggleSidebar,
     isSelected: _controller.sidebarOpen,
     onPressed: _controller.toggleSidebar,
     icon: const KoiPanelIcon(),
@@ -430,7 +443,7 @@ class _KoiWorkbenchFrameState extends State<KoiWorkbenchFrame> {
 
   Widget _detailButton() => IconButton(
     style: _panelStyle(),
-    tooltip: '切换详情面板',
+    tooltip: KoiUiStrings.of(context).toggleDetail,
     isSelected: _controller.detailOpen,
     onPressed: _controller.toggleDetail,
     icon: const KoiPanelIcon(trailing: true),

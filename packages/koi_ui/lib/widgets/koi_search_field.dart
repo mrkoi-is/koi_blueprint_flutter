@@ -1,3 +1,4 @@
+import 'package:koi_ui/l10n/koi_ui_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:koi_ui/theme/koi_theme_tokens.dart';
 
@@ -77,7 +78,7 @@ class _KoiSearchFieldState extends State<KoiSearchField> {
       suffixIcon: _controller.text.isEmpty
           ? null
           : IconButton(
-              tooltip: '清除搜索',
+              tooltip: KoiUiStrings.of(context).clearSearch,
               icon: const Icon(Icons.close, size: 18),
               onPressed: () {
                 _controller.clear();

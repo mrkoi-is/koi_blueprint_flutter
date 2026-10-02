@@ -10,8 +10,8 @@
 python3 blueprint.py create acme --output ../acme --org com.example --template workbench
 cd ../acme
 python3 blueprint.py validate
-cd apps/acme_app
-flutter run -d macos
+python3 blueprint.py devices
+python3 blueprint.py run --app apps/acme_app --device macos
 ```
 
 `examples/workbench_app` 保存业务源码、测试和小型真实媒体 fixture，平台 runner 由固定 Flutter SDK 生成。可以用 `--platforms web,macos` 创建平台子集；Linux 需要 `libmpv-dev`、`mpv`、`libepoxy-dev` 及 Flutter 的 GTK 构建依赖。
@@ -21,11 +21,15 @@ flutter run -d macos
 - 文本：新建、导入 UTF-8 TXT/Markdown、重命名、搜索、纯文本编辑；停止输入 500ms 自动保存，显式保存立即提交。
 - 素材：导入 JPEG/PNG/MP4 工作区副本、图片缩放、视频播放/暂停/seek/音量、实际缩略图；首次打开视频后生成首帧缩略图。
 - 任务：待办与后台导入/缩略图任务使用不同模型；可取消与重试，重试保留原记录。
-- 导航：64px 固定图标栏，底部设置可切换主题和密度；窄窗口将设置移到顶部。macOS 使用原生统一工具栏：红黄绿右侧同一行放后退、前进、项目标题，保存固定右侧；宽窗口去掉重复 Flutter 标题区，与导航背景同步。
+- 导航：尺寸使用 `KoiWorkbenchMetrics.railWidth` 的固定图标栏，底部设置可切换主题和密度；窄窗口有 Flutter 标题栏时设置放顶部，原生标题栏接管时放底部；单目的地也保留入口。macOS 使用原生统一工具栏：红黄绿右侧同一行放后退、前进、侧栏开关及当前内容标题，详情开关与保存固定右侧；原生工具栏接管时去掉重复 Flutter 标题区，与导航背景同步。
 - 页面历史：顶部后退/前进恢复视图和资料/素材选择，保留草稿与播放器；历史仅限本次会话，最多 100 条，跳过已删除内容。后退后打开新内容清空前进分支，保存和任务进度不增加历史。Cmd+[ / Cmd+]；非 macOS 另支持 Alt+Left / Alt+Right。
-- Native：应用管理目录内的串行快照、暂存、备份与恢复。Web：IndexedDB 元数据和实际 Blob；预览 URL 不进入持久化模型。
+- Native：应用管理目录内的独占文件锁、版本检查、串行快照、暂存、备份与恢复。Web：Web Locks 单写者、IndexedDB 元数据和实际 Blob；预览 URL 不进入持久化模型。
 - 导入上限默认文本 256 KiB、图片 20 MiB、视频 100 MiB；验收视频为 MP4/H.264 8-bit 4:2:0/AAC-LC。
 - 应用会话拥有任务，展示会话拥有播放器与预览源，bootstrap 最后关闭存储。插件选择器由用户关闭；废弃迟到结果不会替代关闭原生对话框。
+
+同一工作区只允许一个写入会话；第二窗口/标签页显示工作区已打开并可重试。所有权在加载、恢复及清理暂存前取得，资源收尾后释放。Web 需要支持 Web Locks 的安全上下文（HTTPS 或 localhost），不可用时明确失败。Native 存储由宿主的同一拥有者 isolate 装配，不在其他 isolate 重复创建实例。
+
+可取消的正常退出先暂停预览、取消并等待任务、保存全部快照。保存失败取消退出并保留可编辑会话；强杀/断电与浏览器关闭不保证等待异步保存，持续防抖保存仍是基础。
 
 这些工作台依赖不会进入默认 `minimal` 模板。`domain` 不包含插件、文件句柄、浏览器对象、播放器类型或 Blob URL。
 

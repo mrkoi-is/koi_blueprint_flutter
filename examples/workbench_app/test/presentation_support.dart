@@ -11,6 +11,8 @@ final class MemoryRepository implements WorkspaceRepository {
   MemoryRepository([this.snapshot = const WorkspaceSnapshot()]);
   WorkspaceSnapshot snapshot;
   int saves = 0;
+  @override
+  int persistedVersion = 0;
   bool failLoad = false;
   bool failSave = false;
   Future<void>? saveGate;
@@ -23,12 +25,16 @@ final class MemoryRepository implements WorkspaceRepository {
   }
 
   @override
-  Future<void> save(WorkspaceSnapshot value) async {
+  Future<void> save(WorkspaceSnapshot value, {int? expectedVersion}) async {
     await saveGate;
     if (failSave) {
       throw StateError('write failure');
     }
+    if (expectedVersion != null && expectedVersion != persistedVersion) {
+      throw const WorkspaceConflict();
+    }
     ++saves;
+    ++persistedVersion;
     snapshot = value;
   }
 }

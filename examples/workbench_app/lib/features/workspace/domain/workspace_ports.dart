@@ -4,7 +4,16 @@ import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 
 abstract interface class WorkspaceRepository {
   Future<WorkspaceSnapshot> load();
-  Future<void> save(WorkspaceSnapshot snapshot);
+
+  /// Version of the last loaded or successfully committed durable snapshot.
+  int get persistedVersion;
+  Future<void> save(WorkspaceSnapshot snapshot, {int? expectedVersion});
+}
+
+/// Optional history consumption; current tasks remain owned by the workspace.
+abstract interface class JobHistoryRepository {
+  Future<List<WorkspaceJob>> read({String? jobId, int limit = 50});
+  Future<void> clear();
 }
 
 /// Application-owned content. Keys are opaque, never caller supplied paths.
@@ -72,4 +81,12 @@ class WorkspaceStorageException implements Exception {
   final String message;
   @override
   String toString() => message;
+}
+
+final class WorkspaceInUse extends WorkspaceStorageException {
+  const WorkspaceInUse() : super('此工作区已在其他窗口打开，请关闭后重试');
+}
+
+final class WorkspaceConflict extends WorkspaceStorageException {
+  const WorkspaceConflict() : super('工作区已被其他写入更新，当前内容已保留；请重新打开后再操作');
 }

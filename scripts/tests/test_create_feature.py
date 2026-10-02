@@ -27,6 +27,12 @@ class CreateFeatureTest(unittest.TestCase):
         self.assertEqual(self.forwarded('/workspace/apps/demo', 'welcome', '--presentation-only'),
                          ['feature', '/workspace/apps/demo', 'welcome', '--kind', 'presentation'])
 
+    def test_explicit_local_kind_is_preserved(self):
+        for options in (['--kind', 'local'], ['--kind=local']):
+            with self.subTest(options=options):
+                self.assertEqual(self.forwarded('/workspace/apps/demo', 'drafts', *options),
+                                 ['feature', '/workspace/apps/demo', 'drafts', *options])
+
     def test_real_subprocess_dry_run_and_invalid_names_are_nonmutating(self):
         with tempfile.TemporaryDirectory(prefix='legacy feature 中文 ') as temporary:
             root = Path(temporary)
@@ -37,12 +43,16 @@ class CreateFeatureTest(unittest.TestCase):
             for name, options, expected in (
                 ('user_profile', ['--dry-run'], 0),
                 ('hello_panel', ['--presentation-only', '--dry-run'], 0),
+                ('local_notes', ['--kind', 'local', '--dry-run'], 0),
+                ('conflicting', ['--kind', 'local', '--presentation-only'], 2),
                 ('../../../escaped', [], 2),
                 ('enum', [], 2),
             ):
                 with self.subTest(name=name):
                     result = subprocess.run([sys.executable, str(SCRIPT), str(app), name, *options], capture_output=True, text=True, encoding='utf-8', check=False)
                     self.assertEqual(result.returncode, expected, result.stderr)
+                    if name == 'local_notes':
+                        self.assertIn('local:', result.stdout)
             self.assertFalse((app / 'lib').exists())
             self.assertFalse((root / 'packages').exists())
 

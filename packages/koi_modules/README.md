@@ -15,3 +15,7 @@
 ```sh
 ../../tool/flutterw test --no-pub --coverage
 ```
+
+模块可以声明不可变 `capabilities`（稳定操作 ID 集合）和可选 `checkAvailability`。省略这两项兼容旧模块。创建新会话前实际探测 `CapabilityAvailability`：`available` 继续，`unsupported`/`unavailable` 不调用工厂并给出原因；初始化抛错映射为 unavailable 并保留 diagnostic。值类型与原生 adapter 共用 koi_core，不代表下一次 IO 保证成功。preflight 和工厂一样必须有界。
+
+检查发生在旧会话清理后，不自动恢复旧会话；same-ID 的普通导航仍复用活跃会话，配置/账号变更要显式 restart。UI 可基于 reason 展示配置恢复或替代入口，再调用 activate 重试。异步可用性探测同样受代次保护，旧探测结果不会启动已被替换的模块。

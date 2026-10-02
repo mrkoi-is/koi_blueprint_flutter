@@ -1,8 +1,14 @@
+import 'package:workbench_app/core/capabilities/installed_capabilities.dart';
+
 import 'dart:async';
-import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:workbench_app/core/preferences/ui_preferences_store.dart';
+import 'package:workbench_app/core/diagnostics/app_diagnostics.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/appearance_providers.dart';
 import 'package:workbench_app/core/router/app_routes.dart';
 import 'package:workbench_app/core/router/workbench_navigation_history.dart';
 import 'package:workbench_app/features/workspace/application/workspace_session.dart';
@@ -19,6 +25,7 @@ import 'package:workbench_app/features/workspace/presentation/services/media_pre
 final class WorkbenchBootstrap {
   WorkbenchBootstrap._(
     this.storageOwner,
+    this.preferencesStore,
     this.session,
     this.preview,
     this.container,
@@ -27,6 +34,7 @@ final class WorkbenchBootstrap {
     this._routeListener,
   );
   final storage.WorkspaceStorage storageOwner;
+  final UiPreferencesStore preferencesStore;
   final WorkspaceSession session;
   final MediaPreviewSession preview;
   final ProviderContainer container;
@@ -34,6 +42,8 @@ final class WorkbenchBootstrap {
   final WorkbenchNavigationHistory history;
   final void Function() _routeListener;
   Future<void>? _closing;
+  Future<WorkspaceSaveResult>? _preparation;
+  final preparingToClose = ValueNotifier<bool>(false);
 
   static Future<WorkbenchBootstrap> create({
     Future<storage.WorkspaceStorage> Function()? openStorage,
@@ -41,14 +51,20 @@ final class WorkbenchBootstrap {
     MediaPlaybackFactory createPlayback = MediaKitPlayback.new,
     Future<Uint8List> Function(Uint8List)? encodeThumbnail,
     String? initialLocation,
+    Future<UiPreferencesStore> Function()? openPreferences,
   }) async {
     storage.WorkspaceStorage? ownedStorage;
+    UiPreferencesStore? ownedPreferences;
     WorkspaceSession? ownedSession;
     MediaPreviewSession? ownedPreview;
     ProviderContainer? ownedContainer;
     GoRouter? ownedRouter;
     WorkbenchNavigationHistory? ownedHistory;
     try {
+      final preferencesStore =
+          await (openPreferences?.call() ??
+              Future.value(MemoryUiPreferencesStore()));
+      ownedPreferences = preferencesStore;
       final data = await (openStorage ?? storage.openWorkspaceStorage)();
       ownedStorage = data;
       final encoder = encodeThumbnail ?? createImageThumbnail;
@@ -106,7 +122,9 @@ final class WorkbenchBootstrap {
       ownedHistory = history;
       final container = ProviderContainer(
         retry: (_, _) => null,
+        observers: [AppDiagnostics.instance.observer],
         overrides: [
+          uiPreferencesStoreProvider.overrideWithValue(preferencesStore),
           workspaceSessionProvider.overrideWithValue(session),
           mediaPreviewSessionProvider.overrideWithValue(preview),
           navigationHistoryProvider.overrideWithValue(history),
@@ -115,6 +133,7 @@ final class WorkbenchBootstrap {
       ownedContainer = container;
       return WorkbenchBootstrap._(
         data,
+        preferencesStore,
         session,
         preview,
         container,
@@ -131,6 +150,7 @@ final class WorkbenchBootstrap {
         if (ownedPreview != null) ownedPreview.disposeAsync,
         if (ownedSession != null) ownedSession.dispose,
         if (ownedStorage != null) ownedStorage.close,
+        if (ownedPreferences != null) ownedPreferences.close,
       ]) {
         try {
           await close();
@@ -145,6 +165,40 @@ final class WorkbenchBootstrap {
     }
   }
 
+  Future<WorkspaceSaveResult> prepareToClose() =>
+      _preparation ??= _prepareToClose();
+  Future<WorkspaceSaveResult> _prepareToClose() async {
+    preparingToClose.value = true;
+    try {
+      if (container.exists(workbenchAppearanceProvider) &&
+          !await container.read(workbenchAppearanceProvider.notifier).flush()) {
+        preparingToClose.value = false;
+        _preparation = null;
+        return const WorkspaceSaveResult.failed(
+          'App preferences could not be saved',
+        );
+      }
+      if (!await prepareInstalledCapabilities()) {
+        preparingToClose.value = false;
+        _preparation = null;
+        return const WorkspaceSaveResult.failed(
+          'Capability close preparation failed',
+        );
+      }
+      await preview.prepareToClose();
+      final result = await session.prepareToClose();
+      if (!result.succeeded) {
+        preparingToClose.value = false;
+        _preparation = null;
+      }
+      return result;
+    } catch (error) {
+      preparingToClose.value = false;
+      _preparation = null;
+      return WorkspaceSaveResult.failed('关闭前收尾失败：$error');
+    }
+  }
+
   Future<void> disposeAsync() => _closing ??= _close();
   Future<void> _close() async {
     router.routeInformationProvider.removeListener(_routeListener);
@@ -156,6 +210,9 @@ final class WorkbenchBootstrap {
       preview.disposeAsync,
       session.dispose,
       storageOwner.close,
+      preferencesStore.close,
+      disposeInstalledCapabilities,
+      preparingToClose.dispose,
     ]) {
       try {
         await close();

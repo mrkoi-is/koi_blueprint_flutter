@@ -11,9 +11,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_riverpod: 3.4.3
   go_router: ^17.5.0
   riverpod_annotation: 4.0.7
+  koi_core:
   koi_modules:
   koi_ui:
   showcase_contracts:
@@ -27,4 +30,5 @@ dev_dependencies:
   riverpod_generator: 4.0.9
 
 flutter:
+  generate: true
   uses-material-design: true

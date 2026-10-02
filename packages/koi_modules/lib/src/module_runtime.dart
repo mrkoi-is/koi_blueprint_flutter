@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:koi_core/koi_core.dart';
 import 'package:koi_modules/src/module_catalog.dart';
 import 'package:koi_modules/src/module_session.dart';
 
@@ -11,12 +12,23 @@ final class ModuleRuntimeState<T extends Object> {
     this.requestedModuleId,
     this.isSwitching = false,
     this.error,
+    this.availability,
   });
 
   final ModuleSession<T>? session;
   final String? requestedModuleId;
   final bool isSwitching;
   final Object? error;
+  final CapabilityAvailability? availability;
+}
+
+final class ModuleUnavailableException implements Exception {
+  const ModuleUnavailableException(this.moduleId, this.availability);
+  final String moduleId;
+  final CapabilityAvailability availability;
+  @override
+  String toString() =>
+      '$moduleId: ${availability.reason ?? availability.status.name}';
 }
 
 /// Serializes lifecycle transitions while immediately invalidating old results.
@@ -72,6 +84,13 @@ final class KoiModuleRuntime<T extends Object> extends ChangeNotifier {
       _ownedSession = null;
       await previous?.context.disposeAsync();
       _ensureCurrent(module.id, generation);
+      final availability =
+          await module.checkAvailability?.call() ??
+          const CapabilityAvailability.available();
+      _ensureCurrent(module.id, generation);
+      if (!availability.isAvailable) {
+        throw ModuleUnavailableException(module.id, availability);
+      }
       context = ModuleSessionContext(
         moduleId: module.id,
         generation: generation,
@@ -84,7 +103,11 @@ final class KoiModuleRuntime<T extends Object> extends ChangeNotifier {
       _ownedSession = session;
       _creating = null;
       _publish(
-        ModuleRuntimeState(session: session, requestedModuleId: module.id),
+        ModuleRuntimeState(
+          session: session,
+          requestedModuleId: module.id,
+          availability: const CapabilityAvailability.available(),
+        ),
       );
       return session;
     } catch (error, stackTrace) {
@@ -97,7 +120,16 @@ final class KoiModuleRuntime<T extends Object> extends ChangeNotifier {
       if (identical(_creating, context)) _creating = null;
       if (!_closed && generation == _generation) {
         _publish(
-          ModuleRuntimeState(requestedModuleId: module.id, error: failure),
+          ModuleRuntimeState(
+            requestedModuleId: module.id,
+            error: failure,
+            availability: failure is ModuleUnavailableException
+                ? failure.availability
+                : CapabilityAvailability.unavailable(
+                    '模块初始化失败，请重试',
+                    diagnostic: failure,
+                  ),
+          ),
         );
       }
       Error.throwWithStackTrace(failure, stackTrace);

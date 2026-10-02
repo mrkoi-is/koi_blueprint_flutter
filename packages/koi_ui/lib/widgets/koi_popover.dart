@@ -1,3 +1,5 @@
+import 'package:koi_ui/l10n/koi_ui_strings.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -9,13 +11,15 @@ class KoiPopover extends StatefulWidget {
   const KoiPopover({
     required this.builder,
     required this.child,
-    this.label = '打开面板',
+    this.label,
+    this.dismissLabel,
     super.key,
   });
 
   final Widget Function(BuildContext context, VoidCallback close) builder;
   final Widget child;
-  final String label;
+  final String? label;
+  final String? dismissLabel;
 
   @override
   State<KoiPopover> createState() => _KoiPopoverState();
@@ -104,7 +108,12 @@ class _KoiPopoverState extends State<KoiPopover> {
           return Stack(
             children: [
               Positioned.fill(
-                child: ModalBarrier(onDismiss: _close, semanticsLabel: '关闭面板'),
+                child: ModalBarrier(
+                  onDismiss: _close,
+                  semanticsLabel:
+                      widget.dismissLabel ??
+                      KoiUiStrings.of(context).closePanel,
+                ),
               ),
               Positioned(
                 left: left.toDouble(),
@@ -115,7 +124,7 @@ class _KoiPopoverState extends State<KoiPopover> {
                   scopesRoute: true,
                   namesRoute: true,
                   explicitChildNodes: true,
-                  label: widget.label,
+                  label: widget.label ?? KoiUiStrings.of(context).openPanel,
                   child: FocusScope(
                     node: _scope,
                     autofocus: true,
@@ -154,7 +163,7 @@ class _KoiPopoverState extends State<KoiPopover> {
         onPressed: _toggle,
         child: Semantics(
           expanded: _controller.isShowing,
-          label: widget.label,
+          label: widget.label ?? KoiUiStrings.of(context).openPanel,
           excludeSemantics: true,
           child: widget.child,
         ),

@@ -1,3 +1,4 @@
+import 'package:workbench_app/l10n/app_strings.dart';
 import 'package:workbench_app/features/workspace/presentation/widgets/workspace_save_status.dart';
 
 import 'dart:async';
@@ -31,11 +32,11 @@ class WorkspaceSidebar extends ConsumerWidget {
       final query = ref.watch(documentSearchProvider);
       final documents = searchDocuments(state.documents, query);
       return KoiPanel(
-        title: '文本资料',
+        title: context.l10n.text,
         search: KoiSearchField(
           key: const ValueKey('document-search'),
           initialValue: query,
-          hintText: '搜索资料',
+          hintText: context.l10n.searchDocuments,
           onChanged: ref.read(documentSearchProvider.notifier).setQuery,
         ),
         child: ListView(
@@ -56,11 +57,11 @@ class WorkspaceSidebar extends ConsumerWidget {
                 leading: const Icon(Icons.description_outlined),
                 trailing: document.dirty
                     ? Tooltip(
-                        message: '未保存',
+                        message: context.l10n.unsaved,
                         child: Icon(
                           Icons.circle,
                           size: 6,
-                          semanticLabel: '未保存',
+                          semanticLabel: context.l10n.unsaved,
                           color: Theme.of(context).colorScheme.primary,
                         ),
                       )
@@ -77,7 +78,7 @@ class WorkspaceSidebar extends ConsumerWidget {
                   }
                 },
               ),
-            if (documents.isEmpty) const Text('没有匹配的资料'),
+            if (documents.isEmpty) Text(context.l10n.noMatchingDocuments),
           ],
         ),
       );
@@ -93,11 +94,11 @@ class WorkspaceSidebar extends ConsumerWidget {
       final kind = ref.watch(mediaFilterProvider);
       final query = ref.watch(mediaSearchProvider);
       return KoiPanel(
-        title: '媒体分类',
+        title: context.l10n.mediaCategories,
         search: KoiSearchField(
           key: const ValueKey('media-search'),
           initialValue: query,
-          hintText: '搜索素材',
+          hintText: context.l10n.searchMedia,
           onChanged: ref.read(mediaSearchProvider.notifier).setQuery,
         ),
         child: ListView(
@@ -105,13 +106,13 @@ class WorkspaceSidebar extends ConsumerWidget {
           padding: const EdgeInsets.symmetric(vertical: 4),
           children: [
             KoiSelectableListTile(
-              title: const Text('全部'),
+              title: Text(context.l10n.all),
               trailing: Text('${assets.length}'),
               selected: kind == null,
               onTap: () => ref.read(mediaFilterProvider.notifier).setKind(null),
             ),
             KoiSelectableListTile(
-              title: const Text('图片'),
+              title: Text(context.l10n.image),
               trailing: Text(
                 '${assets.where((asset) => asset.kind == MediaKind.image).length}',
               ),
@@ -121,7 +122,7 @@ class WorkspaceSidebar extends ConsumerWidget {
                   .setKind(MediaKind.image),
             ),
             KoiSelectableListTile(
-              title: const Text('视频'),
+              title: Text(context.l10n.video),
               trailing: Text(
                 '${assets.where((asset) => asset.kind == MediaKind.video).length}',
               ),
@@ -132,7 +133,7 @@ class WorkspaceSidebar extends ConsumerWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              '导入的素材副本保存在当前工作区；切换视图会暂停视频并保留播放位置。',
+              context.l10n.mediaStorageHint,
               style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
@@ -154,17 +155,17 @@ class WorkspaceSidebar extends ConsumerWidget {
       ),
     );
     return KoiPanel(
-      title: '任务概览',
+      title: context.l10n.taskSummary,
       child: ListView(
         key: const PageStorageKey('sidebar-tasks-scroll'),
         padding: const EdgeInsets.symmetric(vertical: 4),
         children: [
-          Text('${counts.todos} 项待办未完成'),
+          Text(context.l10n.incompleteTodos(counts.todos)),
           const SizedBox(height: 8),
-          Text('${counts.jobs} 项 IO 作业处理中'),
+          Text(context.l10n.activeJobs(counts.jobs)),
           const SizedBox(height: 24),
           Text(
-            '任务在切换视图时继续运行。取消会停止读取并清理暂存内容。',
+            context.l10n.taskRunningHint,
             style: Theme.of(context).textTheme.bodySmall,
           ),
         ],
@@ -192,29 +193,32 @@ class WorkspaceDetails extends ConsumerWidget {
         }),
       );
       return KoiPanel(
-        title: '资料详情',
+        title: context.l10n.documentDetails,
         child: ListView(
           key: const PageStorageKey('detail-text-scroll'),
           padding: EdgeInsets.zero,
           children: [
             if (document == null)
-              const Text('尚未选择资料')
+              Text(context.l10n.noDocumentSelected)
             else ...[
-              KoiPropertyRow(label: '名称', value: Text(document.title)),
               KoiPropertyRow(
-                label: '字数',
-                value: Text('${document.text.length} 字'),
+                label: context.l10n.name,
+                value: Text(document.title),
               ),
               KoiPropertyRow(
-                label: '版本',
-                value: Text('版本 ${document.revision}'),
+                label: context.l10n.characterCountLabel,
+                value: Text(context.l10n.characterCount(document.text.length)),
               ),
               KoiPropertyRow(
-                label: '保存状态',
+                label: context.l10n.revisionLabel,
+                value: Text(context.l10n.revision(document.revision)),
+              ),
+              KoiPropertyRow(
+                label: context.l10n.saveStatus,
                 value: WorkspaceSaveStatus(document: document),
               ),
               Text(
-                '停止输入 500 毫秒后自动保存',
+                context.l10n.autosaveHint,
                 style: Theme.of(context).textTheme.bodySmall,
               ),
             ],
@@ -234,30 +238,35 @@ class WorkspaceDetails extends ConsumerWidget {
         }),
       );
       return KoiPanel(
-        title: '素材详情',
+        title: context.l10n.mediaDetails,
         child: ListView(
           key: const PageStorageKey('detail-media-scroll'),
           padding: EdgeInsets.zero,
           children: [
             if (asset == null)
-              const Text('尚未选择素材')
+              Text(context.l10n.noMediaSelected)
             else ...[
-              KoiPropertyRow(label: '名称', value: Text(asset.name)),
+              KoiPropertyRow(label: context.l10n.name, value: Text(asset.name)),
               KoiPropertyRow(
-                label: '大小',
-                value: Text('${asset.byteLength} 字节'),
+                label: context.l10n.size,
+                value: Text(context.l10n.byteCount(asset.byteLength)),
               ),
               KoiPropertyRow(
-                label: '类型',
-                value: Text(asset.kind == MediaKind.image ? '图片' : '视频'),
+                label: context.l10n.type,
+                value: Text(
+                  asset.kind == MediaKind.image
+                      ? context.l10n.image
+                      : context.l10n.video,
+                ),
               ),
               KoiPropertyRow(
-                label: '缩略图状态',
+                label: context.l10n.thumbnailStatus,
                 value: Text(switch (asset.thumbnailStatus) {
-                  ThumbnailStatus.none => '缩略图待生成',
-                  ThumbnailStatus.generating => '正在生成缩略图',
-                  ThumbnailStatus.ready => '缩略图已保存',
-                  ThumbnailStatus.failed => '缩略图失败',
+                  ThumbnailStatus.none => context.l10n.thumbnailPending,
+                  ThumbnailStatus.generating =>
+                    context.l10n.thumbnailGenerating,
+                  ThumbnailStatus.ready => context.l10n.thumbnailSaved,
+                  ThumbnailStatus.failed => context.l10n.thumbnailFailed,
                 }),
               ),
               if (asset.thumbnailError != null) Text(asset.thumbnailError!),
@@ -279,19 +288,19 @@ class WorkspaceDetails extends ConsumerWidget {
                       }
                     }
                   },
-                  child: const Text('重试缩略图'),
+                  child: Text(context.l10n.retryThumbnail),
                 ),
             ],
           ],
         ),
       );
     }
-    return const _Information(
-      title: '任务说明',
+    return _Information(
+      title: context.l10n.taskHelp,
       lines: [
-        '待办可以新建、重命名、完成和删除。',
-        'IO 进度来自实际字节读取。缩略图处理采用不确定进度。',
-        '关闭工作区会取消作业并保存当前草稿。',
+        context.l10n.todoHelp,
+        context.l10n.jobHelp,
+        context.l10n.closeHelp,
       ],
     );
   }

@@ -35,7 +35,10 @@ final class ShowcaseBootstrap {
         buildModules?.call(services) ??
             [
               alpha.createAlphaModule(services),
-              beta.createBetaModule(services),
+              beta.createBetaModule(
+                services,
+                checkAvailability: () => services.betaAvailability,
+              ),
             ],
       );
       // The reusable catalog permits route-only modules. This example's picker
@@ -59,6 +62,7 @@ final class ShowcaseBootstrap {
         retry: (_, _) => null,
         overrides: [
           moduleRuntimeProvider.overrideWithValue(runtime),
+          showcaseServicesProvider.overrideWithValue(services),
           activeShowcaseRepositoryProvider.overrideWith((ref) {
             final session = ref.watch(moduleSnapshotProvider).session;
             if (session == null) {

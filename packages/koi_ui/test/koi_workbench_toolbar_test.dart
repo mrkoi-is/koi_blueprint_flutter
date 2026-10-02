@@ -45,6 +45,52 @@ Widget _host(
 );
 
 void main() {
+  for (final count in [1, 2, 3]) {
+    for (final header in [false, true]) {
+      for (final width in [320.0, 600.0, 1024.0]) {
+        testWidgets(
+          'settings reachable: $count destinations, header=$header, width=$width',
+          (tester) async {
+            await tester.binding.setSurfaceSize(Size(width, 700));
+            addTearDown(() => tester.binding.setSurfaceSize(null));
+            var activations = 0;
+            await tester.pumpWidget(
+              MaterialApp(
+                theme: AppTheme.light,
+                home: KoiWorkbenchFrame(
+                  showHeader: header,
+                  title: const Text('工作区'),
+                  destinations: List.generate(
+                    count,
+                    (i) => KoiNavigationDestination(
+                      id: '$i',
+                      label: '页面$i',
+                      icon: Icons.description_outlined,
+                    ),
+                  ),
+                  selectedId: '0',
+                  onDestinationSelected: (_) {},
+                  navigationTrailing: IconButton(
+                    tooltip: '设置',
+                    icon: const Icon(Icons.settings_outlined),
+                    onPressed: () => activations++,
+                  ),
+                  body: const Text('内容'),
+                ),
+              ),
+            );
+            await tester.pumpAndSettle();
+            expect(find.byTooltip('设置'), findsOneWidget);
+            await tester.tap(find.byTooltip('设置'));
+            expect(activations, 1);
+            if (count == 1) expect(find.byType(NavigationBar), findsNothing);
+            expect(tester.takeException(), isNull);
+          },
+        );
+      }
+    }
+  }
+
   for (final width in [320.0, 800.0, 1440.0]) {
     testWidgets('host panel commands at $width need no second bar', (
       tester,

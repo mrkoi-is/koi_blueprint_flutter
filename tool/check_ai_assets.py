@@ -123,6 +123,16 @@ def _reference_target(root: Path, document: Path, target: str) -> Path | None:
     return root_candidate if root_candidate.exists() else candidate
 
 
+
+def _markdown_targets(text: str):
+    for match in re.finditer(r"(?<!!)\[[^\]\n]+\]\((<[^>]+>|[^)\n]+)\)", text):
+        value = match[1]
+        if value.startswith("<"):
+            yield value[1:-1]
+        else:
+            yield re.split(r'\s+["\']', value, maxsplit=1)[0]
+
+
 def check_references(root: Path, documents: list[Path]) -> list[Issue]:
     issues = []
     root_prefixes = ("apps/", "examples/", "packages/", "modules/", "tool/", "scripts/",
@@ -131,14 +141,7 @@ def check_references(root: Path, documents: list[Path]) -> list[Issue]:
     for document in documents:
         text = _without_fences(document.read_text(encoding="utf-8"))
         path = document.relative_to(root).as_posix()
-        targets = []
-        for match in re.finditer(r"(?<!!)\[[^\]\n]+\]\((<[^>]+>|[^)\n]+)\)", text):
-            value = match[1]
-            if value.startswith("<"):
-                value = value[1:-1]
-            else:
-                value = re.split(r'\s+["\']', value, maxsplit=1)[0]
-            targets.append(value)
+        targets = list(_markdown_targets(text))
         for match in re.finditer(r"(?<!`)`([^`\n]+)`(?!`)", text):
             value = match[1]
             if value in root_files or value.startswith(root_prefixes) or value.startswith("references/"):
@@ -227,11 +230,33 @@ def validate_assets(root: Path) -> list[Issue]:
     documents = [p for base in (root / ".agents/skills", root / "docs")
                  if base.is_dir() for p in base.rglob("*.md")
                  if tuple(p.relative_to(root).parts[:2]) not in source_only_docs]
-    documents.extend(root / name for name in ("AGENTS.md", "CLAUDE.md", "README.md", "DESIGN.md") if (root / name).is_file())
+    documents.extend(root / name for name in ("AGENTS.md", "CLAUDE.md", "README.md", "DESIGN.md", "CONTRIBUTING.md", "MELOS_USAGE.md") if (root / name).is_file())
     cursor = root / ".cursor/rules/koi-workspace.mdc"
     if cursor.is_file():
         documents.append(cursor)
     issues.extend(check_references(root, documents))
+    # Follow links from human/AI entrypoints; an orphan cycle is not discoverable.
+    by_path = {document.resolve(): document for document in documents}
+    reachable = set()
+    pending = [(root / name).resolve() for name in ("README.md", "AGENTS.md") if (root / name).is_file()]
+    while pending:
+        current = pending.pop()
+        if current in reachable:
+            continue
+        reachable.add(current)
+        document = by_path.get(current)
+        if document is None:
+            continue
+        for target in _markdown_targets(_without_fences(document.read_text(encoding="utf-8"))):
+            resolved = _reference_target(root, document, target)
+            if resolved in by_path and resolved not in reachable:
+                pending.append(resolved)
+    for name in (".agents/skills/GOVERNANCE.md", "MELOS_USAGE.md", "docs/tools.md", "docs/platform-acceptance.md"):
+        target = root / name
+        if not target.is_file():
+            continue
+        if target.resolve() not in reachable:
+            issues.append(Issue("AI_DISCOVERY", name, "Not reachable from README.md or AGENTS.md links"))
     # Sample maps point to executable source and tests; snapshots in generated
     # projects stay outside the workspace but retain their source/test pairs.
     source = root / ".blueprint/reference" if (root / ".blueprint/reference").is_dir() else root

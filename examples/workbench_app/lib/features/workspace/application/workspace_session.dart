@@ -14,7 +14,14 @@ final class WorkspaceSession {
     this._limits = const ImportLimits(),
     this._imageThumbnail,
     this._debounce = const Duration(milliseconds: 500),
-  });
+    this._progressInterval = const Duration(milliseconds: 100),
+    this._checkpointInterval = const Duration(seconds: 2),
+    this._historyLimit = 200,
+    DateTime Function()? clock,
+  }) : _clock = clock ?? DateTime.now,
+       assert(_historyLimit > 0),
+       assert(!_progressInterval.isNegative),
+       assert(!_checkpointInterval.isNegative);
 
   final WorkspaceRepository _repository;
   final AssetStore assetStore;
@@ -22,6 +29,13 @@ final class WorkspaceSession {
   final ImportLimits _limits;
   final Future<List<int>> Function(List<int>)? _imageThumbnail;
   final Duration _debounce;
+  final Duration _progressInterval;
+  final Duration _checkpointInterval;
+  final int _historyLimit;
+  final DateTime Function() _clock;
+  final Map<String, WorkspaceJob> _pendingProgress = {};
+  Timer? _progressTimer;
+  DateTime? _lastProgressCheckpoint;
   final _changes = StreamController<WorkspaceState>.broadcast();
   WorkspaceState _state = const WorkspaceState();
   WorkspaceState get state => _state;
@@ -31,6 +45,11 @@ final class WorkspaceSession {
   Future<void> _importPending = Future.value();
   Timer? _timer;
   bool _disposed = false;
+  bool _preparingToClose = false;
+  bool get preparingToClose => _preparingToClose;
+  Future<WorkspaceSaveResult>? _preparation;
+  int _persistedVersion = 0;
+  final Set<Future<void>> _backgroundPending = {};
   bool _selecting = false;
   int _nextId = 0;
 
@@ -38,6 +57,7 @@ final class WorkspaceSession {
       '${prefix}_${DateTime.now().microsecondsSinceEpoch}_${_nextId++}';
   void _ensureOpen() {
     if (_disposed) throw StateError('工作区会话已关闭');
+    if (_preparingToClose) throw StateError('工作区正在保存并关闭');
   }
 
   void _emit(WorkspaceState value) {
@@ -52,7 +72,7 @@ final class WorkspaceSession {
         error: null,
       ),
     );
-    if (schedule && !_disposed) {
+    if (schedule && !_disposed && !_preparingToClose) {
       _timer?.cancel();
       _timer = Timer(_debounce, () {
         unawaited(save());
@@ -66,10 +86,16 @@ final class WorkspaceSession {
     _ensureOpen();
     try {
       final snapshot = await _repository.load();
+      _persistedVersion = _repository.persistedVersion;
       if (_disposed) return;
       await assetStore.cleanupStaging();
       if (_disposed) return;
       final recovered = snapshot.copyWith(
+        jobHistory: snapshot.jobHistory.length > _historyLimit
+            ? snapshot.jobHistory.sublist(
+                snapshot.jobHistory.length - _historyLimit,
+              )
+            : snapshot.jobHistory,
         jobs: snapshot.jobs
             .map(
               (job) => job.terminal
@@ -94,7 +120,13 @@ final class WorkspaceSession {
       _emit(
         _state.copyWith(snapshot: recovered, initialized: true, error: null),
       );
-      if (recovered != snapshot) await save();
+      if (recovered != snapshot) {
+        for (final job in recovered.jobs.where((job) => job.terminal)) {
+          _putJob(job);
+        }
+        final result = await save();
+        if (!result.succeeded) throw WorkspaceStorageException(result.error!);
+      }
     } catch (error) {
       if (!_disposed) {
         _emit(_state.copyWith(initialized: false, error: error.toString()));
@@ -172,6 +204,43 @@ final class WorkspaceSession {
     );
   }
 
+  void deleteDocuments(Set<String> ids) {
+    _ensureOpen();
+    final snapshot = _state.snapshot;
+    _change(
+      snapshot.copyWith(
+        documents: snapshot.documents
+            .where((item) => !ids.contains(item.id))
+            .toList(),
+        preferences: snapshot.preferences.copyWith(
+          selectedDocumentId:
+              ids.contains(snapshot.preferences.selectedDocumentId)
+              ? null
+              : snapshot.preferences.selectedDocumentId,
+        ),
+      ),
+    );
+  }
+
+  void reorderDocuments(List<String> ids) {
+    _ensureOpen();
+    final documents = {
+      for (final item in _state.snapshot.documents) item.id: item,
+    };
+    if (ids.length != documents.length ||
+        ids.toSet().length != ids.length ||
+        !ids.every(documents.containsKey)) {
+      throw ArgumentError(
+        'Reordering must preserve every document ID exactly once',
+      );
+    }
+    _change(
+      _state.snapshot.copyWith(
+        documents: ids.map((id) => documents[id]!).toList(),
+      ),
+    );
+  }
+
   void updatePreferences(WorkspacePreferences value) {
     _ensureOpen();
     _change(_state.snapshot.copyWith(preferences: value));
@@ -219,10 +288,13 @@ final class WorkspaceSession {
   }
 
   /// Captures each revision at execution time; later edits stay dirty.
-  Future<void> save() {
+  Future<WorkspaceSaveResult> save() {
+    _flushProgress();
     _timer?.cancel();
     final operation = _savePending.then((_) async {
-      if (!_state.initialized) return;
+      if (!_state.initialized) {
+        return const WorkspaceSaveResult.failed('工作区尚未初始化');
+      }
       final captured = _state.snapshot;
       final persisted = captured.copyWith(
         documents: captured.documents
@@ -233,7 +305,8 @@ final class WorkspaceSession {
       );
       _emit(_state.copyWith(saving: true, error: null));
       try {
-        await _repository.save(persisted);
+        await _repository.save(persisted, expectedVersion: _persistedVersion);
+        _persistedVersion = _repository.persistedVersion;
         final revisions = {
           for (final document in captured.documents)
             document.id: document.revision,
@@ -254,11 +327,14 @@ final class WorkspaceSession {
             ),
           ),
         );
+        return WorkspaceSaveResult.saved(captured.revision);
       } catch (error) {
-        _emit(_state.copyWith(saving: false, error: '保存失败：$error'));
+        final message = '保存失败：$error';
+        _emit(_state.copyWith(saving: false, error: message));
+        return WorkspaceSaveResult.failed(message);
       }
     });
-    _savePending = operation;
+    _savePending = operation.then((_) {});
     return operation;
   }
 
@@ -268,9 +344,9 @@ final class WorkspaceSession {
     void Function() retainCommittedContent,
   ) async {
     _change(snapshot);
-    await save();
-    final error = _state.error;
-    if (error != null) {
+    final result = await save();
+    final error = result.error;
+    if (!result.succeeded && error != null) {
       retainCommittedContent();
       _emit(_state.copyWith(error: error));
       throw _CancellationRollbackFailed(error);
@@ -278,18 +354,73 @@ final class WorkspaceSession {
   }
 
   void _putJob(WorkspaceJob job) {
+    _pendingProgress.remove(job.id);
     final jobs = _state.snapshot.jobs;
+    var history = _state.snapshot.jobHistory;
+    if (job.terminal) {
+      history = [
+        ...history.where(
+          (entry) =>
+              entry.id != job.id || entry.currentAttempt != job.currentAttempt,
+        ),
+        job,
+      ];
+      if (history.length > _historyLimit) {
+        history = history.sublist(history.length - _historyLimit);
+      }
+    }
     _change(
       _state.snapshot.copyWith(
         jobs: jobs.any((value) => value.id == job.id)
             ? jobs.map((value) => value.id == job.id ? job : value).toList()
             : [...jobs, job],
+        jobHistory: history,
       ),
     );
   }
 
   WorkspaceJob _job(String id) =>
+      _pendingProgress[id] ??
       _state.snapshot.jobs.firstWhere((job) => job.id == id);
+
+  /// Latest terminal attempts, independently queryable from current task state.
+  List<WorkspaceJob> readJobHistory({String? jobId, int limit = 50}) {
+    if (limit < 0) throw ArgumentError.value(limit, 'limit');
+    return List.unmodifiable(
+      _state.snapshot.jobHistory.reversed
+          .where((job) => jobId == null || job.id == jobId)
+          .take(limit),
+    );
+  }
+
+  Future<WorkspaceSaveResult> clearJobHistory() {
+    _ensureOpen();
+    _change(_state.snapshot.copyWith(jobHistory: []));
+    return save();
+  }
+
+  /// Byte events are sampled for observers. Only periodic checkpoints increase
+  /// the durable revision; phase changes and terminal states bypass sampling.
+  void _flushProgress() {
+    _progressTimer?.cancel();
+    _progressTimer = null;
+    if (_pendingProgress.isEmpty) return;
+    final next = _state.snapshot.copyWith(
+      jobs: [
+        for (final job in _state.snapshot.jobs) _pendingProgress[job.id] ?? job,
+      ],
+    );
+    _pendingProgress.clear();
+    final now = _clock();
+    if (_lastProgressCheckpoint == null ||
+        now.difference(_lastProgressCheckpoint!) >= _checkpointInterval) {
+      _lastProgressCheckpoint = now;
+      _change(next);
+    } else {
+      _emit(_state.copyWith(snapshot: next));
+    }
+  }
+
   void _updateJob(
     String id,
     JobStatus status, {
@@ -300,21 +431,34 @@ final class WorkspaceSession {
   }) {
     final current = _job(id);
     if (current.terminal) return;
-    _putJob(
-      current.copyWith(
-        status:
-            current.status == JobStatus.cancelling &&
-                status == JobStatus.running
-            ? JobStatus.cancelling
-            : status,
-        error: error,
-        processedBytes: bytes ?? _job(id).processedBytes,
-        totalBytes: total ?? _job(id).totalBytes,
-        indeterminate: current.status == JobStatus.cancelling
-            ? true
-            : indeterminate ?? current.indeterminate,
-      ),
+    var next = current.copyWith(
+      status:
+          current.status == JobStatus.cancelling && status == JobStatus.running
+          ? JobStatus.cancelling
+          : status,
+      error: error,
+      processedBytes: bytes ?? current.processedBytes,
+      totalBytes: total ?? current.totalBytes,
+      indeterminate: current.status == JobStatus.cancelling
+          ? true
+          : indeterminate ?? current.indeterminate,
+      startedAt:
+          current.startedAt ??
+          (status == JobStatus.running ? _clock().toUtc() : null),
     );
+    if (next.terminal) next = next.copyWith(finishedAt: _clock().toUtc());
+    if (bytes != null &&
+        next.status == JobStatus.running &&
+        current.status == next.status &&
+        current.indeterminate == next.indeterminate &&
+        current.error == next.error &&
+        current.totalBytes == next.totalBytes) {
+      _pendingProgress[id] = next;
+      _progressTimer ??= Timer(_progressInterval, _flushProgress);
+      return;
+    }
+    _flushProgress();
+    _putJob(next);
   }
 
   void cancelJob(String id) {
@@ -334,9 +478,12 @@ final class WorkspaceSession {
                 (job) => job.terminal || job.status == JobStatus.cancelling,
               ));
 
-  Future<void> importFiles(ImportKind kind) {
+  Future<void> importFiles(ImportKind kind) => _queueImport(kind);
+
+  Future<void> _queueImport(ImportKind kind, {WorkspaceJob? retry}) {
     _ensureOpen();
-    final id = _id('import');
+    if (retry != null) _putJob(retry);
+    final id = retry?.id ?? _id('import');
     final cancellation = _Cancellation();
     _cancellations[id] = cancellation;
     _putJob(
@@ -345,6 +492,7 @@ final class WorkspaceSession {
         kind: JobKind.importFiles,
         name: kind == ImportKind.text ? '导入文本资料' : '导入媒体素材',
         importKind: kind,
+        currentAttempt: (retry?.currentAttempt ?? 0) + 1,
       ),
     );
     final operation = _importPending.then(
@@ -435,8 +583,8 @@ final class WorkspaceSession {
               _state.snapshot.preferences.selectedDocumentId;
           final documentId = createDocument(title: source.name, text: text);
           committedBytes += count;
-          await save();
-          if (_state.error != null) throw StateError(_state.error!);
+          final saved = await save();
+          if (!saved.succeeded) throw StateError(saved.error!);
           if (cancellation.cancelled) {
             final committedDocument = _state.snapshot.documents.firstWhere(
               (document) => document.id == documentId,
@@ -516,8 +664,8 @@ final class WorkspaceSession {
                 ),
               ),
             );
-            await save();
-            if (_state.error != null) throw StateError(_state.error!);
+            final saved = await save();
+            if (!saved.succeeded) throw StateError(saved.error!);
             snapshotCommitted = true;
             cancellation.check();
             recorded = true;
@@ -601,7 +749,9 @@ final class WorkspaceSession {
         finalStatus = JobStatus.cancelled;
         finalError = null;
       }
-      _cancellations.remove(id);
+      if (identical(_cancellations[id], cancellation)) {
+        _cancellations.remove(id);
+      }
       if (!_disposed) {
         _updateJob(id, finalStatus, error: finalError);
         await save();
@@ -653,7 +803,17 @@ final class WorkspaceSession {
     final asset = _state.snapshot.assets.firstWhere(
       (asset) => asset.id == assetId,
     );
-    final id = _id('thumbnail');
+    final retry = _state.snapshot.jobs
+        .where(
+          (job) =>
+              job.kind == JobKind.thumbnail &&
+              job.assetId == assetId &&
+              job.terminal &&
+              job.status != JobStatus.succeeded,
+        )
+        .lastOrNull;
+    if (retry != null) _putJob(retry);
+    final id = retry?.id ?? _id('thumbnail');
     _cancellations[id] = _Cancellation();
     _putJob(
       WorkspaceJob(
@@ -662,6 +822,8 @@ final class WorkspaceSession {
         name: '${asset.name} 缩略图',
         assetId: assetId,
         status: JobStatus.running,
+        currentAttempt: (retry?.currentAttempt ?? 0) + 1,
+        startedAt: _clock().toUtc(),
       ),
     );
     _change(
@@ -687,6 +849,7 @@ final class WorkspaceSession {
     String? jobId,
   }) async {
     final id = jobId ?? beginThumbnail(assetId);
+    final cancellation = _cancellations[id];
     final original = _state.snapshot.assets.firstWhere(
       (asset) => asset.id == assetId,
     );
@@ -735,8 +898,8 @@ final class WorkspaceSession {
               .toList(),
         ),
       );
-      await save();
-      if (_state.error != null) throw StateError(_state.error!);
+      final saved = await save();
+      if (!saved.succeeded) throw StateError(saved.error!);
       if (isJobCancelled(id)) throw const _Cancelled();
       committed = null;
       if (oldKey != null) await assetStore.remove(oldKey);
@@ -806,7 +969,9 @@ final class WorkspaceSession {
     } finally {
       if (staged != null) await assetStore.abort(staged);
       if (committed != null) await assetStore.remove(committed);
-      _cancellations.remove(id);
+      if (identical(_cancellations[id], cancellation)) {
+        _cancellations.remove(id);
+      }
       if (!_disposed) await save();
     }
   }
@@ -865,7 +1030,15 @@ final class WorkspaceSession {
     await save();
   }
 
-  Future<void> _generateImageThumbnail(String assetId) async {
+  Future<void> _generateImageThumbnail(String assetId) {
+    late final Future<void> pending;
+    pending = _runImageThumbnail(assetId)
+        .whenComplete(() => _backgroundPending.remove(pending));
+    _backgroundPending.add(pending);
+    return pending;
+  }
+
+  Future<void> _runImageThumbnail(String assetId) async {
     final id = beginThumbnail(assetId);
     try {
       final asset = _state.snapshot.assets.firstWhere(
@@ -890,7 +1063,7 @@ final class WorkspaceSession {
     final job = _job(id);
     if (!job.terminal) return;
     if (job.kind == JobKind.importFiles) {
-      await importFiles(job.importKind ?? ImportKind.media);
+      await _queueImport(job.importKind ?? ImportKind.media, retry: job);
       return;
     }
     final asset = _state.snapshot.assets.firstWhere(
@@ -900,8 +1073,53 @@ final class WorkspaceSession {
     await _generateImageThumbnail(asset.id);
   }
 
+  /// Reversible close preparation. Do not dispose a session before this succeeds.
+  Future<WorkspaceSaveResult> prepareToClose() =>
+      _preparation ??= _prepareToClose();
+
+  Future<WorkspaceSaveResult> _prepareToClose() async {
+    _preparingToClose = true;
+    _flushProgress();
+    _timer?.cancel();
+    for (final entry in _cancellations.entries.toList()) {
+      entry.value.cancel();
+      _updateJob(entry.key, JobStatus.cancelling, indeterminate: true);
+    }
+    try {
+      if (_selecting) {
+        // A system picker cannot be dismissed by the application. Mark these
+        // cancelled now; its token rejects late files before any storage access.
+        for (final job
+            in _state.snapshot.jobs
+                .where(
+                  (job) => job.kind == JobKind.importFiles && !job.terminal,
+                )
+                .toList()) {
+          _updateJob(job.id, JobStatus.cancelled);
+        }
+      } else {
+        await _importPending;
+      }
+      await Future.wait(_backgroundPending.toList());
+      final result = await save();
+      if (!result.succeeded) {
+        _preparingToClose = false;
+        _preparation = null;
+      }
+      return result;
+    } catch (error) {
+      _preparingToClose = false;
+      _preparation = null;
+      final message = '关闭前保存失败：$error';
+      _emit(_state.copyWith(error: message));
+      return WorkspaceSaveResult.failed(message);
+    }
+  }
+
   Future<void> dispose() async {
     if (_disposed) return;
+    _flushProgress();
+    _progressTimer?.cancel();
     _disposed = true;
     _timer?.cancel();
     for (final cancellation in _cancellations.values) {
@@ -910,7 +1128,8 @@ final class WorkspaceSession {
     // A system picker has no programmatic dismiss API. Its late result is
     // discarded before any storage access; do not block shutdown on that UI.
     if (!_selecting) await _importPending;
-    await save();
+    await Future.wait(_backgroundPending.toList());
+    if (!_preparingToClose) await save();
     await _changes.close();
   }
 }
@@ -937,4 +1156,12 @@ final class _CancellationRollbackFailed implements Exception {
   final String message;
   @override
   String toString() => '取消操作回滚保存失败，已保留可用内容：$message';
+}
+
+final class WorkspaceSaveResult {
+  const WorkspaceSaveResult.saved(this.revision) : error = null;
+  const WorkspaceSaveResult.failed(this.error) : revision = null;
+  final int? revision;
+  final String? error;
+  bool get succeeded => revision != null;
 }

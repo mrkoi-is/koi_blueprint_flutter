@@ -1,0 +1,57 @@
+{
+  "@@locale": "zh_Hant",
+  "databaseTitle": "資料庫",
+  "databaseNew": "新建資料",
+  "databasePersistent": "資料保存在此設備，關閉後可繼續編輯。",
+  "databaseTemporary": "當前瀏覽器僅提供臨時存儲，關閉後資料不會保留。",
+  "databaseSingleTab": "當前存儲模式不支持多個標籤頁同時編輯，請只保留一個頁面。",
+  "databaseSearch": "搜索標題或正文",
+  "databaseArchived": "已歸檔",
+  "databaseRetry": "重試",
+  "databaseNoArchived": "還沒有歸檔資料",
+  "databaseEmpty": "新建第一份資料；標籤會隨資料一起保存。",
+  "databaseNoMatch": "沒有匹配的資料",
+  "databaseRestore": "恢復資料",
+  "databaseArchive": "歸檔資料",
+  "databaseEdit": "編輯資料",
+  "databaseDocumentTitle": "標題",
+  "databaseTitleRequired": "請輸入標題",
+  "databaseContents": "正文",
+  "databaseTags": "標籤",
+  "databaseTagHint": "用逗號分隔；重復標籤會自動合併",
+  "databaseCancel": "取消",
+  "databaseSaving": "保存中…",
+  "databaseSave": "保存",
+  "databaseOperationFailed": "操作失敗：{error}",
+  "@databaseOperationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseReadFailed": "讀取失敗：{error}",
+  "@databaseReadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseSaveFailed": "保存失敗：{error}。內容仍保留，可重試。",
+  "@databaseSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseOpenFailed": "無法恢復資料：{error}",
+  "@databaseOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -14,11 +14,11 @@
 
 统一入口 `python3 blueprint.py validate`。默认手写代码合并行覆盖率不低于 **80%**，可用 `--coverage-min` 提高项目门槛。不要为了通过检查扩展排除范围或降低标准。
 
-门禁包括 AI 资产/引用检查、架构边界、代码生成、只读格式检查、fatal-infos 分析、成员测试和覆盖率。生成物 `*.g.dart / *.freezed.dart` 不入库，不计手写覆盖率。含可执行逻辑的手写文件不能因为没有被测试导入就从统计消失；入口/平台代码若以构建验证，必须有明确范围和对应证据。
+源仓库另含 `templates` 真实继承资产检查。存在 API Web 冒烟入口时另执行 JS 编译和 Node 运行。Chrome 仅在活动 workspace 成员包含浏览器测试时要求，参照快照里的测试不触发前置要求。门禁包括 AI 资产/引用检查、架构边界、代码生成、只读格式检查、fatal-infos 分析、成员测试和覆盖率。生成物 `*.g.dart / *.freezed.dart` 不入库，不计手写覆盖率。含可执行逻辑的手写文件不能因为没有被测试导入就从统计消失；入口/平台代码若以构建验证，必须有明确范围和对应证据。
 
 带 `dart:js_interop` 或 `package:web` 的浏览器实现不在 VM 中执行；覆盖率工具将其可执行行以 **零命中** 加入总分母，不能当作已覆盖或从统计消失。`check browser` 在真实 Chrome 中运行各成员 `test/browser`，已进入 validate。Browser 测试证明 IndexedDB/Blob 行为，VM LCOV 证明可测业务/UI/Native 分支；二者分别报告。Safari 和其他目标 OS 的实际运行另行记录。
 
-分项检查使用 `python3 blueprint.py check <phase>`；可选 phase 见 `check --help`。新增或调整依赖后先执行 `check bootstrap`，再生成和检查。
+分项检查使用 `python3 blueprint.py check <phase>`；可选 phase 见 `check --help`。`generate-check` 与 `generate` 都重建未入库的 Dart part，验证可重复生成，不是只读差异检查。工具说明见 [工具清单](tools.md)。新增或调整依赖后先执行 `check bootstrap`，再生成和检查。
 
 目标平台构建使用 `python3 blueprint.py build --app <path> --platforms <platforms>`。不同平台需要匹配主机与 SDK；验证矩阵分别记录生成、依赖、分析、测试、构建与实际运行。不得把 Web 构建成功折算成六端成功。
 

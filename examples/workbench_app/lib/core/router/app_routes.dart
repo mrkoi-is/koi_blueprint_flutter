@@ -1,3 +1,5 @@
+import 'package:workbench_app/core/capabilities/capability_page.dart';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workbench_app/features/workspace/presentation/screens/media_page.dart';
@@ -59,4 +61,13 @@ class TasksRoute extends GoRouteData with $TasksRoute {
   const TasksRoute();
   @override
   Widget build(BuildContext context, GoRouterState state) => const TasksPage();
+}
+
+@TypedGoRoute<CapabilityRoute>(path: '/capabilities/:id')
+class CapabilityRoute extends GoRouteData with $CapabilityRoute {
+  const CapabilityRoute({required this.id});
+  final String id;
+  @override
+  Widget build(BuildContext context, GoRouterState state) =>
+      CapabilityPage(id: id);
 }

@@ -1,3 +1,5 @@
+import 'package:koi_ui/l10n/koi_ui_strings.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
@@ -15,7 +17,7 @@ class KoiResizableSplitView extends StatefulWidget {
     this.minSecondaryWidth = 240,
     this.onWidthChanged,
     this.primaryOnTrailing = false,
-    this.resizeLabel = '调整侧栏宽度',
+    this.resizeLabel,
     super.key,
   }) : assert(minWidth >= 0),
        assert(maxWidth >= minWidth),
@@ -29,7 +31,7 @@ class KoiResizableSplitView extends StatefulWidget {
   final double minSecondaryWidth;
   final ValueChanged<double>? onWidthChanged;
   final bool primaryOnTrailing;
-  final String resizeLabel;
+  final String? resizeLabel;
 
   @override
   State<KoiResizableSplitView> createState() => _KoiResizableSplitViewState();
@@ -119,7 +121,8 @@ class _KoiResizableSplitViewState extends State<KoiResizableSplitView> {
               ),
             },
             child: Semantics(
-              label: widget.resizeLabel,
+              label:
+                  widget.resizeLabel ?? KoiUiStrings.of(context).resizeSidebar,
               value: '${width.round()}',
               increasedValue: '${(width + 10).clamp(min, max).round()}',
               decreasedValue: '${(width - 10).clamp(min, max).round()}',

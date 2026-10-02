@@ -9,4 +9,10 @@ if __name__ == '__main__':
     presentation = '--presentation-only' in arguments
     if presentation:
         arguments.remove('--presentation-only')
-    raise SystemExit(main(['feature', *arguments, '--kind', 'presentation' if presentation else 'api']))
+    explicit_kind = any(value == '--kind' or value.startswith('--kind=') for value in arguments)
+    if presentation and explicit_kind:
+        print('create_feature: use --presentation-only or --kind, not both; no files were changed', file=sys.stderr)
+        raise SystemExit(2)
+    if not explicit_kind:
+        arguments.extend(['--kind', 'presentation' if presentation else 'api'])
+    raise SystemExit(main(['feature', *arguments]))

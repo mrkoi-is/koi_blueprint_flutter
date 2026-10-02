@@ -1,7 +1,12 @@
-import 'package:feature_lab/features/catalog/domain/catalog_item.dart';
+import 'package:feature_lab/features/catalog/domain/catalog_page_slice.dart';
+import 'package:feature_lab/features/catalog/domain/catalog_request.dart';
 
-/// Implement at bootstrap using your generated API + Koi request executor.
-/// Wire DTO conversion here; generated API and transport types stay out of UI.
+/// Implement at bootstrap using your generated API + request executor.
+/// Wire cancellation to the actual transport. Transport and DTO types stay here.
 abstract interface class CatalogDataSource {
-  Future<List<CatalogItem>> fetch({required int page});
+  Future<CatalogPageSlice> fetch({
+    required CatalogCancellation cancellation,
+    String query = '',
+    String? cursor,
+  });
 }

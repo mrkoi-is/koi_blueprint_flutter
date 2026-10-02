@@ -1,0 +1,16 @@
+{
+  "@@locale": "en",
+  "retry": "Retry",
+  "loading": "Preparing workspace…",
+  "openMenu": "Open menu",
+  "openPanel": "Open panel",
+  "closePanel": "Close panel",
+  "clearSearch": "Clear search",
+  "back": "Back",
+  "forward": "Forward",
+  "toggleSidebar": "Toggle sidebar",
+  "toggleDetail": "Toggle details",
+  "resizeSidebar": "Resize sidebar",
+  "resizeDetail": "Resize details",
+  "resizePanel": "Resize panel"
+}

@@ -2,6 +2,10 @@ include: package:flutter_lints/flutter.yaml
 
 analyzer:
   exclude:
+    - "tool/capabilities/recipes/**"
+    # Local acceptance evidence is not product source. Fixture pubspecs
+    # under docs/validation must not fail `dart analyze --fatal-infos`.
+    - "docs/validation/**"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
   language:

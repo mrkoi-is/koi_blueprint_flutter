@@ -1,18 +1,37 @@
+import 'package:workbench_app/core/diagnostics/app_diagnostics.dart';
+import 'package:workbench_app/core/preferences/ui_preferences_store.dart';
+import 'package:workbench_app/core/capabilities/installed_capabilities.dart';
+import 'package:workbench_app/l10n/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/app.dart';
 import 'package:workbench_app/bootstrap.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  AppDiagnostics.instance.install();
   runApp(const WorkbenchLauncher());
 }
 
 /// Both decoder initialization and storage failures are handled by the launcher.
 Future<WorkbenchBootstrap> initializeWorkbench() async {
-  MediaKit.ensureInitialized();
-  return WorkbenchBootstrap.create();
+  await initializeInstalledCapabilities();
+  try {
+    MediaKit.ensureInitialized();
+    return await WorkbenchBootstrap.create(
+      openPreferences: openUiPreferencesStore,
+    );
+  } catch (error, stack) {
+    AppDiagnostics.instance.record(error, stack, 'bootstrap');
+    try {
+      await disposeInstalledCapabilities();
+    } catch (cleanup, trace) {
+      AppDiagnostics.instance.record(cleanup, trace, 'bootstrap.cleanup');
+    }
+    rethrow;
+  }
 }
 
 class WorkbenchLauncher extends StatefulWidget {
@@ -59,21 +78,31 @@ class _WorkbenchLauncherState extends State<WorkbenchLauncher> {
         return WorkbenchApp(bootstrap: bootstrap);
       }
       return MaterialApp(
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: [
+          KoiUiLocalizations.delegate,
+          ...AppLocalizations.localizationsDelegates,
+        ],
+        localeListResolutionCallback: resolveKoiLocale,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        home: Scaffold(
-          body: value.hasError
-              ? KoiErrorState(
-                  title: '工作区初始化失败',
-                  description: '${value.error}',
-                  onRetry: () {
-                    final pending = _create();
-                    setState(() {
-                      _pending = pending;
-                    });
-                  },
-                )
-              : const KoiLoadingState(message: '正在初始化本地工作区…'),
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: value.hasError
+                ? KoiErrorState(
+                    title: value.error is WorkspaceInUse
+                        ? context.l10n.workspaceInUse
+                        : context.l10n.initializationFailed,
+                    description: '${value.error}',
+                    onRetry: () {
+                      final pending = _create();
+                      setState(() {
+                        _pending = pending;
+                      });
+                    },
+                  )
+                : KoiLoadingState(message: context.l10n.initializing),
+          ),
         ),
       );
     },

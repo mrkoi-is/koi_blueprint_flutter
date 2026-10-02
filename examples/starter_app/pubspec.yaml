@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
   flutter_riverpod: 3.4.3
   riverpod_annotation: 4.0.7
   go_router: ^17.5.0
@@ -26,4 +28,5 @@ dev_dependencies:
   freezed: 4.0.2
   json_serializable: 6.14.1
 flutter:
+  generate: true
   uses-material-design: true

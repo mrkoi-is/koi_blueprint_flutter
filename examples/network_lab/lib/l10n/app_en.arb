@@ -1,0 +1,138 @@
+{
+  "@@locale": "en",
+  "networkTitle": "Network",
+  "networkLabTitle": "Network Lab",
+  "networkRetry": "Retry",
+  "networkEndpointRequired": "Enter an HTTP(S) service URL below, or provide NETWORK_LAB_URL with --dart-define.",
+  "networkStartupFailed": "Could not start networking: {error}",
+  "@networkStartupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkSearchLabel": "Search (300 ms debounce)",
+  "networkReachability": "Connectivity: {status}. Each request reports its own result.",
+  "@networkReachability": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "networkReachabilityState": "{state, select, reachable{Reachable} unreachable{Unreachable} other{Unknown}}",
+  "@networkReachabilityState": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "networkEnterQuery": "Enter a keyword to query the test service",
+  "networkSearching": "Searching…",
+  "networkNoResults": "No results",
+  "networkRequestFailed": "Request failed; try again",
+  "networkErrorDetails": "Request error: {error}",
+  "@networkErrorDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkRefresh": "Refresh",
+  "networkLoadMore": "Load more",
+  "networkClearQueryCache": "Clear query cache",
+  "networkTransferPhase": "{phase, select, idle{Idle} downloading{Downloading} cancelling{Cancelling} cancelled{Cancelled} complete{Complete} failed{Failed} other{Unknown}}",
+  "@networkTransferPhase": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "networkTransferProgress": "Transfer: {phase} · {received} / {total} bytes",
+  "@networkTransferProgress": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      },
+      "received": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "networkTransferError": "Transfer error: {error}",
+  "@networkTransferError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkDownloadRetry": "Download / retry",
+  "networkCancel": "Cancel",
+  "networkEndpointLabel": "Service URL (HTTP/HTTPS)",
+  "networkEndpointHelp": "Enter the address of your test service. A connection starts only after you submit.",
+  "networkConnect": "Connect",
+  "networkChangeEndpoint": "Change service",
+  "networkKeepEndpoint": "Keep current service",
+  "imagesTitle": "Images",
+  "imagesInputLabel": "HTTP(S) image URL / local path",
+  "imagesAsset": "Asset",
+  "imagesMemory": "Memory",
+  "imagesPickLocal": "Choose local image",
+  "imagesReadPath": "Read local path",
+  "imagesNetwork": "Network",
+  "imagesInvalidUrl": "Enter a valid HTTP(S) image URL",
+  "imagesReadError": "Could not read image: {error}",
+  "@imagesReadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesLayout": "Layout {width} dp · DPR {dpr} · Decode limit {pixels} px",
+  "@imagesLayout": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "dpr": {
+        "type": "String"
+      },
+      "pixels": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesRetry": "Retry",
+  "imagesCacheHit": "Cache hit; available offline",
+  "imagesValidated": "Image loaded and validated",
+  "imagesClearCache": "Clear this page’s image cache and retry",
+  "imagesDecodeFailed": "Could not decode image: {error}",
+  "@imagesDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesDecodedSize": "Decoded {width} × {height} px",
+  "@imagesDecodedSize": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "height": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesPreview": "Image preview"
+}

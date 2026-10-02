@@ -22,6 +22,10 @@ workspace:
   - examples/workbench_app
   - examples/minimal_module
   - examples/feature_lab
+  - examples/network_lab
+  - examples/database_lab
+  - examples/platform_lab
+  - examples/device_lab
   - examples/module_showcase
   - examples/module_showcase/packages/showcase_contracts
   - examples/module_showcase/modules/alpha

@@ -504,6 +504,9 @@ void main() {
     expect(tester.takeException(), isNull);
     await tester.tap(find.byTooltip('设置'));
     await tester.pumpAndSettle();
+    // Installed capabilities can add settings above the theme controls.
+    await tester.ensureVisible(find.text('深色主题'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('深色主题'));
     await tester.pumpAndSettle();
     expect(
@@ -896,11 +899,16 @@ void main() {
       expect(players.last.openedUri, 'test://b');
       expect(find.text('B.mp4'), findsWidgets);
       final jobs = bootstrap.session.state.snapshot.jobs;
-      expect(jobs, hasLength(2));
-      expect(jobs.first.id, 'old-b');
-      expect(jobs.first.status, JobStatus.failed);
-      expect(jobs.last.assetId, 'b');
-      expect(jobs.last.status, JobStatus.succeeded);
+      expect(jobs, hasLength(1));
+      final retried = jobs.singleWhere((job) => job.id == 'old-b');
+      expect(retried.assetId, 'b');
+      expect(retried.status, JobStatus.succeeded);
+      expect(retried.currentAttempt, 2);
+      final original = bootstrap.session
+          .readJobHistory(jobId: 'old-b')
+          .singleWhere((job) => job.currentAttempt == 1);
+      expect(original.status, JobStatus.failed);
+      expect(original.error, 'previous screenshot failed');
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);
       await closeApp(tester, bootstrap);
@@ -929,7 +937,12 @@ void main() {
       expect(find.text('重试作业'), findsOneWidget);
       await tester.tap(find.text('重试作业'));
       await tester.pumpAndSettle();
-      expect(bootstrap.session.state.snapshot.jobs, hasLength(2));
+      expect(bootstrap.session.state.snapshot.jobs, hasLength(1));
+      expect(bootstrap.session.state.snapshot.jobs.single.currentAttempt, 2);
+      expect(
+        bootstrap.session.readJobHistory().map((job) => job.currentAttempt),
+        [2, 1],
+      );
       expect(
         bootstrap.session.state.snapshot.jobs.every(
           (job) => job.status == JobStatus.cancelled,
@@ -1146,10 +1159,16 @@ void main() {
       await tester.runAsync(() => Future<void>.delayed(Duration.zero));
       await tester.pump();
       final snapshot = bootstrap.session.state.snapshot;
-      expect(snapshot.jobs, hasLength(2));
-      expect(snapshot.jobs.first.status, JobStatus.failed);
-      expect(snapshot.jobs.last.status, JobStatus.succeeded);
-      expect(snapshot.jobs.last.processedBytes, png.length);
+      expect(snapshot.jobs, hasLength(1));
+      expect(snapshot.jobs.single.status, JobStatus.succeeded);
+      expect(snapshot.jobs.single.currentAttempt, 2);
+      expect(snapshot.jobs.single.processedBytes, png.length);
+      expect(
+        snapshot.jobHistory
+            .singleWhere((job) => job.currentAttempt == 1)
+            .status,
+        JobStatus.failed,
+      );
       expect(snapshot.assets.single.thumbnailStatus, ThumbnailStatus.ready);
       expect(
         storage.assetStore.values[snapshot.assets.single.thumbnailKey],

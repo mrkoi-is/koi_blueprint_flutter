@@ -81,6 +81,9 @@ void main() {
       expect(players.first.volume, 35);
       await preview.select(second);
       expect(events, ['create:0', 'close:0', 'release:first', 'create:1']);
+      players.last.errorsController.add('current player error');
+      await Future<void>.delayed(Duration.zero);
+      expect(preview.error, contains('current player error'));
       final disposal = preview.disposeAsync();
       expect(preview.disposeAsync(), same(disposal));
       await disposal;
@@ -123,6 +126,10 @@ void main() {
       expect(session.state.snapshot.assets.single.thumbnailKey, isNotNull);
       expect(session.state.snapshot.jobs.last.status, JobStatus.succeeded);
       expect(player.screenshots, 2);
+      expect(preview.playback, same(player));
+      player.errorsController.add('decoder failed after thumbnail retry');
+      await Future<void>.delayed(Duration.zero);
+      expect(preview.error, contains('decoder failed after thumbnail retry'));
       await preview.disposeAsync();
       await session.dispose();
     },

@@ -1,0 +1,377 @@
+{
+  "@@locale": "zh",
+  "appTitle": "Koi 工作区",
+  "aboutTitle": "关于",
+  "aboutSource": "源码摘要",
+  "aboutChannel": "构建频道",
+  "aboutPlatform": "平台",
+  "text": "文本资料",
+  "media": "媒体素材",
+  "tasks": "任务",
+  "settings": "设置",
+  "systemTheme": "跟随系统主题",
+  "lightTheme": "明亮主题",
+  "darkTheme": "深色主题",
+  "comfortable": "舒适密度",
+  "compact": "紧凑密度",
+  "save": "保存工作区",
+  "saveShortcut": "保存工作区 (⌘/Ctrl+S)",
+  "importFiles": "导入文件",
+  "retry": "重试",
+  "restoring": "正在恢复工作区…",
+  "initializing": "正在初始化本地工作区…",
+  "workspaceInUse": "工作区已打开",
+  "initializationFailed": "工作区初始化失败",
+  "language": "语言",
+  "systemLanguage": "跟随系统语言",
+  "accent": "强调色",
+  "moss": "苔绿",
+  "blue": "靛蓝",
+  "violet": "紫罗兰",
+  "cancel": "取消",
+  "confirm": "确定",
+  "apply": "应用",
+  "keyboardShortcuts": "键盘快捷键",
+  "back": "后退",
+  "forward": "前进",
+  "quit": "退出工作区",
+  "unsaved": "未保存",
+  "saved": "已保存",
+  "saving": "工作区保存中",
+  "saveFailed": "工作区保存失败",
+  "newDocument": "新建资料",
+  "importText": "导入文本",
+  "noDocuments": "暂无文本资料",
+  "documentsHint": "新建资料，或导入 UTF-8 TXT/Markdown 文件",
+  "renameCurrentDocument": "重命名当前资料",
+  "writeContent": "写下内容…",
+  "documentNameRequired": "请输入资料名称",
+  "renameDocument": "重命名资料",
+  "documentName": "资料名称",
+  "searchDocuments": "搜索资料",
+  "noMatchingDocuments": "没有匹配的资料",
+  "mediaCategories": "媒体分类",
+  "searchMedia": "搜索素材",
+  "all": "全部",
+  "image": "图片",
+  "video": "视频",
+  "mediaStorageHint": "导入的素材副本保存在当前工作区；切换视图会暂停视频并保留播放位置。",
+  "taskSummary": "任务概览",
+  "taskRunningHint": "任务在切换视图时继续运行。取消会停止读取并清理暂存内容。",
+  "documentDetails": "资料详情",
+  "noDocumentSelected": "尚未选择资料",
+  "name": "名称",
+  "characterCountLabel": "字数",
+  "revisionLabel": "版本",
+  "saveStatus": "保存状态",
+  "autosaveHint": "停止输入 500 毫秒后自动保存",
+  "mediaDetails": "素材详情",
+  "noMediaSelected": "尚未选择素材",
+  "size": "大小",
+  "type": "类型",
+  "thumbnailStatus": "缩略图状态",
+  "thumbnailPending": "缩略图待生成",
+  "thumbnailGenerating": "正在生成缩略图",
+  "thumbnailSaved": "缩略图已保存",
+  "thumbnailFailed": "缩略图失败",
+  "retryThumbnail": "重试缩略图",
+  "taskHelp": "任务说明",
+  "todoHelp": "待办可以新建、重命名、完成和删除。",
+  "jobHelp": "IO 进度来自实际字节读取。缩略图处理采用不确定进度。",
+  "closeHelp": "关闭工作区会取消作业并保存当前草稿。",
+  "importMedia": "导入图片 / 视频",
+  "showList": "切换列表",
+  "showGrid": "切换网格",
+  "noMatchingMedia": "暂无匹配素材",
+  "mediaImportHint": "导入 PNG/JPEG 图片或 MP4 视频",
+  "thumbnailReadFailed": "缩略图读取失败",
+  "openForThumbnail": "打开预览生成缩略图",
+  "retryRead": "重试读取",
+  "selectMedia": "选择素材",
+  "mediaPreviewHint": "图片支持缩放；视频支持播放、暂停和拖动进度",
+  "pauseVideo": "暂停视频",
+  "playVideo": "播放视频",
+  "playbackPosition": "播放进度",
+  "volume": "音量",
+  "retryVideo": "重试视频预览 / 缩略图",
+  "deleteTodo": "删除待办",
+  "delete": "删除",
+  "todos": "待办事项",
+  "todosDescription": "待办与真实 IO 作业分别管理",
+  "incompleteOnly": "仅未完成",
+  "addTodo": "添加待办",
+  "noTodos": "暂无待办",
+  "jobs": "IO 作业",
+  "jobsDescription": "导入字节与缩略图处理来自实际操作",
+  "noJobs": "导入文本或媒体后，作业将显示在这里",
+  "queued": "等待中",
+  "running": "处理中",
+  "cancelling": "正在取消",
+  "succeeded": "完成",
+  "failed": "失败",
+  "cancelled": "已取消",
+  "interrupted": "已中断",
+  "indeterminateProgress": "进度暂不可确定",
+  "cancelJob": "取消作业",
+  "retryJob": "重试作业",
+  "todoNameRequired": "请输入待办名称",
+  "renameTodo": "重命名待办",
+  "todoName": "待办名称",
+  "characterCount": "{count} 字",
+  "@characterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "revision": "版本 {number}",
+  "@revision": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "byteCount": "{count} 字节",
+  "@byteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "incompleteTodos": "{count} 项待办未完成",
+  "@incompleteTodos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "activeJobs": "{count} 项 IO 作业处理中",
+  "@activeJobs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteTodoConfirm": "删除“{name}”？此操作无法撤销。",
+  "@deleteTodoConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "renameTodoNamed": "重命名待办：{name}",
+  "@renameTodoNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteTodoNamed": "删除待办：{name}",
+  "@deleteTodoNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "retryThumbnailNamed": "重试读取缩略图：{name}",
+  "@retryThumbnailNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageDecodeFailed": "图片解码失败：{error}",
+  "@imageDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imageReadFailed": "图片读取失败：{error}",
+  "@imageReadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackTime": "已播放 {position}，共 {duration}",
+  "@playbackTime": {
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "diagTitle": "诊断日志",
+  "diagSearch": "搜索日志",
+  "diagAllLevels": "全部等级",
+  "diagRefresh": "刷新新记录",
+  "diagExportFiltered": "导出筛选结果",
+  "diagExportAll": "导出全部",
+  "diagMore": "加载更早记录",
+  "diagEmpty": "没有匹配的记录",
+  "diagStorageFailed": "日志持久化失败，仍可查看内存中的记录。",
+  "capabilityUnavailable": "尚未安装此能力。",
+  "directoryIndexTitle": "目录索引",
+  "chooseDirectory": "选择目录",
+  "rescanDirectory": "重新扫描",
+  "directoryIndexHint": "只读取名称、大小和修改时间，不复制文件。浏览器中需重新选择目录以取得最新文件。",
+  "directoryIndexEmpty": "选择一个目录开始建立索引",
+  "directoryIndexCancelled": "已取消，保留此前索引",
+  "directoryIndexFailed": "部分文件读取失败，可重新扫描",
+  "directoryIndexCompleted": "索引完成",
+  "directoryIndexProgress": "已发现 {visited} · 复用 {reused} · 失败 {failures}",
+  "@directoryIndexProgress": {
+    "placeholders": {
+      "visited": {
+        "type": "int"
+      },
+      "reused": {
+        "type": "int"
+      },
+      "failures": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkDocumentsTitle": "文档批量操作",
+  "bulkFilter": "筛选文档",
+  "bulkSelected": "已选择 {count} 项",
+  "bulkClear": "清除选择",
+  "bulkDelete": "删除所选",
+  "bulkDeleteConfirm": "删除 {count} 个文档？",
+  "bulkReorder": "拖动排序，键盘使用 Alt+上/下",
+  "@bulkSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@bulkDeleteConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diagSource": "来源",
+  "settingsTitle": "设置",
+  "settingsSearch": "搜索设置",
+  "settingsNoResults": "没有匹配的设置",
+  "settingsLanguageGroup": "语言",
+  "settingsLanguage": "显示语言",
+  "settingsLanguageDescription": "立即应用。跟随系统使用设备语言；不支持的语言回退为简体中文。",
+  "settingsAppearanceGroup": "外观",
+  "settingsTheme": "明暗模式",
+  "settingsThemeDescription": "跟随系统会使用设备当前的明暗设置。",
+  "settingsDensity": "界面密度",
+  "settingsDensityDescription": "自动模式为触摸或手写笔保留舒适间距，鼠标使用紧凑间距。手动选择始终优先。",
+  "settingsAccent": "强调色",
+  "settingsAccentDescription": "调整高亮与选择颜色，保留状态色含义。",
+  "settingsSystem": "跟随系统",
+  "settingsLight": "浅色",
+  "settingsDark": "深色",
+  "settingsComfortable": "舒适",
+  "settingsCompact": "紧凑",
+  "settingsMoss": "苔绿",
+  "settingsBlue": "蓝色",
+  "settingsViolet": "紫色",
+  "settingsReset": "恢复默认",
+  "settingsResetDescription": "恢复语言、明暗模式、密度和强调色。文档与其他设置不受影响。",
+  "settingsCancel": "取消",
+  "settingsRetry": "重试",
+  "settingsSaveError": "设置未能保存，请重试以保存当前选择。",
+  "historyTitle": "任务历史",
+  "historySearch": "搜索名称或任务 ID",
+  "historyClear": "清空历史",
+  "historyClearConfirm": "清空历史执行记录？当前任务会保留。",
+  "historyEmpty": "暂无历史记录",
+  "historyAttempt": "第 {count} 次（0 表示旧版本次数未知）",
+  "@historyAttempt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "platformCapabilities": "平台能力",
+  "platformDesktopWindow": "桌面窗口",
+  "platformWindowUnavailable": "桌面窗口不可用",
+  "platformWindowUninitialized": "桌面能力尚未初始化。",
+  "platformGeometrySaved": "窗口位置与尺寸会自动恢复和保存。",
+  "platformWindowFallback": "原生窗口控制不可用，应用仍可继续使用。",
+  "platformSaveGeometry": "保存当前窗口位置",
+  "platformCloseToTray": "关闭到托盘",
+  "platformCloseWindowToTray": "关闭窗口时收起到托盘",
+  "platformTrayRequirement": "仅在托盘已启用且正常工作时可用。",
+  "platformShowWindow": "显示窗口",
+  "platformSystemTray": "系统托盘",
+  "platformTrayUnavailable": "托盘不可用",
+  "platformDesktopRequired": "需要先完成桌面窗口初始化。",
+  "platformTrayDescription": "托盘可显示窗口，或发起可取消的正常退出。",
+  "platformTrayRetry": "重试托盘初始化",
+  "platformSystemMedia": "系统媒体",
+  "platformAudio": "音频",
+  "platformMediaUnavailable": "系统媒体不可用",
+  "platformMediaUninitialized": "请先初始化媒体能力。",
+  "platformOpenAudio": "打开音频文件",
+  "platformBackgroundAudio": "在后台继续播放音频",
+  "platformNoAudio": "尚未选择音频",
+  "platformPlaybackPosition": "播放位置",
+  "platformPlay": "播放",
+  "platformPause": "暂停",
+  "platformVolume": "音量",
+  "platformMiniPlayer": "迷你播放器",
+  "platformMiniRequirement": "需要初始化桌面与媒体能力",
+  "platformMiniHint": "先在系统媒体中打开音频，再返回这里。",
+  "platformMediaLayout": "媒体视图",
+  "platformRestoreWindow": "恢复窗口",
+  "platformEnterMini": "进入迷你模式",
+  "platformHomeWidget": "主屏组件",
+  "platformSnapshotTitle": "工作区快照",
+  "platformWidgetDescription": "将版本化快照更新到已安装的原生主屏组件；点击组件可重新打开应用。",
+  "platformTitle": "标题",
+  "platformIncrementCompleted": "增加已完成数量",
+  "platformUpdateWidget": "更新主屏组件",
+  "platformSnapshotSent": "快照已发送到原生组件。",
+  "platformControlsUnavailable": "系统媒体控制不可用",
+  "platformCompleted": "已完成：{count}",
+  "@platformCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsDensityAutomatic": "自动（跟随输入设备）",
+  "platformEngineTitle": "播放引擎",
+  "platformEnginePolicy": "引擎由你明确选择。目标引擎失败时保留当前引擎，不会自动替换。",
+  "platformEngineReady": "可用：引擎初始化成功",
+  "platformEngineSelect": "检测并选择引擎",
+  "documentSegmentPrevious": "上一段",
+  "documentSegmentNext": "下一段",
+  "documentSegmentPosition": "第 {index} 段；更改会保存到完整文档。",
+  "documentSegmentComposing": "请完成输入后再切换分段。",
+  "@documentSegmentPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  }
+}

@@ -3,16 +3,20 @@ import 'package:showcase_contracts/showcase_contracts.dart';
 import 'package:showcase_beta/src/core/router/app_routes.dart';
 import 'package:showcase_beta/src/features/welcome/data/beta_repository.dart';
 
-KoiModule<ShowcaseRepository> createBetaModule(ShowcaseServices services) =>
-    KoiModule(
-      id: 'beta',
-      routes: $appRoutes,
-      navigation: [
-        ModuleNavigationItem(
-          id: 'beta.home',
-          label: 'Beta',
-          location: const BetaRoute().location,
-        ),
-      ],
-      createSession: (context) => BetaRepository(context, services),
-    );
+KoiModule<ShowcaseRepository> createBetaModule(
+  ShowcaseServices services, {
+  CapabilityAvailability Function()? checkAvailability,
+}) => KoiModule(
+  id: 'beta',
+  capabilities: const {'message.read', 'refresh.observe'},
+  checkAvailability: checkAvailability,
+  routes: $appRoutes,
+  navigation: [
+    ModuleNavigationItem(
+      id: 'beta.home',
+      label: 'Beta',
+      location: const BetaRoute().location,
+    ),
+  ],
+  createSession: (context) => BetaRepository(context, services),
+);

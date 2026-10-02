@@ -1,0 +1,84 @@
+{
+  "@@locale": "zh_Hant",
+  "networkTitle": "網路",
+  "networkLabTitle": "網路實驗室",
+  "networkRetry": "重試",
+  "networkEndpointRequired": "請在下方輸入 HTTP(S) 服務位址，或透過 --dart-define 提供 NETWORK_LAB_URL。",
+  "networkStartupFailed": "網路啟動失敗：{error}",
+  "@networkStartupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkSearchLabel": "搜尋（300 ms 防抖）",
+  "networkReachability": "連線狀態：{status}，實際請求個別處理結果",
+  "@networkReachability": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "networkReachabilityState": "{state, select, reachable{可連線} unreachable{無法連線} other{未知}}",
+  "@networkReachabilityState": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "networkEnterQuery": "輸入關鍵字連線測試服務",
+  "networkSearching": "正在搜尋…",
+  "networkNoResults": "沒有結果",
+  "networkRequestFailed": "請求失敗，可重試",
+  "networkErrorDetails": "請求錯誤：{error}",
+  "@networkErrorDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkRefresh": "重新整理",
+  "networkLoadMore": "載入更多",
+  "networkClearQueryCache": "清除查詢快取",
+  "networkTransferPhase": "{phase, select, idle{閒置} downloading{下載中} cancelling{正在取消} cancelled{已取消} complete{已完成} failed{失敗} other{未知}}",
+  "@networkTransferPhase": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "networkTransferProgress": "傳輸：{phase} · {received} / {total} 位元組",
+  "@networkTransferProgress": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      },
+      "received": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "networkTransferError": "傳輸錯誤：{error}",
+  "@networkTransferError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkDownloadRetry": "下載 / 重試",
+  "networkCancel": "取消",
+  "networkEndpointLabel": "服務位址（HTTP/HTTPS）",
+  "networkEndpointHelp": "輸入測試服務位址，提交後才開始連線。",
+  "networkConnect": "連線",
+  "networkChangeEndpoint": "更換服務",
+  "networkKeepEndpoint": "保留目前服務"
+}

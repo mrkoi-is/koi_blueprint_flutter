@@ -1,0 +1,57 @@
+{
+  "@@locale": "en",
+  "databaseTitle": "Library",
+  "databaseNew": "New document",
+  "databasePersistent": "Documents are stored on this device and remain available after closing.",
+  "databaseTemporary": "This browser provides temporary storage; documents will not remain after closing.",
+  "databaseSingleTab": "This storage mode supports one editor tab at a time.",
+  "databaseSearch": "Search title or contents",
+  "databaseArchived": "Archived",
+  "databaseRetry": "Retry",
+  "databaseNoArchived": "No archived documents",
+  "databaseEmpty": "Create your first document. Tags are saved with its contents.",
+  "databaseNoMatch": "No matching documents",
+  "databaseRestore": "Restore document",
+  "databaseArchive": "Archive document",
+  "databaseEdit": "Edit document",
+  "databaseDocumentTitle": "Title",
+  "databaseTitleRequired": "Enter a title",
+  "databaseContents": "Contents",
+  "databaseTags": "Tags",
+  "databaseTagHint": "Separate with commas; duplicate tags are merged",
+  "databaseCancel": "Cancel",
+  "databaseSaving": "Saving…",
+  "databaseSave": "Save",
+  "databaseOperationFailed": "Operation failed: {error}",
+  "@databaseOperationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseReadFailed": "Could not load: {error}",
+  "@databaseReadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseSaveFailed": "Save failed: {error}. Your changes are retained; retry when ready.",
+  "@databaseSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseOpenFailed": "Could not restore data: {error}",
+  "@databaseOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

@@ -13,6 +13,102 @@ import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
 
 void main() {
+  test('Web Lock excludes a separate worker and crashed owner releases automatically', () async {
+    final name = 'koi_worker_${DateTime.now().microsecondsSinceEpoch}';
+    final script =
+        "navigator.locks.request('koi-workspace:$name', {ifAvailable:true}, lock => { self.postMessage(lock ? 'acquired' : 'busy'); return lock ? new Promise(() => {}) : undefined; });";
+    final url = web.URL.createObjectURL(
+      web.Blob(
+        [script.toJS].toJS,
+        web.BlobPropertyBag(type: 'text/javascript'),
+      ),
+    );
+    Future<(web.Worker, String)> startWorker() async {
+      final worker = web.Worker(url.toJS);
+      final result = Completer<String>();
+      worker.onmessage = ((web.MessageEvent event) => result.complete(
+        (event.data as JSString).toDart,
+      )).toJS;
+      worker.onerror = ((web.Event event) => result.completeError(
+        StateError('worker failed'),
+      )).toJS;
+      return (worker, await result.future.timeout(const Duration(seconds: 10)));
+    }
+
+    final first = await openStorage(webDatabaseName: name);
+    web.Worker? owner;
+    try {
+      final (blockedWorker, state) = await startWorker();
+      expect(state, 'busy');
+      blockedWorker.terminate();
+      await first.close();
+      final (worker, acquired) = await startWorker();
+      owner = worker;
+      expect(acquired, 'acquired');
+      await expectLater(
+        openStorage(webDatabaseName: name),
+        throwsA(isA<WorkspaceInUse>()),
+      );
+      worker.terminate();
+      owner = null;
+      // Termination releases the lock asynchronously; no timeout-based takeover.
+      final deadline = DateTime.now().add(const Duration(seconds: 10));
+      while (true) {
+        try {
+          final reopened = await openStorage(webDatabaseName: name);
+          await reopened.close();
+          break;
+        } on WorkspaceInUse {
+          if (DateTime.now().isAfter(deadline)) rethrow;
+          await Future<void>.delayed(const Duration(milliseconds: 20));
+        }
+      }
+    } finally {
+      owner?.terminate();
+      await first.close();
+      web.URL.revokeObjectURL(url);
+      web.window.indexedDB.deleteDatabase(name);
+    }
+  });
+
+  test('exclusive ownership rejects duplicate connection without clearing live Blob and can reopen', () async {
+    final name = 'koi_owner_${DateTime.now().microsecondsSinceEpoch}';
+    final first = await openStorage(webDatabaseName: name);
+    try {
+      await first.repository.save(
+        const WorkspaceSnapshot(
+          documents: [WorkspaceDocument(id: 'a', title: '中文资料')],
+        ),
+      );
+      final key = await first.assetStore.stage(
+        Stream.value([1, 2]),
+        name: 'active.png',
+      );
+      await expectLater(
+        openStorage(webDatabaseName: name),
+        throwsA(isA<WorkspaceInUse>()),
+      );
+      await first.assetStore.commit(key);
+      await first.close();
+      final second = await openStorage(webDatabaseName: name);
+      try {
+        expect((await second.repository.load()).documents.single.title, '中文资料');
+        expect(second.repository.persistedVersion, 1);
+        expect(await second.assetStore.readBytes(key), [1, 2]);
+        await expectLater(
+          second.repository.save(const WorkspaceSnapshot(), expectedVersion: 0),
+          throwsA(isA<WorkspaceConflict>()),
+        );
+        expect((await second.repository.load()).documents.single.title, '中文资料');
+      } finally {
+        await second.close();
+      }
+    } finally {
+      await first.close();
+      web.window.indexedDB.deleteDatabase(name);
+    }
+  });
+
   test(
     'selected file URL cleanup revokes the actual browser object URL',
     () async {

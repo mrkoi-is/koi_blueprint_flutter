@@ -2,6 +2,11 @@
 
 ## Unreleased
 - 技能正文收敛到 `.agents/skills`，删除 `.agent` 与发现适配副本。升级报告不改文件；仍保持基线的 `.agent/**` 会显示上游消失，`.agents/skills/**` 会显示为完整正文，需手工删除旧目录并采用新正文
+- 工作台加入 Native 文件锁与 Web Locks 单写者保护、可取消退出协议及真实进程/浏览器锁回归
+- 新增 run/devices/doctor 子命令和模板继承资产门禁，生成项目使用可发现的启动与平台验收入口
+- 修复兼容 Feature 入口覆盖显式 kind、minimal 的 Chrome 过度门禁；生成 README 从 .fvmrc 读取 SDK 版本
+- 补齐 CLI 参数语义、分项 Make 入口、成员 README 与工具清单；Skill 维护/平台验收/Melos 文档可发现性进入 AI 门禁
+- 归档 2026-09-30 整改方案并关联后续验收证据，更新 AGENTS 的 UI 路由与完整验证范围
 - 新项目默认接入 koi_ui；新增 minimal/workbench 模板、确定性平台配置和两种模板的六端构建矩阵
 - 增加产品主题 token、两种密度、自适应工作台组件与 UI Lab；Admin、starter、module showcase 统一主题
 - 增加文本、素材、待办及真实任务工作台，Native 备份快照与 Web IndexedDB/Blob 持久化、真实媒体预览和缩略图
