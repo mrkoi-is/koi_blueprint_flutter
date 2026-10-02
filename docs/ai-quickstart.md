@@ -3,7 +3,7 @@
 ## 最小读取路径
 
 1. 读本文件和 [AGENTS.md](../AGENTS.md)。
-2. 从 [技能索引](../.agent/skills/index.yaml) 选择任务；只读对应 `SKILL.md`。
+2. 从 [技能索引](../.agents/skills/index.yaml) 选择任务；只读对应 `SKILL.md`。
 3. 需要时读该技能指向的架构文档、references 和样例源码。
 4. 调用脚手架；再完成业务实现与注册、注入、测试。
 5. 运行受影响测试和完整门禁，分别报告结果。

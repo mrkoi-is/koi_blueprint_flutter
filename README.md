@@ -33,7 +33,7 @@ python3 blueprint.py validate
 
 ## AI 从哪里开始
 
-读取 [AGENTS.md](AGENTS.md) → [AI Quickstart](docs/ai-quickstart.md) → [技能索引](.agent/skills/index.yaml)，按任务加载 9 个技能中的少数。Codex、Claude Code 和 Cursor 使用轻量入口适配，技能正文只维护一份。客户端差异与手动接入见 [发现机制](docs/agent-skill-rule-discovery.md)。
+读取 [AGENTS.md](AGENTS.md) → [AI Quickstart](docs/ai-quickstart.md) → [技能索引](.agents/skills/index.yaml)，按任务加载 9 个技能中的少数。技能正文只维护在 `.agents/skills/`。客户端差异与手动接入见 [发现机制](docs/agent-skill-rule-discovery.md)。
 
 ## 架构与样例
 
@@ -42,8 +42,7 @@ apps/       宿主、bootstrap、router、core/features/shared
 modules/    有独立边界的业务模块（按需）
 packages/   稳定共享能力与契约
 examples/   最小宿主、三类 Feature、模块宿主
-.agent/     技能正文与索引
-.agents/    Codex 发现适配
+.agents/    技能正文、索引与原生发现入口
 ```
 
 Feature 按职责选择 domain/data/application/presentation；data 与 application 可以共存。业务容器通过 provider 订阅，展示组件可以使用不可变参数和回调。状态拥有者、自动销毁、异步错误和过期结果是架构的一部分。

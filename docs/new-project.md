@@ -45,7 +45,7 @@ python3 blueprint.py module reporting --workspace .
 
 `presentation` 用于无数据源的页面，`api` 用于仓库驱动的异步读取，`local` 用于本地数据与业务状态。生成后仍要完成业务字段、宿主导航、真实依赖 override 和场景测试。网络/本地实现的示例替身不能冒充真实后端或持久化。
 
-新增共享包目前按 [add-shared-package](../.agent/skills/add-shared-package/SKILL.md) 手工完成目录、pubspec、workspace 登记和测试。
+新增共享包目前按 [add-shared-package](../.agents/skills/add-shared-package/SKILL.md) 手工完成目录、pubspec、workspace 登记和测试。
 
 ## 验收与身份替换
 

@@ -377,7 +377,7 @@ def create(args):
                 raise BlueprintError(f'Workbench platform configuration failed: {error}') from error
         for package in REQUIRED_PACKAGES:
             copy(source_root() / 'packages' / package, stage / 'packages' / package)
-        for folder in ('tool', 'scripts', '.agent', '.agents', '.cursor', 'docs', '.github'):
+        for folder in ('tool', 'scripts', '.agents', '.cursor', 'docs', '.github'):
             if (ROOT / folder).exists():
                 copy(ROOT / folder, stage / folder)
         # Historical evidence and exploratory research are source-owned, not

@@ -19,7 +19,7 @@ CLAUDE_ADAPTER = """# Flutter workspace agent entry
 
 @AGENTS.md
 
-Read `AGENTS.md`, `docs/ai-quickstart.md` and `.agent/skills/index.yaml`.
+Read `AGENTS.md`, `docs/ai-quickstart.md` and `.agents/skills/index.yaml`.
 This file only routes discovery; update the canonical files for architecture and task guidance.
 """
 
@@ -28,7 +28,7 @@ description: Flutter workspace task routing
 alwaysApply: true
 ---
 
-Read `AGENTS.md`, then `docs/ai-quickstart.md` and `.agent/skills/index.yaml`.
+Read `AGENTS.md`, then `docs/ai-quickstart.md` and `.agents/skills/index.yaml`.
 Load only the canonical skill for the current task and the references it needs.
 Project rules live in `AGENTS.md` and the linked architecture documents; this file only routes discovery.
 """
@@ -54,13 +54,6 @@ def frontmatter(text: str) -> tuple[str, dict[str, str]]:
     if not values.get("name") or not values.get("description"):
         raise ValueError("Frontmatter requires name and description")
     return match[0].rstrip("\n"), values
-
-
-def expected_adapter(canonical: str, skill_id: str) -> str:
-    header, _ = frontmatter(canonical)
-    return (f"{header}\n\nRead the canonical skill at `.agent/skills/{skill_id}/SKILL.md` "
-            "from the repository root and follow it.\n"
-            "This file is a discovery adapter; edit only the canonical skill.\n")
 
 
 def read_index(path: Path) -> list[dict[str, object]]:
@@ -172,43 +165,42 @@ def check_references(root: Path, documents: list[Path]) -> list[Issue]:
 def validate_assets(root: Path) -> list[Issue]:
     root = root.resolve()
     issues: list[Issue] = []
-    index_path = root / ".agent/skills/index.yaml"
+    index_rel = ".agents/skills/index.yaml"
+    if (root / ".agent").exists():
+        issues.append(Issue("AI_LAYOUT", ".agent",
+                            "Use .agents/skills only; remove the parallel .agent directory"))
+    index_path = root / index_rel
     try:
         entries = read_index(index_path)
     except (OSError, ValueError) as error:
-        return [Issue("AI_INDEX", ".agent/skills/index.yaml", str(error))]
+        issues.append(Issue("AI_INDEX", index_rel, str(error)))
+        return issues
     ids = [str(entry["id"]) for entry in entries]
     if len(ids) != len(set(ids)):
-        issues.append(Issue("AI_INDEX", ".agent/skills/index.yaml", "Duplicate skill ids"))
-    canonical_ids = {p.parent.name for p in (root / ".agent/skills").glob("*/SKILL.md")}
-    adapter_ids = {p.parent.name for p in (root / ".agents/skills").glob("*/SKILL.md")}
-    for label, found in (("canonical", canonical_ids), ("adapter", adapter_ids)):
-        if found != set(ids):
-            issues.append(Issue("AI_INDEX", ".agent/skills/index.yaml",
-                                f"{label} discovery differs from index: missing={sorted(set(ids)-found)}, extra={sorted(found-set(ids))}"))
+        issues.append(Issue("AI_INDEX", index_rel, "Duplicate skill ids"))
+    skill_ids = {p.parent.name for p in (root / ".agents/skills").glob("*/SKILL.md")}
+    if skill_ids != set(ids):
+        issues.append(Issue("AI_INDEX", index_rel,
+                            f"Skill discovery differs from index: missing={sorted(set(ids)-skill_ids)}, extra={sorted(skill_ids-set(ids))}"))
     for entry in entries:
         skill_id = str(entry["id"])
-        expected_path = f".agent/skills/{skill_id}/SKILL.md"
+        expected_path = f".agents/skills/{skill_id}/SKILL.md"
         if entry["path"] != expected_path:
-            issues.append(Issue("AI_INDEX", ".agent/skills/index.yaml", f"Noncanonical path for {skill_id}"))
+            issues.append(Issue("AI_INDEX", index_rel, f"Noncanonical path for {skill_id}"))
         canonical_path = root / expected_path
-        adapter_path = root / f".agents/skills/{skill_id}/SKILL.md"
+        if canonical_path.is_symlink():
+            issues.append(Issue("AI_LAYOUT", expected_path,
+                                "Use a real skill file for consistent Windows checkouts"))
         try:
             canonical = canonical_path.read_text(encoding="utf-8")
             _, metadata = frontmatter(canonical)
             if metadata["name"] != skill_id or metadata["description"] != entry["description"]:
                 issues.append(Issue("AI_METADATA", expected_path, "Canonical metadata differs from index"))
-            if canonical_path.is_symlink() or adapter_path.is_symlink():
-                issues.append(Issue("AI_ADAPTER", adapter_path.relative_to(root).as_posix(),
-                                    "Use real discovery files for consistent Windows checkouts"))
-            if adapter_path.read_text(encoding="utf-8") != expected_adapter(canonical, skill_id):
-                issues.append(Issue("AI_ADAPTER", adapter_path.relative_to(root).as_posix(),
-                                    "Discovery adapter differs from the canonical metadata/routing template"))
         except (OSError, ValueError) as error:
             issues.append(Issue("AI_METADATA", expected_path, str(error)))
     routes = {
-        "AGENTS.md": ("docs/ai-quickstart.md", ".agent/skills/index.yaml"),
-        "docs/ai-quickstart.md": ("AGENTS.md", ".agent/skills/index.yaml"),
+        "AGENTS.md": ("docs/ai-quickstart.md", index_rel),
+        "docs/ai-quickstart.md": ("AGENTS.md", index_rel),
     }
     for name, required in routes.items():
         path = root / name
@@ -232,7 +224,7 @@ def validate_assets(root: Path) -> list[Issue]:
     # Research notes and dated validation evidence are not current AI routing
     # documents; they may legitimately cite source machines or planned paths.
     source_only_docs = {("docs", "research"), ("docs", "validation")}
-    documents = [p for base in (root / ".agent/skills", root / ".agents/skills", root / "docs")
+    documents = [p for base in (root / ".agents/skills", root / "docs")
                  if base.is_dir() for p in base.rglob("*.md")
                  if tuple(p.relative_to(root).parts[:2]) not in source_only_docs]
     documents.extend(root / name for name in ("AGENTS.md", "CLAUDE.md", "README.md", "DESIGN.md") if (root / name).is_file())
@@ -284,7 +276,7 @@ def main(argv: list[str] | None = None) -> int:
         for issue in issues:
             print(f"{issue.path} [{issue.rule}] {issue.message}", file=sys.stderr)
     else:
-        print("AI asset checks passed (canonical skills, discovery adapters, references and template inputs).")
+        print("AI asset checks passed (canonical skills, references and template inputs).")
     return 1 if issues else 0
 
 

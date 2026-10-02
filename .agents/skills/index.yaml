@@ -2,36 +2,36 @@ skills:
   - id: workspace-init
     description: 从 Koi 蓝图创建独立 Flutter workspace 并验证名称、平台、依赖和 AI 入口。
     keywords: [workspace, init, create, bootstrap, project]
-    path: .agent/skills/workspace-init/SKILL.md
+    path: .agents/skills/workspace-init/SKILL.md
   - id: add-feature-module
     description: 在现有 App 或业务 module 新增 presentation、api 或 local Feature 并完成注入、导航和测试。
     keywords: [feature, page, screen, scaffold]
-    path: .agent/skills/add-feature-module/SKILL.md
+    path: .agents/skills/add-feature-module/SKILL.md
   - id: state-management
     description: 按 Koi Riverpod 3 契约实现页面、异步状态、派生计算、依赖注入与生命周期。
     keywords: [riverpod, state, provider, notifier, lifecycle]
-    path: .agent/skills/state-management/SKILL.md
+    path: .agents/skills/state-management/SKILL.md
   - id: add-shared-package
     description: 创建跨 App 的共享 Dart 或 Flutter package 并登记 workspace、公共 API 和测试。
     keywords: [package, shared, library, workspace]
-    path: .agent/skills/add-shared-package/SKILL.md
+    path: .agents/skills/add-shared-package/SKILL.md
   - id: add-business-module
     description: 创建独立业务 module 并通过 koi_modules 接入宿主路由、注入和会话切换。
     keywords: [business-module, module, session, catalog]
-    path: .agent/skills/add-business-module/SKILL.md
+    path: .agents/skills/add-business-module/SKILL.md
   - id: add-generated-api-package
     description: 接入 OpenAPI 生成包与网络消费适配，记录可重复输入、生成命令和真实客户端边界。
     keywords: [openapi, swagger, api, generation, network]
-    path: .agent/skills/add-generated-api-package/SKILL.md
+    path: .agents/skills/add-generated-api-package/SKILL.md
   - id: add-routing
     description: 新增类型化 go_router 路由并验证宿主注册、重定向、参数和路由生命周期。
     keywords: [route, router, navigation, go_router]
-    path: .agent/skills/add-routing/SKILL.md
+    path: .agents/skills/add-routing/SKILL.md
   - id: architecture-review
     description: 对 Koi workspace 审查依赖边界、状态归属、模块生命周期和架构门禁证据。
     keywords: [architecture, review, audit, boundaries]
-    path: .agent/skills/architecture-review/SKILL.md
+    path: .agents/skills/architecture-review/SKILL.md
   - id: testing-scaffold
     description: 为 Koi Feature、共享包和模块补行为测试，覆盖依赖替身、异步错误和会话清理。
     keywords: [test, coverage, widget, provider, regression]
-    path: .agent/skills/testing-scaffold/SKILL.md
+    path: .agents/skills/testing-scaffold/SKILL.md

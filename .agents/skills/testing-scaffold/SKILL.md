@@ -3,5 +3,25 @@ name: testing-scaffold
 description: 为 Koi Feature、共享包和模块补行为测试，覆盖依赖替身、异步错误和会话清理。
 ---
 
-Read the canonical skill at `.agent/skills/testing-scaffold/SKILL.md` from the repository root and follow it.
-This file is a discovery adapter; edit only the canonical skill.
+## 目标
+验证实际行为和架构边界，避免只复写实现或为凑覆盖率添加空断言。
+
+## 决策
+纯领域逻辑用单元测试；状态用 provider 测试；视图交互用 Widget 测试；路由/装配用宿主测试；真实 IO 使用隔离集成测试。
+
+## 流程
+1. 阅读 [测试策略](../../../docs/test_strategy.md)，列出此次变更的行为与失败条件。
+2. 用构造器/provider overrides 注入仓库、时钟、平台、文件根目录等替身。
+3. 测首次 loading、空数据、失败、刷新/重试；异步状态增加逆序返回和 dispose 场景。
+4. module 增加重复 id/路由、切换释放、旧结果拒绝与宿主共享服务仍存活测试。
+5. 运行受影响测试，再运行完整门禁和 80% 手写代码覆盖率检查。
+
+## 核心规则
+- auto-dispose provider 在观测期间保持 listen 订阅，测试结束销毁 container。
+- 测试不读写用户真实数据；IO 测试用临时目录，网络协议用 fixture/fake。
+- 每个 workspace 成员应有适合其职责的测试，不能因成员漏登记而跳过。
+- UI 增强覆盖长中文/200%字号、焦点、Escape 恢复、resize 保留；媒体替身只证明拥有者行为，真实播放、截图与 Web 存储另做平台测试。
+- 生成物排除覆盖率；手写可执行代码缺失于报告不能被当成已覆盖。
+
+## 验证
+对目标平台另跑 build/运行检查。记录通过、失败、未执行；不能把源码检查当成真实设备或外部服务验收。

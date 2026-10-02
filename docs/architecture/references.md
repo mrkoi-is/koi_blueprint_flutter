@@ -12,7 +12,7 @@
 | [Mason](https://github.com/felangel/mason) | 可重复消费的参数化模板 | 保持脚手架与受测源码一致；现阶段不增加第二种模板运行时 |
 | [Riverpod 自动销毁](https://riverpod.dev/docs/concepts2/auto_dispose) | 自动销毁、keepAlive 与资源清理 | 显式选择页面/会话/应用生命周期，不能把 provider 当作永久存储 |
 | [Riverpod select](https://riverpod.dev/docs/how_to/select) | 缩小订阅值与重建范围 | 先确保不可变状态与 equality，再依据测量优化；family 本身不保证单条重建 |
-| [Codex Skills](https://developers.openai.com/codex/skills) | 原生 Skill 发现与按需加载 | `.agents/skills` 使用轻量适配，canonical 正文保留在 `.agent/skills` |
+| [Codex Skills](https://developers.openai.com/codex/skills) | 原生 Skill 发现与按需加载 | 技能正文直接放在 `.agents/skills`，与原生发现目录一致 |
 | [Claude 项目指令](https://code.claude.com/docs/en/memory) | 项目记忆/指令文件及导入机制 | CLAUDE.md 只导入统一入口；客户端能力须在实际环境验证 |
 
 这些是具体机制的参考，不是按 star 数或流行度给项目排名。版本和客户端行为变化后，应重新核对相关接口并执行回归。

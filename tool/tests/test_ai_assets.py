@@ -17,13 +17,12 @@ class AiAssetsTest(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name)
         self.canonical = "---\nname: example\ndescription: Create a tested example.\n---\n\nRead [contract](references/contract.md).\n"
-        self.write(".agent/skills/example/SKILL.md", self.canonical)
-        self.write(".agent/skills/example/references/contract.md", "# Contract\n")
-        self.write(".agents/skills/example/SKILL.md", CHECKER.expected_adapter(self.canonical, "example"))
-        self.write(".agent/skills/index.yaml", "skills:\n  - id: example\n    description: Create a tested example.\n    keywords: [example, test]\n    path: .agent/skills/example/SKILL.md\n")
-        self.write("AGENTS.md", "Read `docs/ai-quickstart.md` and `.agent/skills/index.yaml`.\n\n## 任务路由\n\n| 任务 | Skill |\n| --- | --- |\n| Example | `example` |\n")
+        self.write(".agents/skills/example/SKILL.md", self.canonical)
+        self.write(".agents/skills/example/references/contract.md", "# Contract\n")
+        self.write(".agents/skills/index.yaml", "skills:\n  - id: example\n    description: Create a tested example.\n    keywords: [example, test]\n    path: .agents/skills/example/SKILL.md\n")
+        self.write("AGENTS.md", "Read `docs/ai-quickstart.md` and `.agents/skills/index.yaml`.\n\n## 任务路由\n\n| 任务 | Skill |\n| --- | --- |\n| Example | `example` |\n")
         self.write("CLAUDE.md", CHECKER.CLAUDE_ADAPTER)
-        self.write("docs/ai-quickstart.md", "Read `AGENTS.md` and `.agent/skills/index.yaml`.\n")
+        self.write("docs/ai-quickstart.md", "Read `AGENTS.md` and `.agents/skills/index.yaml`.\n")
         self.write(".cursor/rules/koi-workspace.mdc", CHECKER.CURSOR_ADAPTER)
 
     def write(self, path, text):
@@ -38,29 +37,41 @@ class AiAssetsTest(unittest.TestCase):
         self.assertEqual(CHECKER.validate_assets(self.root), [])
 
     def test_unknown_and_duplicate_index_fields_fail(self):
-        path = self.root / ".agent/skills/index.yaml"
+        path = self.root / ".agents/skills/index.yaml"
         path.write_text(path.read_text() + "    surprise: value\n")
         self.assertIn("AI_INDEX", self.rules())
 
     def test_unindexed_canonical_skill_fails(self):
-        self.write(".agent/skills/orphan/SKILL.md", "---\nname: orphan\ndescription: Orphan.\n---\n")
+        self.write(".agents/skills/orphan/SKILL.md", "---\nname: orphan\ndescription: Orphan.\n---\n")
         self.assertIn("AI_INDEX", self.rules())
 
-    def test_missing_native_adapter_fails(self):
+    def test_missing_indexed_skill_fails(self):
         (self.root / ".agents/skills/example/SKILL.md").unlink()
         self.assertIn("AI_INDEX", self.rules())
 
-    def test_adapter_cannot_add_its_own_rules(self):
-        path = self.root / ".agents/skills/example/SKILL.md"
-        path.write_text(path.read_text() + "Use another architecture instead.\n")
-        self.assertIn("AI_ADAPTER", self.rules())
+    def test_parallel_agent_directory_fails(self):
+        self.write(".agent/skills/example/SKILL.md", self.canonical)
+        self.assertIn("AI_LAYOUT", self.rules())
+
+    def test_noncanonical_index_path_fails(self):
+        path = self.root / ".agents/skills/index.yaml"
+        path.write_text(path.read_text().replace(".agents/skills/example/SKILL.md", ".agent/skills/example/SKILL.md"), encoding="utf-8")
+        self.assertIn("AI_INDEX", self.rules())
+
+    def test_skill_symlink_fails(self):
+        skill = self.root / ".agents/skills/example/SKILL.md"
+        real = self.root / "skill-body.md"
+        real.write_text(skill.read_text(), encoding="utf-8")
+        skill.unlink()
+        skill.symlink_to(real)
+        self.assertIn("AI_LAYOUT", self.rules())
 
     def test_metadata_drift_fails(self):
-        self.write(".agent/skills/example/SKILL.md", self.canonical.replace("Create a tested example.", "Changed description."))
+        self.write(".agents/skills/example/SKILL.md", self.canonical.replace("Create a tested example.", "Changed description."))
         self.assertIn("AI_METADATA", self.rules())
 
     def test_broken_required_reference_fails(self):
-        (self.root / ".agent/skills/example/references/contract.md").unlink()
+        (self.root / ".agents/skills/example/references/contract.md").unlink()
         self.assertIn("AI_REFERENCE", self.rules())
 
     def test_reference_outside_repository_fails(self):

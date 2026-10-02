@@ -1,6 +1,6 @@
 # Koi Flutter 蓝图 — Agent 入口
 
-先读 [AI Quickstart](docs/ai-quickstart.md)，再从 [.agent/skills/index.yaml](.agent/skills/index.yaml) 选择当前任务的一个或少量技能。需要细节时才读其 references；不要全量加载技能。
+先读 [AI Quickstart](docs/ai-quickstart.md)，再从 [.agents/skills/index.yaml](.agents/skills/index.yaml) 选择当前任务的一个或少量技能。需要细节时才读其 references；不要全量加载技能。
 
 ## 架构契约
 
@@ -33,4 +33,4 @@
 
 ## AI 资产单一来源
 
-正文只维护 `.agent/skills/`。`.agents/skills/` 是 Codex 原生发现适配文件，`CLAUDE.md` 与 `.cursor/rules/` 只指向入口。发现不等于已执行；不支持自动发现的工具直接按路径读取。见 [发现机制](docs/agent-skill-rule-discovery.md)。
+正文只维护 `.agents/skills/`。`CLAUDE.md` 与 `.cursor/rules/` 只指向入口。发现不等于已执行；不支持自动发现的工具直接按路径读取。见 [发现机制](docs/agent-skill-rule-discovery.md)。

@@ -3,6 +3,6 @@ description: Flutter workspace task routing
 alwaysApply: true
 ---
 
-Read `AGENTS.md`, then `docs/ai-quickstart.md` and `.agent/skills/index.yaml`.
+Read `AGENTS.md`, then `docs/ai-quickstart.md` and `.agents/skills/index.yaml`.
 Load only the canonical skill for the current task and the references it needs.
 Project rules live in `AGENTS.md` and the linked architecture documents; this file only routes discovery.

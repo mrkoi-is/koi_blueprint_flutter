@@ -51,5 +51,5 @@ rule/path/line/target，并说明保留原因；不接受目录通配。例外�
 不会把所有名字带 Sync 的业务方法都判成 IO。
 
 AI 入口与 Skill 资产另由 `python3 blueprint.py check ai` 验证：索引、正文元数据、
-精确发现适配器、本地文档引用、生成源与配套测试目录以及未展开的命名占位符。
+本地文档引用、生成源与配套测试目录以及未展开的命名占位符。
 样例编译和行为验证由正常 workspace 的 generate/analyze/test 负责。
