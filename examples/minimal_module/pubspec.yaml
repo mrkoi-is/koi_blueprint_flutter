@@ -11,7 +11,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  go_router: ^17.5.0
+  go_router: ^18.0.2
   koi_modules:
 
 dev_dependencies:
