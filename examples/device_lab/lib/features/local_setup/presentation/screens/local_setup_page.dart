@@ -1,9 +1,11 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:device_lab/l10n/generated/app_localizations.dart';
 import 'package:device_lab/features/devices/application/onboarding.dart';
 import 'package:device_lab/features/local_setup/presentation/providers/local_setup_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+@Dependencies([localSetupChanges, localSetupSession])
 class LocalSetupPage extends ConsumerStatefulWidget {
   const LocalSetupPage({super.key, required this.onboarding});
   final bool onboarding;

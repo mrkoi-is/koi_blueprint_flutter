@@ -1,5 +1,5 @@
 name: koi_blueprint_flutter
-version: 0.1.0
+version: 0.2.0-rc.1
 publish_to: none
 description: Koi Flutter monorepo blueprint
 repository: https://github.com/mrkoi-is/koi_blueprint_flutter

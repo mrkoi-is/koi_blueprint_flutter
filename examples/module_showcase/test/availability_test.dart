@@ -1,9 +1,12 @@
+import 'package:showcase_alpha/showcase_alpha.dart' show alphaMessage;
+import 'package:showcase_beta/showcase_beta.dart' show betaMessage;
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:koi_modules/koi_modules.dart';
 import 'package:module_showcase/app.dart';
 import 'package:module_showcase/bootstrap.dart';
-import 'package:showcase_contracts/showcase_contracts.dart';
+import 'package:module_showcase/core/providers/module_providers.dart';
 
 Future<void> settle(WidgetTester tester) async {
   await tester.pump();
@@ -11,6 +14,7 @@ Future<void> settle(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+@Dependencies([alphaMessage, betaMessage])
 void main() {
   testWidgets(
     'real Alpha/Beta injection declares operations and configuration recovers in the same router',
@@ -25,7 +29,10 @@ void main() {
         ),
         isTrue,
       );
-      final alpha = bootstrap.container.read(activeShowcaseRepositoryProvider);
+      final alpha = bootstrap.container
+          .read(moduleSnapshotProvider)
+          .session!
+          .capability;
       expect(
         await tester.runAsync(alpha.loadMessage),
         contains('Alpha capability'),
@@ -46,7 +53,10 @@ void main() {
       await tester.tap(find.text('切换 Beta'));
       await settle(tester);
       expect(find.text('Beta home page'), findsOneWidget);
-      final beta = bootstrap.container.read(activeShowcaseRepositoryProvider);
+      final beta = bootstrap.container
+          .read(moduleSnapshotProvider)
+          .session!
+          .capability;
       expect(
         await tester.runAsync(beta.loadMessage),
         contains('Beta capability'),

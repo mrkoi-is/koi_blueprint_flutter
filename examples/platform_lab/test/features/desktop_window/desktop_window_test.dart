@@ -134,7 +134,9 @@ void main() {
       await host.initialize();
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [desktopWindowHostProvider.overrideWithValue(host)],
+          overrides: [
+            desktopWindowHostProvider.overrideWithValue((host: host)),
+          ],
           child: MaterialApp(
             locale: const Locale('en'),
             supportedLocales: AppLocalizations.supportedLocales,

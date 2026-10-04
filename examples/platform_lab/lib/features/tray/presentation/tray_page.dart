@@ -14,7 +14,7 @@ class TrayPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(trayPortProvider);
-    final host = ref.watch(desktopWindowHostProvider);
+    final host = ref.watch(desktopWindowHostProvider).host;
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.platformSystemTray),

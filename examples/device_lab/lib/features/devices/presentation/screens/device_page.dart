@@ -1,3 +1,4 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:device_lab/l10n/generated/app_localizations.dart';
 
 import 'dart:convert';
@@ -9,6 +10,7 @@ import 'package:device_lab/features/devices/presentation/providers/device_provid
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+@Dependencies([deviceSession, deviceState])
 class DevicePage extends ConsumerStatefulWidget {
   const DevicePage({super.key});
   @override

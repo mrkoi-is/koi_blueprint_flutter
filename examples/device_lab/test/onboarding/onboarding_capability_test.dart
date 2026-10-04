@@ -1,6 +1,7 @@
 @TestOn('vm')
 library;
 
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:device_lab/onboarding_capability.dart';
 import 'package:device_lab/features/local_setup/presentation/providers/local_setup_providers.dart';
 import 'package:device_lab/features/local_setup/presentation/screens/local_setup_page.dart';
@@ -11,6 +12,7 @@ import 'package:koi_core/koi_core.dart';
 
 import '../local_setup/native_capability_support.dart';
 
+@Dependencies([localSetupSession, localSetupChanges])
 void main() {
   testWidgets(
     'onboarding builder retries real storage, saves at prepare and releases only at close',

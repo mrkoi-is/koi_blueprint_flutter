@@ -5,10 +5,11 @@ import 'package:network_lab/features/network/domain/network_ports.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'network_providers.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: true, dependencies: [])
 NetworkSessionPort networkSession(Ref ref) =>
     throw UnimplementedError('Override networkSessionProvider at bootstrap');
-@riverpod
+
+@Riverpod(dependencies: [networkSession])
 Stream<NetworkSnapshot> networkSnapshot(Ref ref) {
   final session = ref.watch(networkSessionProvider);
   return Stream.multi((controller) {

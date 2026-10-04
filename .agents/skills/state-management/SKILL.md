@@ -31,7 +31,7 @@ description: 按 Koi Riverpod 3 契约实现页面、异步状态、派生计算
 - 同级内容侧栏/详情复用 koi_ui 的 KoiPanel；宿主持有跨抽屉/内联切换的滚动恢复范围，不把稳定 router 等同于局部滚动自动保持。
 - 工作区三视图共用会话，resize 不重建文本/媒体控制器；参照 [UI 与自适应](../../../docs/architecture/ui-and-adaptive.md) 和 Workbench。
 
-消费 scoped provider 时，为 Widget、路由和辅助函数补 `@Dependencies`，依赖链声明 `dependencies`。不使用 lint ignore 绕过作用域约束。生成注解与消费元数据的边界见状态管理规范。
+消费 scoped provider 时，为 Widget、路由和辅助函数补 `@Dependencies`，依赖链声明 `dependencies`。Riverpod lint 3.1.9 的 15 条已全部启用；不使用 lint ignore 绕过。生成注解与消费元数据的边界见状态管理规范。
 
 ## 验证
 参照 [Feature Lab](../../../docs/examples.md) 和认证 provider 测试。未测取消与释放时，不宣称生命周期安全。
