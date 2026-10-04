@@ -52,14 +52,10 @@ class _TextPageState extends ConsumerState<TextPage> {
   Widget build(BuildContext context) {
     final session = ref.watch(workspaceSessionProvider);
     final state = ref.watch(
-      workspaceStateProvider.select(
+      workspaceSnapshotProvider.select(
         (value) => TextViewState(
-          documents:
-              value.value?.snapshot.documents ??
-              session.state.snapshot.documents,
-          selectedId:
-              value.value?.snapshot.preferences.selectedDocumentId ??
-              session.state.snapshot.preferences.selectedDocumentId,
+          documents: value.snapshot.documents,
+          selectedId: value.snapshot.preferences.selectedDocumentId,
           sidebarWidth: 0,
         ),
       ),
@@ -76,9 +72,9 @@ class _TextPageState extends ConsumerState<TextPage> {
             () => TextEditingController(text: selected.text),
           );
     ref.listen(
-      workspaceStateProvider.select((value) => value.value?.snapshot.documents),
+      workspaceSnapshotProvider.select((value) => value.snapshot.documents),
       (_, next) {
-        for (final document in next ?? <WorkspaceDocument>[]) {
+        for (final document in next) {
           final controller = _editors[document.id];
           if (controller == null ||
               controller.text == document.text ||

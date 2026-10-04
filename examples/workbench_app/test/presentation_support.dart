@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:workbench_app/features/workspace/data/workspace_storage.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_preview_session.dart';
+import 'package:workbench_app/features/workspace/application/media_preview_session.dart';
 
 final class MemoryRepository implements WorkspaceRepository {
   MemoryRepository([this.snapshot = const WorkspaceSnapshot()]);
@@ -157,13 +157,6 @@ final class FakePlayback extends ChangeNotifier implements MediaPlayback {
   double volume = 100;
   @override
   bool playing = false;
-  @override
-  Widget get surface => const ColoredBox(
-    color: Colors.black,
-    child: Center(
-      child: Text('Fake video surface', style: TextStyle(color: Colors.white)),
-    ),
-  );
   @override
   Stream<String> get errors => errorsController.stream;
   @override

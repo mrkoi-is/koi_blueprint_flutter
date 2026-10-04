@@ -1,6 +1,10 @@
 import hashlib
 import json
 from pathlib import Path
+import os
+import shutil
+import subprocess
+import sys
 import tempfile
 import unittest
 from unittest.mock import patch
@@ -95,6 +99,116 @@ class UpgradeToolsTest(unittest.TestCase):
         before = (current / 'app.dart').read_bytes()
         self.assertEqual(len(upgrade_report(current, source)['conflicts']), 1)
         self.assertEqual((current / 'app.dart').read_bytes(), before)
+
+    def test_guidance_gaps_are_reported_without_inventing_or_writing_a_baseline(self):
+        source, project = self.root / 'source', self.root / 'project'
+        for relative, content in [('AGENTS.md', '# Source\n'), ('CLAUDE.md', 'pointer'),
+                                  ('docs/ai-quickstart.md', 'guide'), ('.agents/skills/test/SKILL.md', 'skill')]:
+            self.write('source/' + relative, content)
+            if relative != 'CLAUDE.md': self.write('project/' + relative, content)
+        metadata = {'schema': 2, 'name': 'demo', 'managedFiles': {}}
+        self.write('project/blueprint.json', json.dumps(metadata))
+        def snapshot():
+            return {f.relative_to(project).as_posix(): hashlib.sha256(f.read_bytes()).hexdigest()
+                    for f in project.rglob('*') if f.is_file()}
+        before = snapshot()
+        report = upgrade_report(project, source)
+        self.assertEqual(snapshot(), before)
+        self.assertEqual(len(report['untrackedGuidance']), 4)
+        by_path = {item['path']: item for item in report['untrackedGuidance']}
+        self.assertEqual(by_path['AGENTS.md']['status'], 'NO_BASELINE')
+        self.assertEqual(by_path['AGENTS.md']['currentSha256'], by_path['AGENTS.md']['upstreamSha256'])
+        self.assertFalse(by_path['CLAUDE.md']['localExists'])
+        self.assertIsNone(by_path['CLAUDE.md']['currentSha256'])
+        self.assertTrue(by_path['CLAUDE.md']['upstreamSha256'])
+        for category in ('unchanged', 'conflicts', 'alreadyApplied', 'upstreamChanges', 'localChanges'):
+            self.assertEqual(report[category], [])
+        # Partial prior baselines keep their normal three-way classification.
+        sha = hashlib.sha256(b'guide').hexdigest()
+        metadata['managedFiles']['docs/ai-quickstart.md'] = {
+            'source': 'docs/ai-quickstart.md', 'sha256': sha, 'sourceSha256': sha}
+        self.write('project/blueprint.json', json.dumps(metadata))
+        before = snapshot()
+        report = upgrade_report(project, source)
+        self.assertEqual(snapshot(), before)
+        self.assertEqual([x['path'] for x in report['unchanged']], ['docs/ai-quickstart.md'])
+        self.assertEqual(len(report['untrackedGuidance']), 3)
+        self.assertTrue(report['manualMigration'])
+
+    def test_guidance_projection_recognizes_the_current_generated_form(self):
+        from blueprint import render_workspace_asset
+        source, project = self.root / 'source', self.root / 'project'
+        old, new = b'# Koi\nOld guidance\n', b'# Koi\nUpdated guidance\n'
+        self.write('source/AGENTS.md', new)
+        old_project = render_workspace_asset(old, 'AGENTS.md', 'demo')
+        self.write('project/AGENTS.md', render_workspace_asset(new, 'AGENTS.md', 'demo'))
+        self.write('project/blueprint.json', json.dumps({'schema': 2, 'name': 'demo', 'managedFiles': {
+            'AGENTS.md': {'source': 'AGENTS.md', 'sha256': hashlib.sha256(old_project).hexdigest(),
+                          'sourceSha256': hashlib.sha256(old).hexdigest()}}}))
+        report = upgrade_report(project, source)
+        self.assertEqual([x['path'] for x in report['alreadyApplied']], ['AGENTS.md'])
+        self.assertEqual(report['untrackedGuidance'], [])
+
+    def test_upgrade_report_cli_preserves_the_entire_project_tree(self):
+        repository = Path(__file__).resolve().parents[2]
+        project, source = self.root / 'project', self.root / 'source'
+        self.write('project/pubspec.yaml', 'name: demo\nworkspace:\n  - apps/demo_app\n')
+        self.write('project/apps/demo_app/pubspec.yaml', 'name: demo_app\nresolution: workspace\n')
+        self.write('project/blueprint.json', json.dumps({'schema': 2, 'name': 'demo', 'managedFiles': {}}))
+        self.write('project/.fvmrc', '{"flutter":"3.47.2"}')
+        self.write('source/AGENTS.md', '# Source\n')
+        self.write('project/AGENTS.md', '# Source\n')
+        shutil.copy2(repository / 'blueprint.py', project / 'blueprint.py')
+        shutil.copytree(repository / 'tool', project / 'tool',
+                        ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.dart_tool', 'build', 'coverage'))
+        def snapshot():
+            return {f.relative_to(project).as_posix(): hashlib.sha256(f.read_bytes()).hexdigest()
+                    for f in project.rglob('*') if f.is_file()}
+        environment = dict(os.environ)
+        environment.pop('PYTHONDONTWRITEBYTECODE', None)
+        before = snapshot()
+        result = subprocess.run([sys.executable, 'blueprint.py', 'upgrade-report',
+                                 '--app', str(project / 'apps/demo_app'), '--source', str(source)],
+                                cwd=project, env=environment, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(snapshot(), before)
+        report = json.loads(result.stdout)
+        self.assertEqual([entry['path'] for entry in report['untrackedGuidance']], ['AGENTS.md'])
+        self.assertEqual(report['untrackedGuidance'][0]['status'], 'NO_BASELINE')
+
+    def test_feature_dry_run_cli_and_compatibility_entry_preserve_the_entire_tree(self):
+        repository = Path(__file__).resolve().parents[2]
+        reference = repository / '.blueprint/reference'
+        source = reference if reference.is_dir() else repository
+        project = self.root / 'project'
+        self.write('project/pubspec.yaml', 'name: demo\nworkspace:\n  - apps/demo_app\n')
+        self.write('project/apps/demo_app/pubspec.yaml', 'name: demo_app\nresolution: workspace\n')
+        shutil.copy2(repository / 'blueprint.py', project / 'blueprint.py')
+        for directory in ('tool', 'scripts'):
+            shutil.copytree(repository / directory, project / directory,
+                            ignore=shutil.ignore_patterns('__pycache__', '*.pyc', '.dart_tool', 'build', 'coverage'))
+        self.write('project/.blueprint/reference/examples/feature_lab/pubspec.yaml',
+                   (source / 'examples/feature_lab/pubspec.yaml').read_bytes())
+        def snapshot():
+            return {f.relative_to(project).as_posix(): hashlib.sha256(f.read_bytes()).hexdigest()
+                    for f in project.rglob('*') if f.is_file()}
+        environment = dict(os.environ)
+        environment.pop('PYTHONDONTWRITEBYTECODE', None)
+        # There is deliberately no .fvmrc or usable SDK: planning must stop before SDK discovery.
+        environment['FLUTTER_BIN'] = str(project / 'missing-sdk')
+        commands = [
+            ['blueprint.py', 'feature', 'apps/demo_app', 'quick_panel', '--kind', 'presentation', '--dry-run'],
+            ['scripts/create_feature.py', 'apps/demo_app', 'quick_panel', '--presentation-only', '--dry-run'],
+        ]
+        before = snapshot()
+        for command in commands:
+            with self.subTest(command=command):
+                result = subprocess.run([sys.executable, *command], cwd=project, env=environment,
+                                        capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                self.assertIn('lib/features/quick_panel', result.stdout)
+                self.assertIn('test/features/quick_panel', result.stdout)
+                self.assertEqual(snapshot(), before)
 
     def test_upgrade_report_recognizes_identical_upstream_fix_already_applied(self):
         source = self.root / 'upstream'

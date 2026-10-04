@@ -7,10 +7,11 @@ import 'package:media_kit/media_kit.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/app.dart';
 import 'package:workbench_app/bootstrap.dart';
+import 'package:workbench_app/core/window/workbench_exit_binding.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  WorkbenchWidgetsFlutterBinding();
   AppDiagnostics.instance.install();
   runApp(const WorkbenchLauncher());
 }

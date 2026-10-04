@@ -5,8 +5,8 @@ import '../architecture/checker.dart';
 
 int _passed = 0;
 
-void expect(bool condition, String message) {
-  if (!condition) throw StateError(message);
+void expect(Object? condition, String message) {
+  if (condition != true) throw StateError(message);
 }
 
 void test(String name, void Function() run) {
@@ -67,6 +67,118 @@ void ruleCase(
 }
 
 void main() {
+  test('Dart CLI exit codes and JSON contract', () {
+    final fixture = Fixture();
+    try {
+      fixture.source(
+        'pubspec.yaml',
+        'name: fixture\nenvironment:\n  sdk: ^3.13.0\nworkspace:\n  - apps/demo\n',
+      );
+      fixture.source(
+        'apps/demo/pubspec.yaml',
+        'name: demo\nresolution: workspace\nenvironment:\n  sdk: ^3.13.0\n',
+      );
+      const page = 'apps/demo/lib/features/tasks/presentation/page.dart';
+      fixture.source(
+        page,
+        'class Page extends StatelessWidget { final VoidCallback a,b,c,d,e; }',
+      );
+      ProcessResult run() => Process.runSync(Platform.resolvedExecutable, [
+        File('tool/check_architecture.dart').absolute.path,
+        '--root',
+        fixture.root.path,
+        '--json',
+      ]);
+      final warning = run();
+      expect(
+        warning.exitCode == 0,
+        'Warning-only CLI passes: ${warning.stderr}',
+      );
+      final data = jsonDecode(warning.stdout as String) as Map<String, dynamic>;
+      expect(data['ok'] == true, 'Warnings do not affect ok');
+      expect(data['summary']['warnings'] == 1, 'Warning count retained');
+      fixture.source(
+        'apps/demo/lib/features/tasks/domain/model.dart',
+        "import 'dart:io';",
+      );
+      final mixed = run();
+      expect(mixed.exitCode == 1, 'Structural errors exit 1: ${mixed.stderr}');
+      final errors = jsonDecode(mixed.stdout as String) as Map<String, dynamic>;
+      expect(
+        errors['summary']['errors'] == 1 && errors['summary']['warnings'] == 1,
+        'Mixed counts',
+      );
+      fixture.source(
+        'tool/architecture_exceptions.json',
+        '{"version": 1, "exceptions": [{"invalid": true}]}',
+      );
+      expect(run().exitCode == 2, 'Invalid configuration exits 2');
+    } finally {
+      fixture.dispose();
+    }
+  });
+
+  test('Severity controls the report, preserving count observations', () {
+    final f = Fixture();
+    try {
+      f
+        ..member('demo', 'apps/demo')
+        ..source(
+          'apps/demo/lib/features/tasks/presentation/page.dart',
+          'class Page extends StatelessWidget { final VoidCallback a,b,c,d,e; }',
+        );
+      final warning = f.check().single;
+      expect(
+        warning.severity == ArchitectureSeverity.warning,
+        'Counts are warnings',
+      );
+      expect(warning.measure == 5, 'Count remains available');
+      expect(
+        architectureReport([warning])['ok'] == true,
+        'Warning does not fail',
+      );
+      final hard = ArchitectureIssue(
+        'ARCH003',
+        'domain.dart',
+        1,
+        'flutter',
+        'Domain violation',
+      );
+      final mixed = architectureReport([warning, hard]);
+      expect(mixed['ok'] == false, 'Error fails');
+      expect(
+        jsonEncode(mixed).contains('"severity":"warning"'),
+        'JSON has severity',
+      );
+      expect(
+        jsonEncode(mixed).contains('"errors":1,"warnings":1'),
+        'Summary counts both',
+      );
+      final file = File('${f.root.path}/exceptions.json');
+      file.writeAsStringSync(
+        jsonEncode({
+          'version': 1,
+          'exceptions': [
+            {
+              'rule': 'ARCH012',
+              'path': 'apps/demo/lib/probe.dart',
+              'line': 1,
+              'target': 'frame_rate.split',
+              'reason': 'Legacy product parser kept pending migration.',
+            },
+          ],
+        }),
+      );
+      expect(
+        applyExceptions([], file).single.severity ==
+            ArchitectureSeverity.warning,
+        'Retired exception is a warning',
+      );
+    } finally {
+      f.dispose();
+    }
+  });
+
   for (final library in [
     'io',
     'ffi',
@@ -148,16 +260,17 @@ void main() {
   test('ARCH003 UI dependency graph allows Flutter helper but rejects transitive media adapters', () {
     final f = Fixture();
     try {
-      f.member('koi_ui', 'packages/koi_ui', dependencies: {'widget_helpers'});
-      f.member(
-        'widget_helpers',
-        'packages/widget_helpers',
-        dependencies: {'flutter'},
-      );
-      f.source(
-        'packages/koi_ui/lib/koi_ui.dart',
-        "export 'package:widget_helpers/widgets.dart';",
-      );
+      f
+        ..member('koi_ui', 'packages/koi_ui', dependencies: {'widget_helpers'})
+        ..member(
+          'widget_helpers',
+          'packages/widget_helpers',
+          dependencies: {'flutter'},
+        )
+        ..source(
+          'packages/koi_ui/lib/koi_ui.dart',
+          "export 'package:widget_helpers/widgets.dart';",
+        );
       expect(
         f.check().isEmpty,
         'Pure Flutter widget helpers should remain valid dependencies',
@@ -241,8 +354,9 @@ void main() {
   test('ARCH001 reject module runtime dependency on sibling module', () {
     final f = Fixture();
     try {
-      f.member('alpha', 'examples/demo/modules/alpha', dependencies: {'beta'});
-      f.member('beta', 'examples/demo/modules/beta');
+      f
+        ..member('alpha', 'examples/demo/modules/alpha', dependencies: {'beta'})
+        ..member('beta', 'examples/demo/modules/beta');
       expect(
         f.check().any((e) => e.rule == 'ARCH001'),
         'Sibling module dependency must fail',
@@ -255,8 +369,9 @@ void main() {
     test('ARCH001 reject $source runtime dependency on app without import', () {
       final f = Fixture();
       try {
-        f.member('alpha', source, dependencies: {'demo'});
-        f.member('demo', 'apps/demo');
+        f
+          ..member('alpha', source, dependencies: {'demo'})
+          ..member('demo', 'apps/demo');
         expect(
           f.check().any((e) => e.rule == 'ARCH001'),
           'Runtime manifest alone must enforce app boundary',
@@ -271,9 +386,10 @@ void main() {
     () {
       final f = Fixture();
       try {
-        f.member('demo', 'apps/demo', dependencies: {'alpha', 'contracts'});
-        f.member('alpha', 'modules/alpha', dependencies: {'contracts'});
-        f.member('contracts', 'packages/contracts');
+        f
+          ..member('demo', 'apps/demo', dependencies: {'alpha', 'contracts'})
+          ..member('alpha', 'modules/alpha', dependencies: {'contracts'})
+          ..member('contracts', 'packages/contracts');
         expect(f.check().isEmpty, 'Allowed runtime direction must pass');
       } finally {
         f.dispose();
@@ -319,11 +435,12 @@ void main() {
   test('ARCH003 allow app domain to import its own domain model', () {
     final f = Fixture();
     try {
-      f.member('demo', 'apps/demo', dependencies: {'flutter', 'riverpod'});
-      f.source(
-        'apps/demo/lib/features/tasks/domain/repository.dart',
-        "import 'package:demo/features/tasks/domain/task.dart';",
-      );
+      f
+        ..member('demo', 'apps/demo', dependencies: {'flutter', 'riverpod'})
+        ..source(
+          'apps/demo/lib/features/tasks/domain/repository.dart',
+          "import 'package:demo/features/tasks/domain/task.dart';",
+        );
       expect(
         f.check().isEmpty,
         'Own domain import must ignore app UI dependency',
@@ -344,8 +461,13 @@ void main() {
     () {
       final f = Fixture();
       try {
-        f.member('koi_domain', 'packages/koi_domain', dependencies: {'bridge'});
-        f.member('bridge', 'packages/bridge', dependencies: {'flutter'});
+        f
+          ..member(
+            'koi_domain',
+            'packages/koi_domain',
+            dependencies: {'bridge'},
+          )
+          ..member('bridge', 'packages/bridge', dependencies: {'flutter'});
         expect(
           f.check().any((e) => e.rule == 'ARCH003'),
           'Transitive UI coupling must fail',
@@ -559,5 +681,259 @@ void main() {
       f.dispose();
     }
   });
+  ruleCase(
+    'ARCH010',
+    'reject a presentation state that owns the editable draft',
+    '''
+class Page extends StatefulWidget {
+  const Page({super.key});
+  State<Page> createState() => _PageState();
+}
+class _PageState extends State<Page> {
+  String? a; String? b; String? c; String? d;
+  int? e; int? f; int? g; int? h; bool i = false;
+  Widget build(BuildContext context) => const SizedBox();
+}
+''',
+    rejected: true,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH010',
+    'allow a presentation state that keeps view chrome',
+    '''
+class Page extends StatefulWidget {
+  const Page({super.key});
+  State<Page> createState() => _PageState();
+}
+class _PageState extends State<Page> {
+  bool overlay = true;
+  double position = 0;
+  Widget build(BuildContext context) => const SizedBox();
+}
+''',
+    rejected: false,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH011',
+    'reject a page that drills command callbacks',
+    '''
+class Page extends StatelessWidget {
+  const Page({required this.onSave, required this.onFavorite, required this.onTags, required this.onUse, required this.onPreview, super.key});
+  final void Function() onSave;
+  final void Function() onFavorite;
+  final void Function() onTags;
+  final void Function() onUse;
+  final VoidCallback onPreview;
+  Widget build(BuildContext context) => const SizedBox();
+}
+''',
+    rejected: true,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH011',
+    'reject ValueChanged callbacks that hide a function type',
+    '''
+class Page extends StatelessWidget {
+  const Page({required this.onCancel, required this.onRetry, required this.onOpen, required this.onClose, required this.onSave, super.key});
+  final ValueChanged<String> onCancel;
+  final ValueChanged<String> onRetry;
+  final ValueChanged<String> onOpen;
+  final ValueChanged<String> onClose;
+  final ValueChanged<String> onSave;
+  Widget build(BuildContext context) => const SizedBox();
+}
+''',
+    rejected: true,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH011',
+    'allow a page with a few command callbacks',
+    '''
+class Page extends StatelessWidget {
+  const Page({required this.onSave, required this.onClose, super.key});
+  final void Function() onSave;
+  final VoidCallback onClose;
+  Widget build(BuildContext context) => const SizedBox();
+}
+''',
+    rejected: false,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH012',
+    'retired media rule is not emitted',
+    r'''
+double rate(Map stream) {
+  final parts = '${stream['avg_frame_rate']}'.split('/');
+  return 0;
+}
+''',
+    rejected: false,
+    path: 'apps/demo/lib/shell/import.dart',
+  );
+  ruleCase(
+    'ARCH012',
+    'allow a shared parser outside apps',
+    r'''
+double? rate(Map stream) {
+  final parts = '${stream['avg_frame_rate']}'.split('/');
+  return null;
+}
+''',
+    rejected: false,
+    path: 'packages/koi_media/lib/src/frame_rate.dart',
+    setup: (f) => f.member('koi_media', 'packages/koi_media'),
+  );
+  ruleCase(
+    'ARCH013',
+    'reject a shell coordinator importing presentation',
+    "import 'package:demo/features/tasks/presentation/page.dart';",
+    rejected: true,
+    path: 'apps/demo/lib/shell/coordinators/storage.dart',
+  );
+  ruleCase(
+    'ARCH013',
+    'allow the shell to compose a feature page',
+    "import 'package:demo/features/tasks/presentation/page.dart';",
+    rejected: false,
+    path: 'apps/demo/lib/shell/app_shell.dart',
+  );
+  ruleCase(
+    'ARCH013',
+    'allow a coordinator to import application',
+    "import 'package:demo/features/tasks/application/media.dart';",
+    rejected: false,
+    path: 'apps/demo/lib/shell/coordinators/storage.dart',
+  );
+  test('ARCH010 reports a field measure and a budget stops growth', () {
+    final fixture = Fixture();
+    try {
+      fixture
+        ..member('demo', 'apps/demo')
+        ..source('apps/demo/lib/features/tasks/presentation/page.dart', '''
+class Page extends StatefulWidget {
+  const Page({super.key});
+  State<Page> createState() => _PageState();
+}
+class _PageState extends State<Page> {
+  String? a; String? b; String? c; String? d;
+  int? e; int? f; int? g; int? h; bool i = false;
+  Widget build(BuildContext context) => const SizedBox();
+}
+''');
+      final issue = fixture.check().singleWhere(
+        (item) => item.rule == 'ARCH010',
+      );
+      expect(
+        issue.measure == 9,
+        'ARCH010 measure must count fields, got ${issue.measure}',
+      );
+      final file = File('${fixture.root.path}/exceptions.json');
+      final entry = {
+        'rule': 'ARCH010',
+        'path': issue.path,
+        'line': issue.line,
+        'target': issue.target,
+        'reason': 'View chrome stays under the recorded field budget.',
+        'budget': 9,
+      };
+      file.writeAsStringSync(
+        jsonEncode({
+          'version': 1,
+          'exceptions': [entry],
+        }),
+      );
+      expect(
+        applyExceptions([issue], file).isEmpty,
+        'Budget that fits must suppress',
+      );
+      entry['budget'] = 8;
+      file.writeAsStringSync(
+        jsonEncode({
+          'version': 1,
+          'exceptions': [entry],
+        }),
+      );
+      final exceeded = applyExceptions([issue], file);
+      expect(
+        exceeded.length == 2,
+        'Exceeded budget keeps the issue and adds ARCH_EXCEPTION',
+      );
+      expect(
+        exceeded.any((item) => item.rule == 'ARCH_EXCEPTION'),
+        'Exceeded budget must fail the check',
+      );
+      entry.remove('budget');
+      file.writeAsStringSync(
+        jsonEncode({
+          'version': 1,
+          'exceptions': [entry],
+        }),
+      );
+      var rejected = false;
+      try {
+        applyExceptions([issue], file);
+      } on FormatException {
+        rejected = true;
+      }
+      expect(rejected, 'ARCH010 exception without a budget must fail');
+      file.writeAsStringSync(
+        jsonEncode({'version': 1, 'exceptions': <Object>[]}),
+      );
+      expect(
+        applyExceptions([issue], file).length == 1,
+        'Empty exceptions keep the issue',
+      );
+    } finally {
+      fixture.dispose();
+    }
+  });
+  ruleCase(
+    'ARCH010',
+    'count each instance variable in one declaration',
+    'class S extends State<Page> { int a=0,b=0,c=0,d=0,e=0,f=0,g=0,h=0,i=0; }',
+    rejected: true,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH010',
+    'ignore static constants in State budget',
+    'class S extends State<Page> { static int a=0,b=0,c=0,d=0,e=0,f=0,g=0,h=0,i=0; int position=0; }',
+    rejected: false,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH011',
+    'constructor cannot hide commands in an object',
+    'class Page extends StatelessWidget { Page({required VoidCallback a, required VoidCallback b, required VoidCallback c, required VoidCallback d, required VoidCallback e}); final Object commands=null; }',
+    rejected: true,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH011',
+    'recognize local function typedefs',
+    'typedef Action = void Function(); class Page extends StatelessWidget { final Action a,b,c,d,e; }',
+    rejected: true,
+    path: 'apps/demo/lib/features/tasks/presentation/page.dart',
+  );
+  ruleCase(
+    'ARCH013',
+    'reject chained shared exports and terminate cycles',
+    "import 'package:demo/shared/first.dart';",
+    rejected: true,
+    path: 'apps/demo/lib/shell/coordinators/storage.dart',
+    setup: (f) {
+      f
+        ..source('apps/demo/lib/shared/first.dart', "export 'second.dart';")
+        ..source(
+          'apps/demo/lib/shared/second.dart',
+          "export 'first.dart'; export '../features/tasks/presentation/page.dart';",
+        );
+    },
+  );
   stdout.writeln('$_passed architecture tests passed.');
 }

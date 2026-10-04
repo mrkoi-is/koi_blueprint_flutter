@@ -19,7 +19,10 @@ import 'package:workbench_app/features/workspace/data/workspace_storage.dart'
 import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/navigation_providers.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_preview_session.dart';
+import 'package:workbench_app/features/workspace/application/media_preview_session.dart';
+import 'package:workbench_app/features/workspace/data/media/media_kit_playback.dart';
+import 'package:workbench_app/features/workspace/presentation/media/media_kit_surface.dart';
+import 'package:workbench_app/features/workspace/presentation/media/media_surface_handle.dart';
 
 /// Composition root owns storage, one workspace, player owner and router.
 final class WorkbenchBootstrap {
@@ -48,7 +51,7 @@ final class WorkbenchBootstrap {
   static Future<WorkbenchBootstrap> create({
     Future<storage.WorkspaceStorage> Function()? openStorage,
     FileImportPort? fileImportPort,
-    MediaPlaybackFactory createPlayback = MediaKitPlayback.new,
+    MediaPlaybackFactory? createPlayback,
     Future<Uint8List> Function(Uint8List)? encodeThumbnail,
     String? initialLocation,
     Future<UiPreferencesStore> Function()? openPreferences,
@@ -76,6 +79,15 @@ final class WorkbenchBootstrap {
       );
       ownedSession = session;
       await session.initialize();
+      final surfaces = MediaSurfaceHandle();
+      MediaPlayback playbackFactory() {
+        if (createPlayback != null) return createPlayback();
+        late final MediaKitPlayback player;
+        player = MediaKitPlayback(onClosed: () => surfaces.clear(player));
+        surfaces.attach(player, createMediaKitSurface(player.videoController));
+        return player;
+      }
+
       final preview = MediaPreviewSession(
         workspace: session,
         openSource: (key) async {
@@ -83,7 +95,7 @@ final class WorkbenchBootstrap {
           return PreviewSource(uri: lease.uri, release: lease.dispose);
         },
         encodeThumbnail: encoder,
-        createPlayback: createPlayback,
+        createPlayback: playbackFactory,
       );
       ownedPreview = preview;
       final restored = session.state.snapshot.preferences.navId;
@@ -126,8 +138,9 @@ final class WorkbenchBootstrap {
         overrides: [
           uiPreferencesStoreProvider.overrideWithValue(preferencesStore),
           workspaceSessionProvider.overrideWithValue(session),
-          mediaPreviewSessionProvider.overrideWithValue(preview),
-          navigationHistoryProvider.overrideWithValue(history),
+          mediaPreviewSessionProvider.overrideWithValue((session: preview)),
+          mediaSurfaceHandleProvider.overrideWithValue(surfaces),
+          navigationHistoryProvider.overrideWithValue((history: history)),
         ],
       );
       ownedContainer = container;
@@ -201,6 +214,8 @@ final class WorkbenchBootstrap {
 
   Future<void> disposeAsync() => _closing ??= _close();
   Future<void> _close() async {
+    // Forced widget removal must not release IO owners under a pending save.
+    await _preparation;
     router.routeInformationProvider.removeListener(_routeListener);
     final failures = <Object>[];
     for (final close in <FutureOr<void> Function()>[

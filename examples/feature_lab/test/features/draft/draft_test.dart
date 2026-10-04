@@ -2,12 +2,14 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:feature_lab/features/draft/draft.dart';
+import 'package:feature_lab/features/draft/draft_composition.dart';
 import 'package:feature_lab/features/draft/data/file_draft_repository_stub.dart'
     as web;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:koi_core/koi_core.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
 class Submission implements DraftSubmission {
   bool fail = true;
@@ -42,7 +44,40 @@ class MemoryRepository implements DraftRepository {
   FutureResult<void> save(String text) async => success(null);
 }
 
+@Dependencies([DraftController])
 void main() {
+  test(
+    'two controller instances stay isolated after removing a listener',
+    () async {
+      final container = ProviderContainer(
+        overrides: [
+          draftRepositoryProvider().overrideWithValue(MemoryRepository()),
+        ],
+      );
+      addTearDown(container.dispose);
+      final first = draftControllerProvider(editorId: 'route-one');
+      final second = draftControllerProvider(editorId: 'route-two');
+      final listener = container.listen(first, (_, _) {});
+      await container.read(first.future);
+      await container.read(second.future);
+      container.read(first.notifier).edit('first independent edit');
+      container.read(second.notifier).edit('second independent edit');
+      listener.close();
+      await container.pump();
+      expect(container.read(first).requireValue.text, 'first independent edit');
+      expect(
+        container.read(second).requireValue.text,
+        'second independent edit',
+      );
+      container.invalidate(first);
+      await container.read(first.future);
+      expect(
+        container.read(second).requireValue.text,
+        'second independent edit',
+      );
+    },
+  );
+
   late Directory directory;
   setUp(() async {
     directory = await Directory.systemTemp.createTemp('blueprint-draft-');
@@ -80,33 +115,33 @@ void main() {
     final submission = Submission();
     final container = ProviderContainer(
       overrides: [
-        draftRepositoryProvider.overrideWithValue(repository),
-        draftSubmissionProvider.overrideWithValue(submission),
+        draftRepositoryProvider().overrideWithValue(repository),
+        draftSubmissionProvider().overrideWithValue(submission),
       ],
     );
     addTearDown(container.dispose);
-    await container.read(draftControllerProvider.future);
-    final controller = container.read(draftControllerProvider.notifier);
+    await container.read(draftControllerProvider().future);
+    final controller = container.read(draftControllerProvider().notifier);
     controller.edit('my draft');
     await controller.save();
     await controller.submit();
     expect(
-      container.read(draftControllerProvider).requireValue.operationFailure,
+      container.read(draftControllerProvider()).requireValue.operationFailure,
       isNotNull,
     );
     expect(
-      container.read(draftControllerProvider).requireValue.text,
+      container.read(draftControllerProvider()).requireValue.text,
       'my draft',
     );
     submission.fail = false;
     await controller.submit();
     expect(
-      container.read(draftControllerProvider).requireValue.operationFailure,
+      container.read(draftControllerProvider()).requireValue.operationFailure,
       isNull,
     );
-    container.invalidate(draftControllerProvider);
+    container.invalidate(draftControllerProvider());
     expect(
-      (await container.read(draftControllerProvider.future)).text,
+      (await container.read(draftControllerProvider().future)).text,
       'my draft',
     );
   });
@@ -114,11 +149,11 @@ void main() {
   test('late save result cannot overwrite a newer edit', () async {
     final repository = DelayedRepository();
     final container = ProviderContainer(
-      overrides: [draftRepositoryProvider.overrideWithValue(repository)],
+      overrides: [draftRepositoryProvider().overrideWithValue(repository)],
     );
     addTearDown(container.dispose);
-    await container.read(draftControllerProvider.future);
-    final controller = container.read(draftControllerProvider.notifier);
+    await container.read(draftControllerProvider().future);
+    final controller = container.read(draftControllerProvider().notifier);
     final saving = controller.save();
     controller.edit('new edit');
     repository.pending.complete(
@@ -126,11 +161,11 @@ void main() {
     );
     await saving;
     expect(
-      container.read(draftControllerProvider).requireValue.text,
+      container.read(draftControllerProvider()).requireValue.text,
       'new edit',
     );
     expect(
-      container.read(draftControllerProvider).requireValue.operationFailure,
+      container.read(draftControllerProvider()).requireValue.operationFailure,
       isNull,
     );
   });
@@ -141,7 +176,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          draftRepositoryProvider.overrideWithValue(BrokenRepository()),
+          draftRepositoryProvider().overrideWithValue(BrokenRepository()),
         ],
         child: const MaterialApp(home: DraftPage()),
       ),
@@ -151,7 +186,7 @@ void main() {
     final container = ProviderScope.containerOf(
       tester.element(find.byType(DraftPage)),
     );
-    container.read(draftControllerProvider.notifier).edit('pending');
+    container.read(draftControllerProvider().notifier).edit('pending');
     await tester.pump();
     await tester.enterText(find.byType(TextFormField), 'edited');
     await tester.tap(find.text('Save'));
@@ -166,7 +201,7 @@ void main() {
     final repository = MemoryRepository();
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [draftRepositoryProvider.overrideWithValue(repository)],
+        overrides: [draftRepositoryProvider().overrideWithValue(repository)],
         child: const MaterialApp(home: DraftPage()),
       ),
     );
@@ -174,10 +209,10 @@ void main() {
     final container = ProviderScope.containerOf(
       tester.element(find.byType(DraftPage)),
     );
-    container.read(draftControllerProvider.notifier).edit('replacement');
+    container.read(draftControllerProvider().notifier).edit('replacement');
     await tester.pump();
     expect(
-      container.read(draftControllerProvider).requireValue.text,
+      container.read(draftControllerProvider()).requireValue.text,
       'replacement',
     );
     expect(
@@ -188,13 +223,13 @@ void main() {
         .widget<EditableText>(find.byType(EditableText))
         .controller;
     controller.selection = const TextSelection.collapsed(offset: 3);
-    container.read(draftControllerProvider.notifier).edit('replacement');
+    container.read(draftControllerProvider().notifier).edit('replacement');
     await tester.pump();
     expect(controller.selection.extentOffset, 3);
 
     repository.content = 'reopened';
-    container.invalidate(draftControllerProvider);
-    await container.read(draftControllerProvider.future);
+    container.invalidate(draftControllerProvider());
+    await container.read(draftControllerProvider().future);
     await tester.pump();
     expect(controller.text, 'reopened');
   });

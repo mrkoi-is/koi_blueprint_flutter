@@ -23,6 +23,12 @@
 
 每条子命令的参数含义以 `--help` 为准。升级命令是 `upgrade-report`，没有 upgrade/apply 子命令。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
 
+Feature 的源码布局、导入和 dry-run 使用同一解析结果，双布局会明确拒绝；测试统一放 test/features。API/local 的注入声明来自 composition 入口，独立 module 的外部消费仍经过模块根入口。
+
+dry-run 与 upgrade-report 不写项目文件，也不创建 Python 字节码缓存；Feature dry-run 在 SDK 发现之前返回。兼容的 create_feature.py 入口遵循同一合同。
+
+指导资产采用 blueprint.py 的显式复制计划；研究、迁移评分和历史运行记录保留在源仓 docs/research、docs/validation，不下发。README/CHANGELOG 按新项目生成，参照源码仅放 .blueprint/reference。来源登记复用 schema 2 managedFiles；升级报告用 untrackedGuidance 标识旧指导文件的 NO_BASELINE 缺口，参照 [升级指南](upgrade-guide.md)。
+
 能力安装只接受 schema 2 主 App，来源仅为内置配方及其继承参照。相同版本/配置的重复安装先核对既有输出摘要；发现用户修改、未知目标文件或 registry/native wiring 变化时拒绝覆盖。安装事务包含根锁文件和受管基线，避免并发 pub get/codegen；受管 registry 之外的自有接线放到 App 的 app_capabilities 文件。schema 1 旧工程只能得到人工迁移报告，不能通过修改 schema 数字绕过缺少的装配与基线。
 
 构建先严格 pub get 刷新插件登记，再以 no-pub 构建；成功时打印版本、构建号、source、channel、platform、architecture 和 manifest 路径，完整清单保留在文件。package 在打包前后核对源与产物。清单位于生成 App 的 `apps/<app>/build/blueprint/<profile>.json` 和 `apps/<app>/build/packages/<profile>/package-manifest.json`，已有包目录拒绝覆盖。实际运行与安装初始为 NOT_RUN。无签名 iOS 可构建但不产生可安装 app 包；Windows/Linux 必须匹配宿主，AppImage 需要显式提供固定 runtime 文件。

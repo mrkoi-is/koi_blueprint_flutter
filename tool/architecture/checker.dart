@@ -22,9 +22,31 @@ const architectureRules = <String, String>{
   'ARCH008': 'Data/application layers must not depend on presentation.',
   'ARCH009':
       'All packages under managed source roots must be Pub workspace members.',
+  'ARCH010': 'Review State responsibilities and lifecycle when instance fields exceed eight.',
+  'ARCH011':
+      'Review widget responsibilities and API when callbacks exceed four.',
+  'ARCH012': 'Retired: media parsing belongs to product behavior tests.',
+  'ARCH013': 'Shell coordinators must not import presentation.',
 };
 
-String normalized(String path) => path.replaceAll('\\', '/');
+String normalized(String path) => path.replaceAll(r'\', '/');
+
+/// 未解析语法树看不到 typedef 的底层函数类型，所以按名字认命令回调。
+bool _isCommandCallback(
+  TypeAnnotation? type, {
+  Set<String> aliases = const {},
+}) {
+  if (type is GenericFunctionType) return true;
+  if (type is! NamedType) return false;
+  final name = type.name.lexeme;
+  return name == 'Function' ||
+      aliases.contains(name) ||
+      name.endsWith('Callback') ||
+      name == 'ValueChanged' ||
+      name == 'ValueSetter' ||
+      name == 'AsyncValueSetter' ||
+      name == 'ValueGetter';
+}
 
 String relativeTo(Directory root, String path) {
   final base = normalized(root.absolute.path).replaceFirst(RegExp(r'/$'), '');
@@ -36,28 +58,50 @@ String relativeTo(Directory root, String path) {
   return absolute.substring(base.length + 1);
 }
 
+enum ArchitectureSeverity { error, warning }
+
 final class ArchitectureIssue {
   const ArchitectureIssue(
     this.rule,
     this.path,
     this.line,
     this.target,
-    this.message,
-  );
+    this.message, {
+    this.measure,
+    this.severity = ArchitectureSeverity.error,
+  });
+  final ArchitectureSeverity severity;
   final String rule;
   final String path;
   final int line;
   final String target;
   final String message;
+
+  /// Field or callback count for ARCH010 and ARCH011. Exceptions budget against it.
+  final int? measure;
   Map<String, Object> toJson() => {
+    'severity': severity.name,
     'rule': rule,
     'path': path,
     'line': line,
     'target': target,
     'message': message,
+    'measure': ?measure,
   };
   @override
-  String toString() => '$path:$line [$rule] $message ($target)';
+  String toString() =>
+      '$path:$line [${severity.name} $rule] $message ($target)';
+}
+
+Map<String, Object> architectureReport(List<ArchitectureIssue> issues) {
+  final errors = issues
+      .where((issue) => issue.severity == ArchitectureSeverity.error)
+      .length;
+  return {
+    'ok': errors == 0,
+    'issues': [for (final issue in issues) issue.toJson()],
+    'summary': {'errors': errors, 'warnings': issues.length - errors},
+  };
 }
 
 final class WorkspaceMember {
@@ -211,17 +255,21 @@ List<ArchitectureIssue> checkWorkspace(
   }
   final byName = {for (final member in members) member.name: member};
   bool impureDependency(
-    String name, [
+    String name, {
     Set<String>? visited,
     bool allowFlutter = false,
-  ]) {
+  }) {
     if (_isImpurePackage(name) && !(allowFlutter && name == 'flutter')) {
       return true;
     }
     final seen = visited ?? <String>{};
     if (!seen.add(name)) return false;
     return byName[name]?.dependencies.any(
-          (dependency) => impureDependency(dependency, seen, allowFlutter),
+          (dependency) => impureDependency(
+            dependency,
+            visited: seen,
+            allowFlutter: allowFlutter,
+          ),
         ) ??
         false;
   }
@@ -242,7 +290,7 @@ List<ArchitectureIssue> checkWorkspace(
         );
       }
       if ((member.isPure || member.isUi) &&
-          impureDependency(dependency, null, member.isUi)) {
+          impureDependency(dependency, allowFlutter: member.isUi)) {
         issues.add(
           ArchitectureIssue(
             'ARCH003',
@@ -283,7 +331,13 @@ List<ArchitectureIssue> checkWorkspace(
         }
         continue;
       }
-      void report(String rule, AstNode node, String target, String message) {
+      void report(
+        String rule,
+        AstNode node,
+        String target,
+        String message, {
+        int? measure,
+      }) {
         issues.add(
           ArchitectureIssue(
             rule,
@@ -291,6 +345,10 @@ List<ArchitectureIssue> checkWorkspace(
             parsed.lineInfo.getLocation(node.offset).lineNumber,
             target,
             message,
+            measure: measure,
+            severity: {'ARCH010', 'ARCH011'}.contains(rule)
+                ? ArchitectureSeverity.warning
+                : ArchitectureSeverity.error,
           ),
         );
       }
@@ -360,7 +418,7 @@ List<ArchitectureIssue> checkWorkspace(
               (_platformLibraries.contains(uri) ||
                   package != null &&
                       package != member.name &&
-                      impureDependency(package, null, true) ||
+                      impureDependency(package, allowFlutter: true) ||
                   targetSource != null &&
                       _isImplementationLayer(targetSource))) {
             report(
@@ -397,9 +455,21 @@ List<ArchitectureIssue> checkWorkspace(
               'Data/application must not depend on presentation',
             );
           }
+          if (_isShellCoordinator(memberSource) &&
+              (_importsPresentation(uri, targetSource) ||
+                  _exportsPresentation(root, file, member, byName, uri, {}))) {
+            report(
+              'ARCH013',
+              literal,
+              uri,
+              'Shell coordinators must not import presentation',
+            );
+          }
         }
       }
-      parsed.unit.accept(_SourceVisitor(parsed.unit, memberSource, report));
+      parsed.unit.accept(
+        _SourceVisitor(parsed.unit, memberSource, path, report),
+      );
     }
   }
   issues.sort(
@@ -418,6 +488,53 @@ String? _featureLayer(String source) {
   final index = parts.indexOf('features');
   if (index >= 0 && parts.length > index + 2) return parts[index + 2];
   return null;
+}
+
+bool _isShellCoordinator(String memberSource) {
+  final value = normalized(memberSource);
+  return value.startsWith('shell/coordinators/') ||
+      value.contains('/shell/coordinators/');
+}
+
+bool _importsPresentation(String uri, String? targetSource) {
+  if (normalized(uri).contains('/presentation/')) return true;
+  return targetSource != null &&
+      normalized(targetSource).contains('/presentation/');
+}
+
+/// 跟随 workspace 内的重导出，防止 shared barrel 隐藏展示依赖。
+bool _exportsPresentation(
+  Directory root,
+  File source,
+  WorkspaceMember member,
+  Map<String, WorkspaceMember> members,
+  String uri,
+  Set<String> visited,
+) {
+  final target = _resolveImport(root, source, member, members, uri);
+  if (target == null) return false;
+  if (_importsPresentation(uri, target.$2)) return true;
+  final file = File('${root.path}/${target.$1.path}/lib/${target.$2}');
+  if (!visited.add(normalized(file.absolute.path)) || !file.existsSync()) {
+    return false;
+  }
+  final unit = parseString(
+    content: file.readAsStringSync(),
+    throwIfDiagnostics: false,
+  ).unit;
+  for (final directive in unit.directives.whereType<ExportDirective>()) {
+    for (final literal in [
+      directive.uri,
+      ...directive.configurations.map((c) => c.uri),
+    ]) {
+      final next = literal.stringValue;
+      if (next != null &&
+          _exportsPresentation(root, file, target.$1, members, next, visited)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 (WorkspaceMember, String)? _resolveImport(
@@ -469,13 +586,15 @@ typedef _Report = void Function(
   String rule,
   AstNode node,
   String target,
-  String message,
-);
+  String message, {
+  int? measure,
+});
 
 final class _SourceVisitor extends RecursiveAstVisitor<void> {
-  _SourceVisitor(this.unit, this.path, this.report);
+  _SourceVisitor(this.unit, this.path, this.filePath, this.report);
   final CompilationUnit unit;
   final String path;
+  final String filePath;
   final _Report report;
   final List<Map<String, String?>> ioScopes = [{}];
   static const providerNames = {
@@ -568,6 +687,7 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
     if (annotated(node.metadata)) {
       checkProvider(node, node.namePart.typeName.lexeme);
     }
+    checkPresentationMass(node);
     ioScopes.add({});
     try {
       super.visitClassDeclaration(node);
@@ -683,7 +803,7 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
   }
 
   bool restrictedSyncBody(AstNode node) {
-    AstNode? current = node.parent;
+    var current = node.parent;
     while (current != null) {
       if (current is FunctionExpression &&
           current.parent is! FunctionDeclaration) {
@@ -694,7 +814,7 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
       }
       if (current is MethodDeclaration) {
         if (current.name.lexeme != 'build') return false;
-        AstNode? owner = current.parent;
+        var owner = current.parent;
         while (owner != null && owner is! ClassDeclaration) {
           owner = owner.parent;
         }
@@ -750,6 +870,75 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
     }
     super.visitMethodInvocation(node);
   }
+
+  void checkPresentationMass(ClassDeclaration node) {
+    if (!normalized(path).contains('/presentation/') ||
+        normalized(path).contains('/presentation/providers/')) {
+      return;
+    }
+    final superclass = node.extendsClause?.superclass.name.lexeme;
+    final name = node.namePart.typeName.lexeme;
+    if ({'State', 'ConsumerState'}.contains(superclass)) {
+      final fields = node.body.members
+          .whereType<FieldDeclaration>()
+          .where((field) => !field.isStatic)
+          .fold<int>(
+            0,
+            (count, field) => count + field.fields.variables.length,
+          );
+      if (fields > 8) {
+        report(
+          'ARCH010',
+          node,
+          name,
+          'Review responsibilities, state ownership and lifecycle; field count alone does not require a provider',
+          measure: fields,
+        );
+      }
+    }
+    if ({
+      'StatelessWidget',
+      'StatefulWidget',
+      'ConsumerWidget',
+      'ConsumerStatefulWidget',
+    }.contains(superclass)) {
+      final unit = node.thisOrAncestorOfType<CompilationUnit>()!;
+      final aliases = {
+        for (final alias in unit.declarations.whereType<GenericTypeAlias>())
+          if (alias.type is GenericFunctionType) alias.name.lexeme,
+        for (final alias in unit.declarations.whereType<FunctionTypeAlias>())
+          alias.name.lexeme,
+      };
+      final fieldNames = {
+        for (final field in node.body.members.whereType<FieldDeclaration>())
+          if (!field.isStatic &&
+              _isCommandCallback(field.fields.type, aliases: aliases))
+            for (final variable in field.fields.variables) variable.name.lexeme,
+      };
+      var callbacks = fieldNames.length;
+      for (final constructor
+          in node.body.members.whereType<ConstructorDeclaration>()) {
+        final names = {...fieldNames};
+        for (final parameter in constructor.parameters.parameters) {
+          if (parameter.functionTypedSuffix != null ||
+              _isCommandCallback(parameter.type, aliases: aliases)) {
+            final name = parameter.name?.lexeme;
+            if (name != null) names.add(name);
+          }
+        }
+        if (names.length > callbacks) callbacks = names.length;
+      }
+      if (callbacks > 4) {
+        report(
+          'ARCH011',
+          node,
+          name,
+          'Review responsibilities and callback API; callback count alone does not require provider injection',
+          measure: callbacks,
+        );
+      }
+    }
+  }
 }
 
 /// Exceptions are exact, justified, and fail when they no longer match. This
@@ -773,6 +962,7 @@ List<ArchitectureIssue> applyExceptions(
           'line',
           'target',
           'reason',
+          'budget',
         }).isNotEmpty ||
         entry['rule'] is! String ||
         !architectureRules.containsKey(entry['rule']) ||
@@ -786,10 +976,24 @@ List<ArchitectureIssue> applyExceptions(
         'Exception requires exact rule/path/line/target and a meaningful reason',
       );
     }
+    final retired = entry['rule'] == 'ARCH012';
+    final counted = entry['rule'] == 'ARCH010' || entry['rule'] == 'ARCH011';
+    final budget = entry['budget'];
+    if (counted) {
+      if (budget is! int || budget < 0) {
+        throw const FormatException(
+          'ARCH010 and ARCH011 exceptions require a non-negative integer budget',
+        );
+      }
+    } else if (entry.containsKey('budget')) {
+      throw const FormatException(
+        'Only ARCH010 and ARCH011 exceptions accept a budget',
+      );
+    }
     final path = entry['path'] as String;
     if (path.startsWith('/') ||
-        RegExp(r'^[A-Za-z]:').hasMatch(path) ||
-        path.contains('\\') ||
+        RegExp('^[A-Za-z]:').hasMatch(path) ||
+        path.contains(r'\') ||
         path.split('/').contains('..') ||
         path.contains('*')) {
       throw const FormatException(
@@ -807,14 +1011,32 @@ List<ArchitectureIssue> applyExceptions(
               issue.target == entry['target'],
         )
         .toList();
-    if (matching.length != 1) {
+    if (retired || matching.length != 1) {
       remaining.add(
         ArchitectureIssue(
           'ARCH_EXCEPTION',
           path,
           entry['line'] as int,
           entry['target'] as String,
-          'Stale or ambiguous exception: $key',
+          retired
+              ? 'Retired ARCH012 exception; remove it: $key'
+              : 'Stale or ambiguous exception: $key',
+          severity: counted || retired
+              ? ArchitectureSeverity.warning
+              : ArchitectureSeverity.error,
+        ),
+      );
+    } else if (counted &&
+        (matching.single.measure == null ||
+            matching.single.measure! > (budget as int))) {
+      remaining.add(
+        ArchitectureIssue(
+          'ARCH_EXCEPTION',
+          path,
+          entry['line'] as int,
+          entry['target'] as String,
+          'Exception budget exceeded: $key measure ${matching.single.measure} > budget $budget',
+          severity: ArchitectureSeverity.warning,
         ),
       );
     } else {

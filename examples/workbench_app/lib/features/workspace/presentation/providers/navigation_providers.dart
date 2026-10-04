@@ -5,5 +5,5 @@ part 'navigation_providers.g.dart';
 
 /// Borrowed from bootstrap, which awaits history cleanup before closing IO.
 @Riverpod(keepAlive: true)
-WorkbenchNavigationHistory navigationHistory(Ref ref) =>
+({WorkbenchNavigationHistory history}) navigationHistory(Ref ref) =>
     throw UnimplementedError('Bootstrap must inject navigation history');

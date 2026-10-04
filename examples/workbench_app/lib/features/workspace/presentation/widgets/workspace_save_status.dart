@@ -15,13 +15,9 @@ class WorkspaceSaveStatus extends ConsumerWidget {
   final bool includeCount;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final session = ref.watch(workspaceSessionProvider);
     final activity = ref.watch(
-      workspaceStateProvider.select(
-        (value) => (
-          saving: value.value?.saving ?? session.state.saving,
-          error: value.value?.error ?? session.state.error,
-        ),
+      workspaceSnapshotProvider.select(
+        (value) => (saving: value.saving, error: value.error),
       ),
     );
     final revision = document.dirty ? context.l10n.unsaved : context.l10n.saved;

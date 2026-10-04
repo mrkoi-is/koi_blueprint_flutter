@@ -235,6 +235,49 @@ class BlueprintTest(unittest.TestCase):
         self.assertFalse((self.root / 'packages').exists())
         self.assertFalse(list(self.root.glob('.feature-*')))
 
+    def test_feature_layout_is_shared_by_sources_tests_and_dry_run(self):
+        for relative, existing in [('apps/demo', None), ('modules/demo', None),
+                                   ('packages/demo', None), ('apps/demo', 'src/features'),
+                                   ('modules/demo', 'features')]:
+            with self.subTest(relative=relative, existing=existing):
+                with tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    member = root / relative
+                    write(root / 'pubspec.yaml', f'name: fixture\nworkspace:\n  - {relative}\n')
+                    write(member / 'pubspec.yaml', 'name: demo\nresolution: workspace\n')
+                    if existing:
+                        (member / 'lib' / existing).mkdir(parents=True)
+                    prefix = existing or ('features' if relative.startswith('apps/') else 'src/features')
+                    args = argparse.Namespace(path=str(member), name='inventory', kind='api', dry_run=True)
+                    before = {str(f.relative_to(root)): f.read_bytes() for f in root.rglob('*') if f.is_file()}
+                    with patch.object(blueprint, 'SDK', side_effect=AssertionError('dry-run used SDK')), patch.object(blueprint, 'run', side_effect=AssertionError('dry-run ran command')):
+                        blueprint.feature(args)
+                    self.assertEqual(before, {str(f.relative_to(root)): f.read_bytes() for f in root.rglob('*') if f.is_file()})
+                    args.dry_run = False
+                    blueprint.feature(args)
+                    self.assertTrue((member / f'lib/{prefix}/inventory/inventory.dart').is_file())
+                    tests = list((member / 'test/features/inventory').rglob('*_test.dart'))
+                    self.assertTrue(tests)
+                    for test in tests:
+                        self.assertIn('package:demo/' + prefix + '/inventory/', test.read_text())
+
+    def test_module_entry_identifies_example_without_registering_a_package_role(self):
+        member = self.root / 'examples/minimal_module'
+        write(member / 'pubspec.yaml', 'name: minimal_module\n')
+        write(member / 'lib/minimal_module.dart', "export 'src/module.dart';")
+        write(member / 'lib/src/module.dart', 'void module() {}')
+        self.assertEqual(blueprint.feature_layout(self.root, member)['import_prefix'], 'src/features')
+
+    def test_feature_dual_layout_conflict_preserves_all_files_before_sdk(self):
+        for dry_run in (True, False):
+            (self.app / 'lib/features').mkdir(parents=True, exist_ok=True)
+            (self.app / 'lib/src/features').mkdir(parents=True, exist_ok=True)
+            before = self.snapshot()
+            with patch.object(blueprint, 'SDK', side_effect=AssertionError('layout conflict used SDK')):
+                with self.assertRaisesRegex(blueprint.BlueprintError, 'both lib/features and lib/src/features'):
+                    self.feature('local', dry_run=dry_run)
+            self.assertEqual(before, self.snapshot())
+
     def test_module_is_minimal_multiword_and_registers_support(self):
         self.module()
         module = self.root / 'modules/sales_reports'

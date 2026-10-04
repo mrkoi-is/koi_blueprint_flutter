@@ -16,6 +16,9 @@ ROOT = Path(__file__).resolve().parent
 MIN_PYTHON = (3, 11)
 PLATFORMS = ('web', 'android', 'ios', 'macos', 'windows', 'linux')
 TEMPLATES = {'minimal': 'starter_app', 'workbench': 'workbench_app'}
+# Only current guidance is inherited. New documents require an explicit decision.
+INHERITED_DOCUMENTS = ('docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
+
 REQUIRED_PACKAGES = ('koi_core', 'koi_ui')
 IGNORED = shutil.ignore_patterns('.dart_tool', 'build', 'coverage', '.fvm', '__pycache__', '*.g.dart', '*.freezed.dart', '*.pyc', '.flutter-plugins*', '.git', 'Pods', 'ephemeral', '.symlinks', '.swiftpm', '.DS_Store')
 RESERVED = set('abstract as assert async augment await base break case catch class const continue covariant default deferred do dynamic else enum export extends extension external factory false final finally for Function get hide if implements import in interface is late library mixin native new null of on operator part required rethrow return sealed set show static super switch sync this throw true try type typedef var void when while with yield dart flutter test con prn aux nul'.split())
@@ -300,7 +303,27 @@ def support_package(root, registered, stage, name):
     return [(stage / name, target)], [f'packages/{name}']
 
 
-def rename_feature(root, old, new, package):
+def feature_layout(root, member):
+    """Resolve source layout independently of dependency-role classification."""
+    public = member / 'lib/features'
+    internal = member / 'lib/src/features'
+    if public.exists() and internal.exists():
+        raise BlueprintError('Ambiguous Feature layout: both lib/features and lib/src/features exist')
+    if public.exists():
+        prefix, reason = 'features', 'existing App layout'
+    elif internal.exists():
+        prefix, reason = 'src/features', 'existing internal layout'
+    elif {'modules', 'packages'} & set(member.relative_to(root).parts):
+        prefix, reason = 'src/features', 'package/module layout'
+    elif (member / 'lib/src/module.dart').is_file() and (member / f'lib/{package_name(member / "pubspec.yaml")}.dart').is_file():
+        prefix, reason = 'src/features', 'module public entrypoint'
+    else:
+        prefix, reason = 'features', 'App layout'
+    return {'feature_root': member / 'lib' / prefix, 'import_prefix': prefix,
+            'test_root': member / 'test/features', 'reason': reason}
+
+
+def rename_feature(root, old, new, package, import_prefix="features"):
     # Paths and imports use snake_case; Dart type/provider identifiers use their
     # proper case. A plain string replacement produces broken api_thingProvider.
     for path in sorted(root.rglob('*'), key=lambda p: len(p.parts), reverse=True):
@@ -308,7 +331,7 @@ def rename_feature(root, old, new, package):
             text = path.read_text(encoding='utf-8')
             pattern = rf'({pascal(old)})|({old})(?=[A-Z])|({old})'
             text = re.sub(pattern, lambda match: pascal(new) if match[1] else camel(new) if match[2] else new, text)
-            text = text.replace('package:feature_lab/', f'package:{package}/')
+            text = text.replace('package:feature_lab/features/', f'package:{package}/{import_prefix}/')
             path.write_text(text, encoding='utf-8')
         name = path.name.replace(old, new)
         if name != path.name:
@@ -335,35 +358,89 @@ Generated {template} Flutter workspace with unified koi_ui themes. Requires Pyth
 '''
 
 
-def inherit_workspace_assets(stage, name):
-    for folder in ('tool', 'scripts', '.agents', '.cursor', 'docs', '.github'):
-        if (ROOT / folder).exists():
-            copy(ROOT / folder, stage / folder)
-    # Historical evidence and exploratory research are source-owned, not
-    # instructions or results belonging to the generated project.
-    for source_only in ('validation', 'research'):
-        inherited = stage / 'docs' / source_only
-        if inherited.exists():
-            shutil.rmtree(inherited)
-    for file in ('blueprint.py', 'AGENTS.md', 'CLAUDE.md', 'README.md', 'DESIGN.md', 'MELOS_USAGE.md', 'CONTRIBUTING.md', 'LICENSE', 'analysis_options.yaml', '.fvmrc', '.gitignore', 'Makefile'):
-        if (ROOT / file).exists():
-            shutil.copy2(ROOT / file, stage / file)
-    agent_entry = stage / 'AGENTS.md'
-    if agent_entry.exists():
-        agent_text = agent_entry.read_text(encoding='utf-8')
-        agent_text = re.sub(r'\A# [^\n]+', f'# {pascal(name)} — Agent 入口', agent_text, count=1)
-        agent_entry.write_text(agent_text, encoding='utf-8')
-    # References are inert source snapshots, not members or runtime dependencies.
-    references = stage / '.blueprint/reference'
+def workspace_asset_plan(source, project_name, template="minimal", selected=("web",)):
+    """One file plan for copying guidance and recording its original source."""
+    source = Path(source)
+    entries = []
+    def add(relative, destination, kind):
+        file = source / relative
+        if file.is_symlink() or any(parent.is_symlink() for parent in file.parents if parent.is_relative_to(source)):
+            raise BlueprintError(f'Symlink in template: {file}')
+        if file.is_file():
+            entries.append({'source': relative, 'destination': destination, 'kind': kind})
+    def tree(relative, destination, kind):
+        base = source / relative
+        if not base.exists():
+            return
+        if base.is_symlink():
+            raise BlueprintError(f'Symlink template root: {base}')
+        for directory, folders, files in os.walk(base):
+            ignored = IGNORED(directory, folders + files)
+            folders[:] = sorted(set(folders) - set(ignored))
+            for name in folders + sorted(set(files) - set(ignored)):
+                file = Path(directory) / name
+                if file.is_symlink():
+                    raise BlueprintError(f'Symlink in template: {file}')
+                if file.is_file():
+                    add(file.relative_to(source).as_posix(),
+                        (Path(destination) / file.relative_to(base)).as_posix(), kind)
+    for folder in ('tool', 'scripts', '.agents', '.cursor', '.github'):
+        tree(folder, folder, 'guidance' if folder in ('.agents', '.cursor') else 'tooling')
+    for entry in entries:
+        if entry['source'] == 'tool/architecture/README.md':
+            entry['kind'] = 'guidance'
+    for document in INHERITED_DOCUMENTS:
+        add(document, document, 'guidance')
+    for file in ('blueprint.py', 'AGENTS.md', 'CLAUDE.md', 'DESIGN.md', 'MELOS_USAGE.md', 'CONTRIBUTING.md', 'LICENSE', 'analysis_options.yaml', '.fvmrc', '.gitignore', 'Makefile'):
+        add(file, file, 'guidance' if file.endswith('.md') or file == 'analysis_options.yaml' else 'tooling')
+    entries.extend([
+        {'source': None, 'destination': 'README.md', 'kind': 'project_seed',
+         'content': generated_readme(project_name, template, selected).encode('utf-8')},
+        {'source': None, 'destination': 'CHANGELOG.md', 'kind': 'project_seed',
+         'content': f'# Changelog\n\n## 0.1.0\n\n- Initialize {project_name} as an independent Flutter workspace.\n'.encode('utf-8')},
+    ])
+    # References are inert, not managed upgrade inputs.
+    reference_source = '.blueprint/reference' if (source / '.blueprint/reference').is_dir() else ''
     for folder in ('examples', 'packages', 'apps'):
-        if (source_root() / folder).exists():
-            copy(source_root() / folder, references / folder)
-    example_map = stage / 'docs/examples.md'
-    if example_map.exists():
-        text = example_map.read_text(encoding='utf-8')
-        for folder in ('examples', 'apps', 'packages'):
-            text = text.replace('../' + folder + '/', '../.blueprint/reference/' + folder + '/')
-        example_map.write_text(text, encoding='utf-8')
+        tree((Path(reference_source) / folder).as_posix(), f'.blueprint/reference/{folder}', 'reference')
+    return entries
+
+
+def render_workspace_asset(content, destination, name):
+    """Deterministic copied-asset projection, shared with read-only upgrade reports."""
+    if destination == 'analysis_options.yaml':
+        text = content.decode('utf-8')
+        if '".blueprint/**"' not in text:
+            text = text.replace('  exclude:\n', '  exclude:\n    - ".blueprint/**"\n')
+        return text.encode('utf-8')
+    if not destination.endswith('.md'):
+        return content
+    text = content.decode('utf-8')
+    if destination == 'AGENTS.md':
+        text = re.sub(r'\A# [^\n]+', f'# {pascal(name)} — Agent 入口', text, count=1)
+    if destination.startswith('docs/'):
+        text = re.sub(r'`(examples/[^`\n]+)`',
+                      lambda match: '`.blueprint/reference/' + match[1] + '`', text)
+        if destination == 'docs/examples.md':
+            for folder in ('examples', 'apps', 'packages'):
+                text = text.replace('../' + folder + '/', '../.blueprint/reference/' + folder + '/')
+    return text.encode('utf-8')
+
+
+def inherit_workspace_assets(stage, name, template="minimal", selected=("web",)):
+    origins = {}
+    for entry in workspace_asset_plan(ROOT, name, template, selected):
+        target = stage / entry['destination']
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if entry['kind'] == 'project_seed':
+            target.write_bytes(entry['content'])
+            continue
+        source = ROOT / entry['source']
+        shutil.copy2(source, target)
+        if entry['kind'] != 'reference':
+            target.write_bytes(render_workspace_asset(source.read_bytes(), entry['destination'], name))
+            origins[entry['destination']] = entry['source']
+    return origins
 
 
 def create(args):
@@ -443,9 +520,7 @@ def create(args):
                 raise BlueprintError(f'Workbench platform configuration failed: {error}') from error
         for package in REQUIRED_PACKAGES:
             copy(source_root() / 'packages' / package, stage / 'packages' / package)
-        inherit_workspace_assets(stage, name)
-        (stage / 'README.md').write_text(generated_readme(name, template, selected), encoding='utf-8')
-        (stage / 'CHANGELOG.md').write_text(f'# Changelog\n\n## 0.1.0\n\n- Initialize {name} as an independent Flutter workspace.\n', encoding='utf-8')
+        inherited_origins = inherit_workspace_assets(stage, name, template, selected)
         options = (stage / 'analysis_options.yaml').read_text(encoding='utf-8')
         if '".blueprint/**"' not in options:
             options = options.replace('  exclude:\n', '  exclude:\n    - ".blueprint/**"\n')
@@ -498,7 +573,7 @@ def create(args):
             targets = [member / sub for sub in ('lib', 'test', 'integration_test') if (member / sub).is_dir()]
             if targets:
                 run([sdk.dart, 'format', *targets], stage)
-        finalize_generated_provenance(stage, app, template_source)
+        finalize_generated_provenance(stage, app, template_source, inherited_origins)
         if output.is_symlink() or (output.exists() and (not output.is_dir() or any(output.iterdir()))):
             raise BlueprintError('Output changed while creating the workspace; nothing was overwritten')
         if output.exists():
@@ -534,15 +609,16 @@ def feature(args):
     safe_target(root, spec)
     package = package_name(spec)
     example = {'presentation': 'welcome', 'api': 'catalog', 'local': 'draft'}[args.kind]
-    target = app / 'lib/features' / name
-    tests = app / 'test/features' / name
+    layout = feature_layout(root, app)
+    target = layout['feature_root'] / name
+    tests = layout['test_root'] / name
     for path in (target, tests):
         safe_target(root, path, must_be_new=True)
     source = source_root() / 'examples/feature_lab'
     original_spec = spec.read_bytes()
     updated_spec = with_dependencies(original_spec.decode('utf-8'), (source / 'pubspec.yaml').read_text(encoding='utf-8'), args.kind)
     if args.dry_run:
-        print(f'{args.kind}: {target}\nTests: {tests}\nRequired dependencies: ' + ', '.join(sum(FEATURE_DEPENDENCIES[args.kind], ())))
+        print(f'{args.kind}: {target}\nLayout: {layout["reason"]}\nTests: {tests}\nRequired dependencies: ' + ', '.join(sum(FEATURE_DEPENDENCIES[args.kind], ())))
         return
     sdk = SDK(root)
     registered = registered_packages(root, sdk)
@@ -555,7 +631,7 @@ def feature(args):
     try:
         copy(source / 'lib/features' / example, stage / 'source')
         copy(source / 'test/features' / example, stage / 'tests')
-        rename_feature(stage, example, name, package)
+        rename_feature(stage, example, name, package, layout["import_prefix"])
         run([sdk.dart, 'format', stage / 'source', stage / 'tests'], root)
         moves = [(stage / 'source', target), (stage / 'tests', tests)]
         additions = []
@@ -568,9 +644,10 @@ def feature(args):
         commit_changes(root, moves, updates)
     finally:
         shutil.rmtree(stage)
-    print(f'Created {target}\nPublic API: features/{name}/{name}.dart\n'
+    print(f'Created {target}\nPublic API: {layout["import_prefix"]}/{name}/{name}.dart\n'
           f'Integration: add a typed route for {pascal(name)}Page to the target package router.\n'
-          'Inject repository ports from bootstrap (see exported providers); never construct them in a page.\n'
+          f'Business entry exports models/ports/pages; host injection uses {name}_composition.dart for api/local.\n'
+          'Modules expose both through the module root entry; never import module src from the host.\n'
           'Then run: python3 blueprint.py check bootstrap; python3 blueprint.py check generate; python3 blueprint.py validate')
 
 
@@ -759,9 +836,15 @@ def package(args):
 
 
 def upgrade_report(args):
-    from tool.blueprint_provenance import upgrade_report as report
-    app = checked_root(args.app)
-    print(json.dumps(report(workspace_for(app), checked_root(args.source)), ensure_ascii=False, indent=2))
+    # Importing copied tooling must not create caches inside the reviewed project.
+    previous = sys.dont_write_bytecode
+    sys.dont_write_bytecode = True
+    try:
+        from tool.blueprint_provenance import upgrade_report as report
+        app = checked_root(args.app)
+        print(json.dumps(report(workspace_for(app), checked_root(args.source)), ensure_ascii=False, indent=2))
+    finally:
+        sys.dont_write_bytecode = previous
 
 
 def capability(args):
@@ -847,16 +930,16 @@ def capability(args):
         transaction.commit(refresh)
 
 
-def finalize_generated_provenance(stage, app, template_source):
+def finalize_generated_provenance(stage, app, template_source, inherited_origins=None):
     import hashlib
     from tool.blueprint_provenance import record_baseline, read_metadata, write_metadata
-    origins = {}
+    origins = dict(inherited_origins or {})
     for path in template_source.rglob('*'):
         if path.is_file() and not path.is_symlink() and not any(p in ('.dart_tool', 'build', 'coverage', 'generated') for p in path.parts) and not path.name.endswith(('.g.dart', '.freezed.dart')):
             relative = path.relative_to(template_source)
             if (app / relative).is_file():
                 origins[(app / relative).relative_to(stage).as_posix()] = f'examples/{template_source.name}/{relative.as_posix()}'
-    for folder in ('packages', 'tool', 'scripts', '.agents'):
+    for folder in ('packages',):
         base = stage / folder
         for path in base.rglob('*'):
             if path.is_file() and not path.is_symlink() and not any(p in ('.dart_tool', 'build', 'coverage', '__pycache__', 'generated') for p in path.relative_to(base).parts) and not path.name.endswith(('.g.dart', '.freezed.dart', '.pyc')):
@@ -1007,12 +1090,17 @@ def main(argv=None):
         item.add_argument('--workspace', default=str(ROOT), help='Workspace root (default: directory containing blueprint.py)')
     doctor_parser.add_argument('--purpose', choices=('run', 'validate'), default='run', help='run: SDK/platform doctor; validate: additionally inspect active test prerequisites')
     args = parser.parse_args(argv)
+    previous_bytecode = sys.dont_write_bytecode
+    # Read-only commands must also leave copied Python tooling byte-for-byte intact.
+    sys.dont_write_bytecode = previous_bytecode or args.command == 'upgrade-report' or bool(getattr(args, 'dry_run', False))
     try:
         (launch if args.command == 'run' else globals()[args.command.replace('-', '_')])(args)
         return 0
     except (BlueprintError, OSError, ValueError) as error:
         print(f'blueprint: {error}', file=sys.stderr)
         return 2
+    finally:
+        sys.dont_write_bytecode = previous_bytecode
 
 
 if __name__ == '__main__':
