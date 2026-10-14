@@ -27,7 +27,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   build_runner: 2.16.1
   riverpod_generator: 4.0.9
-  drift_dev: 2.35.0
+  drift_dev: 2.35.1
   web: 1.1.1
 flutter:
   generate: true
