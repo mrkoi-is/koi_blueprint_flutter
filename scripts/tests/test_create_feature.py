@@ -59,7 +59,8 @@ class CreateFeatureTest(unittest.TestCase):
 
     def test_piped_cli_preserves_unicode_paths_with_legacy_console_encoding(self):
         with tempfile.TemporaryDirectory(prefix='feature pipes 中文 ') as temporary:
-            root = Path(temporary)
+            # Windows may return an 8.3 temp path; the CLI resolves its inputs.
+            root = Path(temporary).resolve()
             app = root / 'apps/demo'
             app.mkdir(parents=True)
             (root / 'pubspec.yaml').write_text('name: demo_workspace\nworkspace:\n  - apps/demo\n', encoding='utf-8')
