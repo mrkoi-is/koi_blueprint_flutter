@@ -8,14 +8,42 @@ permissions:
   contents: read
 
 jobs:
-  graphics-capability:
+  windows-runtime:
     strategy:
       fail-fast: false
       matrix:
-        os: [macos-latest, macos-15-intel]
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 5
+        suite: [browser, native]
+    runs-on: windows-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - name: Probe the actual media_kit_video OpenGL requirements
-        run: swift tool/macos_media_preflight.swift
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Generate Windows workbench
+        run: python blueprint.py create ci_blueprint --output "${{ runner.temp }}/koi-windows-diagnostic" --org com.example --template workbench --platforms web,windows
+      - name: Windows browser smoke
+        if: matrix.suite == 'browser'
+        working-directory: ${{ runner.temp }}/koi-windows-diagnostic/apps/ci_blueprint_app
+        run: |
+          flutter test --no-pub --verbose --reporter expanded --file-reporter json:browser-tests.json --platform chrome test/browser 2>&1 | Tee-Object -FilePath browser-runtime.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Windows native smoke
+        if: matrix.suite == 'native'
+        working-directory: ${{ runner.temp }}/koi-windows-diagnostic/apps/ci_blueprint_app
+        run: |
+          flutter test --no-pub --verbose --reporter expanded --file-reporter json:native-runtime-tests.json -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: windows-diagnostics-${{ matrix.suite }}
+          path: |
+            ${{ runner.temp }}/koi-windows-diagnostic/apps/ci_blueprint_app/*runtime.log
+            ${{ runner.temp }}/koi-windows-diagnostic/apps/ci_blueprint_app/*tests.json
+          if-no-files-found: ignore
