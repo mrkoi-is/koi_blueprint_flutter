@@ -26,6 +26,7 @@ void main() {
     final sandbox = await createRuntimeSandbox();
     final input = FixtureImportPort();
     const audioOutput = String.fromEnvironment('KOI_TEST_NATIVE_AUDIO_OUTPUT');
+    const hardwareDecoder = String.fromEnvironment('KOI_TEST_NATIVE_HWDEC');
     WorkbenchBootstrap? owned;
     final evidence = <String, Object?>{
       'storage': sandbox.description,
@@ -34,6 +35,9 @@ void main() {
           ? 'system_default'
           : audioOutput,
       'speaker_output': 'NOT_EXERCISED',
+      'native_hardware_decoder': hardwareDecoder.isEmpty
+          ? 'adapter_default'
+          : hardwareDecoder,
     };
     binding.reportData = evidence;
     try {
@@ -42,6 +46,7 @@ void main() {
         openStorage: () async => storage,
         fileImportPort: input,
         nativeAudioOutput: audioOutput.isEmpty ? null : audioOutput,
+        nativeHardwareDecoder: hardwareDecoder.isEmpty ? null : hardwareDecoder,
         initialLocation: '/media',
       );
       owned = bootstrap;
@@ -305,6 +310,7 @@ void main() {
         openStorage: sandbox.open,
         fileImportPort: FixtureImportPort(),
         nativeAudioOutput: audioOutput.isEmpty ? null : audioOutput,
+        nativeHardwareDecoder: hardwareDecoder.isEmpty ? null : hardwareDecoder,
       );
       owned = reopened;
       expect(reopened.session.state.snapshot, expectedSnapshot);

@@ -6,20 +6,27 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:workbench_app/features/workspace/application/media_playback.dart';
 import 'package:workbench_app/features/workspace/data/media/media_frame_gate.dart';
 import 'package:workbench_app/features/workspace/data/media/capture_video_frame.dart';
+import 'package:workbench_app/features/workspace/data/media/native_audio_output.dart';
 
 /// SDK adaptation only. Bootstrap supplies the presentation surface and removes
 /// it by player identity after all SDK cleanup has been attempted.
 final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
-  MediaKitPlayback({this._onClosed, String? nativeAudioOutput})
-    : _nativeAudioOutput = nativeAudioOutput {
+  MediaKitPlayback({
+    this._onClosed,
+    this._nativeAudioOutput,
+    String? nativeHardwareDecoder,
+  }) {
     _video = VideoController(
       _player,
       configuration: VideoControllerConfiguration(
         // Older Linux libmpv versions treat `auto` as every decoder, including
         // experimental devices. Keep supported acceleration and CPU fallback.
-        hwdec: defaultTargetPlatform == TargetPlatform.linux
-            ? 'auto-safe'
-            : null,
+        hwdec:
+            nativeHardwareDecoder ??
+            (defaultTargetPlatform == TargetPlatform.linux ||
+                    defaultTargetPlatform == TargetPlatform.windows
+                ? 'auto-safe'
+                : null),
       ),
     );
     _frameGate = MediaFrameGate(_player);
@@ -55,11 +62,7 @@ final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
     _video;
     final output = _nativeAudioOutput;
     if (output != null) {
-      final platform = _player.platform;
-      if (platform is! NativePlayer) {
-        throw UnsupportedError('Native audio output requires a native player');
-      }
-      await platform.setProperty('ao', output);
+      await configureNativeAudioOutput(_player, output);
     }
     await _player.open(Media(uri), play: false);
   }
