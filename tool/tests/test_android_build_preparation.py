@@ -72,7 +72,7 @@ class AndroidBuildPreparationTests(unittest.TestCase):
             dev = source / 'IntegrationTestPlugin.java'
             dev.write_text('package dev.flutter.plugins.integration_test; public final class IntegrationTestPlugin {}')
             inputs.append(dev)
-        result = subprocess.run([self.javac, '-d', str(source / 'classes'), *map(str, inputs)], capture_output=True, text=True, timeout=20)
+        result = subprocess.run([self.javac, '-d', str(source / 'classes'), *map(str, inputs)], capture_output=True, text=True, timeout=60)
         if result.returncode:
             raise RuntimeError(result.stderr)
 
@@ -161,7 +161,9 @@ class AndroidBuildPreparationTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which('javac'), 'Optional real Java compiler is unavailable')
     def test_real_javac_rejects_old_sequence_and_accepts_prepared_release(self):
         self.javac = shutil.which('javac')
-        available = subprocess.run([self.javac, '-version'], capture_output=True, timeout=10)
+        # A cold JDK on a busy Windows runner can take over ten seconds to start.
+        # Keep a bounded timeout and preserve failures rather than skipping them.
+        available = subprocess.run([self.javac, '-version'], capture_output=True, timeout=60)
         if available.returncode:
             self.skipTest('Java compiler launcher exists but no usable JDK is configured')
         # Reproduce exactly pub-get -> no-pub release with no mode-aware refresh.
