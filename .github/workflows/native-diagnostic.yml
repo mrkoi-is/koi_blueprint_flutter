@@ -1,0 +1,92 @@
+name: PR16 native diagnostics
+
+on:
+  push:
+    branches: [codex/pr16-native-diagnostics]
+
+permissions:
+  contents: read
+
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: macos
+          - os: macos-15-intel
+            platform: macos
+          - os: ubuntu-latest
+            platform: linux
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Linux runtime dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev mpv libepoxy-dev xvfb pulseaudio pulseaudio-utils
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=koi_ci
+          pactl set-default-sink koi_ci
+          pactl info
+      - name: Generate native workbench
+        run: python blueprint.py create ci_blueprint --output "${{ runner.temp }}/koi-native-diagnostic" --org com.example --template workbench --platforms "${{ matrix.platform }}"
+      - name: macOS native smoke
+        if: runner.os == 'macOS'
+        working-directory: ${{ runner.temp }}/koi-native-diagnostic/apps/ci_blueprint_app
+        run: |
+          set -o pipefail
+          flutter test --no-pub --verbose --reporter expanded --file-reporter json:native-runtime-tests.json -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+      - name: Linux native smoke
+        if: runner.os == 'Linux'
+        working-directory: ${{ runner.temp }}/koi-native-diagnostic/apps/ci_blueprint_app
+        run: |
+          set -o pipefail
+          xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+      - name: macOS crash details
+        if: always() && runner.os == 'macOS'
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import time
+          directories = [Path.home() / 'Library/Logs/DiagnosticReports', Path('/Library/Logs/DiagnosticReports')]
+          matches = []
+          for attempt in range(10):
+              matches = [p for folder in directories for pattern in ('ci_blueprint_app*', 'Ci Blueprint*', 'Runner*')
+                         for p in folder.glob(pattern) if p.is_file()]
+              if matches or '${{ job.status }}' == 'success':
+                  break
+              time.sleep(1)
+          print(f'Native crash reports captured: {len(matches)}')
+          for report in matches:
+              content = report.read_text(encoding='utf-8', errors='replace')
+              try:
+                  data = json.loads(content.split('\n', 1)[-1])
+                  index = data.get('faultingThread')
+                  detail = {key: data.get(key) for key in ('procName', 'procPath', 'exception', 'termination', 'faultingThread')}
+                  if isinstance(index, int):
+                      detail['thread'] = data.get('threads', [])[index]
+                  print(json.dumps(detail, ensure_ascii=False))
+              except (ValueError, IndexError):
+                  print(content[:24000])
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-diagnostics-${{ matrix.os }}
+          path: |
+            ${{ runner.temp }}/koi-native-diagnostic/apps/ci_blueprint_app/native-runtime.log
+            ${{ runner.temp }}/koi-native-diagnostic/apps/ci_blueprint_app/native-runtime-tests.json
+          if-no-files-found: ignore
