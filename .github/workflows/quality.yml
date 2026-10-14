@@ -121,17 +121,25 @@ jobs:
           sdk = Path(os.environ['FLUTTER_ROOT'])
           path = sdk / 'packages/flutter_tools/lib/src/test/flutter_web_platform.dart'
           original = path.read_text(encoding='utf-8')
-          before = 'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = _fileSystem.path.fromUri(request.url);'
-          after = 'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = request.url.path;'
-          if original.count(before) == 1:
-              path.write_text(original.replace(before, after), encoding='utf-8')
+          patches = [
+              ('shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = _fileSystem.path.fromUri(request.url);',
+               'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = request.url.path;'),
+              ('shelf.Response _wrapperHandler(shelf.Request request) {\n    final String path = _fileSystem.path.fromUri(request.url);',
+               'shelf.Response _wrapperHandler(shelf.Request request) {\n    final String path = request.url.path;'),
+          ]
+          updated = original
+          for before, after in patches:
+              if updated.count(before) == 1:
+                  updated = updated.replace(before, after)
+              elif updated.count(after) != 1:
+                  raise SystemExit('Unexpected Flutter browser handler; stop rather than patch unknown tooling')
+          if updated != original:
+              path.write_text(updated, encoding='utf-8')
               for name in ('flutter_tools.snapshot', 'flutter_tools.stamp'):
                   (sdk / 'bin/cache' / name).unlink(missing_ok=True)
-              print('Applied isolated CI SDK CanvasKit URL fix (Flutter issue #192069)')
-          elif original.count(after) == 1:
-              print('CI SDK already has the CanvasKit URL fix')
+              print('Applied isolated CI SDK URL fixes for CanvasKit and test selector (Flutter issue #192069)')
           else:
-              raise SystemExit('Unexpected Flutter CanvasKit handler; stop rather than patch unknown tooling')
+              print('CI SDK already has the browser URL fixes')
           '@ | python -
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
@@ -165,7 +173,7 @@ jobs:
         if: matrix.template == 'workbench' && runner.os == 'Windows'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
-          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
+          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json --dart-define=KOI_TEST_NATIVE_AUDIO_OUTPUT=null -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Configure virtual audio for Linux runtime

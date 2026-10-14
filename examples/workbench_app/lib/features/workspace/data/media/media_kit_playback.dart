@@ -6,11 +6,12 @@ import 'package:media_kit_video/media_kit_video.dart';
 import 'package:workbench_app/features/workspace/application/media_playback.dart';
 import 'package:workbench_app/features/workspace/data/media/media_frame_gate.dart';
 import 'package:workbench_app/features/workspace/data/media/capture_video_frame.dart';
+import 'package:workbench_app/features/workspace/data/media/native_audio_output.dart';
 
 /// SDK adaptation only. Bootstrap supplies the presentation surface and removes
 /// it by player identity after all SDK cleanup has been attempted.
 final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
-  MediaKitPlayback({this._onClosed}) {
+  MediaKitPlayback({this._onClosed, this._nativeAudioOutput}) {
     _video = VideoController(
       _player,
       configuration: VideoControllerConfiguration(
@@ -32,6 +33,7 @@ final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
     _subscriptions.add(_player.stream.volume.listen((_) => notifyListeners()));
   }
   final Player _player = Player();
+  final String? _nativeAudioOutput;
   late final VideoController _video;
   late final MediaFrameGate _frameGate;
   final void Function()? _onClosed;
@@ -51,6 +53,10 @@ final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
   @override
   Future<void> open(String uri) async {
     _video;
+    final output = _nativeAudioOutput;
+    if (output != null) {
+      await configureNativeAudioOutput(_player, output);
+    }
     await _player.open(Media(uri), play: false);
   }
 
