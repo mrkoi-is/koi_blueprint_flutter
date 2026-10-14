@@ -9,69 +9,123 @@ const _sessionRevisionExtraKey = 'koi_api_session_revision';
 const _sessionTokenExtraKey = 'koi_api_session_token';
 
 _NativeKoiApiRuntime? _activeRuntime;
+bool _isBootstrapping = false;
 
 Future<KoiApiRuntime> bootstrapKoiApiBackend(
   KoiApiBootstrapOptions options,
   KoiApiBindings bindings,
 ) async {
-  await disposeKoiApiBackend();
-
-  KoiNetworkConstants.debugEnabled = options.enableInternalLogging;
-  KoiNetworkAdapters.register(
-    authAdapter: _SessionAuthAdapter(bindings.tokenSession),
-    errorHandlerAdapter: _BindingsErrorHandlerAdapter(bindings),
-    loadingAdapter: KoiDefaultLoadingAdapter(),
-    platformAdapter: KoiDefaultPlatformAdapter(),
-    loggerAdapter: _BindingsLoggerAdapter(bindings),
-    responseParser: const KoiDefaultResponseParser(),
-    requestEncoder: const KoiJsonRequestEncoder(),
-  );
-
-  final config = KoiNetworkConfig.create(
-    baseUrl: options.baseUrl,
-    enableLogging: options.enableLogging,
-    validateCertificate: options.isProduction || options.validateCertificate,
-    enableProactiveTokenRefresh: options.enableProactiveTokenRefresh,
-    tokenRefreshWhiteList: options.tokenRefreshWhiteList,
-    headerBuilders: [
-      (requestOptions) async {
-        final token = bindings.tokenSession.getToken();
-        requestOptions.extra[_sessionRevisionExtraKey] =
-            bindings.tokenSession.revision;
-        requestOptions.extra[_sessionTokenExtraKey] = token;
-        if (token == null || token.isEmpty) {
-          return <String, String>{};
-        }
-        return <String, String>{'Authorization': 'Bearer $token'};
-      },
-    ],
-  );
-
-  try {
-    await KoiNetworkInitializer.initializeWithConfig(config);
-    KoiNetworkServiceManager.instance.mainDio.interceptors.insert(
-      0,
-      _SessionAwareAuthErrorInterceptor(
-        bindings,
-        options.tokenRefreshWhiteList,
-      ),
-    );
-  } catch (_) {
-    await disposeKoiApiBackend();
-    rethrow;
+  final backends = options.validatedBackends();
+  final whiteList = List<String>.unmodifiable(options.tokenRefreshWhiteList);
+  if (_isBootstrapping) {
+    throw StateError('Koi API Runtime 正在初始化，不能并发 bootstrap');
   }
+  _isBootstrapping = true;
+  try {
+    _disposeRuntime();
+    final moduleKeys = <String, String>{
+      for (final backend in backends)
+        backend.key: backend.key == options.primaryBackendKey
+            ? 'main'
+            : backend.key,
+    };
+    final runtime = _NativeKoiApiRuntime(bindings, moduleKeys);
+    KoiNetworkConstants.debugEnabled = options.enableInternalLogging;
+    KoiNetworkAdapters.register(
+      authAdapter: _SessionAuthAdapter(bindings.tokenSession),
+      errorHandlerAdapter: _BindingsErrorHandlerAdapter(bindings),
+      loadingAdapter: KoiDefaultLoadingAdapter(),
+      platformAdapter: KoiDefaultPlatformAdapter(),
+      loggerAdapter: _BindingsLoggerAdapter(
+        bindings,
+        enabled: options.enableInternalLogging,
+      ),
+      responseParser: const KoiDefaultResponseParser(),
+      requestEncoder: const KoiJsonRequestEncoder(),
+    );
 
-  final runtime = _NativeKoiApiRuntime(bindings);
-  _activeRuntime = runtime;
-  return runtime;
+    for (final backend in backends) {
+      final config = KoiNetworkConfig.create(
+        baseUrl: backend.baseUrl,
+        enableLogging: options.enableLogging,
+        // 业务幂等性由调用方决定，不能沿用底层对所有请求的自动重试默认值。
+        enableRetry: false,
+        validateCertificate:
+            options.requiresSecureTransport || options.validateCertificate,
+        enableProactiveTokenRefresh: options.enableProactiveTokenRefresh,
+        tokenRefreshWhiteList: whiteList,
+        headerBuilders: [
+          (requestOptions) async {
+            final token = bindings.tokenSession.getToken();
+            requestOptions.extra[_sessionRevisionExtraKey] =
+                bindings.tokenSession.revision;
+            requestOptions.extra[_sessionTokenExtraKey] = token;
+            if (token == null || token.isEmpty) {
+              return <String, String>{};
+            }
+            return <String, String>{'Authorization': 'Bearer $token'};
+          },
+        ],
+      );
+      final moduleKey = moduleKeys[backend.key]!;
+      await KoiNetworkServiceManager.instance.initialize(
+        config: config,
+        key: moduleKey,
+      );
+      KoiNetworkServiceManager.instance
+          .getModuleDio(moduleKey)
+          .interceptors
+          .insert(
+            0,
+            _SessionAwareAuthErrorInterceptor(
+              bindings,
+              whiteList,
+              () => identical(_activeRuntime, runtime),
+            ),
+          );
+    }
+    _activeRuntime = runtime;
+    return runtime;
+  } catch (_) {
+    _disposeRuntime();
+    rethrow;
+  } finally {
+    _isBootstrapping = false;
+  }
 }
 
 Future<void> disposeKoiApiBackend() async {
+  if (_isBootstrapping) {
+    throw StateError('Koi API Runtime 正在初始化，等待 bootstrap 完成后再释放');
+  }
+  _disposeRuntime();
+}
+
+void _disposeRuntime() {
   _activeRuntime?._markDisposed();
   _activeRuntime = null;
+  // 先关闭调试开关，避免 teardown 继续输出上一环境的诊断信息。
+  KoiNetworkConstants.debugEnabled = false;
   KoiNetworkInitializer.dispose();
   KoiNetworkAdapters.clear();
-  KoiNetworkConstants.debugEnabled = false;
+}
+
+/// 仅供显式 Native composition 入口使用。
+T buildNativeKoiApiClient<T>(
+  KoiApiRuntime runtime,
+  String backendKey,
+  T Function(Dio dio) factory,
+) {
+  if (runtime is! _NativeKoiApiRuntime ||
+      runtime._disposed ||
+      !identical(_activeRuntime, runtime)) {
+    throw StateError('必须使用当前活动的 Native Koi API Runtime');
+  }
+  final moduleKey = runtime._moduleKeys[backendKey];
+  if (moduleKey == null) {
+    throw ArgumentError.value(backendKey, 'backendKey', '未登记的后端');
+  }
+  return factory(KoiNetworkServiceManager.instance.getModuleDio(moduleKey));
 }
 
 final class _SessionAuthAdapter extends KoiAuthAdapter {
@@ -115,17 +169,20 @@ final class _SessionAwareAuthErrorInterceptor extends Interceptor {
   _SessionAwareAuthErrorInterceptor(
     this._bindings,
     this._tokenRefreshWhiteList,
+    this._isCurrentRuntime,
   );
 
   final KoiApiBindings _bindings;
   final List<String> _tokenRefreshWhiteList;
+  final bool Function() _isCurrentRuntime;
 
   @override
   Future<void> onError(
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    if (_tokenRefreshWhiteList.any(err.requestOptions.path.contains)) {
+    if (!_isCurrentRuntime() ||
+        _tokenRefreshWhiteList.any(err.requestOptions.path.contains)) {
       handler.next(err);
       return;
     }
@@ -197,38 +254,56 @@ final class _SessionAwareAuthErrorInterceptor extends Interceptor {
 }
 
 final class _BindingsLoggerAdapter implements KoiLoggerAdapter {
-  _BindingsLoggerAdapter(this._bindings);
+  _BindingsLoggerAdapter(this._bindings, {required this.enabled});
+
+  final bool enabled;
 
   final KoiApiBindings _bindings;
 
   @override
   void debug(String message, [dynamic error, StackTrace? stackTrace]) {
-    _bindings.log(KoiApiLogLevel.debug, message, error, stackTrace);
+    if (enabled) {
+      _bindings.log(KoiApiLogLevel.debug, message, error, stackTrace);
+    }
   }
 
   @override
   void info(String message, [dynamic error, StackTrace? stackTrace]) {
-    _bindings.log(KoiApiLogLevel.info, message, error, stackTrace);
+    if (enabled) {
+      _bindings.log(KoiApiLogLevel.info, message, error, stackTrace);
+    }
   }
 
   @override
   void warning(String message, [dynamic error, StackTrace? stackTrace]) {
-    _bindings.log(KoiApiLogLevel.warning, message, error, stackTrace);
+    if (enabled) {
+      _bindings.log(KoiApiLogLevel.warning, message, error, stackTrace);
+    }
   }
 
   @override
   void error(String message, [dynamic error, StackTrace? stackTrace]) {
-    _bindings.log(KoiApiLogLevel.error, message, error, stackTrace);
+    if (enabled) {
+      _bindings.log(KoiApiLogLevel.error, message, error, stackTrace);
+    }
   }
 
   @override
   void fatal(String message, [dynamic error, StackTrace? stackTrace]) {
-    _bindings.log(KoiApiLogLevel.fatal, message, error, stackTrace);
+    if (enabled) {
+      _bindings.log(KoiApiLogLevel.fatal, message, error, stackTrace);
+    }
   }
 }
 
 final class _NativeKoiApiRuntime implements KoiApiRuntime {
-  _NativeKoiApiRuntime(this.bindings);
+  _NativeKoiApiRuntime(this.bindings, Map<String, String> moduleKeys)
+    : _moduleKeys = Map.unmodifiable(moduleKeys);
+
+  final Map<String, String> _moduleKeys;
+
+  @override
+  Set<String> get backendKeys => Set.unmodifiable(_moduleKeys.keys);
 
   @override
   final KoiApiBindings bindings;

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_admin_app/app.dart';
 import 'package:koi_admin_app/core/config/app_environment.dart';
+import 'package:koi_admin_app/core/network/app_network_container.dart';
+import 'package:koi_admin_app/core/providers/system_status_providers.dart';
 import 'package:koi_admin_app/features/auth/data/datasources/auth_data_source.dart';
 import 'package:koi_admin_app/features/auth/data/datasources/mock_auth_data_source.dart';
 import 'package:koi_admin_app/features/auth/data/repositories/auth_repository_impl.dart';
@@ -41,7 +43,7 @@ Future<ProviderContainer> bootstrap({KoiTokenSession? tokenStorage}) async {
     },
   );
 
-  await bootstrapKoiApi(
+  final runtime = await bootstrapKoiApi(
     KoiApiBootstrapOptions(
       baseUrl: environment.apiBaseUrl,
       environment: environment.name,
@@ -56,8 +58,14 @@ Future<ProviderContainer> bootstrap({KoiTokenSession? tokenStorage}) async {
     dataSource: dataSource,
     tokenSession: bindings.tokenSession,
   );
+  final network = AppNetworkContainer.fromRuntime(runtime);
   final container = ProviderContainer(
-    overrides: [authRepositoryProvider.overrideWithValue(repository)],
+    overrides: [
+      authRepositoryProvider.overrideWithValue(repository),
+      systemStatusGatewayProvider.overrideWithValue(
+        network.systemStatusGateway,
+      ),
+    ],
   );
   unauthorizedBridge.attach(
     () => container.read(authControllerProvider.notifier).handleUnauthorized(),

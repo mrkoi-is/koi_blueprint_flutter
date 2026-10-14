@@ -22,13 +22,14 @@
 | 新增共享 package | `add-shared-package` |
 | 新增独立业务 module、切换会话 | `add-business-module` |
 | 接入生成 API | `add-generated-api-package` |
+| 新增 Host、网络策略、外部出口或迁移旧网络 | `network-architecture` |
 | 新增或重构路由 | `add-routing` |
 | 审查架构边界 | `architecture-review` |
 | 补充测试 | `testing-scaffold` |
 
 ## 执行与验证
 
-优先使用 `python3 blueprint.py --help` 和各子命令帮助，工具总览见 [工具清单](docs/tools.md)。Windows 使用 `py -3 blueprint.py`。完整门禁为 `python3 blueprint.py validate`：严格锁文件、生成、只读格式、架构/AI 资产、分析、成员测试、活动成员的 Chrome 浏览器测试、手写代码覆盖率（80%）。源仓库另执行 `templates` 继承资产检查；存在 API Web 冒烟入口时另执行 JS 编译及 Node 运行。无活动浏览器测试的项目不要求 Chrome。目标平台构建需单独报告，不能用其他平台构建代替。
+优先使用 `python3 blueprint.py --help` 和各子命令帮助，工具总览见 [工具清单](docs/tools.md)。Windows 使用 `py -3 blueprint.py`。完整门禁为 `python3 blueprint.py validate`：严格锁文件、生成、只读格式、架构/AI 资产、分析、成员测试、活动成员的 Chrome 浏览器测试、手写代码覆盖率（80%）。源仓库另执行 `templates` 继承资产检查；存在网络出口清单时执行 `network` 静态门禁；存在 API Web 冒烟入口时另执行 JS 编译及 Node 运行。无活动浏览器测试的项目不要求 Chrome。目标平台构建需单独报告，不能用其他平台构建代替。
 
 先检查工作区变化，保留用户已有修改。交付说明区分“修改完成”“本地验证通过”“目标平台验证”“未执行项”。不要把样例、规划或说明文档写成已完成的真实业务能力。
 

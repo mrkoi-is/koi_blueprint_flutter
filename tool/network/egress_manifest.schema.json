@@ -1,0 +1,724 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/mrkoi-is/koi_blueprint_flutter/tool/network/egress_manifest.schema.json",
+  "title": "Koi Flutter 网络出口清单",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "gateScope",
+    "template",
+    "project",
+    "boundaries",
+    "migration",
+    "nativeSecurityExceptions",
+    "entries"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schemaVersion": {
+      "const": 1
+    },
+    "gateScope": {
+      "const": "basic_lint",
+      "description": "本门禁只提供静态基础 lint，不代表运行时出口完整或迁移验收完成"
+    },
+    "template": {
+      "type": "boolean"
+    },
+    "project": {
+      "type": "string",
+      "minLength": 1
+    },
+    "boundaries": {
+      "type": "object",
+      "required": [
+        "presentationPathSegments",
+        "forbiddenSymbols"
+      ],
+      "properties": {
+        "presentationPathSegments": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "forbiddenSymbols": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "transportConstructionPaths": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "pattern": "^(apps|packages|modules|examples)/.+\\.dart$"
+          },
+          "description": "只扩展 Dio 构造位置；必须是存在的精确源文件，仍检查 presentation、origin 与 TLS。"
+        }
+      },
+      "additionalProperties": false
+    },
+    "migration": {
+      "type": "object",
+      "required": [
+        "enabled",
+        "manifest",
+        "requireZeroLegacy",
+        "defaultStack"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "manifest": {
+          "type": "string",
+          "minLength": 1
+        },
+        "requireZeroLegacy": {
+          "type": "boolean"
+        },
+        "defaultStack": {
+          "enum": [
+            "legacy",
+            "koi_generated"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "nativeSecurityExceptions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nativeSecurityException"
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "template": {
+            "const": false
+          }
+        },
+        "required": [
+          "template"
+        ]
+      },
+      "then": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "dataClassification": {
+                  "not": {
+                    "const": "template"
+                  }
+                },
+                "owner": {
+                  "$ref": "#/$defs/nonPlaceholderString"
+                },
+                "provider": {
+                  "$ref": "#/$defs/nonPlaceholderString"
+                },
+                "securityPolicyDetails": {
+                  "$ref": "#/$defs/nonPlaceholderString"
+                },
+                "testEvidence": {
+                  "items": {
+                    "$ref": "#/$defs/nonPlaceholderString"
+                  }
+                },
+                "hosts": {
+                  "properties": {
+                    "development": {
+                      "$ref": "#/$defs/nonTemplateHost"
+                    },
+                    "staging": {
+                      "$ref": "#/$defs/nonTemplateHost"
+                    },
+                    "production": {
+                      "$ref": "#/$defs/nonTemplateHost"
+                    }
+                  }
+                },
+                "developmentOnly": {
+                  "not": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          },
+          "nativeSecurityExceptions": {
+            "items": {
+              "properties": {
+                "reason": {
+                  "$ref": "#/$defs/nonPlaceholderString"
+                },
+                "owner": {
+                  "$ref": "#/$defs/nonPlaceholderString"
+                },
+                "approvedBy": {
+                  "$ref": "#/$defs/nonPlaceholderString"
+                },
+                "evidence": {
+                  "items": {
+                    "$ref": "#/$defs/nonPlaceholderString"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "entry": {
+      "type": "object",
+      "required": [
+        "id",
+        "category",
+        "purpose",
+        "owner",
+        "dataClassification",
+        "transport",
+        "contract",
+        "authentication",
+        "authFailurePolicy",
+        "retryPolicy",
+        "dynamicUrlPolicy",
+        "hostPolicy",
+        "securityPolicy",
+        "securityPolicyDetails",
+        "testEvidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "category": {
+          "enum": [
+            "business_api",
+            "ai_stream",
+            "transfer",
+            "remote_asset",
+            "media",
+            "webview",
+            "platform_sdk",
+            "device_link"
+          ]
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "dataClassification": {
+          "enum": [
+            "public",
+            "internal",
+            "personal",
+            "sensitive",
+            "template"
+          ]
+        },
+        "transport": {
+          "type": "string",
+          "minLength": 1
+        },
+        "contract": {
+          "enum": [
+            "openapi",
+            "compatibility",
+            "manual",
+            "external",
+            "plugin",
+            "platform"
+          ]
+        },
+        "authentication": {
+          "enum": [
+            "none",
+            "project_adapter",
+            "signed",
+            "external_credential",
+            "platform_sdk"
+          ]
+        },
+        "authFailurePolicy": {
+          "enum": [
+            "global_session",
+            "per_backend",
+            "business_error",
+            "none",
+            "plugin_managed"
+          ]
+        },
+        "retryPolicy": {
+          "enum": [
+            "never",
+            "endpoint_semantics",
+            "idempotency_key",
+            "plugin_managed"
+          ]
+        },
+        "dynamicUrlPolicy": {
+          "enum": [
+            "fixed_origin",
+            "allowlist",
+            "runtime_validated",
+            "platform_managed",
+            "runtime_supplied"
+          ]
+        },
+        "hostPolicy": {
+          "enum": [
+            "declared",
+            "provider_managed",
+            "runtime_supplied"
+          ],
+          "description": "provider_managed 仅用于无法由 App 枚举 origin 的 platform SDK"
+        },
+        "securityPolicy": {
+          "enum": [
+            "strict_tls",
+            "runtime_validated",
+            "provider_managed",
+            "development_only"
+          ]
+        },
+        "securityPolicyDetails": {
+          "type": "string",
+          "minLength": 1,
+          "description": "说明证书、重定向、完整性、缓存或厂商 SDK 责任边界等适用策略"
+        },
+        "provider": {
+          "type": "string",
+          "minLength": 1,
+          "description": "hostPolicy=provider_managed 时必填的 SDK/厂商名称"
+        },
+        "hosts": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "development": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https?://(?![^/?#]*@)[^?#]+$",
+              "minLength": 1
+            },
+            "staging": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://(?![^/?#]*@)[^?#]+$",
+              "minLength": 1
+            },
+            "production": {
+              "type": "string",
+              "format": "uri",
+              "pattern": "^https://(?![^/?#]*@)[^?#]+$",
+              "minLength": 1
+            }
+          },
+          "additionalProperties": false
+        },
+        "tls": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "properties": {
+            "staging": {
+              "const": "strict"
+            },
+            "production": {
+              "const": "strict"
+            }
+          },
+          "additionalProperties": false
+        },
+        "testEvidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "developmentOnly": {
+          "type": "boolean",
+          "description": "仅模板仓库的开发演示，不表示 staging/production 可用或通过安全验收。"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "hostPolicy": {
+                "const": "declared"
+              }
+            },
+            "required": [
+              "hostPolicy"
+            ]
+          },
+          "then": {
+            "required": [
+              "hosts",
+              "tls"
+            ],
+            "properties": {
+              "hosts": {
+                "type": "object"
+              },
+              "tls": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "hostPolicy": {
+                "const": "provider_managed"
+              }
+            },
+            "required": [
+              "hostPolicy"
+            ]
+          },
+          "then": {
+            "required": [
+              "hosts",
+              "tls",
+              "provider"
+            ],
+            "properties": {
+              "category": {
+                "const": "platform_sdk"
+              },
+              "dynamicUrlPolicy": {
+                "const": "platform_managed"
+              },
+              "securityPolicy": {
+                "const": "provider_managed"
+              },
+              "hosts": {
+                "type": "null"
+              },
+              "tls": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "developmentOnly": {
+                "const": true
+              }
+            },
+            "required": [
+              "developmentOnly"
+            ]
+          },
+          "then": {
+            "properties": {
+              "securityPolicy": {
+                "const": "development_only"
+              },
+              "hosts": {
+                "properties": {
+                  "staging": false,
+                  "production": false
+                }
+              },
+              "tls": {
+                "properties": {
+                  "staging": false,
+                  "production": false
+                }
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "securityPolicy": {
+                "not": {
+                  "const": "development_only"
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "hostPolicy": {
+                    "const": "declared"
+                  }
+                },
+                "required": [
+                  "hostPolicy"
+                ]
+              },
+              {
+                "properties": {
+                  "developmentOnly": {
+                    "const": true
+                  }
+                },
+                "required": [
+                  "developmentOnly"
+                ]
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "hosts": {
+                "required": [
+                  "development"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "allOf": [
+              {
+                "properties": {
+                  "hostPolicy": {
+                    "const": "declared"
+                  }
+                },
+                "required": [
+                  "hostPolicy"
+                ]
+              },
+              {
+                "not": {
+                  "properties": {
+                    "developmentOnly": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "developmentOnly"
+                  ]
+                }
+              }
+            ]
+          },
+          "then": {
+            "properties": {
+              "hosts": {
+                "required": [
+                  "development",
+                  "staging",
+                  "production"
+                ]
+              },
+              "tls": {
+                "required": [
+                  "staging",
+                  "production"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "hostPolicy": {
+                "const": "runtime_supplied"
+              }
+            },
+            "required": [
+              "hostPolicy"
+            ]
+          },
+          "then": {
+            "required": [
+              "developmentOnly",
+              "hosts",
+              "tls"
+            ],
+            "properties": {
+              "developmentOnly": {
+                "const": true
+              },
+              "dynamicUrlPolicy": {
+                "const": "runtime_supplied"
+              },
+              "hosts": {
+                "type": "null"
+              },
+              "tls": {
+                "type": "null"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "dynamicUrlPolicy": {
+                "const": "runtime_supplied"
+              }
+            },
+            "required": [
+              "dynamicUrlPolicy"
+            ]
+          },
+          "then": {
+            "required": [
+              "developmentOnly"
+            ],
+            "properties": {
+              "developmentOnly": {
+                "const": true
+              }
+            }
+          }
+        }
+      ],
+      "additionalProperties": false
+    },
+    "nativeSecurityException": {
+      "type": "object",
+      "required": [
+        "id",
+        "kind",
+        "path",
+        "sourceSet",
+        "reason",
+        "owner",
+        "approvedBy",
+        "environments",
+        "expiresAt",
+        "evidence",
+        "configSha256"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "kind": {
+          "const": "android_domain_cleartext"
+        },
+        "path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "sourceSet": {
+          "type": "string",
+          "enum": [
+            "debug",
+            "dev",
+            "development",
+            "test",
+            "testing",
+            "local"
+          ],
+          "description": "必须与 path 中 android/.../src/<sourceSet>/ 精确对应"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner": {
+          "type": "string",
+          "minLength": 1
+        },
+        "approvedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "environments": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "enum": [
+              "development",
+              "testing"
+            ]
+          }
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date"
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "configSha256": {
+          "type": "string",
+          "pattern": "^[a-fA-F0-9]{64}$",
+          "description": "批准时原生网络安全配置文件的 SHA-256；配置发生变化后必须重新评审"
+        }
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "description": "validator 进一步检查仓库内路径真实存在；远程证据仅允许 HTTPS URL",
+      "oneOf": [
+        {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://(?![^/?#]*@)[^?#]+$"
+        },
+        {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^(?!https?://)(?!/)(?![A-Za-z]:[\\\\/])(?!.*(?:^|/)\\.\\.(?:/|$)).+"
+        }
+      ]
+    },
+    "nonPlaceholderString": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^(?!.*(?:[Rr][Ee][Pp][Ll][Aa][Cc][Ee]|[Tt][Oo][Dd][Oo]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|<[^>]*>)).+$"
+    },
+    "nonTemplateHost": {
+      "not": {
+        "pattern": "^[Hh][Tt][Tt][Pp][Ss]?://(?:[^/?#@]+\\.)*(?:[Ee][Xx][Aa][Mm][Pp][Ll][Ee]\\.[Cc][Oo][Mm]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]\\.[Nn][Ee][Tt]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee]\\.[Oo][Rr][Gg]|[Ll][Oo][Cc][Aa][Ll][Hh][Oo][Ss][Tt]|[Tt][Ee][Ss][Tt]|[Ii][Nn][Vv][Aa][Ll][Ii][Dd]|[Ee][Xx][Aa][Mm][Pp][Ll][Ee])(?::[0-9]+)?(?:/|$)"
+      }
+    }
+  }
+}

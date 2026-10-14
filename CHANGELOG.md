@@ -1,6 +1,9 @@
 # Changelog
 
 ## Unreleased
+- 恢复并适配网络架构标准和 canonical 网络 Skill；网络与 OpenAPI 保持按需接入，离线生成项目不继承源仓活动出口配置
+- 新增带 provenance 的 Admin OpenAPI 演示、两阶段生成及源码漂移检查，接入网络出口静态门禁与 schema/黑盒回归
+- Native bootstrap 支持共享 bindings 的具名多 Host 和各后端 session-aware 401；生产日志约束覆盖内部调试，公共入口保留 Web no-op 与平台类型边界
 - 技能正文收敛到 `.agents/skills`，删除 `.agent` 与发现适配副本。升级报告不改文件；仍保持基线的 `.agent/**` 会显示上游消失，`.agents/skills/**` 会显示为完整正文，需手工删除旧目录并采用新正文
 - 工作台加入 Native 文件锁与 Web Locks 单写者保护、可取消退出协议及真实进程/浏览器锁回归
 - 新增 run/devices/doctor 子命令和模板继承资产门禁，生成项目使用可发现的启动与平台验收入口

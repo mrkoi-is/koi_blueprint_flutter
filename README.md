@@ -26,6 +26,10 @@ python3 blueprint.py build --app apps/field_notes_app --platforms web
 
 Windows 使用 `py -3 blueprint.py`。平台可选 `web,android,ios,macos,windows,linux`；对应平台的构建需要合适主机和 SDK。`--dry-run` 用于检查计划，生成成功不代表所有平台都构建通过。完整说明见 [创建项目](docs/new-project.md)。
 
+## 可选网络接入
+
+网络标准见 [网络架构契约](docs/architecture/NETWORK_ARCHITECTURE_STANDARD.md)。源仓提供本地 OpenAPI → 生成 API → Native Koi Client → Domain Gateway 的示例，保留主线认证会话和 Web no-op 边界。生成执行 `python3 blueprint.py check generate`，出口与契约检查执行 `python3 blueprint.py check network`；已启用清单的项目会纳入完整 validate。示例不会自动请求真实服务，新建离线项目不会启用源仓的网络清单。
+
 ## 日常开发
 
 ```sh

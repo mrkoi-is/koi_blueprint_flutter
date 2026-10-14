@@ -17,9 +17,12 @@ MIN_PYTHON = (3, 11)
 PLATFORMS = ('web', 'android', 'ios', 'macos', 'windows', 'linux')
 TEMPLATES = {'minimal': 'starter_app', 'workbench': 'workbench_app'}
 # Only current guidance is inherited. New documents require an explicit decision.
-INHERITED_DOCUMENTS = ('docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
+INHERITED_DOCUMENTS = ('docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/NETWORK_ARCHITECTURE_STANDARD.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
 
 REQUIRED_PACKAGES = ('koi_core', 'koi_ui')
+# Network governance is opt-in. A fresh offline project must not inherit the
+# source repository's active service contracts or its example host inventory.
+SOURCE_NETWORK_INPUTS = ('tool/network/egress_manifest.json', 'tool/openapi/PROVENANCE.json')
 IGNORED = shutil.ignore_patterns('.dart_tool', 'build', 'coverage', '.fvm', '__pycache__', '*.g.dart', '*.freezed.dart', '*.pyc', '.flutter-plugins*', '.git', 'Pods', 'ephemeral', '.symlinks', '.swiftpm', '.DS_Store')
 RESERVED = set('abstract as assert async augment await base break case catch class const continue covariant default deferred do dynamic else enum export extends extension external factory false final finally for Function get hide if implements import in interface is late library mixin native new null of on operator part required rethrow return sealed set show static super switch sync this throw true try type typedef var void when while with yield dart flutter test con prn aux nul'.split())
 FEATURE_DEPENDENCIES = {
@@ -363,6 +366,12 @@ def workspace_asset_plan(source, project_name, template="minimal", selected=("we
     source = Path(source)
     entries = []
     def add(relative, destination, kind):
+        if relative in SOURCE_NETWORK_INPUTS or (
+            relative.startswith('tool/koi_swagger_parser/')
+            and relative.endswith(('.yaml', '.yml'))
+            and not relative.endswith(('.example.yaml', '.example.yml'))
+        ):
+            return
         file = source / relative
         if file.is_symlink() or any(parent.is_symlink() for parent in file.parents if parent.is_relative_to(source)):
             raise BlueprintError(f'Symlink in template: {file}')
@@ -723,6 +732,57 @@ def coverage(root, sdk, workspace, threshold):
         raise BlueprintError('Coverage below threshold')
 
 
+def openapi_configs(root):
+    directory = root / 'tool/koi_swagger_parser'
+    return sorted(path for path in directory.glob('*')
+                  if path.is_file() and path.suffix in ('.yaml', '.yml')
+                  and not path.name.endswith(('.example.yaml', '.example.yml')))
+
+
+def generated_api_sources(root):
+    # Compare parser-owned source, including new/deleted files. build_runner
+    # parts remain untracked and are rebuilt by the normal generation phase.
+    return {str(path.relative_to(root)): path.read_bytes()
+            for package in (root / 'packages').glob('*_api')
+            for path in (package / 'lib').rglob('*.dart')
+            if not path.name.endswith(('.g.dart', '.freezed.dart'))}
+
+
+def generate_openapi(root, sdk, verify=False):
+    configs = openapi_configs(root)
+    if not configs:
+        return
+    run([sdk.dart, 'run', 'scripts/validate_network_architecture.dart'], root)
+    before = generated_api_sources(root) if verify else None
+    for config in configs:
+        run([sdk.dart, 'run', 'koi_swagger_parser', 'generate', '--all',
+             '--config', config], root)
+    if verify and generated_api_sources(root) != before:
+        raise BlueprintError('Generated OpenAPI source drift; run check generate and review the changes')
+
+
+def check_network(root, sdk):
+    if not (root / 'tool/network/egress_manifest.json').is_file():
+        if openapi_configs(root) or list((root / 'packages').glob('*_api')):
+            raise BlueprintError('Network manifest required for active OpenAPI/API packages')
+        print('Network checks NOT_RUN: no network manifest; network governance is not enabled.')
+        return
+    run([sdk.dart, 'run', 'scripts/validate_network_architecture.dart'], root)
+    # Tooling regression fixtures belong to the source blueprint. Downstream
+    # projects validate their own manifests, not the source example inventory.
+    tests = root / 'scripts/test/validate_network_architecture_test.dart'
+    if tests.is_file() and not (root / 'blueprint.json').is_file():
+        previous = os.environ.get('DART_BIN')
+        os.environ['DART_BIN'] = str(sdk.dart)
+        try:
+            run([sdk.flutter, 'test', '--no-pub', tests], root)
+        finally:
+            if previous is None:
+                os.environ.pop('DART_BIN', None)
+            else:
+                os.environ['DART_BIN'] = previous
+
+
 def check(args):
     root = Path(args.workspace).resolve()
     phase = args.phase
@@ -738,6 +798,7 @@ def check(args):
         return
     workspace = members(root, sdk)
     if phase in ('generate', 'generate-check'):
+        generate_openapi(root, sdk, verify=phase == 'generate-check')
         for member in workspace:
             if (member / 'l10n.yaml').is_file():
                 run([sdk.flutter, 'gen-l10n'], member)
@@ -745,7 +806,8 @@ def check(args):
                 run([sdk.dart, 'run', 'build_runner', 'build'], member)
     elif phase in ('format-check', 'format'):
         flags = ['--output=none', '--set-exit-if-changed'] if phase == 'format-check' else []
-        targets = [str(path.relative_to(root)) for path in (root / 'tool').rglob('*.dart') if '.dart_tool' not in path.parts]
+        targets = [str(path.relative_to(root)) for folder in ('tool', 'scripts')
+                   for path in (root / folder).rglob('*.dart') if '.dart_tool' not in path.parts]
         targets += [str(member.relative_to(root) / sub) for member in workspace for sub in ('lib', 'test', 'integration_test') if (member / sub).exists()]
         run([sdk.dart, 'format', *flags, *targets], root)
     elif phase == 'analyze':
@@ -766,6 +828,8 @@ def check(args):
                 run([sdk.flutter, 'test', '--no-pub', '--platform', 'chrome', 'test/browser'], member)
     elif phase == 'architecture':
         run([sdk.dart, 'run', 'tool/check_architecture.dart', '--root', root], root)
+    elif phase == 'network':
+        check_network(root, sdk)
     elif phase == 'coverage':
         coverage(root, sdk, workspace, args.coverage_min)
 
@@ -777,7 +841,7 @@ def validate(args):
     run([sdk.flutter, 'pub', 'get', '--enforce-lockfile'], root)
     if not (root / 'blueprint.json').exists():
         check(argparse.Namespace(workspace=str(root), phase='templates'))
-    for phase in ('generate-check', 'format-check', 'architecture', 'ai', 'analyze', 'test', 'browser', 'coverage'):
+    for phase in ('generate-check', 'format-check', 'architecture', 'network', 'ai', 'analyze', 'test', 'browser', 'coverage'):
         check(argparse.Namespace(workspace=str(root), phase=phase, coverage_min=args.coverage_min))
     smoke = root / 'packages/koi_api_bootstrap/test/web_compile_smoke.dart'
     if smoke.exists():
@@ -1057,8 +1121,8 @@ def main(argv=None):
     module_parser.add_argument('--workspace', required=True, help='Destination workspace root')
     module_parser.add_argument('--dry-run', action='store_true', help='Show the plan without writing files or resolving dependencies')
     validate_parser = commands.add_parser('validate', help='Run the complete local quality gate', description='Strict lockfile, source-only templates, generation, format, architecture, AI assets, analysis, tests, active Chrome tests and 80% coverage. Source API Web smoke also requires Node. Platform builds are separate.')
-    check_parser = commands.add_parser('check', help='Run one quality phase', description='bootstrap resolves dependencies; generate and generate-check both rebuild untracked Dart parts (reproducibility, not a read-only drift check). format rewrites; format-check is read-only. browser runs active test/browser tests. templates checks source template assets. Other phases: architecture, ai, analyze, test, coverage.')
-    check_parser.add_argument('phase', choices=['bootstrap', 'generate', 'generate-check', 'format', 'format-check', 'analyze', 'test', 'browser', 'coverage', 'architecture', 'ai', 'templates'], help='Quality phase to run; see descriptions above')
+    check_parser = commands.add_parser('check', help='Run one quality phase', description='bootstrap resolves dependencies; generate and generate-check rebuild OpenAPI sources and untracked Dart parts; generate-check rejects OpenAPI source drift (reproducibility). format rewrites; format-check is read-only. browser runs active test/browser tests. templates checks source template assets. Other phases: architecture, optional network, ai, analyze, test, coverage.')
+    check_parser.add_argument('phase', choices=['bootstrap', 'generate', 'generate-check', 'format', 'format-check', 'analyze', 'test', 'browser', 'coverage', 'architecture', 'network', 'ai', 'templates'], help='Quality phase to run; see descriptions above')
     for item in (validate_parser, check_parser):
         item.add_argument('--workspace', default=str(ROOT), help='Workspace root (default: directory containing blueprint.py)')
         item.add_argument('--coverage-min', type=float, default=80, help='Minimum handwritten line coverage percentage (default: 80)')

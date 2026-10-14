@@ -15,7 +15,7 @@
 | `python3 blueprint.py run --app PATH --device ID` | 使用固定 SDK 启动活动成员；先用 `devices` 获取 ID |
 | `python3 blueprint.py devices` | 列出设备 |
 | `python3 blueprint.py doctor --purpose run` | SDK、profile 打包工具与版本、已装能力依赖、App 动态库实际加载、Web 资产摘要；`--purpose validate` 另检查活动测试需要的 Chrome/Node |
-| `python3 blueprint.py validate` | 严格锁文件、源仓模板资产、生成、格式、架构、AI、分析、测试、浏览器与覆盖率；目标构建另做 |
+| `python3 blueprint.py validate` | 严格锁文件、源仓模板资产、生成、格式、架构、按配置启用的网络门禁、AI、分析、测试、浏览器与覆盖率；目标构建另做 |
 | `python3 blueprint.py build --app PATH --platforms web,macos` | 为选定平台创建默认 `<platform>-release` profile 构建清单；要求已生成 runner 和匹配工具链 |
 | `python3 blueprint.py build --app PATH --profile NAME` | 读取生成元数据中的 buildProfiles；与 platforms 互斥；Apple 目标先准备原生依赖再冻结身份，记录源码、lock、profile、实际架构与产物摘要 |
 | `python3 blueprint.py package --app PATH --profile NAME` | 只打包输入仍匹配的成功构建；支持 Web zip、Android apk、iOS app、macOS dmg、Windows exe、Linux deb/AppImage；不安装或发布 |
@@ -40,14 +40,17 @@ doctor 的 JSON 区分工具 AVAILABLE、能力依赖 MATCH、库 LOADABLE、Web
 | `check` phase / Make 目标 | 行为 |
 | --- | --- |
 | `bootstrap` | 严格锁文件解析 |
-| `generate`、`generate-check` | 两者都重建未入库的 Dart part；检验生成能完整运行，会写生成文件，不是只读 drift 检查 |
+| `generate`、`generate-check` | 有活动 OpenAPI 配置时先生成客户端，再重建 Dart part；generate-check 另比较 parser 普通 Dart 源码前后字节，漂移失败。两者都会写文件 |
 | `format`、`format-check` | 前者修正格式，后者只读检查 |
 | `architecture`、`ai` | AST 架构边界；AI 资产、引用、维护文档可发现性 |
+| `network` | 有出口清单时执行静态 validator；源仓另执行 schema 与黑盒回归。无清单且无活动 OpenAPI/API 包时 NOT_RUN；有生成输入却无清单时失败 |
 | `templates` | 两种模板的继承资产投影，排除源仓历史后检查链接；源仓 validate 自动执行 |
 | `analyze`、`test`、`browser` | fatal-infos 分析；成员及工具测试；活动成员 test/browser 的真实 Chrome 测试 |
 | `coverage` | 合并手写覆盖率，未采集可执行源码按零命中计入；默认 80% |
 
 `make validate` 与 `make precommit` 都运行完整 validate。Melos 包装见 [MELOS_USAGE.md](../MELOS_USAGE.md)。
+
+网络输入、出口治理和静态检查限制见 [网络标准](architecture/NETWORK_ARCHITECTURE_STANDARD.md)。生成项目继承工具、schema 与示例，但不把蓝图的活动出口、provenance 或 parser 配置当作本项目配置；网络与 OpenAPI 按需接入。
 
 | 文件 | 用途 |
 | --- | --- |
@@ -65,6 +68,7 @@ doctor 的 JSON 区分工具 AVAILABLE、能力依赖 MATCH、库 LOADABLE、Web
 | [tool/check_template_assets.py](../tool/check_template_assets.py)，`python3 tool/check_template_assets.py` | 无 SDK 的继承资产门禁；blueprint check templates 委托它 |
 | [tool/check_ai_assets.py](../tool/check_ai_assets.py)，`python3 tool/check_ai_assets.py` | AI 资产与引用检查，等价 check ai 的底层入口 |
 | [tool/check_architecture.dart](../tool/check_architecture.dart) / [AST 实现说明](../tool/architecture/README.md) | 架构检查底层入口，通常用 check architecture |
+| [scripts/validate_network_architecture.dart](../scripts/validate_network_architecture.dart) | 出口清单、网络依赖与安全静态扫描、OpenAPI 来源/配置/输出检查；通常用 check network |
 | [tool/check_coverage_sources.dart](../tool/check_coverage_sources.dart)、[tool/include_browser_coverage.dart](../tool/include_browser_coverage.dart) | coverage 内部审计：遗漏源码、浏览器零命中行；通过 check coverage 使用 |
 | [tool/blueprint_config.py](../tool/blueprint_config.py)、[能力目录](../tool/capabilities/catalog.json) | JSON 输入、平台/profile 约束、内置能力依赖与受测配方来源；不根据任意远程地址安装 |
 | [tool/blueprint_capabilities.py](../tool/blueprint_capabilities.py)、[tool/blueprint_provenance.py](../tool/blueprint_provenance.py) | 安装计划/事务、文件所有权与来源基线、只读三方升级报告；通过主 CLI 使用 |

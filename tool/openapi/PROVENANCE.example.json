@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "contracts": [
+    {
+      "id": "main",
+      "authority": "server",
+      "sourceUrl": "https://api.example.com/swagger.json",
+      "fetchedAt": "YYYY-MM-DDTHH:mm:ssZ",
+      "sourceFile": "tool/openapi/main.openapi.json",
+      "sourceSha256": "replace-with-sha256",
+      "overlayFile": null,
+      "overlaySha256": null,
+      "overlayPurpose": null,
+      "overlayOwner": null,
+      "overlayRemovalCriteria": null,
+      "compatibilityReason": null,
+      "compatibilityOwner": null,
+      "compatibilityRemoveWhen": null,
+      "parser": "koi_swagger_parser",
+      "parserVersion": "replace-with-version",
+      "configFile": "tool/koi_swagger_parser/main.yaml",
+      "configSha256": "replace-with-sha256",
+      "generationCommand": "dart run koi_swagger_parser generate --all --config tool/koi_swagger_parser/main.yaml",
+      "outputPackage": "packages/<project>_main_api"
+    }
+  ]
+}
