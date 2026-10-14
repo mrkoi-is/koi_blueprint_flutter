@@ -6,6 +6,11 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    ignore:
+      # Flutter 3.47.2: 18.0.2 shell semantics asserts on adaptive reparenting.
+      # workspace_presentation_test.dart reproduces it; 18.0.1 passes all 17 cases.
+      - dependency-name: go_router
+        versions: ["18.0.2"]
     groups:
       codegen-stack:
         patterns:

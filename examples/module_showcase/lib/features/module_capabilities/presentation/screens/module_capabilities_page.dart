@@ -1,49 +1,27 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
+
 import 'dart:async';
+
+import 'package:koi_core/koi_core.dart' show CapabilityStatus;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:koi_core/koi_core.dart';
-import 'package:module_showcase/features/module_capabilities/application/analysis_session.dart';
-import 'package:module_showcase/features/module_capabilities/domain/text_analysis.dart';
 import 'package:module_showcase/features/module_capabilities/presentation/providers/analysis_providers.dart';
 import 'package:module_showcase/l10n/generated/app_localizations.dart';
 
 Widget buildModuleCapabilitiesPage(BuildContext context) =>
     const ModuleCapabilitiesPage();
 
-class ModuleCapabilitiesPage extends StatefulWidget {
+class ModuleCapabilitiesPage extends StatelessWidget {
   const ModuleCapabilitiesPage({super.key});
   @override
-  State<ModuleCapabilitiesPage> createState() => _ModuleCapabilitiesPageState();
-}
-
-class _ModuleCapabilitiesPageState extends State<ModuleCapabilitiesPage> {
-  final _session = AnalysisSession();
-  late final void Function() _unregister;
-  @override
-  void initState() {
-    super.initState();
-    _unregister = CapabilityLifecycle.instance.register(
-      prepare: () async => true,
-      close: _session.close,
-    );
-    unawaited(_session.activate('words'));
-  }
-
-  @override
-  void dispose() {
-    _unregister();
-    unawaited(_session.close());
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) => ProviderScope(
-    overrides: [analysisSessionProvider.overrideWithValue(_session)],
+    overrides: [analysisSessionProvider.overrideWith(analysisSession)],
     child: const _AnalysisPage(),
   );
 }
 
+@Dependencies([AnalysisCommands, analysisSession, analysisState])
 class _AnalysisPage extends ConsumerStatefulWidget {
   const _AnalysisPage();
   @override
@@ -52,28 +30,19 @@ class _AnalysisPage extends ConsumerStatefulWidget {
 
 class _AnalysisPageState extends ConsumerState<_AnalysisPage> {
   final _text = TextEditingController(text: 'One shared contract');
-  TextAnalysis? _result;
-  Object? _error;
+  AnalysisCommands get _commands => ref.read(analysisCommandsProvider.notifier);
   @override
   void dispose() {
     _text.dispose();
     super.dispose();
   }
 
-  Future<void> _run(Future<void> Function() action) async {
-    setState(() => _error = null);
-    try {
-      await action();
-    } catch (error) {
-      if (mounted) {
-        setState(() => _error = error);
-      }
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context)!;
+    final draft = ref.watch(analysisCommandsProvider);
+    final result = draft.result;
+    final error = draft.error;
     final owner = ref.watch(analysisSessionProvider);
     final state = ref.watch(analysisStateProvider).value ?? owner.runtime.state;
     return Scaffold(
@@ -91,18 +60,12 @@ class _AnalysisPageState extends ConsumerState<_AnalysisPage> {
           SwitchListTile(
             title: Text(strings.moduleCapabilitiesEnableCharacters),
             value: owner.charactersEnabled,
-            onChanged: (enabled) => _run(() async {
-              setState(() => owner.charactersEnabled = enabled);
-              if (state.session?.moduleId == 'characters') {
-                await owner.activate('characters', restart: true);
-              }
-            }),
+            onChanged: (enabled) => unawaited(_commands.setCharacters(enabled)),
           ),
           CheckboxListTile(
             title: Text(strings.moduleCapabilitiesFailNext),
             value: owner.failNextCreation,
-            onChanged: (value) =>
-                setState(() => owner.failNextCreation = value ?? false),
+            onChanged: (value) => _commands.setFailNext(value ?? false),
           ),
           Wrap(
             spacing: 8,
@@ -111,7 +74,7 @@ class _AnalysisPageState extends ConsumerState<_AnalysisPage> {
                 FilledButton(
                   onPressed: state.isSwitching
                       ? null
-                      : () => _run(() => owner.activate(id, restart: true)),
+                      : () => unawaited(_commands.select(id)),
                   child: Text(
                     id == 'words'
                         ? strings.moduleCapabilitiesWords
@@ -129,10 +92,11 @@ class _AnalysisPageState extends ConsumerState<_AnalysisPage> {
               CapabilityStatus.unsupported =>
                 strings.moduleCapabilitiesUnsupported,
             }),
-          if (_error != null || state.error != null)
-            Text('${_error ?? state.error}'),
+          if (error != null || state.error != null)
+            Text('${error ?? state.error}'),
           TextField(
             controller: _text,
+            onChanged: _commands.setInput,
             decoration: InputDecoration(
               labelText: strings.moduleCapabilitiesInput,
             ),
@@ -142,19 +106,16 @@ class _AnalysisPageState extends ConsumerState<_AnalysisPage> {
           FilledButton(
             onPressed: state.session == null
                 ? null
-                : () => _run(() async {
-                    final result = await owner.analyze(_text.text);
-                    if (mounted) setState(() => _result = result);
-                  }),
+                : () => unawaited(_commands.analyze()),
             child: Text(strings.moduleCapabilitiesRun),
           ),
-          if (_result != null)
+          if (result != null)
             Text(
               strings.moduleCapabilitiesResult(
-                _result!.engine == 'words'
+                result.engine == 'words'
                     ? strings.moduleCapabilitiesWords
                     : strings.moduleCapabilitiesCharacters,
-                _result!.count,
+                result.count,
               ),
             ),
           Text(strings.moduleCapabilitiesClosed(owner.closedEngines)),

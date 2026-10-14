@@ -24,6 +24,20 @@ Workbench 采用单写者：Native 文件锁覆盖当前拥有者 isolate 与其
 
 正常关闭分为可取消准备与不可逆销毁。准备期间阻止新操作、收尾任务，并消费明确的保存结果；失败恢复可编辑会话。成功之后释放 router/provider/媒体/会话/存储。不能把 await 一个吞掉错误的 Future<void> 当成保存成功，也不能在 dispose 后取消退出并继续显示失效会话。
 
+原生退出由宿主 binding 协调：先等待 Flutter 完成本轮所有退出监听器通知，全部允许退出后，再卸载消费 router/provider 的 Widget 子树并释放它们的拥有者。不能在单个监听器内提前卸载，也不能靠注册顺序或延时推测通知完成；否则本轮快照可能继续调用已释放的监听器。保存失败或其他监听器取消时保留页面与资源；重复请求共享进行中的退出。
+
+## Workbench 内部协作者
+
+WorkspaceSession 继续持有唯一 WorkspaceState、通知流、revision、任务和取消登记。WorkspacePersistence 管理保存队列、防抖与存储版本；WorkspaceImportWorkflow 管理选择器、输入源、读取/校验/暂存/提交；WorkspaceThumbnailWorkflow 管理转换、替换和缩略图清理。内部 access 只读当前状态、提交同步变换与请求保存，不从 Feature 公共入口导出，也不缓存另一份可写快照。
+
+缩略图 workflow 登记完整操作 Future，包含补偿与最后的文件清理；直接 storeThumbnail 和图片转换使用同一 drain 合同。关闭不能只等任务状态变为完成，必须等暂存、提交或删除中的实际 IO 结束，宿主才能释放借用的存储。
+
+保存排队后在实际执行时捕获快照；成功仅确认捕获的文档 revision，不能把保存期间的新编辑标记为已保存。取消补偿先持久化引用变化再删除文件；补偿失败保留可恢复内容并报告失败。关闭等待已开始的 IO 与清理；系统选择器的迟到结果仅释放输入，不再写存储。dispose 的重复调用等待同一清理 Future，借用的存储最后由 bootstrap 释放。
+
+新素材或缩略图引用一旦进入共享 Session，就可能被此前排队的保存持久化。不能用当前工作流自己的保存失败推断文件尚未被引用。取消和普通失败都必须先成功保存去引用的补偿，再删除字节；补偿失败保留文件和可恢复引用。回归应交错“已有保存排队、新引用可见、工作流保存失败”，同时覆盖补偿成功与失败。
+
+MediaPreviewSession 保留队列、代次与播放命令，允许 Flutter foundation 的 Listenable/ChangeNotifier 适配。MediaPlayback 不返回 Widget；MediaKit SDK、订阅和 Web 首帧探测位于 data/media，稳定 Video/key 位于 presentation/media。bootstrap 同时注入工厂和借用的展示句柄，关闭按播放器身份清除句柄。相同素材与布局切换不重建播放器，旧播放器和 source 释放结束后再创建下一实例。
+
 ## 桌面 UI
 
 跟随系统主题，颜色使用主题 token；点击、键盘焦点和 hover 有可见反馈。窗口缩小时布局保持可用，长内容可滚动。窗口关闭需保存草稿时由宿主注册生命周期钩子，业务保存由应用层执行。

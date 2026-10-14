@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:feature_lab/features/catalog/catalog.dart';
+import 'package:feature_lab/features/catalog/catalog_composition.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';

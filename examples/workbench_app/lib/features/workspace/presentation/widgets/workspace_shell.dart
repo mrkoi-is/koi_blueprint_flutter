@@ -37,23 +37,17 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
     final appearance = ref.watch(appAppearanceProvider).value;
     final appearanceActions = ref.read(appAppearanceProvider.notifier);
     final commands = WorkbenchCommandScope.of(context);
-    final history = ref.watch(navigationHistoryProvider);
+    final history = ref.watch(navigationHistoryProvider).history;
     final nativeToolbar = WorkbenchWindowInfo.nativeToolbarOf(context);
     final state = ref.watch(
-      workspaceStateProvider.select(
+      workspaceSnapshotProvider.select(
         (value) => (
-          saving: value.value?.saving ?? session.state.saving,
-          error: value.value?.error ?? session.state.error,
-          initialized: value.value?.initialized ?? session.state.initialized,
-          density:
-              value.value?.snapshot.preferences.density ??
-              session.state.snapshot.preferences.density,
-          sidebarWidth:
-              value.value?.snapshot.preferences.sidebarWidth ??
-              session.state.snapshot.preferences.sidebarWidth,
-          detailsWidth:
-              value.value?.snapshot.preferences.detailsWidth ??
-              session.state.snapshot.preferences.detailsWidth,
+          saving: value.saving,
+          error: value.error,
+          initialized: value.initialized,
+          density: value.snapshot.preferences.density,
+          sidebarWidth: value.snapshot.preferences.sidebarWidth,
+          detailsWidth: value.snapshot.preferences.detailsWidth,
         ),
       ),
     );

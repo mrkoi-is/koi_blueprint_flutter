@@ -32,6 +32,6 @@ Page Shortcuts/Actions 连接语义命令；Cmd/Ctrl+O 导入、Cmd/Ctrl+S 保�
 
 使用 [UI Lab](../examples.md) 查看主题、密度、长文本、字号和组件行为；使用 Workbench 查看文本、媒体、待办与真实 IO 任务。样例源码与测试不能替代目标端运行结果。
 
-工作台的 Native 存储、Web IndexedDB/Blob、文件导入和媒体引擎留在 App 的 data/core，通过 bootstrap 注入。domain 只包含模型和端口。导入为副本；Blob URL 只用于当前预览，先关闭播放器再释放 URL。首帧截图失败保留素材并提供重试，不写假缩略图。任务的字节进度来自实际读取/写入，解码阶段使用不确定进度；取消机制与迟到结果隔离分别实现。
+工作台的 Native 存储、Web IndexedDB/Blob 和文件导入留在 App 的 data/core，通过 bootstrap 注入。媒体控制会话放在 feature application，插件适配放在 data，返回 Widget 的媒体画面及句柄放在 presentation；domain 只包含纯模型和端口。导入为副本；Blob URL 只用于当前预览，先关闭播放器再释放 URL。首帧截图失败保留素材并提供重试，不写假缩略图。任务的字节进度来自实际读取/写入，解码阶段使用不确定进度；取消机制与迟到结果隔离分别实现。
 
 目标媒体基线为 JPEG/PNG 与 MP4/H.264 8-bit 4:2:0/AAC-LC。文本、图片、视频默认上限分别为 256 KiB、20 MiB、100 MiB。首次成功预览生成真实视频缩略图；Native/Web 持久化、重开恢复、取消清理、换片释放须独立记录证据。

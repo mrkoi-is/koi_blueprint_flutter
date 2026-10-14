@@ -124,30 +124,35 @@ void main() {
     },
   );
 
-  test(
-    'native ownership excludes another Dart process and releases on close',
-    () async {
-      final flutterRoot = Platform.environment['FLUTTER_ROOT'];
-      expect(
-        flutterRoot,
-        isNotNull,
-        reason: 'Flutter test must expose its selected SDK',
-      );
-      final dart = '$flutterRoot/bin/dart${Platform.isWindows ? '.exe' : ''}';
-      Future<String> probe() async {
-        final result = await Process.run(dart, [
-          'test/support/process_lock_probe.dart',
-          directory.path,
-        ]);
-        expect(result.exitCode, 0, reason: '${result.stderr}');
-        return '${result.stdout}'.trim();
-      }
+  test('native ownership excludes another Dart process and releases on close', () async {
+    final flutterRoot = Platform.environment['FLUTTER_ROOT'];
+    expect(
+      flutterRoot,
+      isNotNull,
+      reason: 'Flutter test must expose its selected SDK',
+    );
+    // Flutter's bin/dart wrapper is dart.bat on Windows. Run the selected
+    // SDK's actual runtime so Process.run works without a shell on every OS.
+    final dart =
+        '$flutterRoot/bin/cache/dart-sdk/bin/dart${Platform.isWindows ? '.exe' : ''}';
+    expect(
+      File(dart).existsSync(),
+      isTrue,
+      reason: 'The selected Flutter SDK must contain its Dart runtime: $dart',
+    );
+    Future<String> probe() async {
+      final result = await Process.run(dart, [
+        'test/support/process_lock_probe.dart',
+        directory.path,
+      ]);
+      expect(result.exitCode, 0, reason: '${result.stderr}');
+      return '${result.stdout}'.trim();
+    }
 
-      expect(await probe(), 'busy');
-      await storage.close();
-      expect(await probe(), 'acquired');
-    },
-  );
+    expect(await probe(), 'busy');
+    await storage.close();
+    expect(await probe(), 'acquired');
+  });
 
   test('conditional factory opens injected native directory and unsupported target is explicit', () async {
     await storage.close();

@@ -1,7 +1,9 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:showcase_beta/src/features/welcome/presentation/providers/beta_providers.dart';
 
+@Dependencies([betaMessage])
 class BetaPage extends ConsumerWidget {
   const BetaPage({super.key, this.details = false, this.onOpenDetails});
 

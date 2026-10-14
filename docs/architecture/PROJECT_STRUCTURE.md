@@ -7,8 +7,9 @@
 | 当前 App 的启动、路由、环境和原生装配 | apps/<app>/lib/core |
 | 单一业务功能 | apps/<app>/lib/features/<feature> |
 | 仅当前 App 复用的组件/工具 | apps/<app>/lib/shared |
-| 具有独立依赖、生命周期、测试的业务模块 | modules/<module> |
+| 具有独立依赖、生命周期、测试的业务模块 | 按需放在某个宿主旁，例如 `examples/module_showcase/modules/{alpha,beta}` 与 `examples/minimal_module`。仓库根没有 `modules/`。App 使用 `lib/features`；package 与 module 使用 `lib/src/features`。 |
 | 稳定跨 App 共享能力 | packages/<package> |
+| 壳层组合 | `lib/shell` 可以组合 feature 页面。`lib/shell/coordinators` 只依赖 domain 或 application，不导入 presentation。 |
 
 Feature 根据职责拥有 `domain / data / application / presentation` 中所需的目录。`data` 负责 IO，`application` 负责业务状态和编排，可以同时存在。纯展示页不创建空的数据/领域层。Feature provider 统一放 `presentation/providers/`，展示 ViewModel 放 `presentation/models/`。
 
@@ -26,3 +27,9 @@ App 提交目标平台源码，生成物与构建产物保持忽略。新增平�
 4. 需要对照时可放 `legacy/`，不参与当前编译；删除旧代码前核对调用与迁移证据。
 
 不复制其他业务项目的账号、平台标识、路径、业务术语或历史依赖覆盖。迁移和新建是不同任务，技能应识别二者。
+
+## 生成布局与入口
+
+Feature 生成器沿用已经存在的 `lib/features` 或 `lib/src/features`；同时存在时拒绝生成。无既有根目录时 App 默认前者，package/module 默认后者。minimal_module 等样例通过现有模块根入口和 src/module.dart 识别，不增加包类型清单。测试统一位于 `test/features`，源码、测试导入、dry-run 与提示由同一布局解析结果驱动。
+
+API/local 的业务入口为 `<feature>.dart`，装配入口为 `<feature>_composition.dart`。宿主消费 module 时只用模块根入口，内部 Feature 文件可以互相引用本模块职责；本轮不增加全面禁止跨 Feature provider 引用的门禁。

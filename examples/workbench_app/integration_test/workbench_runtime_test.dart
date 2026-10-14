@@ -17,17 +17,27 @@ import 'support/tracking_storage.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
 
   testWidgets('real content, image, Player, screenshots and reopening smoke', (
     tester,
   ) async {
+    debugPrint('KOI_RUNTIME_STAGE initialize');
+    MediaKit.ensureInitialized();
     final sandbox = await createRuntimeSandbox();
     final input = FixtureImportPort();
+    const audioOutput = String.fromEnvironment('KOI_TEST_NATIVE_AUDIO_OUTPUT');
+    const hardwareDecoder = String.fromEnvironment('KOI_TEST_NATIVE_HWDEC');
     WorkbenchBootstrap? owned;
     final evidence = <String, Object?>{
       'storage': sandbox.description,
       'file_picker': 'NOT_EXERCISED_fixture_adapter',
+      'native_audio_output': audioOutput.isEmpty
+          ? 'system_default'
+          : audioOutput,
+      'speaker_output': 'NOT_EXERCISED',
+      'native_hardware_decoder': hardwareDecoder.isEmpty
+          ? 'adapter_default'
+          : hardwareDecoder,
     };
     binding.reportData = evidence;
     try {
@@ -35,6 +45,8 @@ void main() {
       final bootstrap = await WorkbenchBootstrap.create(
         openStorage: () async => storage,
         fileImportPort: input,
+        nativeAudioOutput: audioOutput.isEmpty ? null : audioOutput,
+        nativeHardwareDecoder: hardwareDecoder.isEmpty ? null : hardwareDecoder,
         initialLocation: '/media',
       );
       owned = bootstrap;
@@ -64,6 +76,7 @@ void main() {
         (count, source) => count + source.byteLength,
       );
 
+      debugPrint('KOI_RUNTIME_STAGE images');
       final image = session.state.snapshot.assets.first;
       session.updatePreferences(
         session.state.snapshot.preferences.copyWith(selectedAssetId: image.id),
@@ -153,6 +166,7 @@ void main() {
       final videoEvidence = <Map<String, Object?>>[];
       evidence['videos'] = videoEvidence;
       for (final name in ['landscape.mp4', 'portrait.mp4']) {
+        debugPrint('KOI_RUNTIME_STAGE video $name');
         final asset = session.state.snapshot.assets.singleWhere(
           (value) => value.name == name,
         );
@@ -291,9 +305,12 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await bootstrap.disposeAsync();
       owned = null;
+      debugPrint('KOI_RUNTIME_STAGE reopen');
       final reopened = await WorkbenchBootstrap.create(
         openStorage: sandbox.open,
         fileImportPort: FixtureImportPort(),
+        nativeAudioOutput: audioOutput.isEmpty ? null : audioOutput,
+        nativeHardwareDecoder: hardwareDecoder.isEmpty ? null : hardwareDecoder,
       );
       owned = reopened;
       expect(reopened.session.state.snapshot, expectedSnapshot);

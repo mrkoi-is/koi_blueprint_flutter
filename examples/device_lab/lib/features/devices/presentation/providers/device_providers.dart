@@ -4,10 +4,11 @@ import 'package:device_lab/features/devices/application/device_lab_session.dart'
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'device_providers.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: true, dependencies: [])
 DeviceLabSession deviceSession(Ref ref) =>
     throw UnimplementedError('Bootstrap owns and injects the device session');
-@riverpod
+
+@Riverpod(dependencies: [deviceSession])
 Stream<DeviceLabSnapshot> deviceState(Ref ref) {
   final session = ref.watch(deviceSessionProvider);
   final events = StreamController<DeviceLabSnapshot>();
