@@ -21,10 +21,23 @@ class OpenApiCheckoutTests(unittest.TestCase):
         for contract in provenance['contracts']:
             expected[contract['sourceFile']] = contract['sourceSha256']
             expected[contract['configFile']] = contract['configSha256']
+            for source in (ROOT / contract['outputPackage'] / 'lib').rglob('*.dart'):
+                if not source.name.endswith(('.g.dart', '.freezed.dart')):
+                    expected[source.relative_to(ROOT).as_posix()] = hashlib.sha256(source.read_bytes()).hexdigest()
+        attributes = set()
+        for relative in expected:
+            parent = (ROOT / relative).parent
+            while parent.is_relative_to(ROOT):
+                attribute = parent / '.gitattributes'
+                if attribute.is_file():
+                    attributes.add(attribute.relative_to(ROOT).as_posix())
+                if parent == ROOT:
+                    break
+                parent = parent.parent
         with tempfile.TemporaryDirectory() as temporary:
             checkout = Path(temporary)
             copied = []
-            for relative in [*expected, 'tool/openapi/.gitattributes', 'tool/koi_swagger_parser/.gitattributes']:
+            for relative in [*expected, *sorted(attributes)]:
                 target = checkout / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(ROOT / relative, target)
