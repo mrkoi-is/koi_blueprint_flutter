@@ -120,12 +120,22 @@ jobs:
       - name: Build native platforms and web
         run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" build --app "${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app" --platforms "${{ matrix.platforms }}"
 
-      - name: Run real native media and storage smoke on macOS
+      - name: Check macOS native video rendering capability
+        id: macos-media
         if: matrix.template == 'workbench' && runner.os == 'macOS'
+        run: |
+          set -o pipefail
+          swift tool/macos_media_preflight.swift | tee "$RUNNER_TEMP/macos-media-capability.txt" >> "$GITHUB_OUTPUT"
+          if ! rg -q '^available=true$' "$RUNNER_TEMP/macos-media-capability.txt"; then
+            echo 'macOS native media runtime: NOT_RUN. This host cannot create the OpenGL context required by media_kit_video; use a graphics-capable Mac. Native builds and generated-workspace checks still run.' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Run real native media and storage smoke on macOS
+        if: matrix.template == 'workbench' && runner.os == 'macOS' && steps.macos-media.outputs.available == 'true'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          flutter test --no-pub --verbose --reporter expanded --file-reporter json:native-runtime-tests.json -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
 
       - name: Run real native media and storage smoke on Windows
         if: matrix.template == 'workbench' && runner.os == 'Windows'
@@ -133,6 +143,15 @@ jobs:
         run: |
           flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Configure virtual audio for Linux runtime
+        if: matrix.template == 'workbench' && runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y pulseaudio pulseaudio-utils
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=koi_ci
+          pactl set-default-sink koi_ci
+          pactl info
 
       - name: Run real native media and storage smoke on Linux
         if: matrix.template == 'workbench' && runner.os == 'Linux'
@@ -155,14 +174,26 @@ jobs:
         if: always() && matrix.template == 'workbench' && runner.os == 'macOS'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
+          /usr/bin/log show --last 10m --style compact --predicate 'process == "ci_blueprint_app"' > native-system.log || true
           python - <<'PY'
           import json
           from pathlib import Path
           import shutil
-          reports = Path.home() / 'Library/Logs/DiagnosticReports'
+          import time
+          reports = [Path.home() / 'Library/Logs/DiagnosticReports',
+                     Path('/Library/Logs/DiagnosticReports')]
           target = Path('build/runtime-crashes')
           target.mkdir(parents=True, exist_ok=True)
-          for report in reports.glob('ci_blueprint_app*'):
+          matches = []
+          for attempt in range(10):
+              matches = [path for directory in reports
+                         for pattern in ('ci_blueprint_app*', 'Ci Blueprint*', 'Runner*')
+                         for path in directory.glob(pattern) if path.is_file()]
+              if matches or '${{ job.status }}' == 'success':
+                  break
+              time.sleep(1)
+          print(f'Native crash reports captured: {len(matches)}')
+          for report in matches:
               if report.is_file():
                   shutil.copy2(report, target / report.name)
                   contents = report.read_text(encoding='utf-8', errors='replace')
@@ -186,8 +217,10 @@ jobs:
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/integration_response_data.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-system.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-tests.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/runtime-crashes
+            ${{ runner.temp }}/macos-media-capability.txt
           if-no-files-found: ignore
 
       - name: Preserve platform provenance and build artifacts

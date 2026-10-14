@@ -33,6 +33,12 @@ python3 blueprint.py build --app apps/acceptance_app --platforms web,macos
 
 运行集成fixture测试：在App目录用同一固定SDK执行 `flutter test --no-pub -d <设备ID> integration_test/workbench_runtime_test.dart`。它验证真实存储和媒体，但选择文件由fixture替代。
 
+macOS 原生视频运行还需要 `media_kit_video` 可创建的 OpenGL 像素格式和上下文。CI 先执行 `swift tool/macos_media_preflight.swift`；缺少该图形能力的托管 runner 将运行验收明确记录为 `NOT_RUN`，继续执行生成、完整门禁和原生构建。此记录不等于运行通过，也不改变 macOS 能力适用性；图形能力可用时仍执行原有真实媒体测试。
+
+2026-10-14 的 PR #16 验证中，macOS 托管 ARM runner 的系统日志记录 `media_kit_video/OpenGLHelpers.swift:25` 空像素格式崩溃，原失败保留在 [诊断运行](https://github.com/mrkoi-is/koi_blueprint_flutter/actions/runs/38512832265)。同日使用 Flutter 3.47.2 在本机 ARM Mac 的隔离生成工程完成 macOS 构建后，默认渲染模式的真实图片、两段视频、像素截图、播放/暂停/seek/音量、缩略图和存储重开测试通过；它不替代 CI runner 的运行结果或人工文件选择验收。
+
+Linux 无物理音频设备的 CI 使用 PulseAudio null sink，仍执行实际 AAC 解码、播放控制和视频像素验收。播放器在 Linux 使用 libmpv 支持的 `auto-safe` 硬件解码名单并保留软件回退，避免旧版 `auto` 尝试实验解码器时把中间错误暴露为预览失败。
+
 Web：使用匹配浏览器版本的ChromeDriver或SafariDriver，按照workbench README的drive入口运行。Safari另需已开启远程自动化及可用SafariDriver；缺少时记NOT_RUN，不自动修改用户系统设置。Chrome测试结果不能替代Safari结果。
 
 ## 人工流程

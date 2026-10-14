@@ -11,7 +11,16 @@ import 'package:workbench_app/features/workspace/data/media/capture_video_frame.
 /// it by player identity after all SDK cleanup has been attempted.
 final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
   MediaKitPlayback({this._onClosed}) {
-    _video = VideoController(_player);
+    _video = VideoController(
+      _player,
+      configuration: VideoControllerConfiguration(
+        // Older Linux libmpv versions treat `auto` as every decoder, including
+        // experimental devices. Keep supported acceleration and CPU fallback.
+        hwdec: defaultTargetPlatform == TargetPlatform.linux
+            ? 'auto-safe'
+            : null,
+      ),
+    );
     _frameGate = MediaFrameGate(_player);
     _subscriptions.add(
       _player.stream.position.listen((_) => notifyListeners()),
