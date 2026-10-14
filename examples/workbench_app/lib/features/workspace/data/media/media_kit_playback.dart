@@ -11,15 +11,22 @@ import 'package:workbench_app/features/workspace/data/media/native_audio_output.
 /// SDK adaptation only. Bootstrap supplies the presentation surface and removes
 /// it by player identity after all SDK cleanup has been attempted.
 final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
-  MediaKitPlayback({this._onClosed, this._nativeAudioOutput}) {
+  MediaKitPlayback({
+    this._onClosed,
+    this._nativeAudioOutput,
+    String? nativeHardwareDecoder,
+  }) {
     _video = VideoController(
       _player,
       configuration: VideoControllerConfiguration(
         // Older Linux libmpv versions treat `auto` as every decoder, including
         // experimental devices. Keep supported acceleration and CPU fallback.
-        hwdec: defaultTargetPlatform == TargetPlatform.linux
-            ? 'auto-safe'
-            : null,
+        hwdec:
+            nativeHardwareDecoder ??
+            (defaultTargetPlatform == TargetPlatform.linux ||
+                    defaultTargetPlatform == TargetPlatform.windows
+                ? 'auto-safe'
+                : null),
       ),
     );
     _frameGate = MediaFrameGate(_player);

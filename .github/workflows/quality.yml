@@ -173,7 +173,7 @@ jobs:
         if: matrix.template == 'workbench' && runner.os == 'Windows'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
-          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json --dart-define=KOI_TEST_NATIVE_AUDIO_OUTPUT=null -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
+          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json --dart-define=KOI_TEST_NATIVE_AUDIO_OUTPUT=null --dart-define=KOI_TEST_NATIVE_HWDEC=no -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Configure virtual audio for Linux runtime

@@ -53,6 +53,7 @@ final class WorkbenchBootstrap {
     FileImportPort? fileImportPort,
     MediaPlaybackFactory? createPlayback,
     String? nativeAudioOutput,
+    String? nativeHardwareDecoder,
     Future<Uint8List> Function(Uint8List)? encodeThumbnail,
     String? initialLocation,
     Future<UiPreferencesStore> Function()? openPreferences,
@@ -87,6 +88,7 @@ final class WorkbenchBootstrap {
         player = MediaKitPlayback(
           onClosed: () => surfaces.clear(player),
           nativeAudioOutput: nativeAudioOutput,
+          nativeHardwareDecoder: nativeHardwareDecoder,
         );
         surfaces.attach(player, createMediaKitSurface(player.videoController));
         return player;
