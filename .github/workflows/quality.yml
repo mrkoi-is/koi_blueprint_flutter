@@ -28,7 +28,7 @@ jobs:
 
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
 
     steps:
       - name: Check out repository
@@ -125,13 +125,13 @@ jobs:
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          flutter test --no-pub -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
 
       - name: Run real native media and storage smoke on Windows
         if: matrix.template == 'workbench' && runner.os == 'Windows'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
-          flutter test --no-pub -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
+          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Run real native media and storage smoke on Linux
@@ -139,7 +139,7 @@ jobs:
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          xvfb-run -a flutter test --no-pub -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
 
       - name: Run real Chrome media and IndexedDB smoke
         if: matrix.template == 'workbench' && runner.os == 'Linux'
@@ -151,6 +151,32 @@ jobs:
           trap 'kill "$driver_pid" 2>/dev/null || true' EXIT
           flutter drive --no-pub --driver integration_test/support/runtime_driver.dart --target integration_test/workbench_runtime_test.dart -d web-server --headless --driver-port=4444 --web-browser-flag=--autoplay-policy=no-user-gesture-required
 
+      - name: Collect native crash evidence on macOS
+        if: always() && matrix.template == 'workbench' && runner.os == 'macOS'
+        working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import shutil
+          reports = Path.home() / 'Library/Logs/DiagnosticReports'
+          target = Path('build/runtime-crashes')
+          target.mkdir(parents=True, exist_ok=True)
+          for report in reports.glob('ci_blueprint_app*'):
+              if report.is_file():
+                  shutil.copy2(report, target / report.name)
+                  contents = report.read_text(encoding='utf-8', errors='replace')
+                  try:
+                      data = json.loads(contents.split('\n', 1)[-1])
+                      index = data.get('faultingThread')
+                      detail = {key: data.get(key) for key in ('procName', 'exception', 'termination', 'faultingThread')}
+                      if isinstance(index, int):
+                          detail['thread'] = data.get('threads', [])[index]
+                      print(json.dumps(detail, ensure_ascii=False))
+                  except (ValueError, IndexError):
+                      print(contents[:24000])
+          PY
+
       - name: Preserve runtime evidence
         if: always() && matrix.template == 'workbench'
         uses: actions/upload-artifact@v4
@@ -160,6 +186,8 @@ jobs:
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/integration_response_data.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-tests.json
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/runtime-crashes
           if-no-files-found: ignore
 
       - name: Preserve platform provenance and build artifacts

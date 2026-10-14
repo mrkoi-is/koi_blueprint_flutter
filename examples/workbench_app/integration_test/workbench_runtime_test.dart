@@ -17,11 +17,12 @@ import 'support/tracking_storage.dart';
 
 void main() {
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  MediaKit.ensureInitialized();
 
   testWidgets('real content, image, Player, screenshots and reopening smoke', (
     tester,
   ) async {
+    debugPrint('KOI_RUNTIME_STAGE initialize');
+    MediaKit.ensureInitialized();
     final sandbox = await createRuntimeSandbox();
     final input = FixtureImportPort();
     WorkbenchBootstrap? owned;
@@ -64,6 +65,7 @@ void main() {
         (count, source) => count + source.byteLength,
       );
 
+      debugPrint('KOI_RUNTIME_STAGE images');
       final image = session.state.snapshot.assets.first;
       session.updatePreferences(
         session.state.snapshot.preferences.copyWith(selectedAssetId: image.id),
@@ -153,6 +155,7 @@ void main() {
       final videoEvidence = <Map<String, Object?>>[];
       evidence['videos'] = videoEvidence;
       for (final name in ['landscape.mp4', 'portrait.mp4']) {
+        debugPrint('KOI_RUNTIME_STAGE video $name');
         final asset = session.state.snapshot.assets.singleWhere(
           (value) => value.name == name,
         );
@@ -291,6 +294,7 @@ void main() {
       await tester.pumpWidget(const SizedBox.shrink());
       await bootstrap.disposeAsync();
       owned = null;
+      debugPrint('KOI_RUNTIME_STAGE reopen');
       final reopened = await WorkbenchBootstrap.create(
         openStorage: sandbox.open,
         fileImportPort: FixtureImportPort(),

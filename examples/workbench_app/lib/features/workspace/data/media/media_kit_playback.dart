@@ -5,6 +5,7 @@ import 'package:media_kit/media_kit.dart';
 import 'package:media_kit_video/media_kit_video.dart';
 import 'package:workbench_app/features/workspace/application/media_playback.dart';
 import 'package:workbench_app/features/workspace/data/media/media_frame_gate.dart';
+import 'package:workbench_app/features/workspace/data/media/capture_video_frame.dart';
 
 /// SDK adaptation only. Bootstrap supplies the presentation surface and removes
 /// it by player identity after all SDK cleanup has been attempted.
@@ -48,7 +49,10 @@ final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
   Future<void> get firstFrame =>
       _frameGate.wait(_video.waitUntilFirstFrameRendered);
   @override
-  Future<Uint8List?> screenshot() => _player.screenshot(format: 'image/jpeg');
+  Future<Uint8List?> screenshot() => captureVideoFrame(
+    () => _player.screenshot(format: 'image/jpeg'),
+    isActive: () => _closing == null,
+  );
   @override
   Future<void> play() => _player.play();
   @override
