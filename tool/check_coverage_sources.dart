@@ -19,7 +19,9 @@ void main(List<String> arguments) {
     return;
   }
 
-  final member = Directory(arguments[0]);
+  final memberPath = Directory(arguments[0]).path
+      .replaceAll(r'\', '/')
+      .replaceFirst(RegExp(r'/+$'), '');
   final report = File(arguments[1]);
   final coveredSources = report
       .readAsLinesSync()
@@ -29,25 +31,19 @@ void main(List<String> arguments) {
   final missingExecutableSources = <String>[];
 
   // A workspace member owns only its lib; nested members have their own reports.
-  final library = Directory('${member.path}/lib');
+  final library = Directory('$memberPath/lib');
   if (!library.existsSync()) return;
   for (final entity in library.listSync(recursive: true)) {
     if (entity is! File ||
         !entity.path.endsWith('.dart') ||
-        !entity.path.contains(
-          '${Platform.pathSeparator}lib${Platform.pathSeparator}',
-        ) ||
         entity.path.endsWith('.g.dart') ||
         entity.path.endsWith('.freezed.dart')) {
       continue;
     }
 
-    final memberPath = member.path.endsWith(Platform.pathSeparator)
-        ? member.path
-        : '${member.path}${Platform.pathSeparator}';
     final relativeSource = entity.path
-        .substring(memberPath.length)
-        .replaceAll(Platform.pathSeparator, '/');
+        .replaceAll(r'\', '/')
+        .substring(memberPath.length + 1);
     // Match blueprint.coverage's generated-directory boundary. A generated
     // export may live outside this directory, but contains no executable body.
     if (relativeSource.split('/').contains('generated')) continue;
@@ -55,10 +51,7 @@ void main(List<String> arguments) {
       continue;
     }
 
-    final repositorySource = '${member.path}/$relativeSource'.replaceAll(
-      Platform.pathSeparator,
-      '/',
-    );
+    final repositorySource = '$memberPath/$relativeSource';
     if (_compileOnlySources.contains(repositorySource) ||
         (relativeSource == 'lib/main.dart' &&
             (repositorySource.startsWith('apps/') ||

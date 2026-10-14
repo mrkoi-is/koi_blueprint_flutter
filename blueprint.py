@@ -64,9 +64,29 @@ class SDK:
         # on the selected SDK, even when PATH points at a different installation.
         os.environ['PATH'] = str(self.flutter.parent) + os.pathsep + os.environ.get('PATH', '')
         expected = pinned_flutter_version(root)
-        actual = json.loads(run([self.flutter, '--version', '--machine'], root, capture=True))['frameworkVersion']
+        actual = self._framework_version(root)
         if actual != expected:
             raise BlueprintError(f'Flutter {expected} required, found {actual}')
+
+    def _framework_version(self, root):
+        for attempt in range(2):
+            output = run([self.flutter, '--version', '--machine'], root, capture=True)
+            try:
+                version = json.loads(output)
+            except json.JSONDecodeError as error:
+                # A cold Windows SDK may print pub bootstrap logs before its
+                # machine JSON. Retry once after initialization, without
+                # relaxing JSON parsing or retrying a failed SDK command.
+                if attempt == 0:
+                    continue
+                preview = repr(output[:240])
+                raise BlueprintError(
+                    'Flutter --version --machine returned invalid JSON after one retry; '
+                    f'stdout starts with {preview}'
+                ) from error
+            if not isinstance(version, dict) or not isinstance(version.get('frameworkVersion'), str):
+                raise BlueprintError('Flutter --version --machine JSON is missing a string frameworkVersion')
+            return version['frameworkVersion']
 
 
 def source_root():
@@ -474,6 +494,14 @@ def create(args):
     args.org = choose(args.org, config, 'org')
     if not isinstance(args.org, str) or not re.fullmatch(r'[a-z][a-z0-9]*(?:\.[a-z][a-z0-9]*)+', args.org):
         raise BlueprintError('--org must be a lowercase reverse-DNS organization, e.g. com.example')
+    explicit_display_name = getattr(args, 'display_name', None)
+    configured_display_name = config.get('brand', {}).get('displayName')
+    if explicit_display_name is not None:
+        if not isinstance(explicit_display_name, str) or not explicit_display_name.strip() or len(explicit_display_name) > 80 or any(not c.isprintable() for c in explicit_display_name):
+            raise BlueprintError('--display-name must contain 1–80 printable Unicode characters')
+        if configured_display_name is not None and explicit_display_name != configured_display_name:
+            raise BlueprintError('Conflicting --display-name and configuration brand.displayName')
+        config = {**config, 'brand': {**config.get('brand', {}), 'displayName': explicit_display_name}}
     output = Path(args.output).expanduser().absolute()
     if output.parent.is_symlink():
         raise BlueprintError('Refusing a symlink output parent')
@@ -504,15 +532,20 @@ def create(args):
         # template identifier themselves.
         inputs = stage / '.app-inputs'
         copy(template_source, inputs)
-        replacements = {template_name: f'{name}_app', pascal(template_name): pascal(name) + 'App',
-                        'Starter App' if template == 'minimal' else 'Koi Workbench': pascal(name)}
-        if config.get('brand', {}).get('displayName'):
-            replacements['Starter App' if template == 'minimal' else 'Koi Workbench'] = config['brand']['displayName']
+        brand_display_name = config.get('brand', {}).get('displayName')
+        replacements = {
+            template_name: f'{name}_app',
+            pascal(template_name): pascal(name) + 'App',
+            'Starter App' if template == 'minimal' else 'Koi Workbench': brand_display_name or pascal(name),
+            # A JSON string is also a quoted YAML scalar; preserve punctuation
+            # in the generated pubspec description instead of YAML syntax.
+            'Executable blueprint reference, also used by the generator': json.dumps(
+                f'{brand_display_name or pascal(name)} Flutter application', ensure_ascii=False),
+        }
         if template == 'workbench':
-            brand_name = config.get('brand', {}).get('displayName')
-            replacements['Koi Workspace'] = brand_name or pascal(name)
-            replacements['Koi 工作区'] = brand_name or pascal(name) + ' 工作区'
-            replacements['Koi 工作區'] = brand_name or pascal(name) + ' 工作區'
+            replacements['Koi Workspace'] = brand_display_name or pascal(name)
+            replacements['Koi 工作区'] = brand_display_name or pascal(name) + ' 工作区'
+            replacements['Koi 工作區'] = brand_display_name or pascal(name) + ' 工作區'
         pattern = re.compile('|'.join(re.escape(value) for value in sorted(replacements, key=len, reverse=True)))
         for path in inputs.rglob('*'):
             if path.is_file() and 'assets' not in path.relative_to(inputs).parts and path.suffix in ('.dart', '.yaml', '.md', '.json', '.arb'):
@@ -556,7 +589,7 @@ def create(args):
                                 config=config.get('capabilityOptions'), brand=config.get('brand'),
                                 brand_root=Path(args.config).resolve().parent if args.config else None, fresh=True)
             FileTransaction(stage, plan['changes']).commit()
-        display_name = config.get('brand', {}).get('displayName')
+        display_name = brand_display_name or ' '.join(part.capitalize() for part in name.split('_'))
         if display_name:
             import hashlib
             from tool.blueprint_display_name import plan_display_name
@@ -1098,6 +1131,11 @@ def doctor(args):
 
 
 def main(argv=None):
+    # Windows pipes otherwise use the system code page, which cannot represent
+    # all workspace paths. Keep CLI output consistent with run()'s UTF-8 input.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8', errors='replace')
     if sys.version_info < MIN_PYTHON:
         print('blueprint: Python 3.11 or newer is required; no files were changed', file=sys.stderr)
         return 2
@@ -1107,6 +1145,7 @@ def main(argv=None):
     create_parser.add_argument('name', help='Non-reserved snake_case workspace name')
     create_parser.add_argument('--output', required=True, help='New output directory; existing nonempty targets are rejected')
     create_parser.add_argument('--org', help='Reverse-domain application organization, e.g. com.example')
+    create_parser.add_argument('--display-name', default=None, help='Human-readable application display name across selected platform runners')
     create_parser.add_argument('--platforms', default=None, help='Comma-separated subset: ' + ','.join(PLATFORMS) + ' (default: all)')
     create_parser.add_argument('--template', choices=tuple(TEMPLATES), default=None, help='minimal: simple App; workbench: documents, media and tasks (default: minimal)')
     create_parser.add_argument('--dry-run', action='store_true', help='Show the plan without writing files or resolving dependencies')

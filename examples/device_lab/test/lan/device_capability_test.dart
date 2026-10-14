@@ -1,6 +1,7 @@
 @TestOn('vm')
 library;
 
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:device_lab/capabilities/device_capability.dart';
 import 'package:device_lab/features/devices/presentation/providers/device_providers.dart';
 import 'package:device_lab/features/devices/presentation/screens/device_page.dart';
@@ -11,6 +12,7 @@ import 'package:koi_core/koi_core.dart';
 
 import '../local_setup/native_capability_support.dart';
 
+@Dependencies([deviceSession, deviceState])
 void main() {
   testWidgets(
     'LAN builder retries storage and prepares a real draft without starting network services',

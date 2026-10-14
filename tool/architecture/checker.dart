@@ -27,6 +27,7 @@ const architectureRules = <String, String>{
       'Review widget responsibilities and API when callbacks exceed four.',
   'ARCH012': 'Retired: media parsing belongs to product behavior tests.',
   'ARCH013': 'Shell coordinators must not import presentation.',
+  'ARCH014': 'Async notifier methods assigning state after await must check ref.mounted.',
 };
 
 String normalized(String path) => path.replaceAll(r'\', '/');
@@ -49,12 +50,32 @@ bool _isCommandCallback(
 }
 
 String relativeTo(Directory root, String path) {
-  final base = normalized(root.absolute.path).replaceFirst(RegExp(r'/$'), '');
-  final absolute = normalized(File(path).absolute.path);
-  if (absolute == base) return '.';
-  if (!absolute.startsWith('$base/')) {
+  final relative = relativePathWithin(
+    root.absolute.path,
+    File(path).absolute.path,
+  );
+  if (relative == null) {
     throw FormatException('Path is outside workspace: $path');
   }
+  return relative;
+}
+
+/// Lexical containment using the host's path semantics; no filesystem access.
+/// Windows comparisons ignore case, while the returned relative spelling does not.
+String? relativePathWithin(String root, String path, {bool? windows}) {
+  final isWindows = windows ?? Platform.isWindows;
+  String canonical(String value) => normalized(
+    Uri.file(
+      value,
+      windows: isWindows,
+    ).normalizePath().toFilePath(windows: isWindows),
+  ).replaceFirst(RegExp(r'/+$'), '');
+  final base = canonical(root);
+  final absolute = canonical(path);
+  final comparisonBase = isWindows ? base.toLowerCase() : base;
+  final comparisonPath = isWindows ? absolute.toLowerCase() : absolute;
+  if (comparisonPath == comparisonBase) return '.';
+  if (!comparisonPath.startsWith('$comparisonBase/')) return null;
   return absolute.substring(base.length + 1);
 }
 
@@ -358,7 +379,10 @@ List<ArchitectureIssue> checkWorkspace(
           memberSource.split('/').contains('domain') || member.isPure;
       final presentation = memberSource.contains('presentation/');
       final isPage =
-          presentation && !memberSource.contains('presentation/providers/');
+          (presentation ||
+              (_isFeatureUiPath(memberSource) &&
+                  _containsWidgetOrState(parsed.unit))) &&
+          !memberSource.contains('presentation/providers/');
       final layer = _featureLayer(memberSource);
       for (final directive
           in parsed.unit.directives.whereType<NamespaceDirective>()) {
@@ -490,6 +514,34 @@ String? _featureLayer(String source) {
   return null;
 }
 
+bool _isFeatureUiPath(String source) {
+  final value = normalized(source);
+  final parts = value.split('/');
+  final index = parts.indexOf('features');
+  if (index < 0 || value.endsWith('_capability.dart')) return false;
+  final layer = _featureLayer(value);
+  return !{'data', 'application', 'domain'}.contains(layer) &&
+      !value.contains('presentation/providers/');
+}
+
+const _widgetOrStateSuperclasses = <String>{
+  'StatelessWidget',
+  'StatefulWidget',
+  'ConsumerWidget',
+  'ConsumerStatefulWidget',
+  'HookWidget',
+  'HookConsumerWidget',
+  'State',
+  'ConsumerState',
+};
+
+bool _containsWidgetOrState(CompilationUnit unit) =>
+    unit.declarations.whereType<ClassDeclaration>().any(
+      (decl) => _widgetOrStateSuperclasses.contains(
+        decl.extendsClause?.superclass.name.lexeme,
+      ),
+    );
+
 bool _isShellCoordinator(String memberSource) {
   final value = normalized(memberSource);
   return value.startsWith('shell/coordinators/') ||
@@ -554,10 +606,12 @@ bool _exportsPresentation(
   }
   final resolved = normalized(source.absolute.uri.resolve(uri).toFilePath());
   for (final candidate in members.values) {
-    final prefix =
-        '${normalized(Directory('${root.path}/${candidate.path}/lib').absolute.path)}/';
-    if (resolved.startsWith(prefix)) {
-      return (candidate, resolved.substring(prefix.length));
+    final relative = relativePathWithin(
+      Directory('${root.path}/${candidate.path}/lib').absolute.path,
+      resolved,
+    );
+    if (relative != null && relative != '.') {
+      return (candidate, relative);
     }
   }
   return null;
@@ -684,8 +738,13 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    if (annotated(node.metadata)) {
+    final isAnnotatedNotifier = annotated(node.metadata);
+    if (isAnnotatedNotifier) {
       checkProvider(node, node.namePart.typeName.lexeme);
+    }
+    final superclass = node.extendsClause?.superclass.name.lexeme;
+    if (isAnnotatedNotifier || (superclass?.startsWith(r'_$') ?? false)) {
+      checkAsyncNotifierMounted(node);
     }
     checkPresentationMass(node);
     ioScopes.add({});
@@ -693,6 +752,25 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
       super.visitClassDeclaration(node);
     } finally {
       ioScopes.removeLast();
+    }
+  }
+
+  void checkAsyncNotifierMounted(ClassDeclaration node) {
+    final className = node.namePart.typeName.lexeme;
+    for (final method in node.body.members.whereType<MethodDeclaration>()) {
+      if (method.name.lexeme == 'build' || !method.body.isAsynchronous) {
+        continue;
+      }
+      final inspector = _AsyncStateAssignmentVisitor();
+      method.body.accept(inspector);
+      if (inspector.unsafeAssignments.isNotEmpty) {
+        report(
+          'ARCH014',
+          inspector.unsafeAssignments.first,
+          '$className.${method.name.lexeme}',
+          'Check ref.mounted after await before assigning notifier state',
+        );
+      }
     }
   }
 
@@ -872,8 +950,10 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
   }
 
   void checkPresentationMass(ClassDeclaration node) {
-    if (!normalized(path).contains('/presentation/') ||
-        normalized(path).contains('/presentation/providers/')) {
+    final normalizedPath = normalized(path);
+    if ((!normalizedPath.contains('/presentation/') &&
+            !_isFeatureUiPath(normalizedPath)) ||
+        normalizedPath.contains('/presentation/providers/')) {
       return;
     }
     final superclass = node.extendsClause?.superclass.name.lexeme;
@@ -938,6 +1018,355 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
         );
       }
     }
+  }
+}
+
+final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
+  _AsyncStateAssignmentVisitor({
+    this.pending = false,
+    Set<AssignmentExpression>? unsafeAssignments,
+  }) : unsafeAssignments = unsafeAssignments ?? {};
+
+  // null = unreachable; true = a reachable path has suspended without a guard.
+  // Normal, return and exception paths stay separate until a finally block.
+  bool? pending;
+  bool? returned;
+  bool? thrown;
+  final Set<AssignmentExpression> unsafeAssignments;
+
+  static bool? _join(bool? first, bool? second) => first == null
+      ? second
+      : second == null
+      ? first
+      : first || second;
+
+  _AsyncStateAssignmentVisitor _run(AstNode? node, bool? entry) {
+    final branch = _AsyncStateAssignmentVisitor(
+      pending: entry,
+      unsafeAssignments: unsafeAssignments,
+    );
+    if (entry != null) node?.accept(branch);
+    return branch;
+  }
+
+  void _mergeExits(_AsyncStateAssignmentVisitor branch) {
+    returned = _join(returned, branch.returned);
+    thrown = _join(thrown, branch.thrown);
+  }
+
+  bool _isRef(Expression expression) =>
+      expression is SimpleIdentifier && expression.name == 'ref' ||
+      expression is PropertyAccess &&
+          expression.target is ThisExpression &&
+          expression.propertyName.name == 'ref';
+
+  bool _isMounted(Expression expression) =>
+      expression is PrefixedIdentifier &&
+          expression.prefix.name == 'ref' &&
+          expression.identifier.name == 'mounted' ||
+      expression is PropertyAccess &&
+          expression.target != null &&
+          _isRef(expression.target!) &&
+          expression.propertyName.name == 'mounted';
+
+  // Facts belong to the evaluated branch, never to a mere read of ref.mounted.
+  (bool?, bool?) _condition(Expression condition, bool? entry) {
+    if (entry == null) return (null, null);
+    if (condition is ParenthesizedExpression) {
+      return _condition(condition.expression, entry);
+    }
+    if (_isMounted(condition)) return (false, entry);
+    if (condition is BooleanLiteral) {
+      return condition.value ? (entry, null) : (null, entry);
+    }
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      final (yes, no) = _condition(condition.operand, entry);
+      return (no, yes);
+    }
+    if (condition is BinaryExpression) {
+      final operator = condition.operator.lexeme;
+      if (operator == '&&' || operator == '||') {
+        final (leftYes, leftNo) = _condition(condition.leftOperand, entry);
+        final (rightYes, rightNo) = _condition(
+          condition.rightOperand,
+          operator == '&&' ? leftYes : leftNo,
+        );
+        return operator == '&&'
+            ? (rightYes, _join(leftNo, rightNo))
+            : (_join(leftYes, rightYes), rightNo);
+      }
+    }
+    final evaluated = _run(condition, entry);
+    _mergeExits(evaluated);
+    return (evaluated.pending, evaluated.pending);
+  }
+
+  @override
+  void visitBlock(Block node) {
+    for (final statement in node.statements) {
+      if (pending == null) break;
+      statement.accept(this);
+    }
+  }
+
+  void _mayThrow() => thrown = _join(thrown, pending);
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    super.visitMethodInvocation(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    super.visitFunctionExpressionInvocation(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    super.visitInstanceCreationExpression(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (_isMounted(node)) return;
+    super.visitPropertyAccess(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (_isMounted(node)) return;
+    super.visitPrefixedIdentifier(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    super.visitIndexExpression(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitAsExpression(AsExpression node) {
+    super.visitAsExpression(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    super.visitPostfixExpression(node);
+    // Both a failed null assertion and an overloaded update can throw.
+    _mayThrow();
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    super.visitPrefixExpression(node);
+    // Boolean negation itself is not an overloaded operation. Its operand's
+    // effects are visited, while _condition preserves mounted guard facts.
+    if (node.operator.lexeme != '!') _mayThrow();
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {}
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {}
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    final bool? yes;
+    final bool? no;
+    if (node.caseClause == null) {
+      (yes, no) = _condition(node.expression, pending);
+    } else {
+      // Matching a boolean against a pattern is not a truthiness test.
+      final evaluated = _run(node.expression, pending);
+      node.caseClause!.accept(evaluated);
+      _mergeExits(evaluated);
+      yes = no = evaluated.pending;
+    }
+    final thenBranch = _run(node.thenStatement, yes);
+    final elseBranch = _run(node.elseStatement, no);
+    _mergeExits(thenBranch);
+    _mergeExits(elseBranch);
+    pending = _join(thenBranch.pending, elseBranch.pending);
+  }
+
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    final (yes, no) = _condition(node.condition, pending);
+    final thenBranch = _run(node.thenExpression, yes);
+    final elseBranch = _run(node.elseExpression, no);
+    _mergeExits(thenBranch);
+    _mergeExits(elseBranch);
+    pending = _join(thenBranch.pending, elseBranch.pending);
+  }
+
+  @override
+  void visitSwitchStatement(SwitchStatement node) {
+    node.expression.accept(this);
+    final entry = pending;
+    // Keep the unmatched path conservatively, including pattern switches.
+    var normal = entry;
+    for (final member in node.members) {
+      final branch = _run(member, entry);
+      _mergeExits(branch);
+      normal = _join(normal, branch.pending);
+    }
+    pending = normal;
+  }
+
+  @override
+  void visitSwitchExpression(SwitchExpression node) {
+    node.expression.accept(this);
+    final entry = pending;
+    var normal = entry;
+    for (final arm in node.cases) {
+      final branch = _run(arm, entry);
+      _mergeExits(branch);
+      normal = _join(normal, branch.pending);
+    }
+    pending = normal;
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    if ({'&&', '||'}.contains(node.operator.lexeme)) {
+      final (yes, no) = _condition(node, pending);
+      pending = _join(yes, no);
+    } else {
+      super.visitBinaryExpression(node);
+      // Arithmetic, comparison and equality can throw or call user operators.
+      // Null coalescing only contributes the effects of its operands.
+      if (node.operator.lexeme != '??') _mayThrow();
+    }
+  }
+
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    node.expression?.accept(this);
+    returned = _join(returned, pending);
+    pending = null;
+  }
+
+  @override
+  void visitThrowExpression(ThrowExpression node) {
+    node.expression.accept(this);
+    thrown = _join(thrown, pending);
+    pending = null;
+  }
+
+  @override
+  void visitRethrowExpression(RethrowExpression node) {
+    thrown = _join(thrown, pending);
+    pending = null;
+  }
+
+  @override
+  void visitTryStatement(TryStatement node) {
+    final body = _run(node.body, pending);
+    var normal = body.pending;
+    var returns = body.returned;
+    var errors = node.catchClauses.any((clause) => clause.exceptionType == null)
+        ? null
+        : body.thrown;
+    for (final clause in node.catchClauses) {
+      final handler = _run(clause.body, body.thrown);
+      normal = _join(normal, handler.pending);
+      returns = _join(returns, handler.returned);
+      errors = _join(errors, handler.thrown);
+    }
+    final finallyBlock = node.finallyBlock;
+    if (finallyBlock != null) {
+      final afterNormal = _run(finallyBlock, normal);
+      final afterReturn = _run(finallyBlock, returns);
+      final afterError = _run(finallyBlock, errors);
+      normal = afterNormal.pending;
+      returns = _join(afterReturn.pending, afterNormal.returned);
+      errors = _join(afterError.pending, afterNormal.thrown);
+      returns = _join(
+        returns,
+        _join(afterReturn.returned, afterError.returned),
+      );
+      errors = _join(errors, _join(afterReturn.thrown, afterError.thrown));
+    }
+    pending = normal;
+    returned = _join(returned, returns);
+    thrown = _join(thrown, errors);
+  }
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    node.expression.accept(this);
+    if (pending != null) {
+      pending = true;
+      thrown = true;
+    }
+  }
+
+  // Loops are conservative: a suspension in any iteration invalidates facts
+  // at the next iteration and after the loop. Guards inside the body still work.
+  void _loop(AstNode node, void Function() visitChildren) {
+    final awaits = _AwaitFinder();
+    node.accept(awaits);
+    final entry = pending;
+    if (entry != null && awaits.found) pending = true;
+    visitChildren();
+    pending = awaits.found && entry != null ? true : _join(entry, pending);
+  }
+
+  @override
+  void visitForStatement(ForStatement node) {
+    _loop(node, () => super.visitForStatement(node));
+  }
+
+  @override
+  void visitWhileStatement(WhileStatement node) {
+    _loop(node, () => super.visitWhileStatement(node));
+  }
+
+  @override
+  void visitDoStatement(DoStatement node) {
+    _loop(node, () => super.visitDoStatement(node));
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    node.leftHandSide.accept(this);
+    node.rightHandSide.accept(this);
+    final lhs = node.leftHandSide;
+    final writesState =
+        lhs is SimpleIdentifier && lhs.name == 'state' ||
+        lhs is PropertyAccess &&
+            lhs.target is ThisExpression &&
+            lhs.propertyName.name == 'state';
+    if (writesState && pending == true) {
+      unsafeAssignments.add(node);
+    }
+    _mayThrow();
+  }
+}
+
+final class _AwaitFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {}
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {}
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) => found = true;
+
+  @override
+  void visitForStatement(ForStatement node) {
+    if (node.awaitKeyword != null) found = true;
+    super.visitForStatement(node);
   }
 }
 

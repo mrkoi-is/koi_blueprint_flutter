@@ -1560,8 +1560,7 @@ String? _canonicalRepoFile(
   List<String> errors,
   String context,
 ) {
-  final uri = Uri.tryParse(rawPath);
-  if (uri == null || uri.isAbsolute && uri.scheme != 'file') {
+  if (!isLocalOpenApiPath(rawPath)) {
     errors.add('$context 必须使用仓库内本地 OpenAPI：$rawPath');
     return null;
   }
@@ -1660,11 +1659,12 @@ String? _canonicalRepoPath(
   try {
     final root = _normalizePath(Directory.current.resolveSymbolicLinksSync());
     final normalized = _normalizePath(canonicalPath);
-    if (!normalized.startsWith('$root/')) {
+    final relative = canonicalRepoRelativePath(normalized, root);
+    if (relative == null) {
       errors.add('$context 解析后必须位于仓库内：$canonicalPath');
       return null;
     }
-    return normalized.substring(root.length + 1);
+    return relative;
   } on FileSystemException catch (error) {
     errors.add('$context 无法解析仓库真实路径：${error.message}');
     return null;
@@ -2180,6 +2180,29 @@ bool _isSafeRepoRelativePath(String path) {
 }
 
 String _normalizePath(String path) => path.replaceAll('\\', '/');
+
+/// Parser-resolved Windows drive paths are filesystem paths, not URI schemes.
+bool isLocalOpenApiPath(String path, {bool? windows}) {
+  if ((windows ?? Platform.isWindows) &&
+      RegExp(r'^[a-zA-Z]:[\\/]').hasMatch(path)) {
+    return true;
+  }
+  final uri = Uri.tryParse(path);
+  return uri != null && !uri.isAbsolute;
+}
+
+/// Inputs must already be canonicalized by the filesystem before containment.
+String? canonicalRepoRelativePath(String path, String root, {bool? windows}) {
+  final normalized = _normalizePath(path);
+  final prefix = '${_normalizePath(root).replaceFirst(RegExp(r'/+$'), '')}/';
+  final caseInsensitive = windows ?? Platform.isWindows;
+  if (!(caseInsensitive ? normalized.toLowerCase() : normalized).startsWith(
+    caseInsensitive ? prefix.toLowerCase() : prefix,
+  )) {
+    return null;
+  }
+  return normalized.substring(prefix.length);
+}
 
 String _normalizeRepoPath(String path) {
   final normalized = _normalizePath(path);

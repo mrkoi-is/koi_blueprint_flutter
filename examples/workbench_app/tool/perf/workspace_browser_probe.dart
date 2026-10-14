@@ -181,7 +181,7 @@ Future<void> main() async {
   } finally {
     SchedulerBinding.instance.removeTimingsCallback(timing);
     if (rafHandle != null) web.window.cancelAnimationFrame(rafHandle!);
-    runApp(const SizedBox());
+    runApp(ProviderScope(child: const SizedBox()));
     await SchedulerBinding.instance.endOfFrame;
     container.dispose();
     await session.dispose();

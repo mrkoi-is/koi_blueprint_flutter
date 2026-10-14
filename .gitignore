@@ -5,6 +5,8 @@
 .fvm/
 **/.dart_tool/
 **/build/
+# Build-cache symlinks are local artifacts too (including unmounted targets).
+**/build
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
 **/.pub/

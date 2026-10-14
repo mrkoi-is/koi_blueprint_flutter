@@ -12,7 +12,7 @@ class ShowcaseShell extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final snapshot = ref.watch(moduleSnapshotProvider);
-    final runtime = ref.watch(moduleRuntimeProvider);
+    final runtime = ref.watch(moduleRuntimeProvider).runtime;
     final status = ref.watch(moduleControlsProvider);
     return Scaffold(
       appBar: AppBar(title: const Text('可选业务模块示例')),

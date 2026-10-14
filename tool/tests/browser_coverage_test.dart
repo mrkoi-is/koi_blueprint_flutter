@@ -52,9 +52,12 @@ Future<void> main() async {
       member.path,
       report.path,
     ]);
-    if (check.exitCode == 0 ||
+    if (check.exitCode != 1 ||
         !(check.stderr as String).contains('lib/missing.dart')) {
-      throw StateError('Missing ordinary sources must still fail');
+      throw StateError(
+        'Missing ordinary sources must still fail with exit 1: '
+        '${check.exitCode}; ${check.stdout}${check.stderr}',
+      );
     }
     stdout.writeln(
       'Browser coverage: zero hits, idempotence and ordinary-source protection passed.',

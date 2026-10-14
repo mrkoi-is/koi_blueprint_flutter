@@ -1,9 +1,11 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:database_lab/l10n/generated/app_localizations.dart';
 import 'package:database_lab/features/library/domain/library_repository.dart';
 import 'package:database_lab/features/library/presentation/providers/library_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+@Dependencies([libraryNotes, LibraryCommands, LibraryDraft, LibraryFilter])
 class LibraryPage extends ConsumerStatefulWidget {
   const LibraryPage({required this.availability, super.key});
   final DatabaseAvailability availability;
@@ -12,8 +14,8 @@ class LibraryPage extends ConsumerStatefulWidget {
 }
 
 class _LibraryPageState extends ConsumerState<LibraryPage> {
-  String _query = '';
-  bool _archived = false;
+  String get _query => ref.watch(libraryFilterProvider).query;
+  bool get _archived => ref.watch(libraryFilterProvider).archived;
 
   @override
   Widget build(BuildContext context) {
@@ -64,15 +66,17 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
                                 labelText: strings.databaseSearch,
                                 prefixIcon: Icon(Icons.search),
                               ),
-                              onChanged: (value) =>
-                                  setState(() => _query = value),
+                              onChanged: (value) => ref
+                                  .read(libraryFilterProvider.notifier)
+                                  .setQuery(value),
                             ),
                           ),
                           FilterChip(
                             label: Text(strings.databaseArchived),
                             selected: _archived,
-                            onSelected: (value) =>
-                                setState(() => _archived = value),
+                            onSelected: (value) => ref
+                                .read(libraryFilterProvider.notifier)
+                                .setArchived(value),
                           ),
                         ],
                       ),
@@ -175,6 +179,7 @@ class _LibraryPageState extends ConsumerState<LibraryPage> {
   );
 }
 
+@Dependencies([LibraryDraft, LibraryCommands])
 class _NoteEditor extends ConsumerStatefulWidget {
   const _NoteEditor({this.note});
   final LibraryNote? note;
@@ -187,6 +192,12 @@ class _NoteEditorState extends ConsumerState<_NoteEditor> {
   late final _body = TextEditingController(text: widget.note?.body);
   late final _tags = TextEditingController(text: widget.note?.tags.join(', '));
   final _form = GlobalKey<FormState>();
+  LibraryDraftProvider get _draftProvider => libraryDraftProvider(
+    id: widget.note?.id,
+    title: widget.note?.title ?? '',
+    body: widget.note?.body ?? '',
+    tags: widget.note?.tags.join(', ') ?? '',
+  );
   @override
   void dispose() {
     _title.dispose();
@@ -198,6 +209,7 @@ class _NoteEditorState extends ConsumerState<_NoteEditor> {
   @override
   Widget build(BuildContext context) {
     final strings = AppLocalizations.of(context)!;
+    ref.watch(_draftProvider);
     final command = ref.watch(libraryCommandsProvider);
     return AlertDialog(
       title: Text(
@@ -213,6 +225,8 @@ class _NoteEditorState extends ConsumerState<_NoteEditor> {
               children: [
                 TextFormField(
                   controller: _title,
+                  onChanged: (value) =>
+                      ref.read(_draftProvider.notifier).update(title: value),
                   autofocus: true,
                   maxLength: 200,
                   decoration: InputDecoration(
@@ -225,6 +239,8 @@ class _NoteEditorState extends ConsumerState<_NoteEditor> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _body,
+                  onChanged: (value) =>
+                      ref.read(_draftProvider.notifier).update(body: value),
                   minLines: 3,
                   maxLines: 8,
                   decoration: InputDecoration(
@@ -234,6 +250,8 @@ class _NoteEditorState extends ConsumerState<_NoteEditor> {
                 const SizedBox(height: 12),
                 TextFormField(
                   controller: _tags,
+                  onChanged: (value) =>
+                      ref.read(_draftProvider.notifier).update(tags: value),
                   decoration: InputDecoration(
                     labelText: strings.databaseTags,
                     helperText: strings.databaseTagHint,
@@ -263,14 +281,7 @@ class _NoteEditorState extends ConsumerState<_NoteEditor> {
 
   Future<void> _save() async {
     if (!_form.currentState!.validate()) return;
-    final success = await ref
-        .read(libraryCommandsProvider.notifier)
-        .save(
-          id: widget.note?.id,
-          title: _title.text,
-          body: _body.text,
-          tags: _tags.text.split(RegExp('[,，]')),
-        );
+    final success = await ref.read(_draftProvider.notifier).save();
     if (success && mounted) Navigator.pop(context);
   }
 }

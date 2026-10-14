@@ -5,7 +5,66 @@ import 'package:crypto/crypto.dart';
 import 'package:json_schema/json_schema.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../validate_network_architecture.dart' as network;
+
 void main() {
+  test(
+    'Windows parser paths remain local and containment respects boundaries',
+    () {
+      for (final path in [r'C:\Repo\Spec.json', 'c:/Repo/Spec.json']) {
+        expect(network.isLocalOpenApiPath(path, windows: true), isTrue);
+      }
+      for (final path in [
+        'https://api.example.com/spec.json',
+        'file:///C:/spec.json',
+        'C:spec.json',
+      ]) {
+        expect(network.isLocalOpenApiPath(path, windows: true), isFalse);
+      }
+      expect(network.isLocalOpenApiPath('tool/openapi/spec.json'), isTrue);
+      expect(
+        network.canonicalRepoRelativePath(
+          r'c:\REPO\Tool\Spec.json',
+          r'C:\Repo',
+          windows: true,
+        ),
+        'Tool/Spec.json',
+      );
+      expect(
+        network.canonicalRepoRelativePath(
+          'C:/Repo-other/spec.json',
+          'c:/Repo',
+          windows: true,
+        ),
+        isNull,
+      );
+      expect(
+        network.canonicalRepoRelativePath(
+          'D:/Repo/spec.json',
+          'c:/Repo',
+          windows: true,
+        ),
+        isNull,
+      );
+      expect(
+        network.canonicalRepoRelativePath(
+          r'\\server\share\Repo\Spec.json',
+          r'\\SERVER\SHARE\repo',
+          windows: true,
+        ),
+        'Spec.json',
+      );
+      expect(
+        network.canonicalRepoRelativePath(
+          '/Repo/Spec.json',
+          '/repo',
+          windows: false,
+        ),
+        isNull,
+      );
+    },
+  );
+
   late Directory repositoryRoot;
   late File validator;
   late String packageConfig;

@@ -1,14 +1,44 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:koi_modules/koi_modules.dart';
 import 'package:module_showcase/features/module_capabilities/application/analysis_session.dart';
 import 'package:module_showcase/features/module_capabilities/presentation/providers/analysis_providers.dart';
 
+@Dependencies([analysisSession, analysisState, AnalysisCommands])
 void main() {
-  test('composition must supply the session', () {
+  test('default provider owns and closes the session', () async {
     final container = ProviderContainer(retry: (_, _) => null);
+    container.listen(analysisSessionProvider, (_, _) {});
+    final owner = container.read(analysisSessionProvider);
+    await owner.activate('words');
+    expect(owner.runtime.catalog.modules.length, 2);
+    container.dispose();
+    await expectLater(owner.activate('words'), throwsStateError);
+  });
+
+  test('较早的分析不能覆盖更新的输入草稿与模块选择', () async {
+    final owner = AnalysisSession();
+    addTearDown(owner.close);
+    await owner.activate('words');
+    final container = ProviderContainer(
+      overrides: [analysisSessionProvider.overrideWithValue(owner)],
+    );
     addTearDown(container.dispose);
-    expect(() => container.read(analysisSessionProvider), throwsA(anything));
+    container.listen(analysisCommandsProvider, (_, _) {});
+    final commands = container.read(analysisCommandsProvider.notifier);
+    commands.setInput('one two');
+    final oldResult = commands.analyze();
+    commands.setInput('new');
+    await oldResult;
+    expect(container.read(analysisCommandsProvider).result, isNull);
+    expect(container.read(analysisCommandsProvider).input, 'new');
+    final beforeSwitch = commands.analyze();
+    await commands.select('characters');
+    await beforeSwitch;
+    expect(container.read(analysisCommandsProvider).result, isNull);
+    await commands.analyze();
+    expect(container.read(analysisCommandsProvider).result!.count, 3);
   });
 
   test('state bridge follows real activation, denial and recovery', () async {
