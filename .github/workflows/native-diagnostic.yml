@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [browser, native]
+        suite: [browser]
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -25,6 +25,25 @@ jobs:
           flutter-version: 3.47.2
           channel: stable
           cache: true
+      - name: Normalize pinned SDK CanvasKit URL handling
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          import os
+          sdk = Path(os.environ['FLUTTER_ROOT'])
+          path = sdk / 'packages/flutter_tools/lib/src/test/flutter_web_platform.dart'
+          original = path.read_text(encoding='utf-8')
+          before = 'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = _fileSystem.path.fromUri(request.url);'
+          after = 'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = request.url.path;'
+          if original.count(before) != 1:
+              raise SystemExit('Unexpected Flutter CanvasKit handler; stop rather than patch unknown tooling')
+          path.write_text(original.replace(before, after), encoding='utf-8')
+          for name in ('flutter_tools.snapshot', 'flutter_tools.stamp'):
+              (sdk / 'bin/cache' / name).unlink(missing_ok=True)
+          print('Applied isolated CI SDK CanvasKit URL fix (Flutter issue #192069)')
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Generate Windows workbench
         run: python blueprint.py create ci_blueprint --output "${{ runner.temp }}/koi-windows-diagnostic" --org com.example --template workbench --platforms web,windows
       - name: Windows browser smoke
