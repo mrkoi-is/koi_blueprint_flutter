@@ -935,5 +935,72 @@ class _PageState extends State<Page> {
         );
     },
   );
+  ruleCase(
+    'ARCH006',
+    'reject feature-root widget importing data layer without presentation folder',
+    "import 'package:demo/features/tasks/data/task_repository.dart'; class MainShellScreen extends StatelessWidget {}",
+    rejected: true,
+    path: 'apps/demo/lib/features/main_shell/main_shell_screen.dart',
+  );
+  ruleCase(
+    'ARCH010',
+    'reject feature-root State exceeding field budget without presentation folder',
+    'class S extends State<Page> { int a=0,b=0,c=0,d=0,e=0,f=0,g=0,h=0,i=0; }',
+    rejected: true,
+    path: 'apps/demo/lib/features/main_shell/main_shell_screen.dart',
+  );
+  ruleCase(
+    'ARCH011',
+    'reject feature-root Widget exceeding callback budget without presentation folder',
+    'class MainShellScreen extends StatelessWidget { final VoidCallback a,b,c,d,e; }',
+    rejected: true,
+    path: 'apps/demo/lib/features/main_shell/main_shell_screen.dart',
+  );
+  ruleCase(
+    'ARCH014',
+    'reject async notifier assigning state after await without ref.mounted',
+    '''
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+@riverpod
+class Tasks extends _\$Tasks {
+  int build() => 0;
+  Future<void> refresh() async {
+    final next = await Future.value(1);
+    state = next;
+  }
+}
+''',
+    rejected: true,
+  );
+  ruleCase(
+    'ARCH014',
+    'reject async notifier checking ref.mounted only before await',
+    '''
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+@riverpod
+class Tasks extends _\$Tasks {
+  int build() => 0;
+  Future<void> refresh() async {
+    if (!ref.mounted) return;
+    final next = await Future.value(1);
+    state = next;
+  }
+}
+''',
+    rejected: true,
+  );
+  ruleCase('ARCH014', 'allow async notifier checking ref.mounted after await before state assignment', '''
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+@riverpod
+class Tasks extends _\$Tasks {
+  int build() => 0;
+  Future<void> refresh() async {
+    state = 0;
+    final next = await Future.value(1);
+    if (!ref.mounted) return;
+    state = next;
+  }
+}
+''', rejected: false);
   stdout.writeln('$_passed architecture tests passed.');
 }

@@ -64,6 +64,35 @@ class DisplayNameTest(unittest.TestCase):
             (app / 'web').symlink_to(EXAMPLES / 'platform_lab/web', target_is_directory=True)
             with self.assertRaises(ValueError): plan_display_name(app, 'Name', ['web'])
 
+    def test_create_cli_display_name_and_config_conflict(self):
+        import io
+        from contextlib import redirect_stdout, redirect_stderr
+        import blueprint
+        with tempfile.TemporaryDirectory() as temporary:
+            out = Path(temporary) / 'demo_out'
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                code = blueprint.main([
+                    'create', 'koi_pocket', '--output', str(out),
+                    '--org', 'com.example', '--display-name', 'Koi AI Pocket',
+                    '--platforms', 'ios,android', '--dry-run',
+                ])
+            self.assertEqual(code, 0)
+            plan = json.loads(buf.getvalue())
+            self.assertEqual(plan['configuration']['brand']['displayName'], 'Koi AI Pocket')
+
+            cfg = Path(temporary) / 'config.json'
+            cfg.write_text(json.dumps({'schema': 1, 'brand': {'displayName': 'Other Name'}}), encoding='utf-8')
+            err = io.StringIO()
+            with redirect_stderr(err):
+                code = blueprint.main([
+                    'create', 'koi_pocket', '--output', str(out),
+                    '--org', 'com.example', '--display-name', 'Koi AI Pocket',
+                    '--config', str(cfg), '--dry-run',
+                ])
+            self.assertEqual(code, 2)
+            self.assertIn('Conflicting --display-name', err.getvalue())
+
 
 class CapabilityDoctorTest(unittest.TestCase):
     def setUp(self):

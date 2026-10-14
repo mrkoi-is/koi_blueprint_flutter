@@ -27,6 +27,7 @@ const architectureRules = <String, String>{
       'Review widget responsibilities and API when callbacks exceed four.',
   'ARCH012': 'Retired: media parsing belongs to product behavior tests.',
   'ARCH013': 'Shell coordinators must not import presentation.',
+  'ARCH014': 'Async notifier methods assigning state after await must check ref.mounted.',
 };
 
 String normalized(String path) => path.replaceAll(r'\', '/');
@@ -358,7 +359,10 @@ List<ArchitectureIssue> checkWorkspace(
           memberSource.split('/').contains('domain') || member.isPure;
       final presentation = memberSource.contains('presentation/');
       final isPage =
-          presentation && !memberSource.contains('presentation/providers/');
+          (presentation ||
+              (_isFeatureUiPath(memberSource) &&
+                  _containsWidgetOrState(parsed.unit))) &&
+          !memberSource.contains('presentation/providers/');
       final layer = _featureLayer(memberSource);
       for (final directive
           in parsed.unit.directives.whereType<NamespaceDirective>()) {
@@ -489,6 +493,34 @@ String? _featureLayer(String source) {
   if (index >= 0 && parts.length > index + 2) return parts[index + 2];
   return null;
 }
+
+bool _isFeatureUiPath(String source) {
+  final value = normalized(source);
+  final parts = value.split('/');
+  final index = parts.indexOf('features');
+  if (index < 0 || value.endsWith('_capability.dart')) return false;
+  final layer = _featureLayer(value);
+  return !{'data', 'application', 'domain'}.contains(layer) &&
+      !value.contains('presentation/providers/');
+}
+
+const _widgetOrStateSuperclasses = <String>{
+  'StatelessWidget',
+  'StatefulWidget',
+  'ConsumerWidget',
+  'ConsumerStatefulWidget',
+  'HookWidget',
+  'HookConsumerWidget',
+  'State',
+  'ConsumerState',
+};
+
+bool _containsWidgetOrState(CompilationUnit unit) =>
+    unit.declarations.whereType<ClassDeclaration>().any(
+      (decl) => _widgetOrStateSuperclasses.contains(
+        decl.extendsClause?.superclass.name.lexeme,
+      ),
+    );
 
 bool _isShellCoordinator(String memberSource) {
   final value = normalized(memberSource);
@@ -684,8 +716,13 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
 
   @override
   void visitClassDeclaration(ClassDeclaration node) {
-    if (annotated(node.metadata)) {
+    final isAnnotatedNotifier = annotated(node.metadata);
+    if (isAnnotatedNotifier) {
       checkProvider(node, node.namePart.typeName.lexeme);
+    }
+    final superclass = node.extendsClause?.superclass.name.lexeme;
+    if (isAnnotatedNotifier || (superclass?.startsWith(r'_$') ?? false)) {
+      checkAsyncNotifierMounted(node);
     }
     checkPresentationMass(node);
     ioScopes.add({});
@@ -693,6 +730,32 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
       super.visitClassDeclaration(node);
     } finally {
       ioScopes.removeLast();
+    }
+  }
+
+  void checkAsyncNotifierMounted(ClassDeclaration node) {
+    final className = node.namePart.typeName.lexeme;
+    for (final method in node.body.members.whereType<MethodDeclaration>()) {
+      if (method.name.lexeme == 'build' || !method.body.isAsynchronous) {
+        continue;
+      }
+      final inspector = _AsyncStateAssignmentVisitor();
+      method.body.accept(inspector);
+      final awaitOffset = inspector.firstAwaitOffset;
+      if (awaitOffset == null) continue;
+      final postAwaitAssignments = inspector.stateAssignments
+          .where((assignment) => assignment.offset > awaitOffset)
+          .toList();
+      if (postAwaitAssignments.isEmpty) continue;
+      final mountedOffset = inspector.lastMountedOffset;
+      if (mountedOffset == null || mountedOffset < awaitOffset) {
+        report(
+          'ARCH014',
+          postAwaitAssignments.first,
+          '$className.${method.name.lexeme}',
+          'Check ref.mounted after await before assigning notifier state',
+        );
+      }
     }
   }
 
@@ -872,8 +935,10 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
   }
 
   void checkPresentationMass(ClassDeclaration node) {
-    if (!normalized(path).contains('/presentation/') ||
-        normalized(path).contains('/presentation/providers/')) {
+    final normalizedPath = normalized(path);
+    if ((!normalizedPath.contains('/presentation/') &&
+            !_isFeatureUiPath(normalizedPath)) ||
+        normalizedPath.contains('/presentation/providers/')) {
       return;
     }
     final superclass = node.extendsClause?.superclass.name.lexeme;
@@ -938,6 +1003,52 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
         );
       }
     }
+  }
+}
+
+final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
+  int? firstAwaitOffset;
+  int? lastMountedOffset;
+  final List<AssignmentExpression> stateAssignments = [];
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {
+    if (node.body.isAsynchronous) return;
+    super.visitFunctionExpression(node);
+  }
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) {
+    firstAwaitOffset ??= node.offset;
+    super.visitAwaitExpression(node);
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (node.prefix.name == 'ref' && node.identifier.name == 'mounted') {
+      lastMountedOffset = node.offset;
+    }
+    super.visitPrefixedIdentifier(node);
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    final target = node.target;
+    if (target is SimpleIdentifier &&
+        target.name == 'ref' &&
+        node.propertyName.name == 'mounted') {
+      lastMountedOffset = node.offset;
+    }
+    super.visitPropertyAccess(node);
+  }
+
+  @override
+  void visitAssignmentExpression(AssignmentExpression node) {
+    final lhs = node.leftHandSide;
+    if (lhs is SimpleIdentifier && lhs.name == 'state') {
+      stateAssignments.add(node);
+    }
+    super.visitAssignmentExpression(node);
   }
 }
 

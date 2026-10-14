@@ -44,7 +44,7 @@ class AuthController extends _$AuthController {
           password: password,
         );
 
-    if (operation != _operation) {
+    if (!ref.mounted || operation != _operation) {
       return;
     }
 
@@ -74,7 +74,7 @@ class AuthController extends _$AuthController {
         stackTrace: stackTrace,
       );
     } finally {
-      if (operation == _operation) {
+      if (ref.mounted && operation == _operation) {
         state = const AuthSession.unauthenticated();
       }
     }

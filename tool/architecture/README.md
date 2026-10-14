@@ -12,7 +12,7 @@
 | ARCH003 | domain 和基础纯 Dart 包不得依赖 Flutter、Riverpod、网络/存储实现或 feature 实现层。koi_ui 允许 Flutter/Material/dart:ui 展示能力，禁止平台 IO、浏览器/媒体适配、业务状态与实现层。检查所有手写 lib 的 import/export、条件分支及递归运行依赖。 |
 | ARCH004 | feature 中 `@riverpod` / `@Riverpod` 的 provider 生成声明放在 `presentation/providers`；`core` 的基础设施装配不受此目录限制；消费者的 `@Dependencies` 元数据不生成 provider。 |
 | ARCH005 | Riverpod provider 使用注解生成；拒绝手写 Provider/NotifierProvider 等构造与 factory 调用。 |
-| ARCH006 | presentation 页面/组件不导入 IO、网络客户端或 feature data 实现；通过 providers 和 domain 访问。 |
+| ARCH006 | presentation 页面/组件（含省略 `presentation/` 子目录但直接置于 feature 下非 `*_capability.dart` 的 Widget/State 文件）不导入 IO、网络客户端或 feature data 实现；通过 providers 和 domain 访问。 |
 | ARCH007 | Widget build 与 provider build 不直接调用可识别 dart:io 接收者的同步方法；async 关键字不使阻塞 IO 变为异步。命令回调由 ARCH011 计数。 |
 | ARCH008 | feature data/application 不反向导入 presentation。 |
 | ARCH009 | apps/packages/modules/examples 中真实存在的 package 必须在 Pub 的成员列表里，不能把模板移出验证范围。 |
@@ -20,6 +20,7 @@
 | ARCH011 | warning：Widget 回调超过 4 个；函数字段、构造参数、函数 typedef 与 Flutter 回调类型计数。审查展示接口，不要求机械 provider 化。 |
 | ARCH012 | 已退役，编号保留。媒体探测解析由具体产品行为测试验证。 |
 | ARCH013 | `shell/coordinators/` 不导入路径中含 `/presentation/` 的 URI、解析结果或 workspace 内重导出闭包。壳层页面组合（如 `app_shell.dart`）仍可引用 feature 页面。 |
+| ARCH014 | `@riverpod` / `@Riverpod` Notifier 异步方法（除 `build` 外）在 `await` 之后写入 `state` 前必须检查 `ref.mounted`。 |
 
 生成的 `.g.dart`/`.freezed.dart` 由生成与 analyze 检查，结构检查扫描成员的手写
 `lib`。语法错误以 ARCH000 失败。测试包含每条规则的正例、反例及合法例外；运行
