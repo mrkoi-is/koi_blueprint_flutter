@@ -1,7 +1,9 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:showcase_alpha/src/features/welcome/presentation/providers/alpha_providers.dart';
 
+@Dependencies([alphaMessage])
 class AlphaPage extends ConsumerWidget {
   const AlphaPage({super.key, this.details = false, this.onOpenDetails});
 

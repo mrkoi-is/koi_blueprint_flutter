@@ -91,7 +91,7 @@ SDK 选择顺序是 `FLUTTER_BIN` → 项目 `.fvm/flutter_sdk` → PATH 中的 
 
 `python3 blueprint.py validate` 是统一入口。源仓库完整验证需要 Chrome 和 Node；生成项目只在活动成员存在浏览器测试时要求 Chrome，只在存在 API Web 冒烟入口时要求 Node。默认 minimal 两者都不要求；workbench 要求 Chrome。`doctor --purpose validate` 会提前检查这些条件。源仓库 validate 还检查两个模板的真实继承资产；完整递归验收另运行 `python3 tool/generator_smoke.py`。质量要求包括 AI 资产/引用、架构边界、代码生成、只读格式、fatal-infos 分析、成员测试和 **80% 手写代码覆盖率**。生成的 Dart part 文件不入库。目标平台使用 `build` 单独验证；测试与本地构建不能替代真实业务后端或设备验收。
 
-已有 `make validate` 与 shell 入口保留为兼容包装。完整命令见 [工具清单](docs/tools.md) 和 [Melos 使用](MELOS_USAGE.md)。详见 [测试策略](docs/test_strategy.md) 与 [平台验收](docs/platform-acceptance.md)。仓库中的配置和测试描述验收要求，当前是否通过以本次执行结果为准。当前结果与平台缺口见 [验收索引](docs/validation/README.md)；[2026-09-29 记录](docs/validation/2026-09-29.md)保留为历史证据。
+已有 `make validate` 与 shell 入口保留为兼容包装。完整命令见 [工具清单](docs/tools.md) 和 [Melos 使用](MELOS_USAGE.md)。详见 [测试策略](docs/test_strategy.md) 与 [平台验收](docs/platform-acceptance.md)。仓库中的配置和测试描述验收要求，当前是否通过以本次执行结果为准。本地运行结果与平台缺口记录在 `docs/validation/`，这些记录不随新项目下发，也不作为干净检出的必需指导文件。
 
 ## 参与贡献
 

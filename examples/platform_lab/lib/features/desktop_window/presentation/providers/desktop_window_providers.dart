@@ -45,7 +45,8 @@ Future<void> _initializeDesktopWindow() async {
 }
 
 @Riverpod(keepAlive: true)
-DesktopWindowHost? desktopWindowHost(Ref ref) => DesktopWindowRuntime.host;
+({DesktopWindowHost? host}) desktopWindowHost(Ref ref) =>
+    (host: DesktopWindowRuntime.host);
 
 Future<bool> prepareDesktopWindow() async {
   final host = DesktopWindowRuntime.host;

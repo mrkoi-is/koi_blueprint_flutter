@@ -108,9 +108,9 @@ class BuildManifestTests(unittest.TestCase):
         self.assertNotEqual(manifest['source']['sourceSha256'], before['sourceSha256'])
         self.assertIn('--dart-define=BUILD_SOURCE=' + manifest['source']['sourceSha256'], calls[2])
         changed = manifest['preparation']['changedInputs']
-        self.assertEqual(set(changed), {str(path.relative_to(self.root)) for path in (
+        self.assertEqual(set(changed), {path.relative_to(self.root).as_posix() for path in (
             native / 'Podfile.lock', native / 'Runner.xcodeproj/project.pbxproj', native / 'Runner.xcworkspace/contents.xcworkspacedata')})
-        self.assertIsNone(changed[str((native / 'Podfile.lock').relative_to(self.root))]['beforeSha256'])
+        self.assertIsNone(changed[(native / 'Podfile.lock').relative_to(self.root).as_posix()]['beforeSha256'])
         # Once prepared, repeating the same command freezes exactly the same inputs.
         calls.clear()
         with patch('tool.blueprint_build.sys.platform', 'darwin'):

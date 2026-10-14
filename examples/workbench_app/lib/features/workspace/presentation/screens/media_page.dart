@@ -8,7 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_preview_session.dart';
+import 'package:workbench_app/features/workspace/application/media_preview_session.dart';
+import 'package:workbench_app/features/workspace/presentation/media/media_surface_handle.dart';
 
 class MediaPage extends ConsumerStatefulWidget {
   const MediaPage({super.key});
@@ -39,7 +40,7 @@ class _MediaPageState extends ConsumerState<MediaPage> {
       return;
     }
     _requestedAsset = selected?.id;
-    unawaited(ref.read(mediaPreviewSessionProvider).select(selected));
+    unawaited(ref.read(mediaPreviewSessionProvider).session.select(selected));
   }
 
   void _select(WorkspaceAsset asset) {
@@ -53,18 +54,16 @@ class _MediaPageState extends ConsumerState<MediaPage> {
   Widget build(BuildContext context) {
     final session = ref.watch(workspaceSessionProvider);
     final state = ref.watch(
-      workspaceStateProvider.select(
+      workspaceSnapshotProvider.select(
         (value) => (
-          assets: value.value?.snapshot.assets ?? session.state.snapshot.assets,
-          selectedAssetId:
-              value.value?.snapshot.preferences.selectedAssetId ??
-              session.state.snapshot.preferences.selectedAssetId,
+          assets: value.snapshot.assets,
+          selectedAssetId: value.snapshot.preferences.selectedAssetId,
         ),
       ),
     );
     ref.listen(
-      workspaceStateProvider.select(
-        (value) => value.value?.snapshot.preferences.selectedAssetId,
+      workspaceSnapshotProvider.select(
+        (value) => value.snapshot.preferences.selectedAssetId,
       ),
       (_, _) => _updatePreview(session.state),
     );
@@ -80,7 +79,7 @@ class _MediaPageState extends ConsumerState<MediaPage> {
     final selected = state.assets
         .where((asset) => asset.id == state.selectedAssetId)
         .firstOrNull;
-    final preview = ref.watch(mediaPreviewSessionProvider);
+    final preview = ref.watch(mediaPreviewSessionProvider).session;
     return Column(
       children: [
         KoiToolbar(
@@ -163,7 +162,11 @@ class _MediaPageState extends ConsumerState<MediaPage> {
                         );
                       },
                     );
-              final viewer = _MediaViewer(asset: selected, preview: preview);
+              final viewer = _MediaViewer(
+                asset: selected,
+                preview: preview,
+                surfaces: ref.watch(mediaSurfaceHandleProvider),
+              );
               // Both regions retain their position in this Flex when its axis changes.
               return Flex(
                 direction: wide ? Axis.horizontal : Axis.vertical,
@@ -354,9 +357,14 @@ class _StoredImage extends ConsumerWidget {
 }
 
 class _MediaViewer extends StatelessWidget {
-  const _MediaViewer({required this.asset, required this.preview});
+  const _MediaViewer({
+    required this.asset,
+    required this.preview,
+    required this.surfaces,
+  });
   final WorkspaceAsset? asset;
   final MediaPreviewSession preview;
+  final MediaSurfaceHandle surfaces;
   @override
   Widget build(BuildContext context) {
     final selected = asset;
@@ -406,7 +414,9 @@ class _MediaViewer extends StatelessWidget {
                           child: Stack(
                             fit: StackFit.expand,
                             children: [
-                              if (player != null) player.surface,
+                              if (player != null)
+                                surfaces.surfaceFor(player) ??
+                                    const SizedBox.shrink(),
                               if (preview.loading)
                                 const Center(
                                   child: CircularProgressIndicator(),

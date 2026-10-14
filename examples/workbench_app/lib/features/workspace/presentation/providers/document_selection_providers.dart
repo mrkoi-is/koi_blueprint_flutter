@@ -8,11 +8,9 @@ part 'document_selection_providers.g.dart';
 class DocumentSelection extends _$DocumentSelection {
   @override
   IdSelection build() {
-    ref.listen(workspaceStateProvider, (_, next) {
-      final snapshot = next.value?.snapshot;
-      if (snapshot != null) {
-        state = state.retain(snapshot.documents.map((item) => item.id));
-      }
+    ref.listen(workspaceSnapshotProvider, (_, next) {
+      final snapshot = next.snapshot;
+      state = state.retain(snapshot.documents.map((item) => item.id));
     });
     return IdSelection();
   }

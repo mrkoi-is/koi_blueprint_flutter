@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:media_kit/media_kit.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_frame_gate.dart';
+import 'package:workbench_app/features/workspace/data/media/media_frame_gate.dart';
 
 class _BorrowedPlayer implements Player {
   @override

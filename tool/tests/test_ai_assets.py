@@ -54,7 +54,7 @@ class AiAssetsTest(unittest.TestCase):
 
     def test_unknown_and_duplicate_index_fields_fail(self):
         path = self.root / ".agents/skills/index.yaml"
-        path.write_text(path.read_text() + "    surprise: value\n")
+        path.write_text(path.read_text(encoding="utf-8") + "    surprise: value\n", encoding="utf-8")
         self.assertIn("AI_INDEX", self.rules())
 
     def test_unindexed_canonical_skill_fails(self):
@@ -71,13 +71,13 @@ class AiAssetsTest(unittest.TestCase):
 
     def test_noncanonical_index_path_fails(self):
         path = self.root / ".agents/skills/index.yaml"
-        path.write_text(path.read_text().replace(".agents/skills/example/SKILL.md", ".agent/skills/example/SKILL.md"), encoding="utf-8")
+        path.write_text(path.read_text(encoding="utf-8").replace(".agents/skills/example/SKILL.md", ".agent/skills/example/SKILL.md"), encoding="utf-8")
         self.assertIn("AI_INDEX", self.rules())
 
     def test_skill_symlink_fails(self):
         skill = self.root / ".agents/skills/example/SKILL.md"
         real = self.root / "skill-body.md"
-        real.write_text(skill.read_text(), encoding="utf-8")
+        real.write_text(skill.read_text(encoding="utf-8"), encoding="utf-8")
         skill.unlink()
         skill.symlink_to(real)
         self.assertIn("AI_LAYOUT", self.rules())
@@ -136,7 +136,7 @@ class AiAssetsTest(unittest.TestCase):
 
     def test_agents_task_routing_must_match_index(self):
         path = self.root / "AGENTS.md"
-        path.write_text(path.read_text().replace("`example`", "`unknown`"), encoding="utf-8")
+        path.write_text(path.read_text(encoding="utf-8").replace("`example`", "`unknown`"), encoding="utf-8")
         self.assertIn("AI_ROUTING", self.rules())
 
     def test_generator_must_keep_executable_source_and_test_inputs(self):

@@ -2,6 +2,8 @@
 """Compatibility entry: new features are complete tested source templates."""
 from pathlib import Path
 import sys
+if '--dry-run' in sys.argv[1:]:
+    sys.dont_write_bytecode = True
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from blueprint import main
 if __name__ == '__main__':

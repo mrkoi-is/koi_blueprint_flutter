@@ -1,6 +1,8 @@
 @TestOn('vm')
 library;
 
+import 'package:riverpod_annotation/experimental/scope.dart';
+
 import 'dart:io';
 
 import 'package:database_lab/capabilities/database_capability.dart';
@@ -25,6 +27,13 @@ Future<void> _until(WidgetTester tester, bool Function() ready) async {
   expect(ready(), isTrue, reason: 'Owned database operation must complete');
 }
 
+@Dependencies([
+  libraryRepository,
+  libraryNotes,
+  LibraryCommands,
+  LibraryDraft,
+  LibraryFilter,
+])
 void main() {
   testWidgets(
     'embedded database retries opening, persists, and closes with host',

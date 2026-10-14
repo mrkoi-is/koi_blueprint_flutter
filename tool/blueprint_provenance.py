@@ -130,7 +130,7 @@ def upgrade_report(root, source):
     value = read_metadata(root)
     report = {'schema': 1, 'project': str(root), 'source': str(source), 'writesProject': False,
               'upstreamChanges': [], 'localChanges': [], 'conflicts': [], 'alreadyApplied': [], 'unchanged': [],
-              'manualMigration': [], 'newCapabilities': [], 'capabilityUpdates': []}
+              'manualMigration': [], 'untrackedGuidance': [], 'newCapabilities': [], 'capabilityUpdates': []}
     if not value or value['schema'] == 1:
         report['manualMigration'].extend([
             'Schema 1 or missing baseline: a reliable three-way comparison is unavailable; no files were changed.',
@@ -139,6 +139,24 @@ def upgrade_report(root, source):
             'Run validate and platform checks in the migrated copy, then establish managed baselines only for files whose origin and contents were verified.',
         ])
         return report
+    from blueprint import workspace_asset_plan, render_workspace_asset
+    asset_plan = workspace_asset_plan(source, value.get('name', 'project'))
+    guidance_paths = {item['destination'] for item in asset_plan if item['kind'] == 'guidance'}
+    for item in asset_plan:
+        relative, origin = item['destination'], item['source']
+        if item['kind'] != 'guidance' or relative in value.get('managedFiles', {}):
+            continue
+        local, upstream = root / relative, source / origin
+        if local.is_symlink() or not local.resolve().is_relative_to(root):
+            raise ValueError('Guidance path must not escape through symlinks')
+        report['untrackedGuidance'].append({
+            'path': relative, 'source': origin, 'status': 'NO_BASELINE',
+            'localExists': local.is_file(),
+            'currentSha256': hashlib.sha256(local.read_bytes()).hexdigest() if local.is_file() else None,
+            'upstreamSha256': hashlib.sha256(upstream.read_bytes()).hexdigest(),
+        })
+    if report['untrackedGuidance']:
+        report['manualMigration'].append('Guidance without a trusted creation baseline requires manual comparison; no baseline was reconstructed and no files were changed.')
     for relative, entry in value.get('managedFiles', {}).items():
         candidate = Path(relative)
         origin_value = entry.get('source')
@@ -174,6 +192,8 @@ def upgrade_report(root, source):
                     f'package:{old_package}/'.encode('utf-8'),
                     f'package:{package}/'.encode('utf-8'),
                 )
+        if relative in guidance_paths and upstream is not None and upstream.is_file():
+            rendered = render_workspace_asset(upstream.read_bytes(), relative, value.get('name', 'project'))
         same_new_content = (rendered is not None and current == hashlib.sha256(rendered).hexdigest())
         category = ('alreadyApplied' if local_changed and upstream_changed and same_new_content else
                     'conflicts' if local_changed and upstream_changed else

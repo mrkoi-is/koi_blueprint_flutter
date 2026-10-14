@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:network_lab/app.dart';
@@ -13,12 +14,14 @@ Future<void> main() async {
     final bootstrap = await NetworkBootstrap.create(
       baseUri: Uri.parse(endpoint),
     );
-    runApp(NetworkLabApp(bootstrap: bootstrap));
+    runApp(ProviderScope(child: NetworkLabApp(bootstrap: bootstrap)));
   } catch (error) {
     runApp(
-      MaterialApp(
-        theme: AppTheme.light,
-        home: Scaffold(body: Center(child: Text('Network Lab 无法启动：$error'))),
+      ProviderScope(
+        child: MaterialApp(
+          theme: AppTheme.light,
+          home: Scaffold(body: Center(child: Text('Network Lab 无法启动：$error'))),
+        ),
       ),
     );
   }

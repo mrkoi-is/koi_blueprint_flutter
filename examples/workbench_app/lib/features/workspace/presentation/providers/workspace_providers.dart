@@ -4,7 +4,9 @@ import 'dart:typed_data';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:workbench_app/features/workspace/application/workspace_session.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_preview_session.dart';
+import 'package:workbench_app/features/workspace/application/media_preview_session.dart';
+
+import 'package:workbench_app/features/workspace/presentation/media/media_surface_handle.dart';
 
 part 'workspace_providers.g.dart';
 
@@ -15,9 +17,31 @@ WorkspaceSession workspaceSession(Ref ref) =>
 
 /// Bootstrap owns the player and awaits its cleanup before closing storage.
 @Riverpod(keepAlive: true)
-MediaPreviewSession mediaPreviewSession(Ref ref) =>
+({MediaPreviewSession session}) mediaPreviewSession(Ref ref) =>
     throw UnimplementedError('Bootstrap must inject a MediaPreviewSession');
 
+/// Presentation borrows a handle injected alongside the player factory.
+@Riverpod(keepAlive: true)
+MediaSurfaceHandle mediaSurfaceHandle(Ref ref) =>
+    throw UnimplementedError('Bootstrap must inject a MediaSurfaceHandle');
+
+/// Synchronous read-only projection. Rebinding cancels the old subscription;
+/// invalidating/rebuilding this provider never closes the borrowed session.
+@Riverpod(keepAlive: true)
+WorkspaceState workspaceSnapshot(Ref ref) {
+  final session = ref.watch(workspaceSessionProvider);
+  var active = true;
+  final subscription = session.changes.listen((_) {
+    if (active) ref.invalidateSelf();
+  });
+  ref.onDispose(() {
+    active = false;
+    unawaited(subscription.cancel());
+  });
+  return session.state;
+}
+
+/// Compatibility stream for existing AsyncValue consumers. Owns no state.
 @Riverpod(keepAlive: true)
 Stream<WorkspaceState> workspaceState(Ref ref) {
   final session = ref.watch(workspaceSessionProvider);

@@ -18,7 +18,7 @@
 | 创建项目、初始化 workspace | `workspace-init` |
 | 新增业务 Feature | `add-feature-module` |
 | 编写页面与 provider | `state-management` |
-| UI、主题、布局与交互 | 先读 [DESIGN.md](DESIGN.md)，按状态与测试职责选择 `state-management` / `testing-scaffold` |
+| UI 视觉、主题、布局与控件交互 | 先读 [DESIGN.md](DESIGN.md)，按状态与测试职责选择 `state-management` / `testing-scaffold`；既有事件接线与实例参数修复从状态入口定位 |
 | 新增共享 package | `add-shared-package` |
 | 新增独立业务 module、切换会话 | `add-business-module` |
 | 接入生成 API | `add-generated-api-package` |

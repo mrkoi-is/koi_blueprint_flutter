@@ -28,7 +28,7 @@ jobs:
 
   quality:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90
 
     steps:
       - name: Check out repository
@@ -111,6 +111,38 @@ jobs:
       - name: Record platform source provenance
         run: python tool/platform_evidence.py --output "${{ runner.temp }}/koi-platform-evidence/source.json"
 
+      - name: Correct pinned Flutter Windows CanvasKit URL handling
+        if: matrix.template == 'workbench' && runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          @'
+          from pathlib import Path
+          import os
+          sdk = Path(os.environ['FLUTTER_ROOT'])
+          path = sdk / 'packages/flutter_tools/lib/src/test/flutter_web_platform.dart'
+          original = path.read_text(encoding='utf-8')
+          patches = [
+              ('shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = _fileSystem.path.fromUri(request.url);',
+               'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = request.url.path;'),
+              ('shelf.Response _wrapperHandler(shelf.Request request) {\n    final String path = _fileSystem.path.fromUri(request.url);',
+               'shelf.Response _wrapperHandler(shelf.Request request) {\n    final String path = request.url.path;'),
+          ]
+          updated = original
+          for before, after in patches:
+              if updated.count(before) == 1:
+                  updated = updated.replace(before, after)
+              elif updated.count(after) != 1:
+                  raise SystemExit('Unexpected Flutter browser handler; stop rather than patch unknown tooling')
+          if updated != original:
+              path.write_text(updated, encoding='utf-8')
+              for name in ('flutter_tools.snapshot', 'flutter_tools.stamp'):
+                  (sdk / 'bin/cache' / name).unlink(missing_ok=True)
+              print('Applied isolated CI SDK URL fixes for CanvasKit and test selector (Flutter issue #192069)')
+          else:
+              print('CI SDK already has the browser URL fixes')
+          '@ | python -
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Generate a new six-platform project
         run: python blueprint.py create ci_blueprint --output "${{ runner.temp }}/koi-blueprint-generated" --org com.example --template "${{ matrix.template }}"
 
@@ -120,26 +152,45 @@ jobs:
       - name: Build native platforms and web
         run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" build --app "${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app" --platforms "${{ matrix.platforms }}"
 
-      - name: Run real native media and storage smoke on macOS
+      - name: Check macOS native video rendering capability
+        id: macos-media
         if: matrix.template == 'workbench' && runner.os == 'macOS'
+        run: |
+          set -o pipefail
+          swift tool/macos_media_preflight.swift | tee "$RUNNER_TEMP/macos-media-capability.txt" >> "$GITHUB_OUTPUT"
+          if ! rg -q '^available=true$' "$RUNNER_TEMP/macos-media-capability.txt"; then
+            echo 'macOS native media runtime: NOT_RUN. This host cannot create the OpenGL context required by media_kit_video; use a graphics-capable Mac. Native builds and generated-workspace checks still run.' | tee -a "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Run real native media and storage smoke on macOS
+        if: matrix.template == 'workbench' && runner.os == 'macOS' && steps.macos-media.outputs.available == 'true'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          flutter test --no-pub -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          flutter test --no-pub --verbose --reporter expanded --file-reporter json:native-runtime-tests.json -d macos integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
 
       - name: Run real native media and storage smoke on Windows
         if: matrix.template == 'workbench' && runner.os == 'Windows'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
-          flutter test --no-pub -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
+          flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json --dart-define=KOI_TEST_NATIVE_AUDIO_OUTPUT=null --dart-define=KOI_TEST_NATIVE_HWDEC=no -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Configure virtual audio for Linux runtime
+        if: matrix.template == 'workbench' && runner.os == 'Linux'
+        run: |
+          sudo apt-get install -y pulseaudio pulseaudio-utils
+          pulseaudio --start --exit-idle-time=-1
+          pactl load-module module-null-sink sink_name=koi_ci
+          pactl set-default-sink koi_ci
+          pactl info
 
       - name: Run real native media and storage smoke on Linux
         if: matrix.template == 'workbench' && runner.os == 'Linux'
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          xvfb-run -a flutter test --no-pub -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
 
       - name: Run real Chrome media and IndexedDB smoke
         if: matrix.template == 'workbench' && runner.os == 'Linux'
@@ -151,6 +202,44 @@ jobs:
           trap 'kill "$driver_pid" 2>/dev/null || true' EXIT
           flutter drive --no-pub --driver integration_test/support/runtime_driver.dart --target integration_test/workbench_runtime_test.dart -d web-server --headless --driver-port=4444 --web-browser-flag=--autoplay-policy=no-user-gesture-required
 
+      - name: Collect native crash evidence on macOS
+        if: always() && matrix.template == 'workbench' && runner.os == 'macOS'
+        working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
+        run: |
+          /usr/bin/log show --last 10m --style compact --predicate 'process == "ci_blueprint_app"' > native-system.log || true
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          import shutil
+          import time
+          reports = [Path.home() / 'Library/Logs/DiagnosticReports',
+                     Path('/Library/Logs/DiagnosticReports')]
+          target = Path('build/runtime-crashes')
+          target.mkdir(parents=True, exist_ok=True)
+          matches = []
+          for attempt in range(10):
+              matches = [path for directory in reports
+                         for pattern in ('ci_blueprint_app*', 'Ci Blueprint*', 'Runner*')
+                         for path in directory.glob(pattern) if path.is_file()]
+              if matches or '${{ job.status }}' == 'success':
+                  break
+              time.sleep(1)
+          print(f'Native crash reports captured: {len(matches)}')
+          for report in matches:
+              if report.is_file():
+                  shutil.copy2(report, target / report.name)
+                  contents = report.read_text(encoding='utf-8', errors='replace')
+                  try:
+                      data = json.loads(contents.split('\n', 1)[-1])
+                      index = data.get('faultingThread')
+                      detail = {key: data.get(key) for key in ('procName', 'exception', 'termination', 'faultingThread')}
+                      if isinstance(index, int):
+                          detail['thread'] = data.get('threads', [])[index]
+                      print(json.dumps(detail, ensure_ascii=False))
+                  except (ValueError, IndexError):
+                      print(contents[:24000])
+          PY
+
       - name: Preserve runtime evidence
         if: always() && matrix.template == 'workbench'
         uses: actions/upload-artifact@v4
@@ -160,6 +249,10 @@ jobs:
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/integration_response_data.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-system.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-tests.json
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/runtime-crashes
+            ${{ runner.temp }}/macos-media-capability.txt
           if-no-files-found: ignore
 
       - name: Preserve platform provenance and build artifacts

@@ -19,7 +19,10 @@ description: 在现有 App 或业务 module 新增 presentation、api 或 local 
 ## 核心规则
 - 参照 [Feature Lab](../../../docs/examples.md)；认证专用行为参照 [认证样例](../../../docs/examples.md)。
 - domain 纯 Dart，presentation 不直接 IO；Feature provider 统一放 presentation/providers。
-- 业务容器通过 provider 取数，展示 Widget 可以用不可变 props 和回调。
+- 业务容器通过 provider 取数；展示子组件可用不可变 props 与语义化回调。回调/字段数量仅作为维护 warning，先判断职责和生命周期。
+- 生成器沿用一个既有 Feature 根，双布局拒绝；新 App 默认 lib/features，package/module 默认 lib/src/features，测试统一 test/features。dry-run 不调用 SDK 或写文件。
+- api/local 的业务入口导出模型、端口、页面；宿主从 composition 入口获得实现与注入声明。module 的外部消费仍只经过模块根入口。
+- 长期草稿用稳定 editorId/route/session scope 隔离同时打开的实例；简单页面筛选/显示模式留在 Widget。
 - 页面先消费 [DESIGN](../../../DESIGN.md) 与 UI Lab 的标准 Flutter 组件主题；跨页面外观统一在 koi_ui 修正，标准组件能表达时不新增平行控件。
 - 脚手架的示例数据不是已接通的真实 API 或持久化。
 

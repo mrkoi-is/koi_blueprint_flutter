@@ -20,9 +20,7 @@ class _JobHistoryPageState extends ConsumerState<JobHistoryPage> {
   Widget build(BuildContext context) {
     final strings = context.l10n;
     final session = ref.watch(workspaceSessionProvider);
-    final records =
-        ref.watch(workspaceStateProvider).value?.snapshot.jobHistory ??
-        session.state.snapshot.jobHistory;
+    final records = ref.watch(workspaceSnapshotProvider).snapshot.jobHistory;
     final matching = records.reversed
         .where(
           (job) => '${job.name} ${job.id}'.toLowerCase().contains(

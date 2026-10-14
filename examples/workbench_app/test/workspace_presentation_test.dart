@@ -5,11 +5,14 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:workbench_app/features/workspace/presentation/screens/tasks_page.dart';
 import 'package:workbench_app/app.dart';
 import 'package:workbench_app/bootstrap.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
 import 'package:workbench_app/features/workspace/presentation/screens/media_page.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
 import 'package:workbench_app/features/workspace/presentation/widgets/workspace_panels.dart';
 import 'package:workbench_app/main.dart';
 import 'package:workbench_app/core/window/workbench_window_chrome.dart';
@@ -965,6 +968,54 @@ void main() {
         );
         await restored.disposeAsync();
       });
+    },
+  );
+
+  testWidgets(
+    'page-only filters reset on a fresh page; shared filters stay in the session scope',
+    (tester) async {
+      tester.view.physicalSize = const Size(1500, 1100);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      final bootstrap = await WorkbenchBootstrap.create(
+        openStorage: () async => MemoryStorage(),
+        fileImportPort: CancelImport(),
+        createPlayback: FakePlayback.new,
+      );
+      Widget page(Widget child) => UncontrolledProviderScope(
+        container: bootstrap.container,
+        child: MaterialApp(home: Scaffold(body: child)),
+      );
+      final todo = bootstrap.session.addTodo('Completed item');
+      bootstrap.session.updateTodo(todo, completed: true);
+      await tester.pumpWidget(page(const TasksPage()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(FilterChip));
+      await tester.pump();
+      expect(find.text('Completed item'), findsNothing);
+      await tester.pumpWidget(page(const SizedBox()));
+      await tester.pumpWidget(page(const TasksPage()));
+      await tester.pumpAndSettle();
+      expect(find.text('Completed item'), findsOneWidget);
+      await tester.pumpWidget(page(const MediaPage()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byTooltip('切换列表'));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('切换网格'), findsOneWidget);
+      bootstrap.container
+          .read(mediaSearchProvider.notifier)
+          .setQuery('retained search');
+      bootstrap.container
+          .read(mediaFilterProvider.notifier)
+          .setKind(MediaKind.video);
+      await tester.pumpWidget(page(const SizedBox()));
+      await tester.pumpWidget(page(const MediaPage()));
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('切换列表'), findsOneWidget);
+      expect(bootstrap.container.read(mediaSearchProvider), 'retained search');
+      expect(bootstrap.container.read(mediaFilterProvider), MediaKind.video);
+      await closeApp(tester, bootstrap);
     },
   );
 

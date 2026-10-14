@@ -1,6 +1,8 @@
 @TestOn('vm')
 library;
 
+import 'package:device_lab/features/local_setup/presentation/providers/local_setup_providers.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:device_lab/local_capabilities.dart';
 import 'package:device_lab/features/local_setup/presentation/screens/local_setup_page.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import 'package:koi_core/koi_core.dart';
 
 import 'native_capability_support.dart';
 
+@Dependencies([localSetupChanges, localSetupSession])
 void main() {
   testWidgets(
     'common local capability owns persistent storage with no incoming or LAN dependency',

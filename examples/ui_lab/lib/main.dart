@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -5,7 +7,7 @@ import 'package:koi_ui/koi_ui.dart';
 
 import 'package:ui_lab/standard_component_catalog.dart';
 
-void main() => runApp(const KoiUiLabApp());
+void main() => runApp(ProviderScope(child: const KoiUiLabApp()));
 
 class KoiUiLabApp extends StatefulWidget {
   const KoiUiLabApp({super.key});
