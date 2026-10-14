@@ -25,10 +25,15 @@ void main() {
     MediaKit.ensureInitialized();
     final sandbox = await createRuntimeSandbox();
     final input = FixtureImportPort();
+    const audioOutput = String.fromEnvironment('KOI_TEST_NATIVE_AUDIO_OUTPUT');
     WorkbenchBootstrap? owned;
     final evidence = <String, Object?>{
       'storage': sandbox.description,
       'file_picker': 'NOT_EXERCISED_fixture_adapter',
+      'native_audio_output': audioOutput.isEmpty
+          ? 'system_default'
+          : audioOutput,
+      'speaker_output': 'NOT_EXERCISED',
     };
     binding.reportData = evidence;
     try {
@@ -36,6 +41,7 @@ void main() {
       final bootstrap = await WorkbenchBootstrap.create(
         openStorage: () async => storage,
         fileImportPort: input,
+        nativeAudioOutput: audioOutput.isEmpty ? null : audioOutput,
         initialLocation: '/media',
       );
       owned = bootstrap;
@@ -298,6 +304,7 @@ void main() {
       final reopened = await WorkbenchBootstrap.create(
         openStorage: sandbox.open,
         fileImportPort: FixtureImportPort(),
+        nativeAudioOutput: audioOutput.isEmpty ? null : audioOutput,
       );
       owned = reopened;
       expect(reopened.session.state.snapshot, expectedSnapshot);

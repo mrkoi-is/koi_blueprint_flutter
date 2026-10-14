@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [browser]
+        suite: [native]
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -56,7 +56,7 @@ jobs:
         if: matrix.suite == 'native'
         working-directory: ${{ runner.temp }}/koi-windows-diagnostic/apps/ci_blueprint_app
         run: |
-          flutter test --no-pub --verbose --reporter expanded --file-reporter json:native-runtime-tests.json -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
+          flutter test --no-pub --verbose --reporter expanded --file-reporter json:native-runtime-tests.json --dart-define=KOI_TEST_NATIVE_AUDIO_OUTPUT=null -d windows integration_test/workbench_runtime_test.dart 2>&1 | Tee-Object -FilePath native-runtime.log
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - uses: actions/upload-artifact@v4
         if: always()

@@ -52,6 +52,7 @@ final class WorkbenchBootstrap {
     Future<storage.WorkspaceStorage> Function()? openStorage,
     FileImportPort? fileImportPort,
     MediaPlaybackFactory? createPlayback,
+    String? nativeAudioOutput,
     Future<Uint8List> Function(Uint8List)? encodeThumbnail,
     String? initialLocation,
     Future<UiPreferencesStore> Function()? openPreferences,
@@ -83,7 +84,10 @@ final class WorkbenchBootstrap {
       MediaPlayback playbackFactory() {
         if (createPlayback != null) return createPlayback();
         late final MediaKitPlayback player;
-        player = MediaKitPlayback(onClosed: () => surfaces.clear(player));
+        player = MediaKitPlayback(
+          onClosed: () => surfaces.clear(player),
+          nativeAudioOutput: nativeAudioOutput,
+        );
         surfaces.attach(player, createMediaKitSurface(player.videoController));
         return player;
       }

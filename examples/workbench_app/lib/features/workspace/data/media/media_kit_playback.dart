@@ -10,8 +10,18 @@ import 'package:workbench_app/features/workspace/data/media/capture_video_frame.
 /// SDK adaptation only. Bootstrap supplies the presentation surface and removes
 /// it by player identity after all SDK cleanup has been attempted.
 final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
-  MediaKitPlayback({this._onClosed}) {
-    _video = VideoController(_player);
+  MediaKitPlayback({this._onClosed, String? nativeAudioOutput})
+    : _nativeAudioOutput = nativeAudioOutput {
+    _video = VideoController(
+      _player,
+      configuration: VideoControllerConfiguration(
+        // Older Linux libmpv versions treat `auto` as every decoder, including
+        // experimental devices. Keep supported acceleration and CPU fallback.
+        hwdec: defaultTargetPlatform == TargetPlatform.linux
+            ? 'auto-safe'
+            : null,
+      ),
+    );
     _frameGate = MediaFrameGate(_player);
     _subscriptions.add(
       _player.stream.position.listen((_) => notifyListeners()),
@@ -23,6 +33,7 @@ final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
     _subscriptions.add(_player.stream.volume.listen((_) => notifyListeners()));
   }
   final Player _player = Player();
+  final String? _nativeAudioOutput;
   late final VideoController _video;
   late final MediaFrameGate _frameGate;
   final void Function()? _onClosed;
@@ -42,6 +53,14 @@ final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
   @override
   Future<void> open(String uri) async {
     _video;
+    final output = _nativeAudioOutput;
+    if (output != null) {
+      final platform = _player.platform;
+      if (platform is! NativePlayer) {
+        throw UnsupportedError('Native audio output requires a native player');
+      }
+      await platform.setProperty('ao', output);
+    }
     await _player.open(Media(uri), play: false);
   }
 
