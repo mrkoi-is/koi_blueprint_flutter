@@ -5,6 +5,7 @@
 - 恢复并适配网络架构标准和 canonical 网络 Skill；网络与 OpenAPI 保持按需接入，离线生成项目不继承源仓活动出口配置
 - 新增带 provenance 的 Admin OpenAPI 演示、两阶段生成及源码漂移检查，接入网络出口静态门禁与 schema/黑盒回归
 - Native bootstrap 支持共享 bindings 的具名多 Host 和各后端 session-aware 401；生产日志约束覆盖内部调试，公共入口保留 Web no-op 与平台类型边界
+- 将 go_router 升级并固定到 18.0.1；18.0.2 在 Flutter 3.47.2 的工作台切页与自适应布局中触发语义树断言，待修复后再升级。
 
 ## 0.2.0-rc.1 — 2026-10-04
 

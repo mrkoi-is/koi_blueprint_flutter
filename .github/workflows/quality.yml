@@ -111,6 +111,15 @@ jobs:
       - name: Record platform source provenance
         run: python tool/platform_evidence.py --output "${{ runner.temp }}/koi-platform-evidence/source.json"
 
+      - name: Validate source OpenAPI paths on Windows
+        if: runner.os == 'Windows' && matrix.template == 'minimal' && hashFiles('tool/network/egress_manifest.json') != ''
+        shell: pwsh
+        run: |
+          flutter pub get --enforce-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dart run scripts/validate_network_architecture.dart
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
       - name: Correct pinned Flutter Windows CanvasKit URL handling
         if: matrix.template == 'workbench' && runner.os == 'Windows'
         shell: pwsh
