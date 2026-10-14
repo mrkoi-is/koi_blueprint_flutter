@@ -50,7 +50,7 @@ jobs:
           path = Path('${{ runner.temp }}/koi-native-diagnostic/apps/ci_blueprint_app/lib/features/workspace/data/media/media_kit_playback.dart')
           content = path.read_text(encoding='utf-8')
           content = content.replace('final Player _player = Player();', 'final Player _player = Player(configuration: const PlayerConfiguration(logLevel: MPVLogLevel.debug));')
-          content = content.replace('_video = VideoController(_player);', "_player.stream.log.listen((event) => debugPrint('KOI_MPV $event'));\n    _video = VideoController(_player);")
+          content = content.replace('_video = VideoController(_player);', "_player.stream.log.listen((event) => debugPrint('KOI_MPV $event'));\n    _video = VideoController(_player, configuration: VideoControllerConfiguration(hwdec: defaultTargetPlatform == TargetPlatform.linux ? 'auto-safe' : null));")
           path.write_text(content, encoding='utf-8')
           PY
       - name: macOS native smoke
