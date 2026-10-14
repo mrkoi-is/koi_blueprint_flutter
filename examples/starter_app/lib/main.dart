@@ -11,7 +11,7 @@ import 'package:starter_app/l10n/generated/app_localizations.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   AppDiagnostics.instance.install();
-  runApp(const StarterLauncher());
+  runApp(ProviderScope(child: const StarterLauncher()));
 }
 
 class StarterLauncher extends StatefulWidget {

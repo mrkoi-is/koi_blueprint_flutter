@@ -1,5 +1,25 @@
 include: package:flutter_lints/flutter.yaml
 
+plugins:
+  riverpod_lint:
+    version: 3.1.9
+    diagnostics:
+      missing_provider_scope: true
+      provider_dependencies: true
+      provider_parameters: true
+      unsupported_provider_value: true
+      functional_ref: true
+      notifier_extends: true
+      avoid_ref_inside_state_dispose: true
+      notifier_build: true
+      riverpod_syntax_error: true
+      async_value_nullable_pattern: true
+      avoid_build_context_in_providers: true
+      avoid_public_notifier_properties: true
+      protected_notifier_properties: true
+      scoped_providers_should_specify_dependencies: true
+      only_use_keep_alive_inside_keep_alive: true
+
 analyzer:
   exclude:
     - "tool/capabilities/recipes/**"

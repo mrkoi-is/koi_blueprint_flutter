@@ -74,5 +74,6 @@ doctor 的 JSON 区分工具 AVAILABLE、能力依赖 MATCH、库 LOADABLE、Web
 | [tool/platform_configuration.py](../tool/platform_configuration.py)、[tool/platform_capabilities.py](../tool/platform_capabilities.py)、[tool/device_capabilities.py](../tool/device_capabilities.py) | workbench 与可选能力原生配置计划，由统一安装事务合并，不是独立发布入口 |
 | [tool/create_media_fixtures.py](../tool/create_media_fixtures.py)，`python3 tool/create_media_fixtures.py` | 重新生成并覆盖已登记的合成图片/视频集成素材，需要 ffmpeg 与 ffprobe；仅在维护 fixture 时执行，不读用户素材库 |
 | [tool/platform_evidence.py](../tool/platform_evidence.py)，`python3 tool/platform_evidence.py --output PATH` | 记录源码指纹，不执行也不宣称平台通过；日志与 NOT_RUN 按 [平台验收](platform-acceptance.md) 另记 |
+| [tool/macos_media_preflight.swift](../tool/macos_media_preflight.swift)，`swift tool/macos_media_preflight.swift` | 检查 media_kit_video 所需的 macOS OpenGL 像素格式和上下文；只报告运行前提，不替代真实媒体验收 |
 
 Python 工具测试位于 `scripts/tests` 与 `tool/tests`，在 check test 中执行；Dart 工具行为测试也纳入同一阶段。修改 Skill 时另读 [维护契约](../.agents/skills/GOVERNANCE.md)。

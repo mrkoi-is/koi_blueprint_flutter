@@ -1,3 +1,5 @@
+import 'package:showcase_beta/showcase_beta.dart' show betaMessage;
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,7 @@ import 'package:module_showcase/core/services/showcase_services.dart';
 import 'package:showcase_alpha/showcase_alpha.dart';
 import 'package:showcase_contracts/showcase_contracts.dart';
 
+@Dependencies([alphaMessage, betaMessage])
 void main() {
   test(
     'failed bootstrap closes partial session and host infrastructure',

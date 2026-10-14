@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:database_lab/l10n/generated/app_localizations.dart';
 
 import 'dart:ui' show AppExitResponse;
@@ -10,13 +11,15 @@ import 'package:database_lab/capability.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    MaterialApp(
-      title: 'Database Lab',
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      home: const _StandaloneOwner(),
+    ProviderScope(
+      child: MaterialApp(
+        title: 'Database Lab',
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        home: const _StandaloneOwner(),
+      ),
     ),
   );
 }

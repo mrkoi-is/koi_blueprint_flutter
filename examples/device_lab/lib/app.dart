@@ -1,8 +1,11 @@
+import 'package:device_lab/features/devices/presentation/providers/device_providers.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:device_lab/l10n/generated/app_localizations.dart';
 import 'package:device_lab/features/devices/presentation/screens/device_page.dart';
 import 'package:flutter/material.dart';
 import 'package:koi_ui/koi_ui.dart';
 
+@Dependencies([deviceSession, deviceState])
 class DeviceLabApp extends StatelessWidget {
   const DeviceLabApp({super.key, this.locale});
   final Locale? locale;

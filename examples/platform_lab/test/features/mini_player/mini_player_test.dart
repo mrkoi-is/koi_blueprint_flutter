@@ -30,7 +30,7 @@ void main() {
       await tester.pumpWidget(
         ProviderScope(
           overrides: [
-            desktopWindowHostProvider.overrideWithValue(host),
+            desktopWindowHostProvider.overrideWithValue((host: host)),
             systemMediaControllerProvider.overrideWithValue(media),
           ],
           child: MaterialApp(

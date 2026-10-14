@@ -36,7 +36,7 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
-          desktopWindowHostProvider.overrideWithValue(host),
+          desktopWindowHostProvider.overrideWithValue((host: host)),
           trayPortProvider.overrideWithValue(FakeTray()),
         ],
         child: MaterialApp(
