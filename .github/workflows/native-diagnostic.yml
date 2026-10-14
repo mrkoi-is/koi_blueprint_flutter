@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        suite: [native]
+        suite: [browser]
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -34,14 +34,25 @@ jobs:
           sdk = Path(os.environ['FLUTTER_ROOT'])
           path = sdk / 'packages/flutter_tools/lib/src/test/flutter_web_platform.dart'
           original = path.read_text(encoding='utf-8')
-          before = 'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = _fileSystem.path.fromUri(request.url);'
-          after = 'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = request.url.path;'
-          if original.count(before) != 1:
-              raise SystemExit('Unexpected Flutter CanvasKit handler; stop rather than patch unknown tooling')
-          path.write_text(original.replace(before, after), encoding='utf-8')
-          for name in ('flutter_tools.snapshot', 'flutter_tools.stamp'):
-              (sdk / 'bin/cache' / name).unlink(missing_ok=True)
-          print('Applied isolated CI SDK CanvasKit URL fix (Flutter issue #192069)')
+          patches = [
+              ('shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = _fileSystem.path.fromUri(request.url);',
+               'shelf.Response _localCanvasKitHandler(shelf.Request request) {\n    final String fullPath = request.url.path;'),
+              ('shelf.Response _wrapperHandler(shelf.Request request) {\n    final String path = _fileSystem.path.fromUri(request.url);',
+               'shelf.Response _wrapperHandler(shelf.Request request) {\n    final String path = request.url.path;'),
+          ]
+          updated = original
+          for before, after in patches:
+              if updated.count(before) == 1:
+                  updated = updated.replace(before, after)
+              elif updated.count(after) != 1:
+                  raise SystemExit('Unexpected Flutter browser handler; stop rather than patch unknown tooling')
+          if updated != original:
+              path.write_text(updated, encoding='utf-8')
+              for name in ('flutter_tools.snapshot', 'flutter_tools.stamp'):
+                  (sdk / 'bin/cache' / name).unlink(missing_ok=True)
+              print('Applied isolated CI SDK URL fixes for CanvasKit and test selector (Flutter issue #192069)')
+          else:
+              print('CI SDK already has the browser URL fixes')
           '@ | python -
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Generate Windows workbench
