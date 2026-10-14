@@ -1067,6 +1067,11 @@ def doctor(args):
 
 
 def main(argv=None):
+    # Windows pipes otherwise use the system code page, which cannot represent
+    # all workspace paths. Keep CLI output consistent with run()'s UTF-8 input.
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, 'reconfigure'):
+            stream.reconfigure(encoding='utf-8', errors='replace')
     if sys.version_info < MIN_PYTHON:
         print('blueprint: Python 3.11 or newer is required; no files were changed', file=sys.stderr)
         return 2

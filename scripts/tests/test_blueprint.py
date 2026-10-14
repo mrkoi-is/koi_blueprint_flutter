@@ -90,7 +90,7 @@ class BlueprintTest(unittest.TestCase):
             self.assertEqual(run.call_args_list[0].args, (['flutter', 'pub', 'get', '--enforce-lockfile'], self.app))
             self.assertIn('--config-only', run.call_args_list[1].args[0])
             self.assertEqual(cwd, self.app)
-            manifest = json.loads((self.app / 'build/blueprint/android-release.json').read_text())
+            manifest = json.loads((self.app / 'build/blueprint/android-release.json').read_text(encoding='utf-8'))
             self.assertEqual(manifest['status'], 'PASS')
             self.assertEqual(manifest['runtime'], 'NOT_RUN')
             self.assertEqual(manifest['actualArchitectures'], ['arm64-v8a'])
@@ -259,7 +259,7 @@ class BlueprintTest(unittest.TestCase):
                     tests = list((member / 'test/features/inventory').rglob('*_test.dart'))
                     self.assertTrue(tests)
                     for test in tests:
-                        self.assertIn('package:demo/' + prefix + '/inventory/', test.read_text())
+                        self.assertIn('package:demo/' + prefix + '/inventory/', test.read_text(encoding='utf-8'))
 
     def test_module_entry_identifies_example_without_registering_a_package_role(self):
         member = self.root / 'examples/minimal_module'
@@ -479,26 +479,26 @@ class BlueprintTest(unittest.TestCase):
             args = argparse.Namespace(name=f'{parent_template}_workbench_app', org='org.example', platforms='web', output=str(parent), dry_run=False, template=parent_template)
             with patch.object(blueprint, 'ROOT', source):
                 blueprint.create(args)
-            self.assertEqual((parent / f'apps/{args.name}_app/web/runner_identity.txt').read_text(), f'{args.name}_app')
+            self.assertEqual((parent / f'apps/{args.name}_app/web/runner_identity.txt').read_text(encoding='utf-8'), f'{args.name}_app')
             self.assertTrue((parent / 'packages/koi_ui/pubspec.yaml').exists())
             self.assertEqual((parent / 'DESIGN.md').read_bytes(), (source / 'DESIGN.md').read_bytes())
-            self.assertIn('[DESIGN.md](DESIGN.md)', (parent / 'README.md').read_text())
+            self.assertIn('[DESIGN.md](DESIGN.md)', (parent / 'README.md').read_text(encoding='utf-8'))
             # Product-specific edits must survive all recursive template pairs.
-            design = (parent / 'DESIGN.md').read_text() + 'Product typography decision 中文\n'
-            (parent / 'DESIGN.md').write_text(design)
-            self.assertEqual(json.loads((parent / 'blueprint.json').read_text())['template'], parent_template)
+            design = (parent / 'DESIGN.md').read_text(encoding='utf-8') + 'Product typography decision 中文\n'
+            (parent / 'DESIGN.md').write_text(design, encoding='utf-8')
+            self.assertEqual(json.loads((parent / 'blueprint.json').read_text(encoding='utf-8'))['template'], parent_template)
             if parent_template == 'workbench':
                 self.assertEqual((parent / f'apps/{args.name}_app/assets/sample.mp4').read_bytes(), b'workbench_app\x00\xff\xfe')
-                self.assertEqual((parent / f'apps/{args.name}_app/assets/identity.md').read_text(), 'workbench_app Koi 工作区\n')
-                self.assertIn(blueprint.pascal(args.name) + ' 工作区', (parent / f'apps/{args.name}_app/lib/main.dart').read_text())
+                self.assertEqual((parent / f'apps/{args.name}_app/assets/identity.md').read_text(encoding='utf-8'), 'workbench_app Koi 工作区\n')
+                self.assertIn(blueprint.pascal(args.name) + ' 工作区', (parent / f'apps/{args.name}_app/lib/main.dart').read_text(encoding='utf-8'))
             for child_template in ('minimal', 'workbench'):
                 child = self.root / f'{parent_template}_to_{child_template}'
                 with patch.object(blueprint, 'ROOT', parent):
                     blueprint.create(argparse.Namespace(name='child', org='org.example', platforms='web', output=str(child), dry_run=False, template=child_template))
-                self.assertEqual(json.loads((child / 'blueprint.json').read_text())['template'], child_template)
+                self.assertEqual(json.loads((child / 'blueprint.json').read_text(encoding='utf-8'))['template'], child_template)
                 self.assertTrue((child / 'packages/koi_ui/pubspec.yaml').exists())
-                self.assertEqual((child / 'DESIGN.md').read_text(), design)
-                self.assertIn('[DESIGN.md](DESIGN.md)', (child / 'README.md').read_text())
+                self.assertEqual((child / 'DESIGN.md').read_text(encoding='utf-8'), design)
+                self.assertIn('[DESIGN.md](DESIGN.md)', (child / 'README.md').read_text(encoding='utf-8'))
 
     def test_invalid_template_and_required_ui_name_fail_before_sdk(self):
         for name, template in (('koi_ui', 'minimal'), ('valid', 'missing')):
@@ -533,9 +533,10 @@ class BlueprintTest(unittest.TestCase):
     def test_sdk_precedence_and_dart_share_one_flutter_installation(self):
         sdk_root = self.root / 'sdk-choice'
         write(sdk_root / '.fvmrc', '{"flutter":"3.47.2"}')
-        environment_flutter = self.root / 'env-sdk/bin/flutter'
-        project_flutter = sdk_root / '.fvm/flutter_sdk/bin/flutter'
-        path_flutter = self.root / 'path-sdk/bin/flutter'
+        suffix = '.bat' if os.name == 'nt' else ''
+        environment_flutter = self.root / 'env-sdk/bin' / ('flutter' + suffix)
+        project_flutter = sdk_root / '.fvm/flutter_sdk/bin' / ('flutter' + suffix)
+        path_flutter = self.root / 'path-sdk/bin' / ('flutter' + suffix)
         for path in (environment_flutter, project_flutter, path_flutter):
             write(path, '')
         for selected, expected in ((str(environment_flutter), environment_flutter),
@@ -549,7 +550,7 @@ class BlueprintTest(unittest.TestCase):
                  patch.object(blueprint, 'run', return_value='{"frameworkVersion":"3.47.2"}') as run:
                 sdk = blueprint.SDK(sdk_root)
                 self.assertEqual(sdk.flutter, expected.resolve())
-                self.assertEqual(sdk.dart, expected.parent / 'dart')
+                self.assertEqual(sdk.dart, expected.parent / ('dart' + suffix))
                 self.assertEqual(run.call_args.args[0][0], expected.resolve())
                 self.assertEqual(os.environ['PATH'].split(os.pathsep)[0], str(expected.parent))
 
