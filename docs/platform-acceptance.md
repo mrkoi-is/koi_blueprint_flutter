@@ -39,6 +39,8 @@ macOS 原生视频运行还需要 `media_kit_video` 可创建的 OpenGL 像素�
 
 Linux 无物理音频设备的 CI 使用 PulseAudio null sink，仍执行实际 AAC 解码、播放控制和视频像素验收。播放器在 Linux 使用 libmpv 支持的 `auto-safe` 硬件解码名单并保留软件回退，避免旧版 `auto` 尝试实验解码器时把中间错误暴露为预览失败。
 
+Flutter 3.47.2 的 Windows 浏览器测试工具将 CanvasKit URL 转成本地反斜杠路径后与正斜杠前缀比较，导致资源 404 和启动挂起。Windows workbench CI 对隔离 SDK 的该处理函数应用精确、幂等的 URL 路径修正并重建工具快照，保留原有 Chrome 测试；源码不匹配时失败退出。变更只作用于 CI SDK，不自动修改开发者 SDK。问题机制与 [Flutter #192069](https://github.com/flutter/flutter/issues/192069) 一致；移除此兼容步骤前需验证固定 SDK 中的实现和真实 Windows 浏览器结果。
+
 Web：使用匹配浏览器版本的ChromeDriver或SafariDriver，按照workbench README的drive入口运行。Safari另需已开启远程自动化及可用SafariDriver；缺少时记NOT_RUN，不自动修改用户系统设置。Chrome测试结果不能替代Safari结果。
 
 ## 人工流程
