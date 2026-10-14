@@ -11,6 +11,8 @@ import unittest
 ROOT = Path(__file__).resolve().parents[2]
 
 
+@unittest.skipUnless((ROOT / 'tool/openapi/PROVENANCE.json').is_file(),
+                     'Offline workspace has no active OpenAPI provenance')
 class OpenApiCheckoutTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which('git'), 'Git is unavailable')
     def test_autocrlf_checkout_preserves_contract_and_parser_hashes(self):
