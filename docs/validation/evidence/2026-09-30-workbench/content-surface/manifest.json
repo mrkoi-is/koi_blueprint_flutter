@@ -1,0 +1,158 @@
+{
+  "date": "2026-09-30",
+  "scope": "Shared window/sidebar chrome and one rounded body/details surface",
+  "baseline": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-content-surface-baseline-20260930-cmw0bm9w",
+  "validation": {
+    "result": "PASS",
+    "coverage_percent": 87.21,
+    "covered_lines": 3408,
+    "handwritten_lines": 3908,
+    "workbench_vm_tests": 72,
+    "workbench_chrome_storage_tests": 8,
+    "targeted_ui_tests": 16,
+    "targeted_window_and_workspace_tests": 22
+  },
+  "macos": {
+    "debug_build": "PASS",
+    "actual_runtime": "PASS",
+    "native_window_id": 19560,
+    "observations": [
+      "Native title bar, icon rail and content sidebar share chrome color",
+      "Main area and details share a distinct rounded surface",
+      "Light/dark switching preserves selected Chinese text document",
+      "Original screenshots preserve all four visible corners and native controls",
+      "Restored light appearance after inspection"
+    ],
+    "executable": {
+      "file": "runtimeaccept_app",
+      "bytes": 59008,
+      "sha256": "2d507ac98ad93ce89fcfa072cef004d95651fef8375370fc9493b8f0e355c077",
+      "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/build/macos/Build/Products/Debug/runtimeaccept_app.app/Contents/MacOS/runtimeaccept_app"
+    }
+  },
+  "generator": {
+    "parent": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-content-surface-generator-s_yo9ctb/新工作台",
+    "child": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-content-surface-generator-s_yo9ctb/递归工作台",
+    "verification": "PASS: macos/web create, analyze, exact transformed source, one native toolbar and fixture bytes"
+  },
+  "screenshots": [
+    {
+      "file": "text-light.png",
+      "bytes": 1689260,
+      "sha256": "0edb51364b9ca265ce09904edce552c5afcca0ecab8357fe6cb1a918117fdf40",
+      "original": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/codex-shot-2026-09-30_16-35-55.png",
+      "modified": false
+    },
+    {
+      "file": "text-dark.png",
+      "bytes": 1719920,
+      "sha256": "536dc214584a1736176eb21d0b3b6da0a2e55b50e196e3eb52a3439f20af8bfa",
+      "original": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/codex-shot-2026-09-30_16-36-39.png",
+      "modified": false
+    }
+  ],
+  "pixel_evidence": [
+    {
+      "file": "text-light.png",
+      "size": [
+        3644,
+        2238
+      ],
+      "samples": {
+        "titlebar": "#F2F3F1",
+        "rail": "#F2F3F1",
+        "sidebar": "#F2F3F2",
+        "body_surface": "#FFFBF6",
+        "detail": "#FFFBF6"
+      },
+      "coordinates": {
+        "titlebar": [
+          1100,
+          115
+        ],
+        "rail": [
+          180,
+          1200
+        ],
+        "sidebar": [
+          450,
+          1400
+        ],
+        "body_surface": [
+          2200,
+          300
+        ],
+        "detail": [
+          3300,
+          1200
+        ]
+      },
+      "shell_max_rgb_delta": 1
+    },
+    {
+      "file": "text-dark.png",
+      "size": [
+        3644,
+        2238
+      ],
+      "samples": {
+        "titlebar": "#121B18",
+        "rail": "#121B18",
+        "sidebar": "#121B19",
+        "body_surface": "#1D2622",
+        "detail": "#1D2622"
+      },
+      "coordinates": {
+        "titlebar": [
+          1100,
+          115
+        ],
+        "rail": [
+          180,
+          1200
+        ],
+        "sidebar": [
+          450,
+          1400
+        ],
+        "body_surface": [
+          2200,
+          300
+        ],
+        "detail": [
+          3300,
+          1200
+        ]
+      },
+      "shell_max_rgb_delta": 1
+    }
+  ],
+  "logs": [
+    {
+      "file": "validate.log",
+      "bytes": 111230,
+      "sha256": "c8b9efaa601305066556622286edc0d5bb9122f5012ffb9cb9aa42e24d8740af"
+    },
+    {
+      "file": "macos-build.log",
+      "bytes": 1164,
+      "sha256": "8a5a8f76ebf0da11ee662fefc057b7131072fb7bd5bf36cd17f0af823e4c6004"
+    },
+    {
+      "file": "generator.log",
+      "bytes": 13950,
+      "sha256": "970457ec9ca616d90e89f2a7c726b456ffe4d93a0dc65e4234bdc86332399b47"
+    },
+    {
+      "file": "targeted.log",
+      "bytes": 6004,
+      "sha256": "928e8e89766a81b936f293afc152657e2eb39d848bd832ec9c08b6808f46a088"
+    }
+  ],
+  "source_verification": "All five copied source files exactly match runtime host after capture",
+  "not_run": [
+    "Other target platform builds and real runs for this change",
+    "Remote CI"
+  ],
+  "earlier_failure": "ColoredBox obscured ListTile ink; replaced with Material and reran all affected tests successfully"
+}

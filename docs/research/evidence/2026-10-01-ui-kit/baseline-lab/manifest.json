@@ -1,0 +1,10 @@
+[
+  {
+    "path": "examples/ui_lab/lib/main.dart",
+    "sha256": "24cc7587f42a5ade81f644b82df7f74bb05e4347c82dd97f9faa94c1b838797e"
+  },
+  {
+    "path": "examples/ui_lab/test/ui_lab_test.dart",
+    "sha256": "8020dc16e75a4f0ab049d619650f92d720bf9603a5dd2b9f08db9433f83fb83c"
+  }
+]

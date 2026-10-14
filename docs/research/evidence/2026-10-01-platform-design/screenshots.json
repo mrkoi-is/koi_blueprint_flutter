@@ -1,0 +1,33 @@
+{
+  "before-macos-text.png": {
+    "phase": "before iteration",
+    "logical_window": [
+      1710,
+      1007
+    ],
+    "dpr": 2,
+    "includes_window_shadow": true
+  },
+  "before-macos-tasks.png": {
+    "phase": "before iteration",
+    "logical_window": [
+      1710,
+      1007
+    ],
+    "dpr": 2,
+    "includes_window_shadow": true
+  },
+  "after-macos-medium-text.png": {
+    "phase": "after visual changes, before final semantic-container repair",
+    "logical_window": [
+      800,
+      600
+    ],
+    "dpr": 2,
+    "includes_window_shadow": true,
+    "theme": "light",
+    "density": "compact",
+    "fixture": "generated workbench with disposable Chinese records; root template starts empty",
+    "limit": "visual proof only; final native AX was not reverified"
+  }
+}

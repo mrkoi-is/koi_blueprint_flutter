@@ -1,0 +1,92 @@
+Resolving dependencies in `/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-ui-kit-minimal-4ygp9qfb/project`...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies in `/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-ui-kit-minimal-4ygp9qfb/project`!
+7 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Compiling /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/lib/main.dart for the Web...     
+Unexpected wasm dry run failure (255):
+
+'record-use' is now enabled by default; this flag is no longer required.
+'record-use' is now enabled by default; this flag is no longer required.
+Unhandled exception:
+Unsupported operation: Cannot extract a file path from a org-dartlang-untranslatable-uri URI
+#0      _Uri.toFilePath (dart:core/uri.dart:3432)
+#1      DryRunSummarizer._lintChecks (package:dart2wasm/dry_run.dart:204)
+#2      DryRunSummarizer.summarize (package:dart2wasm/dry_run.dart:278)
+#3      _runCfePhase (package:dart2wasm/compile.dart:356)
+<asynchronous suspension>
+#4      compile (package:dart2wasm/compile.dart:245)
+<asynchronous suspension>
+#5      generateWasm (package:dart2wasm/generate_wasm.dart:78)
+<asynchronous suspension>
+#6      main (file:///Volumes/Work/s/w/ir/x/w/sdk/pkg/dart2wasm/bin/dart2wasm.dart:10)
+<asynchronous suspension>
+
+Use --no-wasm-dry-run to disable these warnings.
+Target dart2js failed: ProcessException: Process exited abnormally with exit code 1:
+Error: Couldn't resolve the package 'ui_lab' in 'package:ui_lab/standard_component_catalog.dart'.
+/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/lib/main.dart:6:8:
+Error: Not found: 'package:ui_lab/standard_component_catalog.dart'
+import 'package:ui_lab/standard_component_catalog.dart';
+       ^
+/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/lib/main.dart:221:38:
+Error: Not a constant expression.
+                        child: const StandardComponentCatalog(),
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^
+Error: Compilation failed.
+  Command: /Users/max/Workspace/env/fvm/versions/3.47.2/bin/cache/dart-sdk/bin/dart compile js --platform-binaries=/Users/max/Workspace/env/fvm/versions/3.47.2/bin/cache/flutter_web_sdk/kernel --invoker=flutter_tool -Ddart.vm.product=true -DFLUTTER_BUILD_NAME=0.1.0 -DFLUTTER_BUILD_NUMBER=1 -DFLUTTER_VERSION=3.47.2 -DFLUTTER_CHANNEL=stable -DFLUTTER_GIT_URL=https://github.com/flutter/flutter.git -DFLUTTER_FRAMEWORK_REVISION=d3b14c8769 -DFLUTTER_ENGINE_REVISION=a804b26164 -DFLUTTER_DART_VERSION=3.13.2 -DFLUTTER_WEB_USE_SKIA=true -DFLUTTER_WEB_USE_SKWASM=false -DFLUTTER_WEB_CANVASKIT_URL=https://www.gstatic.com/flutter-canvaskit/a804b261645ef8c13eb3d5c44a5c2fb0340c5539/ --write-resources --enable-experiment=record-use --native-null-assertions --no-source-maps -O4 --minify -o /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-ui-kit-minimal-4ygp9qfb/project/apps/kit_review_app/.dart_tool/flutter_build/6e2ca818ea2cff9890dbda521d95717f/app.dill --packages=/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-ui-kit-minimal-4ygp9qfb/project/.dart_tool/package_config.json --cfe-only /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-ui-kit-minimal-4ygp9qfb/project/apps/kit_review_app/.dart_tool/flutter_build/6e2ca818ea2cff9890dbda521d95717f/main.dart
+#0      RunResult.throwException (package:flutter_tools/src/base/process.dart:153:5)
+#1      _DefaultProcessUtils.run (package:flutter_tools/src/base/process.dart:379:19)
+<asynchronous suspension>
+#2      Dart2JSTarget.build (package:flutter_tools/src/build_system/targets/web.dart:225:5)
+<asynchronous suspension>
+#3      _BuildInstance._invokeInternal (package:flutter_tools/src/build_system/build_system.dart:937:9)
+<asynchronous suspension>
+#4      Future.wait.<anonymous closure> (dart:async/future.dart:567:21)
+<asynchronous suspension>
+#5      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+<asynchronous suspension>
+#6      Future.wait.<anonymous closure> (dart:async/future.dart:567:21)
+<asynchronous suspension>
+#7      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+<asynchronous suspension>
+#8      Future.wait.<anonymous closure> (dart:async/future.dart:567:21)
+<asynchronous suspension>
+#9      _BuildInstance.invokeTarget (package:flutter_tools/src/build_system/build_system.dart:875:32)
+<asynchronous suspension>
+#10     FlutterBuildSystem.build (package:flutter_tools/src/build_system/build_system.dart:684:16)
+<asynchronous suspension>
+#11     WebBuilder.buildWeb (package:flutter_tools/src/web/compile.dart:107:34)
+<asynchronous suspension>
+#12     BuildWebCommand.runCommand (package:flutter_tools/src/commands/build_web.dart:293:5)
+<asynchronous suspension>
+#13     FlutterCommand.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command.dart:1663:27)
+<asynchronous suspension>
+#14     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#15     CommandRunner.runCommand (package:args/command_runner.dart:212:13)
+<asynchronous suspension>
+#16     FlutterCommandRunner.runCommand.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:496:9)
+<asynchronous suspension>
+#17     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#18     FlutterCommandRunner.runCommand (package:flutter_tools/src/runner/flutter_command_runner.dart:431:5)
+<asynchronous suspension>
+#19     FlutterCommandRunner.run.<anonymous closure> (package:flutter_tools/src/runner/flutter_command_runner.dart:307:33)
+<asynchronous suspension>
+#20     run.<anonymous closure>.<anonymous closure> (package:flutter_tools/runner.dart:104:11)
+<asynchronous suspension>
+#21     AppContext.run.<anonymous closure> (package:flutter_tools/src/base/context.dart:154:19)
+<asynchronous suspension>
+#22     main (package:flutter_tools/executable.dart:103:3)
+<asynchronous suspension>
+
+Compiling /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/lib/main.dart for the Web...        11.7s
+Error: Failed to compile application for the Web.

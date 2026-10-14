@@ -51,7 +51,10 @@ Future<KoiApiRuntime> bootstrapKoiApiBackend(
     await KoiNetworkInitializer.initializeWithConfig(config);
     KoiNetworkServiceManager.instance.mainDio.interceptors.insert(
       0,
-      _SessionAwareAuthErrorInterceptor(bindings),
+      _SessionAwareAuthErrorInterceptor(
+        bindings,
+        options.tokenRefreshWhiteList,
+      ),
     );
   } catch (_) {
     await disposeKoiApiBackend();
@@ -99,9 +102,8 @@ final class _BindingsErrorHandlerAdapter extends KoiErrorHandlerAdapter {
 
   @override
   Future<bool> handleAuthError({int? statusCode, String? message}) {
-    // koi_network does not expose the failed request to this adapter. The
-    // session-aware interceptor below owns logout decisions so a delayed 401
-    // from an old request cannot revoke a newer token.
+    // koi_network 不会向此适配器暴露失败请求。登出判断由下方的会话感知拦截器负责，
+    // 避免旧请求延迟返回的 401 撤销较新的令牌。
     return Future<bool>.value(true);
   }
 
@@ -110,15 +112,24 @@ final class _BindingsErrorHandlerAdapter extends KoiErrorHandlerAdapter {
 }
 
 final class _SessionAwareAuthErrorInterceptor extends Interceptor {
-  _SessionAwareAuthErrorInterceptor(this._bindings);
+  _SessionAwareAuthErrorInterceptor(
+    this._bindings,
+    this._tokenRefreshWhiteList,
+  );
 
   final KoiApiBindings _bindings;
+  final List<String> _tokenRefreshWhiteList;
 
   @override
   Future<void> onError(
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
+    if (_tokenRefreshWhiteList.any(err.requestOptions.path.contains)) {
+      handler.next(err);
+      return;
+    }
+
     final body = err.response?.data;
     final mapBody = body is Map<String, dynamic> ? body : null;
     final isAuthError = KoiNetworkAdapters.responseParser.isAuthError(
@@ -135,9 +146,20 @@ final class _SessionAwareAuthErrorInterceptor extends Interceptor {
 
     if (isAuthError && expectedToken != null) {
       try {
+        String? message;
+        try {
+          message = KoiNetworkAdapters.responseParser.getMessage(mapBody ?? {});
+        } catch (error, stackTrace) {
+          _bindings.log(
+            KoiApiLogLevel.warning,
+            'Could not parse the unauthorized response message',
+            error,
+            stackTrace,
+          );
+        }
         await _bindings.handleUnauthorized(
           statusCode: err.response?.statusCode,
-          message: KoiNetworkAdapters.responseParser.getMessage(mapBody ?? {}),
+          message: message,
           expectedToken: expectedToken,
           expectedRevision: expectedRevision,
         );

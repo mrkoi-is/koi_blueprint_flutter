@@ -1,0 +1,24 @@
+--- before/packages/koi_ui/test/koi_components_test.dart
++++ after/packages/koi_ui/test/koi_components_test.dart
+@@ -363,13 +363,20 @@
+         final sidebarDrawer = tester.widget<Drawer>(
+           find.ancestor(of: find.text('侧栏'), matching: find.byType(Drawer)),
+         );
+-        expect(sidebarDrawer.backgroundColor, tokens.contentBackground);
++        expect(sidebarDrawer.backgroundColor, tokens.panelBackground);
+         Navigator.of(tester.element(find.text('侧栏'))).pop();
+         await tester.pumpAndSettle();
+         await tester.tap(find.byTooltip('切换详情面板'));
+         await tester.pumpAndSettle();
+         expect(find.text('详情'), findsOneWidget);
+       } else {
++        for (final name in ['sidebar', 'detail']) {
++          final panel = tester.widget<Material>(
++            find.byKey(ValueKey('koi-workbench-$name-surface')),
++          );
++          expect(panel.color, tokens.panelBackground);
++          expect(panel.color, isNot(surface.color));
++        }
+         for (final label in ['侧栏', '详情']) {
+           expect(
+             find.descendant(of: contentSurface, matching: find.text(label)),

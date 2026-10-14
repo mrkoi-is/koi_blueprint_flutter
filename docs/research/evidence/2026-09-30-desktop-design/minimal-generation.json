@@ -1,0 +1,26 @@
+{
+  "base": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-final-minimal-lncql1ze",
+  "project": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-final-minimal-lncql1ze/project",
+  "generation_log": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-final-minimal-lncql1ze/generation.log",
+  "ai_assets_log": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-final-minimal-lncql1ze/ai-assets.log",
+  "generation_exit": 0,
+  "ai_assets_exit": 0,
+  "design_byte_equal": true,
+  "source_design_sha256": "1cc11514b675f531aa000cb062affb3ce9de9620f00df3ed5fb809b96ee70d72",
+  "generated_design_sha256": "1cc11514b675f531aa000cb062affb3ce9de9620f00df3ed5fb809b96ee70d72",
+  "koi_ui_pubspec_exists": true,
+  "koi_ui_workspace_member": true,
+  "blueprint": {
+    "schema": 1,
+    "name": "design_final_minimal",
+    "app": "apps/design_final_minimal_app",
+    "platforms": [
+      "web"
+    ],
+    "template": "minimal"
+  },
+  "build_or_runtime": "NOT_RUN",
+  "template": "minimal",
+  "design_sha256": "1cc11514b675f531aa000cb062affb3ce9de9620f00df3ed5fb809b96ee70d72",
+  "design_identical_to_final_source": true
+}

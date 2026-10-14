@@ -1,0 +1,73 @@
+{
+  "host": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project",
+  "identityReplacement": "package:workbench_app/ -> package:runtimeaccept_app/; app.dart WorkbenchApp -> RuntimeacceptApp",
+  "files": [
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/lib/koi_ui.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/packages/koi_ui/lib/koi_ui.dart",
+      "source_sha256": "f7febeea95d741361430379d39f3902012150b8580b01d1d466cb2ec7561b30f",
+      "target_sha256": "f7febeea95d741361430379d39f3902012150b8580b01d1d466cb2ec7561b30f"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+      "source_sha256": "2813c44a086f1930d9b757a794b071106e2d827f1dfdd43378db374b7639aa9f",
+      "target_sha256": "2813c44a086f1930d9b757a794b071106e2d827f1dfdd43378db374b7639aa9f"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/lib/widgets/koi_navigation_history_controls.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/packages/koi_ui/lib/widgets/koi_navigation_history_controls.dart",
+      "source_sha256": "d05895065d2f855d0da64966135ecd79161931989f6f13a4ff29a62ae197d550",
+      "target_sha256": "d05895065d2f855d0da64966135ecd79161931989f6f13a4ff29a62ae197d550"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/lib/bootstrap.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/lib/bootstrap.dart",
+      "source_sha256": "5893c5d87be829fc088d78e17a6e7913831fa65c763a9a24c0aaad1b9c424ee3",
+      "target_sha256": "a19ad248d3328be27b42166ada54e116a54f30ee901e1016142988d9c5a6c6a5"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/lib/core/router/workbench_navigation_history.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/lib/core/router/workbench_navigation_history.dart",
+      "source_sha256": "9e685eab9520dc605daba47895bc12177da02decf3dbcf15e3477bf831db00f7",
+      "target_sha256": "1009506451f5985b01a667d6644901b9b4be02e91aac83da37d3de67b0eb1003"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/lib/features/workspace/presentation/providers/navigation_providers.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/lib/features/workspace/presentation/providers/navigation_providers.dart",
+      "source_sha256": "b7d6298b5d51b6941d455f1475fcfb3e7f4b2407706fc7f0feb0bd815a29632b",
+      "target_sha256": "8a3f9b430580939f4435d3bf6dc7e720dabbc7b7021294295e4b042ea9fe46c3"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/lib/features/workspace/presentation/providers/navigation_providers.g.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/lib/features/workspace/presentation/providers/navigation_providers.g.dart",
+      "source_sha256": "55951115892bb2b999d037e6ab7afbd52c35c62baeddc1f9cc317831f8240aa9",
+      "target_sha256": "55951115892bb2b999d037e6ab7afbd52c35c62baeddc1f9cc317831f8240aa9"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+      "source_sha256": "42cffb773962a8239f075f11010edfda0cc02fbc128786878e1c487f56179dd5",
+      "target_sha256": "e4f0dccd97f79983edc58bbd60cc8b11572944dafe5e7019f2cf97cc1b8d30a1"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/lib/app.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/lib/app.dart",
+      "source_sha256": "ceb5445f44b96806ef94c9558305e97e78131a3f16b0cf58c6e16ff3574c4fc0",
+      "target_sha256": "4bb9b2b404b3136677eff918e4b09a58a1e79954233d3dacae51e0b536744ace"
+    },
+    {
+      "source": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/lib/core/window/workbench_window_chrome.dart",
+      "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/lib/core/window/workbench_window_chrome.dart",
+      "source_sha256": "ddf691834a3245b4e7f82af738ff240cfaa571f94ea36744e1954db8d4ab33bf",
+      "target_sha256": "ddf691834a3245b4e7f82af738ff240cfaa571f94ea36744e1954db8d4ab33bf"
+    }
+  ],
+  "nativeRunner": {
+    "target": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi_runtime_acceptance_r440woi4/project/apps/runtimeaccept_app/macos/Runner/MainFlutterWindow.swift",
+    "configurationSource": "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/tool/platform_configuration.py",
+    "sha256": "01a38f4abf91d29aae82c3c8e30ab2a8d8a6c8bfacd3a51007688807df63d879",
+    "previousRunnerBackup": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-native-toolbar-baseline-20260930-yru0fmal/owned-host-MainFlutterWindow.swift",
+    "configuration_sha256": "630ea2368341f7ae31f45d1fb52b75f3186dd1c2e814ac43fbede929f60c4947"
+  }
+}

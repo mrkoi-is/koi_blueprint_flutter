@@ -1,0 +1,432 @@
+import 'dart:async';
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
+import 'package:workbench_app/features/workspace/presentation/services/media_preview_session.dart';
+
+class MediaPage extends ConsumerStatefulWidget {
+  const MediaPage({super.key});
+  @override
+  ConsumerState<MediaPage> createState() => _MediaPageState();
+}
+
+class _MediaPageState extends ConsumerState<MediaPage> {
+  bool _grid = true;
+  String? _requestedAsset;
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _updatePreview(ref.read(workspaceSessionProvider).state);
+      }
+    });
+  }
+
+  void _updatePreview(WorkspaceState state) {
+    final selected = state.snapshot.assets
+        .where(
+          (asset) => asset.id == state.snapshot.preferences.selectedAssetId,
+        )
+        .firstOrNull;
+    if (_requestedAsset == selected?.id) {
+      return;
+    }
+    _requestedAsset = selected?.id;
+    unawaited(ref.read(mediaPreviewSessionProvider).select(selected));
+  }
+
+  void _select(WorkspaceAsset asset) {
+    final session = ref.read(workspaceSessionProvider);
+    session.updatePreferences(
+      session.state.snapshot.preferences.copyWith(selectedAssetId: asset.id),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final session = ref.watch(workspaceSessionProvider);
+    final state = ref.watch(
+      workspaceStateProvider.select(
+        (value) => (
+          assets: value.value?.snapshot.assets ?? session.state.snapshot.assets,
+          selectedAssetId:
+              value.value?.snapshot.preferences.selectedAssetId ??
+              session.state.snapshot.preferences.selectedAssetId,
+        ),
+      ),
+    );
+    ref.listen(
+      workspaceStateProvider.select(
+        (value) => value.value?.snapshot.preferences.selectedAssetId,
+      ),
+      (_, _) => _updatePreview(session.state),
+    );
+    final filter = ref.watch(mediaFilterProvider);
+    final query = ref.watch(mediaSearchProvider);
+    final assets = state.assets
+        .where(
+          (asset) =>
+              (filter == null || asset.kind == filter) &&
+              asset.name.toLowerCase().contains(query.toLowerCase()),
+        )
+        .toList();
+    final selected = state.assets
+        .where((asset) => asset.id == state.selectedAssetId)
+        .firstOrNull;
+    final preview = ref.watch(mediaPreviewSessionProvider);
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              FilledButton.icon(
+                onPressed: () =>
+                    unawaited(session.importFiles(ImportKind.media)),
+                icon: const Icon(Icons.add_photo_alternate_outlined),
+                label: const Text('导入图片 / 视频'),
+              ),
+              IconButton(
+                tooltip: _grid ? '切换列表' : '切换网格',
+                onPressed: () => setState(() => _grid = !_grid),
+                icon: Icon(
+                  _grid ? Icons.view_list_outlined : Icons.grid_view_outlined,
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final wide = constraints.maxWidth >= 900;
+              final library = assets.isEmpty
+                  ? const KoiEmptyState(
+                      title: '暂无匹配素材',
+                      description: '导入 PNG/JPEG 图片或 MP4 视频',
+                    )
+                  : _grid
+                  ? GridView.builder(
+                      key: const PageStorageKey('media-grid'),
+                      padding: const EdgeInsets.all(12),
+                      gridDelegate:
+                          const SliverGridDelegateWithMaxCrossAxisExtent(
+                            maxCrossAxisExtent: 200,
+                            childAspectRatio: 1.05,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
+                      itemCount: assets.length,
+                      itemBuilder: (context, index) => _AssetTile(
+                        asset: assets[index],
+                        selected: selected?.id == assets[index].id,
+                        onTap: () => _select(assets[index]),
+                      ),
+                    )
+                  : ListView.builder(
+                      key: const PageStorageKey('media-list'),
+                      itemCount: assets.length,
+                      itemBuilder: (context, index) {
+                        final asset = assets[index];
+                        return KoiSelectableListTile(
+                          title: Text(asset.name),
+                          subtitle: Text(
+                            '${asset.kind == MediaKind.image ? '图片' : '视频'} · ${asset.byteLength} 字节',
+                          ),
+                          selected: selected?.id == asset.id,
+                          leading: SizedBox(
+                            width: 48,
+                            height: 48,
+                            child: asset.thumbnailKey == null
+                                ? Icon(
+                                    asset.kind == MediaKind.image
+                                        ? Icons.image_outlined
+                                        : Icons.movie_outlined,
+                                  )
+                                : _StoredImage(storageKey: asset.thumbnailKey!),
+                          ),
+                          onTap: () => _select(asset),
+                        );
+                      },
+                    );
+              final viewer = _MediaViewer(asset: selected, preview: preview);
+              // Both regions retain their position in this Flex when its axis changes.
+              return Flex(
+                direction: wide ? Axis.horizontal : Axis.vertical,
+                children: [
+                  Expanded(flex: wide ? 2 : 1, child: library),
+                  Expanded(flex: wide ? 3 : 1, child: viewer),
+                ],
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _AssetTile extends StatelessWidget {
+  const _AssetTile({
+    required this.asset,
+    required this.selected,
+    required this.onTap,
+  });
+  final WorkspaceAsset asset;
+  final bool selected;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => Card(
+    color: selected ? Theme.of(context).colorScheme.secondaryContainer : null,
+    child: InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(8),
+        child: Column(
+          children: [
+            Expanded(
+              child: asset.thumbnailKey == null
+                  ? Icon(
+                      asset.kind == MediaKind.image
+                          ? Icons.image_outlined
+                          : Icons.movie_outlined,
+                      size: 40,
+                    )
+                  : _StoredImage(
+                      storageKey: asset.thumbnailKey!,
+                      fit: BoxFit.contain,
+                    ),
+            ),
+            Text(asset.name, maxLines: 1, overflow: TextOverflow.ellipsis),
+            if (asset.kind == MediaKind.video &&
+                asset.thumbnailStatus == ThumbnailStatus.none)
+              const Text(
+                '打开预览生成缩略图',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            if (asset.thumbnailStatus == ThumbnailStatus.failed)
+              const Text('缩略图失败'),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class _StoredImage extends ConsumerWidget {
+  const _StoredImage({required this.storageKey, this.fit = BoxFit.contain});
+  final String storageKey;
+  final BoxFit fit;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) => ref
+      .watch(assetBytesProvider(storageKey))
+      .when(
+        data: (bytes) => LayoutBuilder(
+          builder: (context, constraints) {
+            final ratio = MediaQuery.devicePixelRatioOf(context);
+            return Image(
+              image: ResizeImage(
+                MemoryImage(bytes),
+                width: constraints.maxWidth.isFinite
+                    ? math.max(1, (constraints.maxWidth * ratio).ceil())
+                    : null,
+                height: constraints.maxHeight.isFinite
+                    ? math.max(1, (constraints.maxHeight * ratio).ceil())
+                    : null,
+                policy: ResizeImagePolicy.fit,
+              ),
+              fit: fit,
+              errorBuilder: (_, error, _) => Text('图片解码失败：$error'),
+            );
+          },
+        ),
+        error: (error, _) => Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('图片读取失败：$error'),
+            TextButton(
+              onPressed: () => ref.invalidate(assetBytesProvider(storageKey)),
+              child: const Text('重试读取'),
+            ),
+          ],
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+      );
+}
+
+class _MediaViewer extends StatelessWidget {
+  const _MediaViewer({required this.asset, required this.preview});
+  final WorkspaceAsset? asset;
+  final MediaPreviewSession preview;
+  @override
+  Widget build(BuildContext context) {
+    final selected = asset;
+    if (selected == null) {
+      return const KoiEmptyState(
+        title: '选择素材',
+        description: '图片支持缩放；视频支持播放、暂停和拖动进度',
+      );
+    }
+    return LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                selected.name,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: Theme.of(context).textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              if (selected.kind == MediaKind.image)
+                SizedBox(
+                  height: math.max(160, constraints.maxHeight - 84),
+                  child: InteractiveViewer(
+                    key: ValueKey('image-viewer-${selected.id}'),
+                    minScale: 0.25,
+                    maxScale: 8,
+                    child: Center(
+                      child: _StoredImage(storageKey: selected.storageKey),
+                    ),
+                  ),
+                )
+              else
+                ListenableBuilder(
+                  listenable: preview,
+                  builder: (context, _) {
+                    final player = preview.playback;
+                    return Column(
+                      children: [
+                        AspectRatio(
+                          aspectRatio: 16 / 9,
+                          child: Stack(
+                            fit: StackFit.expand,
+                            children: [
+                              if (player != null) player.surface,
+                              if (preview.loading)
+                                const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              if (player == null && !preview.loading)
+                                const Center(
+                                  child: Icon(Icons.movie_outlined, size: 48),
+                                ),
+                            ],
+                          ),
+                        ),
+                        if (preview.error != null)
+                          Text(
+                            preview.error!,
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.error,
+                            ),
+                          ),
+                        Row(
+                          children: [
+                            IconButton(
+                              tooltip: player?.playing == true
+                                  ? '暂停视频'
+                                  : '播放视频',
+                              onPressed: player == null
+                                  ? null
+                                  : () => unawaited(preview.togglePlaying()),
+                              icon: Icon(
+                                player?.playing == true
+                                    ? Icons.pause
+                                    : Icons.play_arrow,
+                              ),
+                            ),
+                            Expanded(
+                              child: Slider(
+                                value:
+                                    player == null ||
+                                        player.duration.inMilliseconds <= 0
+                                    ? 0
+                                    : player.position.inMilliseconds
+                                          .clamp(
+                                            0,
+                                            player.duration.inMilliseconds,
+                                          )
+                                          .toDouble(),
+                                max:
+                                    player == null ||
+                                        player.duration.inMilliseconds <= 0
+                                    ? 1
+                                    : player.duration.inMilliseconds.toDouble(),
+                                onChanged:
+                                    player == null ||
+                                        player.duration.inMilliseconds <= 0
+                                    ? null
+                                    : (value) => unawaited(
+                                        preview.seek(
+                                          Duration(milliseconds: value.round()),
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            Text('${player?.position.inSeconds ?? 0}s'),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.volume_up_outlined),
+                            Expanded(
+                              child: Slider(
+                                value: player?.volume.clamp(0, 100) ?? 100,
+                                max: 100,
+                                onChanged: player == null
+                                    ? null
+                                    : (value) =>
+                                          unawaited(preview.setVolume(value)),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (preview.error != null)
+                          TextButton(
+                            onPressed: () =>
+                                unawaited(preview.retryThumbnail(selected)),
+                            child: const Text('重试视频预览 / 缩略图'),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              if (selected.thumbnailStatus == ThumbnailStatus.failed)
+                TextButton(
+                  onPressed: () => selected.kind == MediaKind.video
+                      ? unawaited(preview.retryThumbnail(selected))
+                      : unawaited(refRetryThumbnail(context, selected.id)),
+                  child: const Text('重试缩略图'),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+Future<void> refRetryThumbnail(BuildContext context, String id) async {
+  final container = ProviderScope.containerOf(context, listen: false);
+  final session = container.read(workspaceSessionProvider);
+  final job = session.state.snapshot.jobs
+      .where((job) => job.assetId == id && job.kind == JobKind.thumbnail)
+      .lastOrNull;
+  if (job != null) {
+    await session.retryJob(job.id);
+  }
+}

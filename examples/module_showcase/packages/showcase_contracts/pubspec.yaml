@@ -1,0 +1,13 @@
+name: showcase_contracts
+description: Public business contracts for the showcase modules.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.47.0'
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter

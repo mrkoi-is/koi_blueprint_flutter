@@ -1,0 +1,115 @@
+import 'package:flutter/material.dart';
+import 'package:koi_ui/theme/app_colors.dart';
+import 'package:koi_ui/theme/koi_theme_tokens.dart';
+
+abstract final class AppTheme {
+  static ThemeData get light => build(brightness: Brightness.light);
+  static ThemeData get dark => build(brightness: Brightness.dark);
+
+  static ThemeData build({
+    Brightness brightness = Brightness.light,
+    KoiDensity density = KoiDensity.comfortable,
+  }) {
+    final isDark = brightness == Brightness.dark;
+    final colors =
+        ColorScheme.fromSeed(
+          seedColor: isDark ? AppColors.amber : AppColors.moss,
+          brightness: brightness,
+        ).copyWith(
+          primary: isDark ? null : AppColors.moss,
+          secondary: isDark ? null : AppColors.amber,
+          surface: isDark ? AppColors.night : AppColors.paper,
+        );
+    final tokens = KoiThemeTokens.fromScheme(colors, density: density).copyWith(
+      chromeBackground: isDark ? AppColors.night : AppColors.chrome,
+      contentBackground: isDark ? AppColors.nightPanel : AppColors.paper,
+    );
+    final outline = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(KoiRadius.medium),
+      borderSide: BorderSide(color: tokens.weakBorder),
+    );
+    return ThemeData(
+      useMaterial3: true,
+      colorScheme: colors,
+      extensions: [tokens],
+      visualDensity: density == KoiDensity.compact
+          ? VisualDensity.compact
+          : VisualDensity.standard,
+      scaffoldBackgroundColor: isDark ? AppColors.night : AppColors.sand,
+      appBarTheme: AppBarTheme(
+        backgroundColor: Colors.transparent,
+        foregroundColor: colors.onSurface,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        color: colors.surface,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(KoiRadius.large),
+          side: BorderSide(color: tokens.weakBorder),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationThemeData(
+        filled: true,
+        fillColor: colors.surfaceContainerLow,
+        border: outline,
+        enabledBorder: outline,
+        focusedBorder: outline.copyWith(
+          borderSide: BorderSide(color: colors.primary, width: 2),
+        ),
+        contentPadding: EdgeInsets.all(tokens.itemPadding),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(KoiRadius.medium),
+          ),
+          padding: EdgeInsets.symmetric(
+            horizontal: KoiSpace.md,
+            vertical: tokens.itemPadding,
+          ),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(KoiRadius.medium),
+          ),
+        ),
+      ),
+      chipTheme: ChipThemeData(
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+      ),
+      menuTheme: MenuThemeData(
+        style: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(colors.surface),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(KoiRadius.medium),
+            ),
+          ),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(KoiRadius.large),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        indicatorColor: tokens.selectedBackground,
+        labelTextStyle: WidgetStateProperty.all(
+          const TextStyle(fontWeight: FontWeight.w600),
+        ),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        useIndicator: true,
+        minWidth: 80,
+        indicatorColor: tokens.selectedBackground,
+      ),
+      dividerTheme: DividerThemeData(color: tokens.weakBorder, space: 1),
+    );
+  }
+}

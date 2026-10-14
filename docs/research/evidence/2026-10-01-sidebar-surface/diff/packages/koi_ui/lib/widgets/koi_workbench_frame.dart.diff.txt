@@ -1,0 +1,56 @@
+--- before/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
++++ after/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
+@@ -217,7 +217,7 @@
+       Widget content = widget.body;
+       if (expanded && widget.detail != null && _controller._detailVisible) {
+         content = KoiResizableSplitView(
+-          primary: widget.detail!,
++          primary: _panelSurface(widget.detail!, 'detail'),
+           secondary: content,
+           primaryOnTrailing: true,
+           resizeLabel: '调整详情宽度',
+@@ -228,7 +228,7 @@
+       }
+       if (expanded && widget.sidebar != null && _controller._sidebarVisible) {
+         content = KoiResizableSplitView(
+-          primary: widget.sidebar!,
++          primary: _panelSurface(widget.sidebar!, 'sidebar'),
+           secondary: content,
+           width: widget.sidebarWidth,
+           onWidthChanged: widget.onSidebarWidthChanged,
+@@ -357,15 +357,17 @@
+         drawer: !expanded && widget.sidebar != null
+             ? Drawer(
+                 width: drawerWidth,
+-                backgroundColor: tokens.contentBackground,
+-                child: SafeArea(child: widget.sidebar!),
++                backgroundColor: tokens.panelBackground,
++                child: SafeArea(
++                  child: _panelSurface(widget.sidebar!, 'sidebar'),
++                ),
+               )
+             : null,
+         endDrawer: !expanded && widget.detail != null
+             ? Drawer(
+                 width: drawerWidth,
+-                backgroundColor: tokens.contentBackground,
+-                child: SafeArea(child: widget.detail!),
++                backgroundColor: tokens.panelBackground,
++                child: SafeArea(child: _panelSurface(widget.detail!, 'detail')),
+               )
+             : null,
+         body: SafeArea(top: false, child: content),
+@@ -400,6 +402,13 @@
+     },
+   );
+ 
++  Widget _panelSurface(Widget child, String name) => Material(
++    key: ValueKey('koi-workbench-$name-surface'),
++    color: KoiThemeTokens.of(context).panelBackground,
++    surfaceTintColor: Colors.transparent,
++    child: child,
++  );
++
+   ButtonStyle _panelStyle() {
+     final colors = Theme.of(context).colorScheme;
+     return ButtonStyle(

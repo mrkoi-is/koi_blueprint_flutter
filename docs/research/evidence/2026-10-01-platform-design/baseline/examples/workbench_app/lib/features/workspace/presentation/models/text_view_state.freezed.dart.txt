@@ -1,0 +1,291 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'text_view_state.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
+T _$identity<T>(T value) => value;
+/// @nodoc
+mixin _$TextViewState {
+
+ List<WorkspaceDocument> get documents; String? get selectedId; double get sidebarWidth;
+/// Create a copy of TextViewState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$TextViewStateCopyWith<TextViewState> get copyWith => _$TextViewStateCopyWithImpl<TextViewState>(this as TextViewState, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as TextViewState;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TextViewState&&const DeepCollectionEquality().equals(other.documents, _this.documents)&&(identical(other.selectedId, _this.selectedId) || other.selectedId == _this.selectedId)&&(identical(other.sidebarWidth, _this.sidebarWidth) || other.sidebarWidth == _this.sidebarWidth));
+}
+
+
+@override
+int get hashCode {
+  final _this = this as TextViewState;
+  return Object.hash(runtimeType,const DeepCollectionEquality().hash(_this.documents),_this.selectedId,_this.sidebarWidth);
+}
+
+@override
+String toString() {
+  final _this = this as TextViewState;
+  return 'TextViewState(documents: ${_this.documents}, selectedId: ${_this.selectedId}, sidebarWidth: ${_this.sidebarWidth})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $TextViewStateCopyWith<$Res>  {
+  factory $TextViewStateCopyWith(TextViewState value, $Res Function(TextViewState) _then) = _$TextViewStateCopyWithImpl;
+@useResult
+$Res call({
+ List<WorkspaceDocument> documents, String? selectedId, double sidebarWidth
+});
+
+
+
+
+}
+/// @nodoc
+class _$TextViewStateCopyWithImpl<$Res>
+    implements $TextViewStateCopyWith<$Res> {
+  _$TextViewStateCopyWithImpl(this._self, this._then);
+
+  final TextViewState _self;
+  final $Res Function(TextViewState) _then;
+
+/// Create a copy of TextViewState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? documents = null,Object? selectedId = freezed,Object? sidebarWidth = null,}) {
+  return _then(TextViewState(
+documents: null == documents ? _self.documents : documents // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceDocument>,selectedId: freezed == selectedId ? _self.selectedId : selectedId // ignore: cast_nullable_to_non_nullable
+as String?,sidebarWidth: null == sidebarWidth ? _self.sidebarWidth : sidebarWidth // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [TextViewState].
+extension TextViewStatePatterns on TextViewState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _TextViewState value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _TextViewState() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _TextViewState value)  $default,){
+final _that = this;
+switch (_that) {
+case _TextViewState():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _TextViewState value)?  $default,){
+final _that = this;
+switch (_that) {
+case _TextViewState() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( List<WorkspaceDocument> documents,  String? selectedId,  double sidebarWidth)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _TextViewState() when $default != null:
+return $default(_that.documents,_that.selectedId,_that.sidebarWidth);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( List<WorkspaceDocument> documents,  String? selectedId,  double sidebarWidth)  $default,) {final _that = this;
+switch (_that) {
+case _TextViewState():
+return $default(_that.documents,_that.selectedId,_that.sidebarWidth);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( List<WorkspaceDocument> documents,  String? selectedId,  double sidebarWidth)?  $default,) {final _that = this;
+switch (_that) {
+case _TextViewState() when $default != null:
+return $default(_that.documents,_that.selectedId,_that.sidebarWidth);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _TextViewState implements TextViewState {
+  const _TextViewState({required  List<WorkspaceDocument> documents, this.selectedId, required this.sidebarWidth}): _documents = documents;
+  
+
+ final  List<WorkspaceDocument> _documents;
+@override List<WorkspaceDocument> get documents {
+  if (_documents is EqualUnmodifiableListView) return _documents;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_documents);
+}
+
+@override final  String? selectedId;
+@override final  double sidebarWidth;
+
+/// Create a copy of TextViewState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$TextViewStateCopyWith<_TextViewState> get copyWith => __$TextViewStateCopyWithImpl<_TextViewState>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TextViewState&&const DeepCollectionEquality().equals(other.documents, _documents)&&(identical(other.selectedId, selectedId) || other.selectedId == selectedId)&&(identical(other.sidebarWidth, sidebarWidth) || other.sidebarWidth == sidebarWidth));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,const DeepCollectionEquality().hash(_documents),selectedId,sidebarWidth);
+}
+
+@override
+String toString() {
+    return 'TextViewState(documents: $documents, selectedId: $selectedId, sidebarWidth: $sidebarWidth)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$TextViewStateCopyWith<$Res> implements $TextViewStateCopyWith<$Res> {
+  factory _$TextViewStateCopyWith(_TextViewState value, $Res Function(_TextViewState) _then) = __$TextViewStateCopyWithImpl;
+@override @useResult
+$Res call({
+ List<WorkspaceDocument> documents, String? selectedId, double sidebarWidth
+});
+
+
+
+
+}
+/// @nodoc
+class __$TextViewStateCopyWithImpl<$Res>
+    implements _$TextViewStateCopyWith<$Res> {
+  __$TextViewStateCopyWithImpl(this._self, this._then);
+
+  final _TextViewState _self;
+  final $Res Function(_TextViewState) _then;
+
+/// Create a copy of TextViewState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? documents = null,Object? selectedId = freezed,Object? sidebarWidth = null,}) {
+  return _then(_TextViewState(
+documents: null == documents ? _self._documents : documents // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceDocument>,selectedId: freezed == selectedId ? _self.selectedId : selectedId // ignore: cast_nullable_to_non_nullable
+as String?,sidebarWidth: null == sidebarWidth ? _self.sidebarWidth : sidebarWidth // ignore: cast_nullable_to_non_nullable
+as double,
+  ));
+}
+
+
+}
+
+// dart format on

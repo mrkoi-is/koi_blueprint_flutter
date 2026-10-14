@@ -1,0 +1,60 @@
+{
+  "total_bytes": 86249,
+  "fixtures": [
+    {
+      "name": "gradient.jpg",
+      "bytes": 1611,
+      "sha256": "c4e7150423cb750767e82dc9048f39fde22390b46092e588fc8a78d31f01c647"
+    },
+    {
+      "name": "gradient.png",
+      "bytes": 43204,
+      "sha256": "943a4bf4c63460e1e4da53c2e92d70bc86192b50bbe7401d2d01a4befab916ae"
+    },
+    {
+      "name": "landscape.mp4",
+      "bytes": 21139,
+      "sha256": "b439026d94cf0fe41ff8f5a8812b76a7fdb6d7def2fec9b33a9c330d03cefb3d",
+      "streams": [
+        {
+          "codec_name": "h264",
+          "profile": "Constrained Baseline",
+          "width": 160,
+          "height": 96,
+          "pix_fmt": "yuv420p"
+        },
+        {
+          "codec_name": "aac",
+          "profile": "LC",
+          "sample_rate": "48000",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "name": "portrait.mp4",
+      "bytes": 20209,
+      "sha256": "f22ae92f15757e3cd2fb437060b0f9dd1a3b159bf41ffa55bf9de5e994cd3d23",
+      "streams": [
+        {
+          "codec_name": "h264",
+          "profile": "Constrained Baseline",
+          "width": 96,
+          "height": 160,
+          "pix_fmt": "yuv420p"
+        },
+        {
+          "codec_name": "aac",
+          "profile": "LC",
+          "sample_rate": "48000",
+          "channels": 1
+        }
+      ]
+    },
+    {
+      "name": "中文资料.md",
+      "bytes": 86,
+      "sha256": "903ba3d38177580955c5254f9e9a1b769c2b9b41db7efd15e1d449b585e7ad28"
+    }
+  ]
+}

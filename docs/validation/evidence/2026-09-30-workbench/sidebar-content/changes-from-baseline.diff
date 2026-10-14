@@ -1,0 +1,158 @@
+--- before/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
++++ after/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
+@@ -88,6 +88,15 @@
+           minSecondaryWidth: 320,
+         );
+       }
++      if (expanded && sidebar != null) {
++        content = KoiResizableSplitView(
++          primary: sidebar!,
++          secondary: content,
++          width: sidebarWidth,
++          onWidthChanged: onSidebarWidthChanged,
++          minSecondaryWidth: detail == null ? 320 : 560,
++        );
++      }
+       content = Padding(
+         padding: const EdgeInsets.all(KoiSpace.sm),
+         child: Material(
+@@ -102,15 +111,6 @@
+           child: content,
+         ),
+       );
+-      if (expanded && sidebar != null) {
+-        content = KoiResizableSplitView(
+-          primary: Material(color: chromeBackground, child: sidebar!),
+-          secondary: content,
+-          width: sidebarWidth,
+-          onWidthChanged: onSidebarWidthChanged,
+-          minSecondaryWidth: detail == null ? 320 : 560,
+-        );
+-      }
+       if (!compact) {
+         content = Row(
+           crossAxisAlignment: CrossAxisAlignment.stretch,
+@@ -208,7 +208,7 @@
+         drawer: !expanded && sidebar != null
+             ? Drawer(
+                 width: drawerWidth,
+-                backgroundColor: chromeBackground,
++                backgroundColor: tokens.contentBackground,
+                 child: SafeArea(child: sidebar!),
+               )
+             : null,
+--- before/packages/koi_ui/lib/theme/koi_theme_tokens.dart
++++ after/packages/koi_ui/lib/theme/koi_theme_tokens.dart
+@@ -56,10 +56,10 @@
+ 
+   final Color panelBackground;
+ 
+-  /// Window title bar, navigation rail and content sidebar share this surface.
++  /// Window title bar and fixed navigation rail share this surface.
+   final Color chromeBackground;
+ 
+-  /// Main workspace and details sit inside one rounded content surface.
++  /// Content sidebar, main workspace and details share one rounded surface.
+   final Color contentBackground;
+   final Color weakBorder;
+   final Color selectedBackground;
+--- before/packages/koi_ui/test/koi_components_test.dart
++++ after/packages/koi_ui/test/koi_components_test.dart
+@@ -297,12 +297,24 @@
+         ),
+       );
+       expect(controller.text, '中文草稿');
+-      final surface = tester.widget<Material>(
+-        find.byKey(const ValueKey('koi-workbench-content-surface')),
+-      );
++      final contentSurface = find.byKey(
++        const ValueKey('koi-workbench-content-surface'),
++      );
++      final surface = tester.widget<Material>(contentSurface);
+       final tokens = AppTheme.light.extension<KoiThemeTokens>()!;
+       expect(surface.color, tokens.contentBackground);
+       expect(surface.clipBehavior, Clip.antiAlias);
++      expect(
++        find.descendant(of: contentSurface, matching: find.byType(TextField)),
++        findsOneWidget,
++      );
++      expect(
++        find.descendant(
++          of: contentSurface,
++          matching: find.byType(NavigationRail),
++        ),
++        findsNothing,
++      );
+       await tester.tap(find.byTooltip('后退'));
+       await tester.tap(find.byTooltip('前进'));
+       await tester.pump();
+@@ -348,14 +360,22 @@
+         await tester.tap(find.byTooltip('Open navigation menu'));
+         await tester.pumpAndSettle();
+         expect(find.text('侧栏'), findsOneWidget);
++        final sidebarDrawer = tester.widget<Drawer>(
++          find.ancestor(of: find.text('侧栏'), matching: find.byType(Drawer)),
++        );
++        expect(sidebarDrawer.backgroundColor, tokens.contentBackground);
+         Navigator.of(tester.element(find.text('侧栏'))).pop();
+         await tester.pumpAndSettle();
+         await tester.tap(find.byTooltip('打开详情'));
+         await tester.pumpAndSettle();
+         expect(find.text('详情'), findsOneWidget);
+       } else {
+-        expect(find.text('侧栏'), findsOneWidget);
+-        expect(find.text('详情'), findsOneWidget);
++        for (final label in ['侧栏', '详情']) {
++          expect(
++            find.descendant(of: contentSurface, matching: find.text(label)),
++            findsOneWidget,
++          );
++        }
+       }
+       expect(tester.takeException(), isNull);
+     });
+--- before/packages/koi_ui/README.md
++++ after/packages/koi_ui/README.md
+@@ -26,9 +26,10 @@
+ `sidebarWidth/onSidebarWidthChanged` and `detailWidth/onDetailWidthChanged` so
+ hosts can persist both panel widths.
+ 
+-The title bar, rail and sidebar share `KoiThemeTokens.chromeBackground`.
+-The main body and inline details share `contentBackground` inside one clipped,
+-rounded surface with a small outer inset. Both light and dark themes provide
++The title bar and fixed icon rail share `KoiThemeTokens.chromeBackground`.
++The content sidebar, main body and inline details share `contentBackground`
++inside one clipped, rounded surface with a small outer inset. Narrow content
++drawers use the same content background. Both light and dark themes provide
+ distinct surfaces; ordinary Material hosts fall back to their ColorScheme.
+ Structural edges use a subtle color independent of control outlines. Split
+ dividers keep their full-height hit target while showing a short grip only on
+--- before/docs/architecture/ui-and-adaptive.md
++++ after/docs/architecture/ui-and-adaptive.md
+@@ -8,7 +8,7 @@
+ 
+ 工作区壳根据局部 LayoutBuilder 约束切换：小于 600 为紧凑导航，600–1023 为 rail 与主体，1024 起显示可调整侧栏、主体及详情。OS 判断只用于平台服务；密度是明确设置，不从窗口宽度推断输入方式。窄窗口、长中文及 200% 字号必须可操作。
+ 
+-宽屏使用 64px 固定图标栏，导航入口靠上，`navigationTrailing` 槽位固定底部。工作台在此装配主题与密度设置菜单；小于 600 时该入口移到顶部标题区。图标栏、资料侧栏和标题区共用 `chromeBackground` 外壳底色，标题区不叠加滚动色调。主体和详情共用 `contentBackground`，组成一个有 8px 外边距、24px 圆角和弱边框的内容面板，真实裁剪其子内容；详情分隔条保留在面板内部。两组颜色随明暗主题同步，普通 Material 宿主使用 ColorScheme 回退。短窗口允许导航入口滚动，底部设置仍保持可见。
++宽屏使用 64px 固定图标栏，导航入口靠上，`navigationTrailing` 槽位固定底部。工作台在此装配主题与密度设置菜单；小于 600 时该入口移到顶部标题区。固定图标栏和标题区共用 `chromeBackground` 外壳底色，标题区不叠加滚动色调。资料侧栏（标题、搜索和列表）、主体和详情共用 `contentBackground`，一起组成一个有 8px 外边距、24px 圆角和弱边框的内容面板，真实裁剪其子内容；两条可调整分隔条都在面板内部。窄窗口的资料及详情抽屉也使用内容底色。两组颜色随明暗主题同步，普通 Material 宿主使用 ColorScheme 回退。短窗口允许导航入口滚动，底部设置仍保持可见。
+ 
+ 结构边线单独使用 onSurface 的 6% 透明度，不复用输入框等控件的 outlineVariant。可调整面板保留 12px 全高命中区和键盘/语义操作；默认隐藏拖动条，悬停显示 48px 短提示，键盘焦点及拖动期间使用品牌指示色。鼠标离开或操作结束后收起提示，内容边界主要由底色和留白表达。
+ 
+--- before/docs/validation/2026-09-30-workbench.md
++++ after/docs/validation/2026-09-30-workbench.md
+@@ -141,3 +141,15 @@
+ 组件 16 项、工作台展示 16 项定向行为通过，覆盖鼠标进入/离开、键盘焦点、拖动和方向键、尺寸边界、200% 字号及文本/播放器身份保持。首次悬停测试发现 FocusableActionDetector 的 hover 提示受输入高亮模式影响，已改为独立 MouseRegion 并复验通过。实际 macOS Debug 构建 PASS：拖动资料侧栏后边界移动，恢复原宽度后中文资料仍显示；切换深色再恢复明亮，默认长线保持隐藏。截图原图未修改：[明亮](evidence/2026-09-30-workbench/subtle-dividers/text-light.png)、[深色](evidence/2026-09-30-workbench/subtle-dividers/text-dark.png)。
+ 
+ 完整 `python3 blueprint.py validate`：PASS，手写覆盖率 **87.23%，3422/3923 行**；Workbench 72 项 VM 与 8 项 Chrome 存储行为通过。[manifest](evidence/2026-09-30-workbench/subtle-dividers/manifest.json) 保存日志、截图、运行源码核对及基线差异。本轮其他平台构建与真实运行为 NOT_RUN；未复跑新项目生成，生成器未修改，共享 UI 源仍由模板直接复制。
++
++## 资料侧栏纳入内容面板
++
++资料标题、搜索和列表属于内容区，现与主体及详情一起放入同一个 24px 圆角、8px 外边距的 Material 面板。只有顶部标题栏和固定图标栏使用 `chromeBackground`；资料侧栏、主体及详情使用 `contentBackground`，两条可调整分隔条都在圆角面板内部。窄窗口的资料抽屉也使用内容底色。公共 token 注释、组件说明和 UI 架构契约已同步；本节记录当前区域归属，此前截图保留为历史验证。
++
++组件 16 项和工作台展示 16 项定向测试 PASS，覆盖列表及详情处于同一裁剪面板、导航栏位于面板外、窄窗口抽屉底色、320/600/1024/1440 宽度及 200% 字号，并复验 resize、导航切换后的编辑与播放身份。完整 `python3 blueprint.py validate` PASS，手写覆盖率 **87.23%，3423/3924 行**；Workbench 72 项 VM 与 8 项 Chrome 存储行为通过。
++
++macOS 实际 Debug 构建与运行 PASS：资料列表、编辑区和详情显示在同一圆角内容面板中，媒体分类侧栏也位于内容面板内部；切换深色并恢复明亮后，中文资料仍选中，保持 32 字、版本 1、已保存。原生标题栏继续位于红黄绿同一行。运行宿主与当前共享 UI 源码 SHA 已核对一致，工作区会话实现未改变。
++
++实际窗口原图未修改：[深色](evidence/2026-09-30-workbench/sidebar-content/text-dark.png)、[明亮](evidence/2026-09-30-workbench/sidebar-content/text-light.png)。[manifest](evidence/2026-09-30-workbench/sidebar-content/manifest.json) 保存源码、日志、截图及本轮基线差异。首轮完整门禁因证据目录中的 Dart 基线副本被分析器扫描而失败，已将副本保留为 `.dart.txt` 并重新通过，未扩大任何排除范围。
++
++本轮其他平台构建与真实运行为 NOT_RUN；未复跑新项目或递归生成，生成器未修改，共享 UI 源由模板直接复制。Chrome 存储测试不代表 Web 界面或 Safari 运行验收。

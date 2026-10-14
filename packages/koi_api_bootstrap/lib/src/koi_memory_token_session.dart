@@ -35,8 +35,8 @@ class KoiMemoryTokenSession implements KoiTokenSession {
   }
 }
 
-/// Keeps request authentication fail-closed when backing storage operations
-/// fail. Revocation is applied synchronously before the delegate is touched.
+/// 底层存储操作失败时，仍以拒绝请求认证的方式保护会话。
+/// 在访问委托存储之前，会先同步撤销当前令牌。
 class KoiRevocableTokenSession implements KoiTokenSession {
   KoiRevocableTokenSession(KoiTokenSession delegate)
     : _delegate = delegate,

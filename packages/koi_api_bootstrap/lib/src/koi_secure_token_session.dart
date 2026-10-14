@@ -1,9 +1,8 @@
 import 'package:koi_api_bootstrap/src/koi_memory_token_session.dart';
 
-/// Minimal key-value store used to persist the auth token.
+/// 用于持久化认证令牌的最小键值存储接口。
 ///
-/// Keeps the concrete storage plugin out of the public API and lets tests
-/// substitute a fake.
+/// 具体存储插件不会暴露在公共 API 中，测试也可以替换为模拟实现。
 abstract interface class KoiTokenStore {
   Future<String?> read();
 
@@ -12,15 +11,15 @@ abstract interface class KoiTokenStore {
   Future<void> delete();
 }
 
-/// Persists the auth token through a [KoiTokenStore] while serving
-/// synchronous reads from an in-memory copy hydrated by [load].
+/// 通过 [KoiTokenStore] 持久化认证令牌，并使用 [load] 预加载到内存中的副本
+/// 支持同步读取。
 class KoiSecureTokenSession implements KoiTokenSession {
   KoiSecureTokenSession._(this._store, this._token);
 
   final KoiTokenStore _store;
   String? _token;
 
-  /// Reads the persisted token once so [getToken] can stay synchronous.
+  /// 读取一次持久化令牌，以便 [getToken] 保持同步。
   static Future<KoiSecureTokenSession> load(KoiTokenStore store) async {
     final persisted = await store.read();
     return KoiSecureTokenSession._(

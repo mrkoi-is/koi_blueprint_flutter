@@ -1,0 +1,42 @@
+[
+  {
+    "path": "DESIGN.md",
+    "sha256": "91400c0fff138cd13c21301192cdccb4dc14d9d573201e6832b69db4c3d79938"
+  },
+  {
+    "path": "packages/koi_ui/README.md",
+    "sha256": "214e3a4d79f6ec9576ecc8ff470ab8ac0d4e9d4c0553a410a02edae2ecc8c689"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/app_colors.dart",
+    "sha256": "66061242573a82513774c19df4db954ecd78f3d4d2d8daf8442c0e3e44d6dcb8"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/app_theme.dart",
+    "sha256": "5b874d5297a05d5e25b023dc0f917c2881cfe21b0771431bb3597b66ece93a10"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+    "sha256": "c68841e1393287921ce2567f70e181d1fe59d0d0444ea6bf2307b7672160dd8d"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "sha256": "cae7f0fb2c68b7f330d502a1cb958ccad5de3ae37b95649c041924cd7e877c64"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_components_test.dart",
+    "sha256": "022986ed55dc8e284c290c239f3edbb98e7b2e772c1f00c912e40f5a53781054"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_accessible_theme_test.dart",
+    "sha256": "93523acef20d7fd2d9b232d12007b62603806ac2fca5320bcf4cc5ba1d675291"
+  },
+  {
+    "path": "tool/platform_configuration.py",
+    "sha256": "e148d4b20d313e93931fbec40d08b4458e90df01d0727b58cfcdbb508a5c8c14"
+  },
+  {
+    "path": "tool/tests/test_platform_configuration.py",
+    "sha256": "99fe83a110ef1f346e89da3c9c827dd4ec3c7aa005bc7a736e1ebb161a62d2e8"
+  }
+]

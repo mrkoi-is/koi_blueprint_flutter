@@ -1,0 +1,57 @@
+{
+  "@@locale": "zh_Hant",
+  "imagesTitle": "圖片來源",
+  "imagesInputLabel": "HTTP(S) 圖片 URL / 本機路徑",
+  "imagesAsset": "內建資源",
+  "imagesMemory": "記憶體圖片",
+  "imagesPickLocal": "選擇本機圖片",
+  "imagesReadPath": "讀取本機路徑",
+  "imagesNetwork": "網路圖片",
+  "imagesInvalidUrl": "請輸入有效的 HTTP(S) 圖片 URL",
+  "imagesReadError": "無法讀取圖片：{error}",
+  "@imagesReadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesLayout": "版面 {width} dp · DPR {dpr} · 解碼上限 {pixels} px",
+  "@imagesLayout": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "dpr": {
+        "type": "String"
+      },
+      "pixels": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesRetry": "重試",
+  "imagesCacheHit": "快取命中，可離線讀取",
+  "imagesValidated": "已讀取並驗證圖片",
+  "imagesClearCache": "清除此頁圖片快取並重試",
+  "imagesDecodeFailed": "圖片解碼失敗：{error}",
+  "@imagesDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesDecodedSize": "實際解碼 {width} × {height} px",
+  "@imagesDecodedSize": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "height": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesPreview": "圖片預覽"
+}

@@ -6,8 +6,6 @@ import 'package:analyzer/dart/ast/visitor.dart';
 import 'package:analyzer/dart/analysis/utilities.dart';
 
 const _compileOnlySources = <String>{
-  'apps/koi_admin_app/lib/bootstrap.dart',
-  'apps/koi_admin_app/lib/main.dart',
   'packages/koi_api_bootstrap/lib/src/backend/web_backend.dart',
   'packages/koi_api_bootstrap/lib/src/token_storage/web_token_session.dart',
 };
@@ -21,41 +19,43 @@ void main(List<String> arguments) {
     return;
   }
 
-  final member = Directory(arguments[0]);
+  final memberPath = Directory(arguments[0]).path
+      .replaceAll(r'\', '/')
+      .replaceFirst(RegExp(r'/+$'), '');
   final report = File(arguments[1]);
   final coveredSources = report
       .readAsLinesSync()
       .where((line) => line.startsWith('SF:'))
-      .map((line) => line.substring(3))
+      .map((line) => line.substring(3).replaceAll(r'\', '/'))
       .toSet();
   final missingExecutableSources = <String>[];
 
-  for (final entity in member.listSync(recursive: true)) {
+  // A workspace member owns only its lib; nested members have their own reports.
+  final library = Directory('$memberPath/lib');
+  if (!library.existsSync()) return;
+  for (final entity in library.listSync(recursive: true)) {
     if (entity is! File ||
         !entity.path.endsWith('.dart') ||
-        !entity.path.contains(
-          '${Platform.pathSeparator}lib${Platform.pathSeparator}',
-        ) ||
         entity.path.endsWith('.g.dart') ||
         entity.path.endsWith('.freezed.dart')) {
       continue;
     }
 
-    final memberPath = member.path.endsWith(Platform.pathSeparator)
-        ? member.path
-        : '${member.path}${Platform.pathSeparator}';
     final relativeSource = entity.path
-        .substring(memberPath.length)
-        .replaceAll(Platform.pathSeparator, '/');
+        .replaceAll(r'\', '/')
+        .substring(memberPath.length + 1);
+    // Match blueprint.coverage's generated-directory boundary. A generated
+    // export may live outside this directory, but contains no executable body.
+    if (relativeSource.split('/').contains('generated')) continue;
     if (coveredSources.contains(relativeSource)) {
       continue;
     }
 
-    final repositorySource = '${member.path}/$relativeSource'.replaceAll(
-      Platform.pathSeparator,
-      '/',
-    );
-    if (_compileOnlySources.contains(repositorySource)) {
+    final repositorySource = '$memberPath/$relativeSource';
+    if (_compileOnlySources.contains(repositorySource) ||
+        (relativeSource == 'lib/main.dart' &&
+            (repositorySource.startsWith('apps/') ||
+                repositorySource.startsWith('examples/')))) {
       continue;
     }
 

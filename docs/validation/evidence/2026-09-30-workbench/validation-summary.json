@@ -1,0 +1,68 @@
+{
+  "date": "2026-09-30",
+  "code_complete": true,
+  "release_actions": "NOT_REQUESTED",
+  "root_validate": {
+    "result": "PASS",
+    "coverage": {
+      "covered_lines": 3143,
+      "executable_lines": 3641,
+      "percent": 86.32
+    },
+    "workbench_vm_tests": 58,
+    "workbench_browser_tests": 8,
+    "architecture_regression_cases": 74,
+    "python_generator_tests": 28,
+    "python_ai_platform_tests": 22
+  },
+  "workbench_generated_validate": {
+    "result": "PASS",
+    "members": [
+      "app",
+      "koi_core",
+      "koi_ui"
+    ],
+    "covered_lines": 1944,
+    "executable_lines": 2346,
+    "percent": 82.86,
+    "browser_unmeasured_lines_counted_zero": 170
+  },
+  "generator_smoke": {
+    "result": "PASS",
+    "recursive_combinations": [
+      "minimal-to-minimal",
+      "minimal-to-workbench",
+      "workbench-to-minimal",
+      "workbench-to-workbench"
+    ],
+    "extra_final_source_minimal_to_workbench": "PASS",
+    "three_feature_kinds_and_business_module_api": "PASS"
+  },
+  "workspace_session_source_sha256": "16bca3ce3ea7ca26091247b5cdd376bfc1f84e43220e7757dad1ca446e2594a7",
+  "full_logs": [
+    {
+      "path": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-validation-complete-bsc3qkei/validate.log",
+      "bytes": 103090,
+      "sha256": "fd16a2d60377c57e409941d63940b723f09121832644622822b515dee9eb901d"
+    },
+    {
+      "path": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-complete-3bxtok6b/generator-smoke.log",
+      "bytes": 155081,
+      "sha256": "0e4935220e311366fcb419c790c16eefb66c1a392d44390c3aca6cd43b2dde57"
+    },
+    {
+      "path": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-final-recursive-source-auzyd__b/recursive-minimal-workbench.log",
+      "bytes": 71710,
+      "sha256": "f051a8490e9a87100173d023bec3bfe72c93648b3c5cdeefe66f8b40fcd7e62b"
+    }
+  ],
+  "gaps": [
+    "Windows/Linux build and runtime NOT_RUN",
+    "Android/iOS device runtime NOT_RUN",
+    "Safari runtime NOT_RUN_BLOCKED_remote_automation_disabled",
+    "Chrome actual file chooser NOT_RUN_BLOCKED_extension_file_URL_permission",
+    "macOS media file chooser and native keyboard activation NOT_RUN",
+    "Remote CI NOT_RUN"
+  ],
+  "owned_browser_tabs_and_test_http_server": "closed/stopped"
+}

@@ -1,0 +1,107 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'app_routes.dart';
+
+// **************************************************************************
+// GoRouterGenerator
+// **************************************************************************
+
+List<RouteBase> get $appRoutes => [$workbenchShellRoute];
+
+RouteBase get $workbenchShellRoute => StatefulShellRouteData.$route(
+  factory: $WorkbenchShellRouteExtension._fromState,
+  branches: [
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/text',
+          hasOverriddenOnExit: false,
+          factory: $TextRoute._fromState,
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/media',
+          hasOverriddenOnExit: false,
+          factory: $MediaRoute._fromState,
+        ),
+      ],
+    ),
+    StatefulShellBranchData.$branch(
+      routes: [
+        GoRouteData.$route(
+          path: '/tasks',
+          hasOverriddenOnExit: false,
+          factory: $TasksRoute._fromState,
+        ),
+      ],
+    ),
+  ],
+);
+
+extension $WorkbenchShellRouteExtension on WorkbenchShellRoute {
+  static WorkbenchShellRoute _fromState(GoRouterState state) =>
+      const WorkbenchShellRoute();
+}
+
+mixin $TextRoute on GoRouteData {
+  static TextRoute _fromState(GoRouterState state) => const TextRoute();
+
+  @override
+  String get location => GoRouteData.$location('/text');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $MediaRoute on GoRouteData {
+  static MediaRoute _fromState(GoRouterState state) => const MediaRoute();
+
+  @override
+  String get location => GoRouteData.$location('/media');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $TasksRoute on GoRouteData {
+  static TasksRoute _fromState(GoRouterState state) => const TasksRoute();
+
+  @override
+  String get location => GoRouteData.$location('/tasks');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}

@@ -44,9 +44,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       }
       next.whenOrNull(
         failure: (message) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(SnackBar(content: Text(message)));
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text(message)));
         },
       );
     });
@@ -59,13 +58,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFF5EFE6), Color(0xFFE8F1EC)],
-          ),
-        ),
+        color: Theme.of(context).colorScheme.surface,
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -79,7 +72,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     children: [
                       Text(
                         'Koi Admin Blueprint',
-                        style: Theme.of(context).textTheme.headlineMedium,
+                        style: Theme.of(context).textTheme.headlineSmall,
                       ),
                       const SizedBox(height: 12),
                       Text(

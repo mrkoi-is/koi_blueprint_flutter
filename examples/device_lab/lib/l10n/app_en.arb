@@ -1,0 +1,108 @@
+{
+  "@@locale": "en",
+  "devicesDevicesAndIncomingEvents": "Devices and incoming events",
+  "devicesSetupAgain": "Setup again",
+  "devicesDocumentsStayOnThisDevicePairing": "Documents stay on this device. Pairing shares summaries and pauses/resumes the summary refresh task.",
+  "devicesLocalDocuments": "Local documents",
+  "devicesImportText": "Import text",
+  "devicesIncomingEventOpenedTasksSummaryRefresh": "Incoming event opened tasks: Summary refresh",
+  "devicesDocument": "Document",
+  "devicesContents": "Contents",
+  "devicesSave": "Save",
+  "devicesDiscardDraftAndContinue": "Discard draft and continue",
+  "devicesDismissIncomingEvents": "Dismiss incoming events",
+  "devicesIncomingEventsAwaitDraftResolution": "{value0} incoming events await draft resolution",
+  "@devicesIncomingEventsAwaitDraftResolution": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesIncomingLinks": "Incoming links",
+  "devicesOpenLink": "Open link",
+  "devicesPairDevices": "Pair devices",
+  "devicesHostOnLocalhost": "Host on localhost",
+  "devicesAllowLanPairing": "Allow LAN pairing",
+  "devicesStopHosting": "Stop hosting",
+  "devicesThisPlatformIsAForegroundClient": "This platform is a foreground client; start hosting on a desktop.",
+  "devicesPairingCode": "Pairing code",
+  "devicesDiscoverLanDevices": "Discover LAN devices",
+  "devicesDeviceWebsocketAddress": "Device WebSocket address",
+  "devicesPairAndReadSummary": "Pair and read summary",
+  "devicesConnection": "Connection",
+  "devicesRefreshSummary": "Refresh summary",
+  "devicesPauseTask": "Pause task",
+  "devicesResumeTask": "Resume task",
+  "devicesLocalSummaryRefresh": "Local summary refresh",
+  "devicesPaused": "Paused",
+  "devicesRunning": "Running",
+  "devicesFirstSetup": "First setup {value0} / 3",
+  "@devicesFirstSetup": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "devicesLanguage": "Language",
+  "devicesNext": "Next",
+  "devicesOptionalChooseADefaultDirectoryThis": "Optional: choose a default directory; this can be changed later.",
+  "devicesChooseDirectory": "Choose directory",
+  "devicesPairingIsOptionalAfterSetupSelect": "Pairing is optional. After setup, select a device and enter its code; hosting never starts automatically.",
+  "devicesFinishSetup": "Finish setup",
+  "devicesSkipAndSetUpLater": "Skip and set up later",
+  "devicesSystemLanguage": "System",
+  "localSetupFirstSetup": "First setup",
+  "localSetupIncomingIntents": "Incoming intents",
+  "localSetupReconfigure": "Reconfigure",
+  "localSetupSetup": "Setup {value0} / 3",
+  "@localSetupSetup": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupNext": "Next",
+  "localSetupNoDirectoryWebUsesTheBrowser": "No directory; Web uses the browser file picker",
+  "localSetupChooseDirectory": "Choose directory",
+  "localSetupDocumentsStayLocalInstallTheLan": "Documents stay local. Install the LAN capability separately to pair devices.",
+  "localSetupFinish": "Finish",
+  "localSetupSkipForNow": "Skip for now",
+  "localSetupCurrentPage": "Current page",
+  "localSetupDocuments": "documents",
+  "localSetupDraftProtectedPendingIntents": "Draft protected: {value0} pending intents",
+  "@localSetupDraftProtectedPendingIntents": {
+    "placeholders": {
+      "value0": {
+        "type": "int"
+      }
+    }
+  },
+  "localSetupText": "Text",
+  "localSetupSave": "Save",
+  "localSetupDiscardDraft": "Discard draft",
+  "localSetupImportTextFile": "Import text file",
+  "localSetupIncomingUri": "Incoming URI",
+  "localSetupOpenIntent": "Open intent",
+  "localSetupSupportsKoiTasksKoiDocumentId": "Supports koi://tasks, koi://document?id=welcome, and local text files. Cold and warm starts share the draft-protection queue.",
+  "devicesRetry": "Retry",
+  "devicesOpenFailed": "Could not restore data: {error}",
+  "@devicesOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "devicesConnectionDisconnected": "Disconnected",
+  "devicesConnectionConnecting": "Connecting",
+  "devicesConnectionPaired": "Paired",
+  "devicesConnectionReconnecting": "Reconnecting",
+  "devicesConnectionFailed": "Connection failed",
+  "devicesConnectionClosed": "Closed",
+  "devicesIncomingReceived": "Incoming event received",
+  "devicesDocumentsTab": "Documents",
+  "devicesTasksTab": "Tasks"
+}

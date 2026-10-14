@@ -1,0 +1,1745 @@
+{
+  "captured_at": "2026-09-30T22:22:47.766070+00:00",
+  "bundle_directory": "/Users/max/Downloads/ChatGPT-Contents",
+  "archive": "/Users/max/Downloads/ChatGPT-Contents/Resources/app.asar",
+  "version": "26.928.20755",
+  "build": "12246",
+  "archive_size_bytes": 538253308,
+  "asar_data_offset": 5763388,
+  "header_sha256": "0712dd81b4650c515c123d937668573a2f5d7b7b1294a6fa416cf934190f95a8",
+  "header_hash_scope": "parsed header reserialized with compact JSON separators",
+  "scope": "Selected packaged static declarations and JavaScript primitives; not computed styles or a complete official design specification.",
+  "assets": [
+    {
+      "file": "webview/assets/app-shared-b42a855b3317.css",
+      "size_bytes": 1234399,
+      "sha256": "47b83c45c6b351ab2e80c4c1ca4d9b8d97a67bccf723ca609db108915fd9277d",
+      "declarations": [
+        {
+          "property": "outline",
+          "value": "2px solid var(--button-ring-color,var(--color-ring))",
+          "selector": [
+            "@layer components",
+            "._Button_eg66f_2:focus-visible:after"
+          ],
+          "character_offset": 2148
+        },
+        {
+          "property": "outline-offset",
+          "value": "var(--button-ring-offset,2px)",
+          "selector": [
+            "@layer components",
+            "._Button_eg66f_2:focus-visible:after"
+          ],
+          "character_offset": 2209
+        },
+        {
+          "property": "cursor",
+          "value": "not-allowed",
+          "selector": [
+            "@layer components",
+            "._Button_eg66f_2[data-disabled][data-variant]"
+          ],
+          "character_offset": 31908
+        },
+        {
+          "property": "opacity",
+          "value": ".4",
+          "selector": [
+            "@layer components",
+            "._Button_eg66f_2[data-disabled][data-variant]:is([data-disabled-tone=dimmed],[data-variant=ghost],[data-variant=transparent])"
+          ],
+          "character_offset": 32073
+        },
+        {
+          "property": "transform",
+          "value": "scale(1)",
+          "selector": [
+            "@layer components",
+            "._Button_eg66f_2[data-disabled][data-variant]:active:before"
+          ],
+          "character_offset": 32144
+        },
+        {
+          "property": "cursor",
+          "value": "default",
+          "selector": [
+            "@layer components",
+            "._Button_eg66f_2[data-disabled][data-variant][data-disabled-tone=relaxed]"
+          ],
+          "character_offset": 32237
+        },
+        {
+          "property": "--spacing",
+          "value": ".25rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 109149
+        },
+        {
+          "property": "--text-xs",
+          "value": "11px",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 109536
+        },
+        {
+          "property": "--text-sm",
+          "value": "12px",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 109588
+        },
+        {
+          "property": "--text-base",
+          "value": "14px",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 109644
+        },
+        {
+          "property": "--text-lg",
+          "value": "16px",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 109700
+        },
+        {
+          "property": "--font-sans-default",
+          "value": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", sans-serif",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 112689
+        },
+        {
+          "property": "--font-content",
+          "value": "var(--codex-content-font-family,var(--font-sans))",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 112767
+        },
+        {
+          "property": "--font-mono-default",
+          "value": "ui-monospace, \"SFMono-Regular\", \"SF Mono\", menlo, consolas, \"Liberation Mono\", monospace",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 112891
+        },
+        {
+          "property": "--radius-2xs-base",
+          "value": ".125rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114107
+        },
+        {
+          "property": "--radius-xs-base",
+          "value": ".25rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114133
+        },
+        {
+          "property": "--radius-sm-base",
+          "value": ".375rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114157
+        },
+        {
+          "property": "--radius-md-base",
+          "value": ".5rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114182
+        },
+        {
+          "property": "--radius-lg-base",
+          "value": ".625rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114205
+        },
+        {
+          "property": "--radius-xl-base",
+          "value": ".75rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114230
+        },
+        {
+          "property": "--radius-2xl-base",
+          "value": "1rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114254
+        },
+        {
+          "property": "--radius-3xl-base",
+          "value": "1.25rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114277
+        },
+        {
+          "property": "--radius-4xl-base",
+          "value": "1.5rem",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114303
+        },
+        {
+          "property": "--border-width-hairline",
+          "value": ".5px",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114403
+        },
+        {
+          "property": "--height-toolbar",
+          "value": "46px",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 114963
+        },
+        {
+          "property": "--height-titlebar",
+          "value": "calc(var(--spacing) * 11)",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 115037
+        },
+        {
+          "property": "--spacing-token-sidebar",
+          "value": "clamp(240px, var(--codex-sidebar-preferred-width,275px), min(520px, calc(100vw - 320px)))",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 115163
+        },
+        {
+          "property": "--transition-duration-basic",
+          "value": ".15s",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 116378
+        },
+        {
+          "property": "--transition-duration-relaxed",
+          "value": ".3s",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 116411
+        },
+        {
+          "property": "--color-token-side-bar-background",
+          "value": "var(--app-color-background-surface-under)",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 118285
+        },
+        {
+          "property": "--color-token-main-surface-primary",
+          "value": "var(--app-color-background-surface)",
+          "selector": [
+            "@layer theme",
+            ":root,:host"
+          ],
+          "character_offset": 118492
+        },
+        {
+          "property": "--gray-fixed-0",
+          "value": "#fff",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123101
+        },
+        {
+          "property": "--gray-fixed-50",
+          "value": "#f9f9f9",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123145
+        },
+        {
+          "property": "--gray-fixed-100",
+          "value": "#ededed",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123193
+        },
+        {
+          "property": "--gray-fixed-150",
+          "value": "#dfdfdf",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123218
+        },
+        {
+          "property": "--gray-fixed-500",
+          "value": "#5d5d5d",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123393
+        },
+        {
+          "property": "--gray-fixed-550",
+          "value": "#4f4f4f",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123418
+        },
+        {
+          "property": "--gray-fixed-700",
+          "value": "#303030",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123493
+        },
+        {
+          "property": "--gray-fixed-750",
+          "value": "#282828",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123518
+        },
+        {
+          "property": "--gray-fixed-800",
+          "value": "#212121",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123543
+        },
+        {
+          "property": "--gray-fixed-850",
+          "value": "#1c1c1c",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123568
+        },
+        {
+          "property": "--gray-fixed-900",
+          "value": "#181818",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 123593
+        },
+        {
+          "property": "--color-ring",
+          "value": "var(--lightningcss-light,var(--blue-500))var(--lightningcss-dark,var(--blue-400))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 135341
+        },
+        {
+          "property": "--color-border",
+          "value": "var(--lightningcss-light,var(--alpha-10))var(--lightningcss-dark,var(--alpha-12))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 152953
+        },
+        {
+          "property": "--font-text-md-size",
+          "value": "1rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 154995
+        },
+        {
+          "property": "--font-text-md-line-height",
+          "value": "1.5rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 155020
+        },
+        {
+          "property": "--font-text-sm-size",
+          "value": ".875rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 155149
+        },
+        {
+          "property": "--font-text-sm-line-height",
+          "value": "1.25rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 155177
+        },
+        {
+          "property": "--font-text-xs-size",
+          "value": ".75rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 155307
+        },
+        {
+          "property": "--font-text-xs-line-height",
+          "value": "1.125rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 155334
+        },
+        {
+          "property": "--control-size-4xs",
+          "value": "1.25rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156118
+        },
+        {
+          "property": "--control-size-3xs",
+          "value": "1.375rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156145
+        },
+        {
+          "property": "--control-size-2xs",
+          "value": "1.5rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156173
+        },
+        {
+          "property": "--control-size-xs",
+          "value": "1.625rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156199
+        },
+        {
+          "property": "--control-size-sm",
+          "value": "1.75rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156226
+        },
+        {
+          "property": "--control-size-md",
+          "value": "2rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156252
+        },
+        {
+          "property": "--control-size-lg",
+          "value": "2.25rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156275
+        },
+        {
+          "property": "--control-size-xl",
+          "value": "2.5rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156301
+        },
+        {
+          "property": "--control-size-2xl",
+          "value": "2.75rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156326
+        },
+        {
+          "property": "--control-size-3xl",
+          "value": "3rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156353
+        },
+        {
+          "property": "--control-icon-size-xs",
+          "value": ".875rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156867
+        },
+        {
+          "property": "--control-icon-size-sm",
+          "value": "1rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156898
+        },
+        {
+          "property": "--control-icon-size-md",
+          "value": "1.125rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156926
+        },
+        {
+          "property": "--control-icon-size-lg",
+          "value": "1.25rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156958
+        },
+        {
+          "property": "--control-icon-size-xl",
+          "value": "1.375rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 156989
+        },
+        {
+          "property": "--control-icon-size-2xl",
+          "value": "1.5rem",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 157021
+        },
+        {
+          "property": "--transition-duration-basic",
+          "value": ".15s",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 157225
+        },
+        {
+          "property": "--color-surface",
+          "value": "var(--lightningcss-light,var(--gray-0))var(--lightningcss-dark,var(--gray-200))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 158890
+        },
+        {
+          "property": "--color-surface-secondary",
+          "value": "var(--lightningcss-light,var(--gray-50))var(--lightningcss-dark,var(--gray-100))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 158986
+        },
+        {
+          "property": "--color-surface-tertiary",
+          "value": "var(--lightningcss-light,var(--gray-75))var(--lightningcss-dark,var(--gray-50))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 159093
+        },
+        {
+          "property": "--color-surface-elevated",
+          "value": "var(--lightningcss-light,var(--gray-0))var(--lightningcss-dark,var(--gray-300))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 159198
+        },
+        {
+          "property": "--menu-gutter",
+          "value": "calc(var(--spacing) * 1.5)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 167067
+        },
+        {
+          "property": "--menu-radius",
+          "value": "var(--radius-2xl)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 167108
+        },
+        {
+          "property": "--menu-font-size",
+          "value": "var(--font-text-sm-size)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 167140
+        },
+        {
+          "property": "--menu-line-height",
+          "value": "var(--font-text-sm-line-height)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 167182
+        },
+        {
+          "property": "--menu-item-background-color",
+          "value": "var(--lightningcss-light,var(--alpha-08))var(--lightningcss-dark,var(--alpha-10))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 167233
+        },
+        {
+          "property": "--menu-item-padding",
+          "value": "calc(var(--spacing) * 2) calc(var(--spacing) * 3)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 167344
+        },
+        {
+          "property": "--menu-item-radius",
+          "value": "calc(var(--menu-radius) - var(--menu-gutter))",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 167612
+        },
+        {
+          "property": "--menu-background-color",
+          "value": "var(--color-surface-elevated-secondary)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168099
+        },
+        {
+          "property": "--menu-box-shadow",
+          "value": "var(--shadow-xl-spread,var(--shadow-hairline), var(--shadow-xl))",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168163
+        },
+        {
+          "property": "--menu-gutter",
+          "value": "var(--spacing)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168298
+        },
+        {
+          "property": "--menu-font-size",
+          "value": "var(--text-sm)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168327
+        },
+        {
+          "property": "--menu-line-height",
+          "value": "var(--text-sm--line-height)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168359
+        },
+        {
+          "property": "--menu-item-padding",
+          "value": "calc(var(--spacing) * 1.25) var(--padding-row-x,calc(var(--spacing) * 2))",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168406
+        },
+        {
+          "property": "--menu-item-radius",
+          "value": "var(--radius-xl)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168589
+        },
+        {
+          "property": "--menu-item-background-color",
+          "value": "var(--color-background-primary-ghost-hover)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=electron],:root[data-codex-window-type=electron] *)"
+          ],
+          "character_offset": 168625
+        },
+        {
+          "property": "--popover-radius",
+          "value": "var(--radius-xl)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 169394
+        },
+        {
+          "property": "--tooltip-border-radius",
+          "value": "var(--radius-md)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 172018
+        },
+        {
+          "property": "--tooltip-background-color",
+          "value": "var(--color-surface-elevated)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 172059
+        },
+        {
+          "property": "--tooltip-text-color",
+          "value": "var(--color-text)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 172116
+        },
+        {
+          "property": "--tooltip-font-size",
+          "value": "var(--font-text-sm-size)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 172214
+        },
+        {
+          "property": "--tooltip-compact-padding",
+          "value": "calc(var(--spacing) * .5) calc(var(--spacing) * 2)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 172507
+        },
+        {
+          "property": "--tooltip-compact-font-size",
+          "value": "var(--font-text-sm-size)",
+          "selector": [
+            "@layer theme",
+            ":where(:root),:where([data-theme])"
+          ],
+          "character_offset": 172808
+        },
+        {
+          "property": "--menu-background-color",
+          "value": "var(--color-surface-elevated-secondary)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 173466
+        },
+        {
+          "property": "--menu-background-color",
+          "value": "color-mix(in oklab, var(--color-surface-elevated-secondary) 90%, transparent)",
+          "selector": [
+            "@layer theme",
+            "@supports (color:color-mix(in lab, red, red))",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 173701
+        },
+        {
+          "property": "--menu-box-shadow",
+          "value": "0 0 0 var(--border-width-hairline,.5px) var(--color-border), var(--shadow-xl-spread,var(--shadow-hairline), var(--shadow-xl))",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 173929
+        },
+        {
+          "property": "--menu-gutter",
+          "value": "calc(var(--spacing) * 2)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 174117
+        },
+        {
+          "property": "--popover-radius",
+          "value": "var(--radius-2xl)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 174302
+        },
+        {
+          "property": "--tooltip-compact-padding",
+          "value": "var(--spacing) calc(var(--spacing) * 2)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 174863
+        },
+        {
+          "property": "--tooltip-compact-font-size",
+          "value": "var(--font-text-xs-size)",
+          "selector": [
+            "@layer theme",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 174981
+        },
+        {
+          "property": "--menu-item-padding",
+          "value": "calc(var(--spacing) * 2.5) calc(var(--spacing) * 3)",
+          "selector": [
+            "@layer theme",
+            "@media (pointer:coarse)",
+            ":is(:where(:root),:where([data-theme])):where(:root[data-codex-window-type=browser],:root[data-codex-window-type=browser] *)"
+          ],
+          "character_offset": 175241
+        },
+        {
+          "property": "--app-color-background-surface",
+          "value": "var(--lightningcss-light,var(--gray-fixed-0))var(--lightningcss-dark,var(--gray-fixed-900))",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 175663
+        },
+        {
+          "property": "--app-color-background-surface-under",
+          "value": "var(--lightningcss-light,var(--gray-fixed-50))var(--lightningcss-dark,black)",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 175786
+        },
+        {
+          "property": "--app-color-background-editor-opaque",
+          "value": "var(--lightningcss-light,var(--gray-fixed-100))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 176372
+        },
+        {
+          "property": "--app-color-background-elevated-primary",
+          "value": "var(--lightningcss-light,var(--gray-fixed-0))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 176503
+        },
+        {
+          "property": "--app-color-background-elevated-primary-opaque",
+          "value": "var(--lightningcss-light,var(--gray-fixed-0))var(--lightningcss-dark,var(--gray-fixed-750))",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 176635
+        },
+        {
+          "property": "--app-color-text-foreground",
+          "value": "var(--lightningcss-light,#1a1c1f)var(--lightningcss-dark,var(--gray-fixed-150))",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 179623
+        },
+        {
+          "property": "--app-color-text-foreground-secondary",
+          "value": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 179731
+        },
+        {
+          "property": "--app-color-text-foreground-tertiary",
+          "value": "var(--lightningcss-light,var(--app-color-text-foreground))var(--lightningcss-dark,var(--gray-fixed-0))",
+          "selector": [
+            "@layer theme",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 179872
+        },
+        {
+          "property": "--app-color-background-editor-opaque",
+          "value": "var(--lightningcss-light,color-mix(in oklab, var(--gray-fixed-100) 40%, transparent))var(--lightningcss-dark,var(--gray-fixed-800))",
+          "selector": [
+            "@layer theme",
+            "@supports (color:color-mix(in lab, red, red))",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 180636
+        },
+        {
+          "property": "--app-color-background-elevated-primary",
+          "value": "var(--lightningcss-light,color-mix(in oklab, var(--gray-fixed-0) 70%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-800) 96%, transparent))",
+          "selector": [
+            "@layer theme",
+            "@supports (color:color-mix(in lab, red, red))",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 180805
+        },
+        {
+          "property": "--app-color-text-foreground-secondary",
+          "value": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 70%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 70%, transparent))",
+          "selector": [
+            "@layer theme",
+            "@supports (color:color-mix(in lab, red, red))",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 184186
+        },
+        {
+          "property": "--app-color-text-foreground-tertiary",
+          "value": "var(--lightningcss-light,color-mix(in oklab, var(--app-color-text-foreground) 50%, transparent))var(--lightningcss-dark,color-mix(in oklab, var(--gray-fixed-0) 50%, transparent))",
+          "selector": [
+            "@layer theme",
+            "@supports (color:color-mix(in lab, red, red))",
+            ":where(:root:not([data-codex-window-type=extension])),:where(:root:not([data-codex-window-type=extension]) [data-theme])"
+          ],
+          "character_offset": 184403
+        },
+        {
+          "property": "--color-surface",
+          "value": "var(--app-color-background-surface)",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 200335
+        },
+        {
+          "property": "--color-surface-secondary",
+          "value": "var(--app-color-background-surface-under)",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 200462
+        },
+        {
+          "property": "--color-surface-tertiary",
+          "value": "var(--app-color-background-editor-opaque)",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 200623
+        },
+        {
+          "property": "--app-color-background-shell",
+          "value": "var(--color-surface-tertiary)",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 200690
+        },
+        {
+          "property": "--app-shell-sidebar-divider",
+          "value": "var(--color-border)",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 200834
+        },
+        {
+          "property": "--color-surface-elevated",
+          "value": "var(--app-color-background-elevated-primary)",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 201561
+        },
+        {
+          "property": "--color-border",
+          "value": "var(--app-color-border,var(--app-color-text-foreground))",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 205198
+        },
+        {
+          "property": "--color-ring",
+          "value": "var(--app-color-border-focus)",
+          "selector": [
+            "@layer theme",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 205765
+        },
+        {
+          "property": "--color-border",
+          "value": "var(--app-color-border,color-mix(in oklab, var(--app-color-text-foreground) 8%, transparent))",
+          "selector": [
+            "@layer theme",
+            "@supports (color:color-mix(in lab, red, red))",
+            ":where(:root,[data-theme])"
+          ],
+          "character_offset": 211753
+        },
+        {
+          "property": "--font-sans-default",
+          "value": "-apple-system-body, ui-sans-serif, -apple-system, system-ui, \"Segoe UI\", \"Helvetica\", \"Apple Color Emoji\", \"Arial\", sans-serif, \"Segoe UI Emoji\", \"Segoe UI Symbol\"",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1214763
+        },
+        {
+          "property": "--text-lg",
+          "value": "1.125rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1215064
+        },
+        {
+          "property": "--text-base",
+          "value": "1rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1215083
+        },
+        {
+          "property": "--text-sm",
+          "value": ".875rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1215100
+        },
+        {
+          "property": "--text-xs",
+          "value": ".75rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1215118
+        },
+        {
+          "property": "--height-toolbar",
+          "value": "calc(var(--spacing) * 13)",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1216356
+        },
+        {
+          "property": "--radius-xs-base",
+          "value": ".125rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1216913
+        },
+        {
+          "property": "--radius-sm-base",
+          "value": ".25rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1216938
+        },
+        {
+          "property": "--radius-md-base",
+          "value": ".375rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1216962
+        },
+        {
+          "property": "--radius-lg-base",
+          "value": ".5rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1216987
+        },
+        {
+          "property": "--radius-3xl-base",
+          "value": "1.5rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1217010
+        },
+        {
+          "property": "--radius-4xl-base",
+          "value": "2rem",
+          "selector": [
+            "[data-codex-window-type=browser]"
+          ],
+          "character_offset": 1217035
+        },
+        {
+          "property": "--text-sm",
+          "value": "13px",
+          "selector": [
+            "[data-codex-window-type=electron]"
+          ],
+          "character_offset": 1217330
+        },
+        {
+          "property": "--text-xs",
+          "value": "12px",
+          "selector": [
+            "[data-codex-window-type=electron]"
+          ],
+          "character_offset": 1217345
+        },
+        {
+          "property": "--app-color-background-elevated-primary",
+          "value": "var(--app-color-background-elevated-primary-opaque)",
+          "selector": [
+            "[data-codex-window-type=electron].electron-opaque body"
+          ],
+          "character_offset": 1222935
+        },
+        {
+          "property": "--app-color-background-elevated-primary",
+          "value": "var(--app-color-background-elevated-primary-opaque)",
+          "selector": [
+            "[data-codex-window-type=electron].electron-opaque :where([data-theme])"
+          ],
+          "character_offset": 1223507
+        }
+      ]
+    },
+    {
+      "file": "webview/assets/app-initial-a3898107ddbb.css",
+      "size_bytes": 204164,
+      "sha256": "fd6c8526fc184dfbe9abfee7220614d5b9bc549fb1860857159eb63ba26343fc",
+      "declarations": [
+        {
+          "property": "--color-border",
+          "value": "var(--color-border-strong)",
+          "selector": [
+            "@layer components",
+            ":root[data-codex-window-chrome=application-menu] ._SelectedSurface_p64dj_1"
+          ],
+          "character_offset": 2269
+        },
+        {
+          "property": "background-color",
+          "value": "var(--header-tint)",
+          "selector": [
+            "@layer components",
+            "._FloatingHeader_bo1ta_2:not([data-app-shell-left-panel-appearance=content-surface]),._ApplicationMenuTopBar_bo1ta_2"
+          ],
+          "character_offset": 17070
+        },
+        {
+          "property": "--app-shell-sidebar-divider",
+          "value": "transparent",
+          "selector": [
+            "@layer components",
+            "._Layout_bo1ta_2[data-app-shell-docking-peek=true]"
+          ],
+          "character_offset": 27487
+        },
+        {
+          "property": "background-color",
+          "value": "var(--color-surface)",
+          "selector": [
+            "@layer components",
+            "._PageSurfaceLayout_bo1ta_2 [data-app-shell-page-header]:has([data-app-shell-overlay-page-header])"
+          ],
+          "character_offset": 32889
+        },
+        {
+          "property": "--app-shell-main-surface-top-start-radius",
+          "value": "var(--radius-xl-base)",
+          "selector": [
+            "@layer components",
+            "._PageSurfaceLayout_bo1ta_2 ._MainContentSurface_bo1ta_2[data-app-shell-main-surface=default]"
+          ],
+          "character_offset": 33021
+        },
+        {
+          "property": "--app-shell-main-surface-top-end-radius",
+          "value": "var(--radius-xl-base)",
+          "selector": [
+            "@layer components",
+            "._PageSurfaceLayout_bo1ta_2 ._MainContentSurface_bo1ta_2[data-app-shell-main-surface=default]"
+          ],
+          "character_offset": 33085
+        },
+        {
+          "property": "background-color",
+          "value": "var(--color-surface)",
+          "selector": [
+            "@layer components",
+            "._PageSurfaceLayout_bo1ta_2 ._MainContentSurface_bo1ta_2[data-app-shell-main-surface=default]"
+          ],
+          "character_offset": 33227
+        },
+        {
+          "property": "background-color",
+          "value": "var(--color-surface)",
+          "selector": [
+            "@layer components",
+            ":is(._PageSurfaceLayout_bo1ta_2,._FullHeightPageSurfaceLayout_bo1ta_2) ._LeftPanel_bo1ta_2:not([data-slate-sidebar-peeking=true]) .sidebar-navigation:not(.sidebar-navigation .sidebar-navigation)"
+          ],
+          "character_offset": 34638
+        },
+        {
+          "property": "background-color",
+          "value": "color-mix(in oklab, var(--color-surface) 65%, transparent)",
+          "selector": [
+            "@layer components",
+            "@supports (color:color-mix(in lab, red, red))",
+            ":is(._PageSurfaceLayout_bo1ta_2,._FullHeightPageSurfaceLayout_bo1ta_2) ._LeftPanel_bo1ta_2:not([data-slate-sidebar-peeking=true]) .sidebar-navigation:not(.sidebar-navigation .sidebar-navigation)"
+          ],
+          "character_offset": 34917
+        },
+        {
+          "property": "--app-shell-main-surface-top-start-radius",
+          "value": "0px",
+          "selector": [
+            "@layer components",
+            ":is(._PageSurfaceLayout_bo1ta_2,._FullHeightPageSurfaceLayout_bo1ta_2)[data-app-shell-page-sidebar=true] ._MainContentSurface_bo1ta_2"
+          ],
+          "character_offset": 35461
+        },
+        {
+          "property": "--text-base",
+          "value": "16px",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7"
+          ],
+          "character_offset": 74028
+        },
+        {
+          "property": "--text-sm",
+          "value": "14px",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7"
+          ],
+          "character_offset": 74045
+        },
+        {
+          "property": "--text-xs",
+          "value": "12px",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7"
+          ],
+          "character_offset": 74060
+        },
+        {
+          "property": "--text-lg",
+          "value": "18px",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7"
+          ],
+          "character_offset": 74075
+        },
+        {
+          "property": "--spacing",
+          "value": "4px",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7"
+          ],
+          "character_offset": 74090
+        },
+        {
+          "property": "--color-surface-elevated",
+          "value": "var(--checkout-bg-primary)",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7._offerNotice_evknr_144"
+          ],
+          "character_offset": 77309
+        },
+        {
+          "property": "--color-border",
+          "value": "var(--checkout-border-default)",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7._offerNotice_evknr_144"
+          ],
+          "character_offset": 77361
+        },
+        {
+          "property": "--color-surface",
+          "value": "var(--checkout-bg-primary)",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7._modal_evknr_206"
+          ],
+          "character_offset": 78739
+        },
+        {
+          "property": "--color-surface-tertiary",
+          "value": "var(--checkout-bg-primary)",
+          "selector": [
+            "@layer components",
+            "._root_evknr_7._modal_evknr_206"
+          ],
+          "character_offset": 78782
+        }
+      ]
+    },
+    {
+      "file": "webview/assets/app-primary-547a6c7b4fb3.css",
+      "size_bytes": 39430,
+      "sha256": "658cc9377542b4d04ade79be0ae4f520d9695008cd72fb6db8af58d91d1e0cdd",
+      "declarations": [
+        {
+          "property": "--color-surface",
+          "value": "var(--app-color-background-surface)",
+          "selector": [
+            "@layer components",
+            "._EnterpriseFooterBackground_18ixn_2"
+          ],
+          "character_offset": 31945
+        },
+        {
+          "property": "--color-surface",
+          "value": "var(--lightningcss-light,#fff)var(--lightningcss-dark,#212121)",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 32516
+        },
+        {
+          "property": "--color-surface-secondary",
+          "value": "var(--lightningcss-light,#e8e8e8)var(--lightningcss-dark,#303030)",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 32595
+        },
+        {
+          "property": "--color-surface-tertiary",
+          "value": "var(--lightningcss-light,#f3f3f3)var(--lightningcss-dark,#414141)",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 32687
+        },
+        {
+          "property": "--color-border",
+          "value": "var(--lightningcss-light,#0000001a)var(--lightningcss-dark,#ffffff26)",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 33115
+        },
+        {
+          "property": "--text-xs",
+          "value": "12px",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 33997
+        },
+        {
+          "property": "--text-sm",
+          "value": "14px",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 34012
+        },
+        {
+          "property": "--text-base",
+          "value": "16px",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 34027
+        },
+        {
+          "property": "--text-lg",
+          "value": "18px",
+          "selector": [
+            "@layer components",
+            "._surface_ubz2o_3"
+          ],
+          "character_offset": 34044
+        }
+      ]
+    },
+    {
+      "file": "webview/assets/popover-33fff3f58ec9.css",
+      "size_bytes": 2260,
+      "sha256": "4743105b668ed950b744936102f770c5f8700827e84630c802e8845af0556430",
+      "declarations": [
+        {
+          "property": "border-radius",
+          "value": "var(--popover-radius)",
+          "selector": [
+            "@layer components",
+            "._Popover_oe2a7_2"
+          ],
+          "character_offset": 258
+        },
+        {
+          "property": "background",
+          "value": "var(--color-surface-elevated)",
+          "selector": [
+            "@layer components",
+            "._Popover_oe2a7_2"
+          ],
+          "character_offset": 294
+        },
+        {
+          "property": "background",
+          "value": "linear-gradient(360deg,#f7f7f880 0%,#f7f7f8 100%)",
+          "selector": [
+            "@layer components",
+            "._Popover_oe2a7_2[data-translucent]"
+          ],
+          "character_offset": 988
+        },
+        {
+          "property": "background",
+          "value": "linear-gradient(360deg,#56586940 0%,#5658697d 100%)",
+          "selector": [
+            "@layer components",
+            "._Popover_oe2a7_2[data-translucent]:where([data-theme=dark])"
+          ],
+          "character_offset": 1110
+        },
+        {
+          "property": "background",
+          "value": "linear-gradient(360deg,#56586940 0%,#5658697d 100%)",
+          "selector": [
+            "@layer components",
+            "@container style(--theme-variant:dark)",
+            "._Popover_oe2a7_2[data-translucent]:where(:not([data-theme]))"
+          ],
+          "character_offset": 1274
+        },
+        {
+          "property": "transition-duration",
+          "value": ".35s",
+          "selector": [
+            "@layer components",
+            "._Transition_oe2a7_2[data-entering-active] ._Popover_oe2a7_2,._Transition_oe2a7_2[data-entering][data-interrupted] ._Popover_oe2a7_2"
+          ],
+          "character_offset": 1671
+        },
+        {
+          "property": "transition-duration",
+          "value": ".2s",
+          "selector": [
+            "@layer components",
+            "._Transition_oe2a7_2[data-exiting-active] ._Popover_oe2a7_2,._Transition_oe2a7_2[data-exiting][data-interrupted] ._Popover_oe2a7_2"
+          ],
+          "character_offset": 2022
+        }
+      ]
+    },
+    {
+      "file": "webview/assets/floating-navigation-rail-layout-17bd6c59412b.css",
+      "size_bytes": 4117,
+      "sha256": "3c0f212c73a619daf27166f02d48e87cce91ed5dc12eaeccc3007c387fd2edda",
+      "declarations": [
+        {
+          "property": "transition-duration",
+          "value": ".16s",
+          "selector": [
+            "@layer components",
+            "._MarkerLine_k7ebw_2,._BookmarkDot_k7ebw_2"
+          ],
+          "character_offset": 727
+        },
+        {
+          "property": "transition-duration",
+          "value": "0s",
+          "selector": [
+            "@layer components",
+            "[data-floating-navigation-rail-list][data-scrubbing] :is(._MarkerLine_k7ebw_2,._BookmarkDot_k7ebw_2)"
+          ],
+          "character_offset": 2247
+        },
+        {
+          "property": "transition-duration",
+          "value": "0s",
+          "selector": [
+            "@layer components",
+            "@media (prefers-reduced-motion:reduce)",
+            ":is(._MarkerLine_k7ebw_2,._BookmarkDot_k7ebw_2)"
+          ],
+          "character_offset": 4091
+        }
+      ]
+    },
+    {
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "size_bytes": 7755478,
+      "sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6"
+    },
+    {
+      "file": "webview/assets/popover-65d93efc06aa.js",
+      "size_bytes": 6865,
+      "sha256": "d56edf7be00fc3a4b650800f143c0c351cfabec26ac64506655fa8f41b266646"
+    }
+  ],
+  "behaviors": [
+    {
+      "id": "dismiss_top_layer",
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "source_sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6",
+      "character_offset": 740347,
+      "evidence_excerpt": "e.key===`Escape`&&(i?.(e),!e.defaultPrevented&&c",
+      "finding": "Dismissable layer handles Escape only for its top layer; consumers may prevent the default dismissal.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "modal_focus",
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "source_sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6",
+      "character_offset": 766365,
+      "evidence_excerpt": "trapFocus:n.open,disableOutsidePointerEvents:n.open",
+      "finding": "DialogContentModal traps focus while open, prevents outside focus, and restores focus to its trigger by default.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "menu_key_map",
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "source_sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6",
+      "character_offset": 806501,
+      "evidence_excerpt": "hy=[`Enter`,` `],Cje=[`ArrowDown`,`PageUp`,`Home`]",
+      "finding": "Menu primitives declare activation and boundary navigation keys; left/right submenu direction is RTL aware.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "menu_disabled_and_typeahead",
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "source_sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6",
+      "character_offset": 809896,
+      "evidence_excerpt": "let t=E.current+e,n=b().filter(e=>!e.disabled)",
+      "finding": "Menu typeahead filters disabled entries, tracks a one-second search buffer, and focuses matching text.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "menu_selection_close",
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "source_sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6",
+      "character_offset": 812785,
+      "evidence_excerpt": "t.defaultPrevented?l.current=!1:o.onClose()",
+      "finding": "Selecting an enabled menu item dispatches a cancelable select event and closes unless prevented.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "menu_trigger_keys",
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "source_sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6",
+      "character_offset": 825794,
+      "evidence_excerpt": "[`Enter`,` `].includes(e.key)&&a.onOpenToggle()",
+      "finding": "Dropdown trigger opens/toggles with Enter or Space; ArrowDown opens; disabled trigger guards these actions.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "menu_focus_restore",
+      "file": "webview/assets/app-shared-5d8e744d1fa1.js",
+      "source_sha256": "f7edf3bfe729e74f0e375732a956f4d428ce4baea920908ae0ab5e325e4196f6",
+      "character_offset": 826344,
+      "evidence_excerpt": "o.current||i.triggerRef.current?.focus(),o.current=!1",
+      "finding": "Dropdown close restores trigger focus unless an outside-interaction condition has been recorded.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "popover_collision",
+      "file": "webview/assets/popover-65d93efc06aa.js",
+      "source_sha256": "d56edf7be00fc3a4b650800f143c0c351cfabec26ac64506655fa8f41b266646",
+      "character_offset": 4689,
+      "evidence_excerpt": "avoidCollisions:t??!0,hideWhenDetached:!0,collisionPadding:20",
+      "finding": "Popover has collision avoidance and hides when its anchor detaches; base side offset is 8.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "popover_hover",
+      "file": "webview/assets/popover-65d93efc06aa.js",
+      "source_sha256": "d56edf7be00fc3a4b650800f143c0c351cfabec26ac64506655fa8f41b266646",
+      "character_offset": 2371,
+      "evidence_excerpt": "hoverOpenDelay:r=150",
+      "finding": "Optional hover opening has a 150ms default delay; touch pointer movement does not trigger hover opening.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "popover_keyboard",
+      "file": "webview/assets/popover-65d93efc06aa.js",
+      "source_sha256": "d56edf7be00fc3a4b650800f143c0c351cfabec26ac64506655fa8f41b266646",
+      "character_offset": 4962,
+      "evidence_excerpt": "e.target===t&&e.key===`Tab`&&e.shiftKey",
+      "finding": "Popover focuses its content on opening when configured, and Shift-Tab from the container focuses its last focusable descendant.",
+      "kind": "static_implementation"
+    },
+    {
+      "id": "popover_escape_override",
+      "file": "webview/assets/popover-65d93efc06aa.js",
+      "source_sha256": "d56edf7be00fc3a4b650800f143c0c351cfabec26ac64506655fa8f41b266646",
+      "character_offset": 4908,
+      "evidence_excerpt": "onEscapeKeyDown:p,onKeyDown:",
+      "finding": "This wrapper overrides Escape with an imported handler; this excerpt alone does not establish its final dismissal behavior.",
+      "kind": "static_implementation"
+    }
+  ],
+  "not_verified": [
+    "runtime theme overrides",
+    "native titlebar computed appearance",
+    "actual menu/popover interaction",
+    "live accessibility tree",
+    "all platform designs"
+  ]
+}

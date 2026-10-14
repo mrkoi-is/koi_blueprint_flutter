@@ -1,0 +1,267 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
+import 'package:workbench_app/features/workspace/presentation/services/media_retry.dart';
+
+class TasksPage extends ConsumerStatefulWidget {
+  const TasksPage({super.key});
+  @override
+  ConsumerState<TasksPage> createState() => _TasksPageState();
+}
+
+class _TasksPageState extends ConsumerState<TasksPage> {
+  final _newTodo = TextEditingController();
+  bool _onlyOpen = false;
+  @override
+  void dispose() {
+    _newTodo.dispose();
+    super.dispose();
+  }
+
+  Future<void> _rename(WorkspaceTodo todo) async {
+    final title = await showDialog<String>(
+      context: context,
+      builder: (_) => _TodoTitleDialog(title: todo.title),
+    );
+    if (mounted && title != null && title.trim().isNotEmpty) {
+      ref
+          .read(workspaceSessionProvider)
+          .updateTodo(todo.id, title: title.trim());
+    }
+  }
+
+  void _add() {
+    final title = _newTodo.text.trim();
+    if (title.isEmpty) {
+      return;
+    }
+    ref.read(workspaceSessionProvider).addTodo(title);
+    _newTodo.clear();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final session = ref.watch(workspaceSessionProvider);
+    final state = ref.watch(
+      workspaceStateProvider.select(
+        (value) => (
+          todos: value.value?.snapshot.todos ?? session.state.snapshot.todos,
+          jobCount:
+              value.value?.snapshot.jobs.length ??
+              session.state.snapshot.jobs.length,
+        ),
+      ),
+    );
+    final todos = state.todos
+        .where((todo) => !_onlyOpen || !todo.completed)
+        .toList();
+    return ListView(
+      key: const PageStorageKey('tasks-scroll'),
+      padding: const EdgeInsets.all(16),
+      children: [
+        KoiSection(
+          title: const Text('待办事项'),
+          description: const Text('待办与真实 IO 作业分别管理'),
+          actions: [
+            FilterChip(
+              label: const Text('仅未完成'),
+              selected: _onlyOpen,
+              onSelected: (value) => setState(() => _onlyOpen = value),
+            ),
+          ],
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      key: const ValueKey('new-todo'),
+                      controller: _newTodo,
+                      decoration: const InputDecoration(labelText: '添加待办'),
+                      onSubmitted: (_) => _add(),
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: '添加待办',
+                    onPressed: _add,
+                    icon: const Icon(Icons.add),
+                  ),
+                ],
+              ),
+              for (final todo in todos)
+                ListTile(
+                  leading: Checkbox(
+                    value: todo.completed,
+                    onChanged: (value) =>
+                        session.updateTodo(todo.id, completed: value ?? false),
+                  ),
+                  title: Text(todo.title),
+                  trailing: Wrap(
+                    children: [
+                      IconButton(
+                        tooltip: '重命名待办',
+                        onPressed: () => unawaited(_rename(todo)),
+                        icon: const Icon(Icons.edit_outlined),
+                      ),
+                      IconButton(
+                        tooltip: '删除待办',
+                        onPressed: () => session.deleteTodo(todo.id),
+                        icon: const Icon(Icons.delete_outline),
+                      ),
+                    ],
+                  ),
+                ),
+              if (todos.isEmpty)
+                const Padding(padding: EdgeInsets.all(16), child: Text('暂无待办')),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        KoiSection(
+          title: const Text('IO 作业'),
+          description: const Text('导入字节与缩略图处理来自实际操作'),
+          child: Column(
+            children: [
+              if (state.jobCount == 0)
+                const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Text('导入文本或媒体后，作业将显示在这里'),
+                ),
+              for (final job in session.state.snapshot.jobs.reversed)
+                _JobTile(key: ValueKey(job.id), id: job.id),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+String _status(JobStatus status) => switch (status) {
+  JobStatus.queued => '等待中',
+  JobStatus.running => '处理中',
+  JobStatus.cancelling => '正在取消',
+  JobStatus.succeeded => '完成',
+  JobStatus.failed => '失败',
+  JobStatus.cancelled => '已取消',
+  JobStatus.interrupted => '已中断',
+};
+
+class _JobTile extends ConsumerWidget {
+  const _JobTile({super.key, required this.id});
+  final String id;
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(workspaceSessionProvider);
+    final job = ref.watch(
+      workspaceStateProvider.select(
+        (value) =>
+            value.value?.snapshot.jobs.where((job) => job.id == id).firstOrNull,
+      ),
+    );
+    if (job == null) return const SizedBox();
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Row(
+              children: [
+                Expanded(child: Text(job.name)),
+                Text(_status(job.status)),
+              ],
+            ),
+            if (!job.terminal) ...[
+              const SizedBox(height: 8),
+              LinearProgressIndicator(
+                value:
+                    job.indeterminate ||
+                        job.totalBytes == null ||
+                        job.totalBytes == 0
+                    ? null
+                    : (job.processedBytes / job.totalBytes!).clamp(0, 1),
+              ),
+            ],
+            const SizedBox(height: 4),
+            Text(
+              '${job.processedBytes} 字节${job.totalBytes == null ? '' : ' / ${job.totalBytes} 字节'}',
+            ),
+            if (job.error != null)
+              Text(
+                job.error!,
+                style: TextStyle(color: Theme.of(context).colorScheme.error),
+              ),
+            Wrap(
+              alignment: WrapAlignment.end,
+              children: [
+                if (!job.terminal && job.status != JobStatus.cancelling)
+                  TextButton(
+                    onPressed: () => session.cancelJob(job.id),
+                    child: const Text('取消作业'),
+                  ),
+                if (job.status == JobStatus.failed ||
+                    job.status == JobStatus.interrupted ||
+                    job.status == JobStatus.cancelled)
+                  TextButton(
+                    onPressed: () {
+                      final asset = session.state.snapshot.assets
+                          .where((asset) => asset.id == job.assetId)
+                          .firstOrNull;
+                      if (job.kind == JobKind.thumbnail &&
+                          asset?.kind == MediaKind.video) {
+                        unawaited(retryVideoThumbnail(context, ref, asset!));
+                      } else {
+                        unawaited(session.retryJob(job.id));
+                      }
+                    },
+                    child: const Text('重试作业'),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TodoTitleDialog extends StatefulWidget {
+  const _TodoTitleDialog({required this.title});
+  final String title;
+  @override
+  State<_TodoTitleDialog> createState() => _TodoTitleDialogState();
+}
+
+class _TodoTitleDialogState extends State<_TodoTitleDialog> {
+  late final _controller = TextEditingController(text: widget.title);
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AlertDialog(
+    title: const Text('重命名待办'),
+    content: TextField(
+      controller: _controller,
+      autofocus: true,
+      onSubmitted: (value) => Navigator.pop(context, value),
+    ),
+    actions: [
+      TextButton(
+        onPressed: () => Navigator.pop(context),
+        child: const Text('取消'),
+      ),
+      FilledButton(
+        onPressed: () => Navigator.pop(context, _controller.text),
+        child: const Text('确定'),
+      ),
+    ],
+  );
+}

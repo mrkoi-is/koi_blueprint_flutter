@@ -5,6 +5,8 @@
 .fvm/
 **/.dart_tool/
 **/build/
+# Build-cache symlinks are local artifacts too (including unmounted targets).
+**/build
 **/.flutter-plugins
 **/.flutter-plugins-dependencies
 **/.pub/
@@ -14,3 +16,10 @@ melos_*.iml
 # Codegen outputs are not versioned; regenerate via `melos run generate`
 **/*.g.dart
 **/*.freezed.dart
+
+# Python validation tooling
+__pycache__/
+*.pyc
+
+# Flutter localization output (regenerate from ARB)
+**/lib/l10n/generated/

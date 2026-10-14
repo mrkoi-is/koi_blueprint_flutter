@@ -1,0 +1,377 @@
+{
+  "@@locale": "zh_Hant",
+  "appTitle": "Koi 工作區",
+  "aboutTitle": "關於",
+  "aboutSource": "原始碼摘要",
+  "aboutChannel": "建置頻道",
+  "aboutPlatform": "平台",
+  "text": "文字資料",
+  "media": "媒體素材",
+  "tasks": "任務",
+  "settings": "設定",
+  "systemTheme": "跟隨系統主題",
+  "lightTheme": "明亮主題",
+  "darkTheme": "深色主題",
+  "comfortable": "舒適密度",
+  "compact": "緊湊密度",
+  "save": "儲存工作區",
+  "saveShortcut": "儲存工作區 (⌘/Ctrl+S)",
+  "importFiles": "匯入檔案",
+  "retry": "重試",
+  "restoring": "正在還原工作區…",
+  "initializing": "正在初始化本機工作區…",
+  "workspaceInUse": "工作區已開啟",
+  "initializationFailed": "工作區初始化失敗",
+  "language": "語言",
+  "systemLanguage": "跟隨系統語言",
+  "accent": "強調色",
+  "moss": "苔綠",
+  "blue": "靛藍",
+  "violet": "紫羅蘭",
+  "cancel": "取消",
+  "confirm": "確定",
+  "apply": "套用",
+  "keyboardShortcuts": "鍵盤快速鍵",
+  "back": "返回",
+  "forward": "前進",
+  "quit": "離開工作區",
+  "unsaved": "未儲存",
+  "saved": "已儲存",
+  "saving": "工作區儲存中",
+  "saveFailed": "工作區儲存失敗",
+  "newDocument": "新增資料",
+  "importText": "匯入文字",
+  "noDocuments": "尚無文字資料",
+  "documentsHint": "新增資料，或匯入 UTF-8 TXT/Markdown 檔案",
+  "renameCurrentDocument": "重新命名目前資料",
+  "writeContent": "寫下內容…",
+  "documentNameRequired": "請輸入資料名稱",
+  "renameDocument": "重新命名資料",
+  "documentName": "資料名稱",
+  "searchDocuments": "搜尋資料",
+  "noMatchingDocuments": "沒有符合的資料",
+  "mediaCategories": "媒體分類",
+  "searchMedia": "搜尋素材",
+  "all": "全部",
+  "image": "圖片",
+  "video": "影片",
+  "mediaStorageHint": "匯入的素材副本儲存在目前工作區；切換檢視會暫停影片並保留播放位置。",
+  "taskSummary": "任務概覽",
+  "taskRunningHint": "切換檢視時任務會繼續執行。取消會停止讀取並清理暫存內容。",
+  "documentDetails": "資料詳細資訊",
+  "noDocumentSelected": "尚未選擇資料",
+  "name": "名稱",
+  "characterCountLabel": "字數",
+  "revisionLabel": "版本",
+  "saveStatus": "儲存狀態",
+  "autosaveHint": "停止輸入 500 毫秒後自動儲存",
+  "mediaDetails": "素材詳細資訊",
+  "noMediaSelected": "尚未選擇素材",
+  "size": "大小",
+  "type": "類型",
+  "thumbnailStatus": "縮圖狀態",
+  "thumbnailPending": "縮圖待產生",
+  "thumbnailGenerating": "正在產生縮圖",
+  "thumbnailSaved": "縮圖已儲存",
+  "thumbnailFailed": "縮圖失敗",
+  "retryThumbnail": "重試縮圖",
+  "taskHelp": "任務說明",
+  "todoHelp": "待辦可以新增、重新命名、完成和刪除。",
+  "jobHelp": "IO 進度來自實際位元組讀取。縮圖處理採用不確定進度。",
+  "closeHelp": "關閉工作區會取消作業並儲存目前草稿。",
+  "importMedia": "匯入圖片 / 影片",
+  "showList": "切換清單",
+  "showGrid": "切換網格",
+  "noMatchingMedia": "尚無符合素材",
+  "mediaImportHint": "匯入 PNG/JPEG 圖片或 MP4 影片",
+  "thumbnailReadFailed": "縮圖讀取失敗",
+  "openForThumbnail": "開啟預覽以產生縮圖",
+  "retryRead": "重試讀取",
+  "selectMedia": "選擇素材",
+  "mediaPreviewHint": "圖片支援縮放；影片支援播放、暫停和拖動進度",
+  "pauseVideo": "暫停影片",
+  "playVideo": "播放影片",
+  "playbackPosition": "播放進度",
+  "volume": "音量",
+  "retryVideo": "重試影片預覽 / 縮圖",
+  "deleteTodo": "刪除待辦",
+  "delete": "刪除",
+  "todos": "待辦事項",
+  "todosDescription": "待辦與實際 IO 作業分別管理",
+  "incompleteOnly": "僅未完成",
+  "addTodo": "新增待辦",
+  "noTodos": "尚無待辦",
+  "jobs": "IO 作業",
+  "jobsDescription": "匯入位元組與縮圖處理來自實際操作",
+  "noJobs": "匯入文字或媒體後，作業將顯示在這裡",
+  "queued": "等待中",
+  "running": "處理中",
+  "cancelling": "正在取消",
+  "succeeded": "完成",
+  "failed": "失敗",
+  "cancelled": "已取消",
+  "interrupted": "已中斷",
+  "indeterminateProgress": "進度暫不確定",
+  "cancelJob": "取消作業",
+  "retryJob": "重試作業",
+  "todoNameRequired": "請輸入待辦名稱",
+  "renameTodo": "重新命名待辦",
+  "todoName": "待辦名稱",
+  "characterCount": "{count} 字",
+  "@characterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "revision": "版本 {number}",
+  "@revision": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "byteCount": "{count} 位元組",
+  "@byteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "incompleteTodos": "{count} 項待辦未完成",
+  "@incompleteTodos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "activeJobs": "{count} 項 IO 作業處理中",
+  "@activeJobs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteTodoConfirm": "刪除「{name}」？此操作無法復原。",
+  "@deleteTodoConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "renameTodoNamed": "重新命名待辦：{name}",
+  "@renameTodoNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteTodoNamed": "刪除待辦：{name}",
+  "@deleteTodoNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "retryThumbnailNamed": "重試讀取縮圖：{name}",
+  "@retryThumbnailNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageDecodeFailed": "圖片解碼失敗：{error}",
+  "@imageDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imageReadFailed": "圖片讀取失敗：{error}",
+  "@imageReadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackTime": "已播放 {position}，共 {duration}",
+  "@playbackTime": {
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "diagTitle": "診斷記錄",
+  "diagSearch": "搜尋記錄",
+  "diagAllLevels": "全部等級",
+  "diagRefresh": "重新載入新記錄",
+  "diagExportFiltered": "匯出篩選結果",
+  "diagExportAll": "匯出全部",
+  "diagMore": "載入較早記錄",
+  "diagEmpty": "沒有符合的記錄",
+  "diagStorageFailed": "記錄儲存失敗，仍可檢視記憶體中的記錄。",
+  "capabilityUnavailable": "尚未安裝此能力。",
+  "directoryIndexTitle": "目錄索引",
+  "chooseDirectory": "選擇目錄",
+  "rescanDirectory": "重新掃描",
+  "directoryIndexHint": "只讀取名稱、大小和修改時間，不複製檔案。瀏覽器中需重新選擇目錄以取得最新檔案。",
+  "directoryIndexEmpty": "選擇一個目錄開始建立索引",
+  "directoryIndexCancelled": "已取消，保留先前索引",
+  "directoryIndexFailed": "部分檔案讀取失敗，可重新掃描",
+  "directoryIndexCompleted": "索引完成",
+  "directoryIndexProgress": "已發現 {visited} · 重用 {reused} · 失敗 {failures}",
+  "@directoryIndexProgress": {
+    "placeholders": {
+      "visited": {
+        "type": "int"
+      },
+      "reused": {
+        "type": "int"
+      },
+      "failures": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkDocumentsTitle": "文件批次操作",
+  "bulkFilter": "篩選文件",
+  "bulkSelected": "已選擇 {count} 項",
+  "bulkClear": "清除選取",
+  "bulkDelete": "刪除所選",
+  "bulkDeleteConfirm": "刪除 {count} 個文件？",
+  "bulkReorder": "拖曳排序，鍵盤使用 Alt+上/下",
+  "@bulkSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@bulkDeleteConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diagSource": "來源",
+  "settingsTitle": "設定",
+  "settingsSearch": "搜尋設定",
+  "settingsNoResults": "沒有符合的設定",
+  "settingsLanguageGroup": "語言",
+  "settingsLanguage": "顯示語言",
+  "settingsLanguageDescription": "立即套用。跟隨系統使用裝置語言；不支援的語言回退為簡體中文。",
+  "settingsAppearanceGroup": "外觀",
+  "settingsTheme": "明暗模式",
+  "settingsThemeDescription": "跟隨系統會使用裝置目前的明暗設定。",
+  "settingsDensity": "介面密度",
+  "settingsDensityDescription": "自動模式為觸控或手寫筆保留舒適間距，滑鼠使用緊湊間距。手動選擇始終優先。",
+  "settingsAccent": "強調色",
+  "settingsAccentDescription": "調整醒目與選取顏色，保留狀態色含義。",
+  "settingsSystem": "跟隨系統",
+  "settingsLight": "淺色",
+  "settingsDark": "深色",
+  "settingsComfortable": "舒適",
+  "settingsCompact": "緊湊",
+  "settingsMoss": "苔綠",
+  "settingsBlue": "藍色",
+  "settingsViolet": "紫色",
+  "settingsReset": "恢復預設",
+  "settingsResetDescription": "恢復語言、明暗模式、密度及強調色。文件與其他設定不受影響。",
+  "settingsCancel": "取消",
+  "settingsRetry": "重試",
+  "settingsSaveError": "設定未能儲存，請重試以儲存目前選擇。",
+  "historyTitle": "任務歷史",
+  "historySearch": "搜尋名稱或任務 ID",
+  "historyClear": "清空歷史",
+  "historyClearConfirm": "清空歷史執行記錄？目前任務會保留。",
+  "historyEmpty": "暫無歷史記錄",
+  "historyAttempt": "第 {count} 次（0 表示舊版本次數未知）",
+  "@historyAttempt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "platformCapabilities": "平台能力",
+  "platformDesktopWindow": "桌面視窗",
+  "platformWindowUnavailable": "桌面視窗無法使用",
+  "platformWindowUninitialized": "桌面能力尚未初始化。",
+  "platformGeometrySaved": "視窗位置與尺寸會自動恢復及儲存。",
+  "platformWindowFallback": "原生視窗控制無法使用，應用程式仍可繼續使用。",
+  "platformSaveGeometry": "儲存目前視窗位置",
+  "platformCloseToTray": "關閉至系統匣",
+  "platformCloseWindowToTray": "關閉視窗時收至系統匣",
+  "platformTrayRequirement": "僅在系統匣已啟用且正常運作時可用。",
+  "platformShowWindow": "顯示視窗",
+  "platformSystemTray": "系統匣",
+  "platformTrayUnavailable": "系統匣無法使用",
+  "platformDesktopRequired": "需要先完成桌面視窗初始化。",
+  "platformTrayDescription": "系統匣可顯示視窗，或提出可取消的正常結束要求。",
+  "platformTrayRetry": "重試系統匣初始化",
+  "platformSystemMedia": "系統媒體",
+  "platformAudio": "音訊",
+  "platformMediaUnavailable": "系統媒體無法使用",
+  "platformMediaUninitialized": "請先初始化媒體能力。",
+  "platformOpenAudio": "開啟音訊檔案",
+  "platformBackgroundAudio": "在背景繼續播放音訊",
+  "platformNoAudio": "尚未選取音訊",
+  "platformPlaybackPosition": "播放位置",
+  "platformPlay": "播放",
+  "platformPause": "暫停",
+  "platformVolume": "音量",
+  "platformMiniPlayer": "迷你播放器",
+  "platformMiniRequirement": "需要初始化桌面及媒體能力",
+  "platformMiniHint": "先在系統媒體中開啟音訊，再返回此處。",
+  "platformMediaLayout": "媒體檢視",
+  "platformRestoreWindow": "恢復視窗",
+  "platformEnterMini": "進入迷你模式",
+  "platformHomeWidget": "主畫面小工具",
+  "platformSnapshotTitle": "工作區快照",
+  "platformWidgetDescription": "將版本化快照更新至已安裝的原生主畫面小工具；點按小工具可重新開啟應用程式。",
+  "platformTitle": "標題",
+  "platformIncrementCompleted": "增加已完成數量",
+  "platformUpdateWidget": "更新主畫面小工具",
+  "platformSnapshotSent": "快照已傳送至原生小工具。",
+  "platformControlsUnavailable": "系統媒體控制無法使用",
+  "platformCompleted": "已完成：{count}",
+  "@platformCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsDensityAutomatic": "自動（跟隨輸入裝置）",
+  "platformEngineTitle": "播放引擎",
+  "platformEnginePolicy": "引擎由你明確選擇。目標引擎失敗時保留目前引擎，不會自動替換。",
+  "platformEngineReady": "可用：引擎初始化成功",
+  "platformEngineSelect": "偵測並選擇引擎",
+  "documentSegmentPrevious": "上一段",
+  "documentSegmentNext": "下一段",
+  "documentSegmentPosition": "第 {index} 段；更改會儲存到完整文件。",
+  "documentSegmentComposing": "請完成輸入後再切換分段。",
+  "@documentSegmentPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  }
+}

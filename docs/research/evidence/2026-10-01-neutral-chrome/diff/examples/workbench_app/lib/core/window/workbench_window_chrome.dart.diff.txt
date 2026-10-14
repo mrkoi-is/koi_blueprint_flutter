@@ -1,0 +1,41 @@
+--- before/examples/workbench_app/lib/core/window/workbench_window_chrome.dart
++++ after/examples/workbench_app/lib/core/window/workbench_window_chrome.dart
+@@ -11,13 +11,20 @@
+   const WorkbenchWindowInfo({
+     required this.hasNativeToolbar,
+     this.panels,
++    this.title = 'Koi 工作区',
+     required super.child,
+     super.key,
+   });
+   final bool hasNativeToolbar;
++  final String title;
+   final KoiWorkbenchController? panels;
+   static KoiWorkbenchController? panelsOf(BuildContext context) =>
+       context.dependOnInheritedWidgetOfExactType<WorkbenchWindowInfo>()?.panels;
++  static String titleOf(BuildContext context) =>
++      context
++          .dependOnInheritedWidgetOfExactType<WorkbenchWindowInfo>()
++          ?.title ??
++      'Koi 工作区';
+   static bool nativeToolbarOf(BuildContext context) =>
+       context
+           .dependOnInheritedWidgetOfExactType<WorkbenchWindowInfo>()
+@@ -26,7 +33,8 @@
+   @override
+   bool updateShouldNotify(WorkbenchWindowInfo oldWidget) =>
+       hasNativeToolbar != oldWidget.hasNativeToolbar ||
+-      panels != oldWidget.panels;
++      panels != oldWidget.panels ||
++      title != oldWidget.title;
+ }
+ 
+ /// App-owned macOS toolbar bridge. All platforms share the same history owner.
+@@ -237,6 +245,7 @@
+   @override
+   Widget build(BuildContext context) => WorkbenchWindowInfo(
+     hasNativeToolbar: _ready,
++    title: widget.title,
+     panels: widget.panels,
+     child: ColoredBox(
+       color: KoiThemeTokens.of(context).chromeBackground,

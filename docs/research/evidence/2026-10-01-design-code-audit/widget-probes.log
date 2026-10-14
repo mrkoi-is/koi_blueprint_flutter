@@ -1,0 +1,19 @@
+Resolving dependencies...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/design_audit_probe_test.dart
+00:00 +0: audit: sidebar geometry and scroll restoration
+AUDIT heading origins text=Offset(12.0, 20.0) media=Offset(12.0, 12.0) tasks=Offset(16.0, 16.0); scroll before=480.0 after=0.0
+00:00 +1: audit: shared error state at 200 percent text in short viewport
+AUDIT error state exception=A RenderFlex overflowed by 160 pixels on the bottom.
+00:00 +2: All tests passed!

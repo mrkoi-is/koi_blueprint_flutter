@@ -1,0 +1,245 @@
+import 'package:flutter/material.dart';
+import 'package:koi_ui/theme/app_colors.dart';
+import 'package:koi_ui/theme/koi_theme_tokens.dart';
+
+abstract final class AppTheme {
+  static ThemeData get light => build(brightness: Brightness.light);
+  static ThemeData get dark => build(brightness: Brightness.dark);
+
+  static ThemeData build({
+    Brightness brightness = Brightness.light,
+    KoiDensity density = KoiDensity.comfortable,
+  }) {
+    final dark = brightness == Brightness.dark;
+    final colors =
+        ColorScheme.fromSeed(
+          seedColor: AppColors.moss,
+          brightness: brightness,
+        ).copyWith(
+          primary: dark ? const Color(0xFF88BCAC) : AppColors.moss,
+          onPrimary: dark ? AppColors.ink : Colors.white,
+          secondary: dark ? const Color(0xFFE4B269) : AppColors.amber,
+          // The custom amber replaces the seed color, so pair its foreground
+          // explicitly instead of retaining the seed's white onSecondary.
+          onSecondary: dark ? AppColors.ink : const Color(0xFF242424),
+          surface: dark ? AppColors.nightPanel : AppColors.content,
+          surfaceDim: dark ? AppColors.nightPanel : const Color(0xFFDEDEDE),
+          surfaceBright: dark ? const Color(0xFF383838) : AppColors.content,
+          surfaceContainerLowest: dark ? const Color(0xFF111111) : Colors.white,
+          surfaceContainerHigh: dark
+              ? const Color(0xFF303030)
+              : const Color(0xFFEEEEEE),
+          surfaceContainerHighest: dark
+              ? const Color(0xFF363636)
+              : const Color(0xFFE5E5E5),
+          onSurface: dark ? const Color(0xFFECECEC) : const Color(0xFF242424),
+          onSurfaceVariant: dark
+              ? const Color(0xFFB8B8B8)
+              : const Color(0xFF626262),
+          surfaceContainerLow: dark
+              ? const Color(0xFF232323)
+              : const Color(0xFFF5F5F5),
+          surfaceContainer: dark ? const Color(0xFF292929) : Colors.white,
+          outline: dark ? const Color(0xFF767676) : const Color(0xFF787878),
+          outlineVariant: dark
+              ? const Color(0xFF3B3B3B)
+              : const Color(0xFFDDDDDD),
+        );
+    final tokens = KoiThemeTokens.fromScheme(colors, density: density).copyWith(
+      chromeBackground: dark ? AppColors.night : AppColors.chrome,
+      contentBackground: colors.surface,
+      selectedBackground: dark
+          ? const Color(0xFF303030)
+          : const Color(0xFFEBEBEB),
+      hoverBackground: dark ? const Color(0xFF262626) : const Color(0xFFF0F0F0),
+      overlayBackground: colors.surfaceContainer,
+    );
+    // Keep Flutter's platform font and locale fallbacks, then define Koi roles.
+    final base = ThemeData(useMaterial3: true, colorScheme: colors);
+    final text = base.textTheme.copyWith(
+      titleSmall: base.textTheme.titleSmall!.copyWith(
+        fontSize: 14,
+        height: 20 / 14,
+        fontWeight: FontWeight.w500,
+      ),
+      titleMedium: base.textTheme.titleMedium!.copyWith(
+        fontSize: 14,
+        height: 20 / 14,
+        fontWeight: FontWeight.w600,
+      ),
+      titleLarge: base.textTheme.titleLarge!.copyWith(
+        fontSize: 22,
+        height: 30 / 22,
+        fontWeight: FontWeight.w600,
+      ),
+      headlineSmall: base.textTheme.headlineSmall!.copyWith(
+        fontSize: 20,
+        height: 28 / 20,
+        fontWeight: FontWeight.w600,
+      ),
+      bodyMedium: base.textTheme.bodyMedium!.copyWith(
+        fontSize: 14,
+        height: 20 / 14,
+      ),
+      bodySmall: base.textTheme.bodySmall!.copyWith(
+        fontSize: 12,
+        height: 18 / 12,
+        color: colors.onSurfaceVariant,
+      ),
+      bodyLarge: base.textTheme.bodyLarge!.copyWith(
+        fontSize: 16,
+        height: 26 / 16,
+      ),
+      labelLarge: base.textTheme.labelLarge!.copyWith(
+        fontSize: 13,
+        height: 18 / 13,
+        fontWeight: FontWeight.w500,
+      ),
+      labelMedium: base.textTheme.labelMedium!.copyWith(
+        fontSize: 12,
+        height: 18 / 12,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+    final outline = OutlineInputBorder(
+      borderRadius: BorderRadius.circular(KoiRadius.small),
+      borderSide: BorderSide(color: colors.outline),
+    );
+    final button = ButtonStyle(
+      textStyle: WidgetStatePropertyAll(text.labelLarge),
+      minimumSize: WidgetStatePropertyAll(Size(0, tokens.controlHeight)),
+      padding: WidgetStatePropertyAll(tokens.controlPadding),
+      iconSize: const WidgetStatePropertyAll(18),
+      visualDensity: VisualDensity.standard,
+      tapTargetSize: density == KoiDensity.compact
+          ? MaterialTapTargetSize.shrinkWrap
+          : MaterialTapTargetSize.padded,
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(KoiRadius.small),
+        ),
+      ),
+    );
+    return base.copyWith(
+      textTheme: text,
+      extensions: [tokens],
+      visualDensity: VisualDensity.standard,
+      iconTheme: IconThemeData(size: 20, color: colors.onSurfaceVariant),
+      scaffoldBackgroundColor: tokens.chromeBackground,
+      appBarTheme: AppBarTheme(
+        backgroundColor: tokens.chromeBackground,
+        foregroundColor: colors.onSurface,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: text.titleSmall,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+      ),
+      cardTheme: CardThemeData(
+        color: colors.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(KoiRadius.medium),
+          side: BorderSide(color: tokens.weakBorder),
+        ),
+      ),
+      inputDecorationTheme: InputDecorationThemeData(
+        filled: true,
+        isDense: true,
+        fillColor: colors.surfaceContainerLow,
+        hintStyle: text.bodyMedium!.copyWith(color: colors.onSurfaceVariant),
+        labelStyle: text.bodyMedium,
+        border: outline,
+        enabledBorder: outline,
+        focusedBorder: outline.copyWith(
+          borderSide: BorderSide(color: colors.primary, width: 2),
+        ),
+        contentPadding: tokens.inputPadding,
+      ),
+      filledButtonTheme: FilledButtonThemeData(style: button),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: button.copyWith(elevation: const WidgetStatePropertyAll(0)),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(style: button),
+      textButtonTheme: TextButtonThemeData(style: button),
+      iconButtonTheme: IconButtonThemeData(
+        style: button.copyWith(
+          minimumSize: WidgetStatePropertyAll(
+            Size.square(tokens.controlHeight),
+          ),
+          padding: const WidgetStatePropertyAll(EdgeInsets.all(6)),
+          textStyle: null,
+        ),
+      ),
+      listTileTheme: ListTileThemeData(
+        titleTextStyle: text.bodyMedium,
+        subtitleTextStyle: text.bodySmall,
+        minTileHeight: tokens.listTileHeight,
+        minVerticalPadding: 6,
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: tokens.listHorizontalPadding,
+        ),
+        selectedColor: colors.onSurface,
+        selectedTileColor: tokens.selectedBackground,
+      ),
+      chipTheme: ChipThemeData(
+        labelStyle: text.labelMedium,
+        backgroundColor: colors.surface,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(KoiRadius.row),
+        ),
+      ),
+      menuTheme: MenuThemeData(
+        style: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(tokens.overlayBackground),
+          surfaceTintColor: const WidgetStatePropertyAll(Colors.transparent),
+          elevation: const WidgetStatePropertyAll(3),
+          padding: const WidgetStatePropertyAll(EdgeInsets.all(4)),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(KoiRadius.medium),
+            ),
+          ),
+        ),
+      ),
+      menuButtonTheme: MenuButtonThemeData(
+        style: button.copyWith(
+          textStyle: WidgetStatePropertyAll(text.bodyMedium),
+          foregroundColor: WidgetStateProperty.resolveWith(
+            (states) => states.contains(WidgetState.disabled)
+                ? colors.onSurface.withValues(alpha: .38)
+                : colors.onSurface,
+          ),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(KoiRadius.row),
+            ),
+          ),
+        ),
+      ),
+      dialogTheme: DialogThemeData(
+        backgroundColor: tokens.overlayBackground,
+        surfaceTintColor: Colors.transparent,
+        titleTextStyle: text.headlineSmall,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(KoiRadius.dialog),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        indicatorColor: tokens.selectedBackground,
+        labelTextStyle: WidgetStatePropertyAll(text.labelMedium),
+      ),
+      navigationRailTheme: NavigationRailThemeData(
+        useIndicator: true,
+        minWidth: KoiWorkbenchMetrics.railWidth,
+        indicatorColor: tokens.selectedBackground,
+        selectedIconTheme: IconThemeData(size: 20, color: colors.onSurface),
+        unselectedIconTheme: IconThemeData(
+          size: 20,
+          color: colors.onSurfaceVariant,
+        ),
+      ),
+      dividerTheme: DividerThemeData(color: tokens.weakBorder, space: 1),
+    );
+  }
+}

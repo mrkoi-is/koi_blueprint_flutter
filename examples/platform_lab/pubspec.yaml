@@ -1,0 +1,42 @@
+name: platform_lab
+description: Optional desktop and media capability validation host
+publish_to: none
+resolution: workspace
+version: 0.1.0+1
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.47.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  flutter_riverpod: 3.4.3
+  riverpod_annotation: 4.0.7
+  koi_core:
+  koi_ui:
+  window_manager: ^0.5.2
+  screen_retriever: ^0.2.2
+  tray_manager: ^0.7.0
+  audioplayers: 6.8.1
+  audio_service: ^0.18.19
+  audio_service_mpris: ^0.2.1
+  smtc_windows: ^1.1.0
+  audio_session: ^0.2.4
+  home_widget: ^0.10.0
+  media_kit: ^1.2.6
+  media_kit_video: ^2.0.1
+  media_kit_libs_video: ^1.0.7
+  path_provider: ^2.1.5
+  file_selector: ^1.1.0
+  web: 1.1.1
+dev_dependencies:
+  audioplayers_platform_interface: 7.2.0
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  build_runner: 2.16.1
+  riverpod_generator: 4.0.9
+flutter:
+  generate: true
+  uses-material-design: true

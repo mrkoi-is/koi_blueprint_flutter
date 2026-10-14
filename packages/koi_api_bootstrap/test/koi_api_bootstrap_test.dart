@@ -195,6 +195,7 @@ void main() {
     final runtime = await bootstrapKoiApi(options, bindings: bindings);
 
     expect(options.enableLogging, isFalse);
+    expect(options.enableProactiveTokenRefresh, isFalse);
     expect(options.isProduction, isTrue);
     expect(runtime.backend, KoiApiBackend.native);
     expect(runtime.isNoop, isFalse);
@@ -246,6 +247,81 @@ void main() {
     expect(session.getToken(), isNull);
     expect(unauthorizedCount, 1);
     expect(observedStatus, 401);
+    await runtime.dispose();
+  });
+
+  test('a whitelisted 401 does not revoke the current session', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      request.response
+        ..statusCode = HttpStatus.unauthorized
+        ..headers.contentType = ContentType.json
+        ..write(jsonEncode({'code': 401, 'msg': 'expired'}));
+      await request.response.close();
+    });
+
+    var unauthorizedCount = 0;
+    final bindings = KoiApiBindings(
+      tokenStorage: KoiMemoryTokenSession(initialToken: 'current-token'),
+      onUnauthorized: (statusCode, message) async => unauthorizedCount++,
+    );
+    final runtime = await bootstrapKoiApi(
+      KoiApiBootstrapOptions(
+        baseUrl: 'http://${server.address.host}:${server.port}/',
+        environment: 'test',
+        enableProactiveTokenRefresh: false,
+        tokenRefreshWhiteList: const ['public'],
+      ),
+      bindings: bindings,
+    );
+
+    await expectLater(
+      KoiNetworkServiceManager.instance.mainDio.get<void>('public'),
+      throwsA(isA<Object>()),
+    );
+
+    expect(bindings.tokenSession.getToken(), 'current-token');
+    expect(unauthorizedCount, 0);
+    await runtime.dispose();
+  });
+
+  test('a structured 401 message still revokes the session', () async {
+    final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+    addTearDown(() => server.close(force: true));
+    server.listen((request) async {
+      request.response
+        ..statusCode = HttpStatus.unauthorized
+        ..headers.contentType = ContentType.json
+        ..write(
+          jsonEncode({
+            'error': {'message': 'expired'},
+          }),
+        );
+      await request.response.close();
+    });
+
+    var unauthorizedCount = 0;
+    final bindings = KoiApiBindings(
+      tokenStorage: KoiMemoryTokenSession(initialToken: 'expired-token'),
+      onUnauthorized: (statusCode, message) async => unauthorizedCount++,
+    );
+    final runtime = await bootstrapKoiApi(
+      KoiApiBootstrapOptions(
+        baseUrl: 'http://${server.address.host}:${server.port}/',
+        environment: 'test',
+        enableProactiveTokenRefresh: false,
+      ),
+      bindings: bindings,
+    );
+
+    await expectLater(
+      KoiNetworkServiceManager.instance.mainDio.get<void>('protected'),
+      throwsA(isA<Object>()),
+    );
+
+    expect(bindings.tokenSession.getToken(), isNull);
+    expect(unauthorizedCount, 1);
     await runtime.dispose();
   });
 

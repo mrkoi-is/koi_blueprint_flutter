@@ -1,0 +1,33 @@
+{
+  "platform": "macOS",
+  "logical_window": [
+    800,
+    600
+  ],
+  "dpr": 2,
+  "theme": "light",
+  "density": "compact",
+  "text_scale": 1,
+  "app": "toolbar_review_app",
+  "bundle": "com.mrkoi.toolbarfixture.toolbarReviewApp",
+  "method": "CUA native accessibility actions; screenshots use read-only CGWindow capture",
+  "observations": [
+    "Native toolbar order: back, forward, sidebar.left, title, flexible space, sidebar.right, save",
+    "Click sidebar checkbox opens text list and updates native checkbox value to 1",
+    "Click detail checkbox closes sidebar and opens document details; side checkbox becomes 0, detail becomes 1",
+    "Click detail again closes its drawer and restores content/navigation accessibility tree",
+    "Click task navigation removes detail item from native toolbar",
+    "Click native back restores text page and detail item",
+    "No second Flutter toolbar appears in this 800-wide desktop window"
+  ],
+  "screenshots": [
+    "macos-text-toolbar.png",
+    "macos-tasks-toolbar.png"
+  ],
+  "screenshot_scope": "Actual generated macOS release fixture; window shadows included. Fixture-only Chinese data is seeded by runtime-main.dart.txt.",
+  "limits": [
+    "No actual VoiceOver announcements measured",
+    "Windows/Linux/iOS/Android real hosts NOT_RUN in this round",
+    "Web release built; this round did not operate the new fallback header in an actual browser"
+  ]
+}

@@ -1,0 +1,309 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:koi_ui/koi_ui.dart';
+
+void main() => runApp(const KoiUiLabApp());
+
+class KoiUiLabApp extends StatefulWidget {
+  const KoiUiLabApp({super.key});
+
+  @override
+  State<KoiUiLabApp> createState() => _KoiUiLabAppState();
+}
+
+class _KoiUiLabAppState extends State<KoiUiLabApp> {
+  bool _dark = false;
+  bool _compact = false;
+  bool _largeText = false;
+  bool _longText = false;
+  bool _reduceMotion = false;
+  bool _rtl = false;
+  double _width = 1024;
+  double _sidebarWidth = 240;
+  double _detailWidth = 280;
+  String _selected = 'components';
+  String _message = '选择组件操作后显示结果';
+  final _input = TextEditingController();
+
+  @override
+  void dispose() {
+    _input.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => MaterialApp(
+    title: 'Koi UI Lab',
+    theme: AppTheme.build(
+      brightness: _dark ? Brightness.dark : Brightness.light,
+      density: _compact ? KoiDensity.compact : KoiDensity.comfortable,
+    ),
+    builder: (context, child) => MediaQuery(
+      data: MediaQuery.of(context).copyWith(
+        textScaler: TextScaler.linear(_largeText ? 2 : 1),
+        disableAnimations: _reduceMotion,
+      ),
+      child: Directionality(
+        textDirection: _rtl ? TextDirection.rtl : TextDirection.ltr,
+        child: child!,
+      ),
+    ),
+    home: Scaffold(
+      appBar: AppBar(title: const Text('Koi UI Lab')),
+      body: LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(KoiSpace.md),
+                child: Wrap(
+                  spacing: KoiSpace.sm,
+                  runSpacing: KoiSpace.sm,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  children: [
+                    FilterChip(
+                      label: const Text('暗色主题'),
+                      selected: _dark,
+                      onSelected: (value) => setState(() => _dark = value),
+                    ),
+                    FilterChip(
+                      label: const Text('紧凑密度'),
+                      selected: _compact,
+                      onSelected: (value) => setState(() => _compact = value),
+                    ),
+                    FilterChip(
+                      label: const Text('200% 字号'),
+                      selected: _largeText,
+                      onSelected: (value) => setState(() => _largeText = value),
+                    ),
+                    FilterChip(
+                      label: const Text('长中文'),
+                      selected: _longText,
+                      onSelected: (value) => setState(() => _longText = value),
+                    ),
+                    FilterChip(
+                      label: const Text('减少动画'),
+                      selected: _reduceMotion,
+                      onSelected: (value) =>
+                          setState(() => _reduceMotion = value),
+                    ),
+                    FilterChip(
+                      label: const Text('RTL 布局'),
+                      selected: _rtl,
+                      onSelected: (value) => setState(() => _rtl = value),
+                    ),
+                    DropdownButton<double>(
+                      value: _width,
+                      items: [
+                        for (final width in [320.0, 600.0, 1024.0, 1440.0])
+                          DropdownMenuItem(
+                            value: width,
+                            child: Text('${width.toInt()} px'),
+                          ),
+                      ],
+                      onChanged: (value) => setState(() => _width = value!),
+                    ),
+                  ],
+                ),
+              ),
+              Align(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  width: math.min(_width, constraints.maxWidth),
+                  height: 720,
+                  child: KoiWorkbenchFrame(
+                    title: const Text('组件实验工作区'),
+                    headerLeading: KoiNavigationHistoryControls(
+                      onBack: () => setState(() => _message = '已触发后退'),
+                    ),
+                    navigationTrailing: Tooltip(
+                      message: '工作区设置',
+                      child: KoiMenu(
+                        label: '工作区设置',
+                        items: [
+                          KoiMenuItem(
+                            label: _dark ? '切换明亮主题' : '切换暗色主题',
+                            onSelected: () => setState(() => _dark = !_dark),
+                          ),
+                          KoiMenuItem(
+                            label: _compact ? '切换舒适密度' : '切换紧凑密度',
+                            onSelected: () =>
+                                setState(() => _compact = !_compact),
+                          ),
+                        ],
+                        child: const Icon(Icons.settings_outlined),
+                      ),
+                    ),
+                    selectedId: _selected,
+                    onDestinationSelected: (id) =>
+                        setState(() => _selected = id),
+                    destinations: const [
+                      KoiNavigationDestination(
+                        id: 'components',
+                        label: '组件',
+                        icon: Icons.widgets_outlined,
+                      ),
+                      KoiNavigationDestination(
+                        id: 'states',
+                        label: '状态',
+                        icon: Icons.hourglass_empty,
+                      ),
+                      KoiNavigationDestination(
+                        id: 'layout',
+                        label: '布局',
+                        icon: Icons.view_sidebar_outlined,
+                      ),
+                    ],
+                    sidebarWidth: _sidebarWidth,
+                    detailWidth: _detailWidth,
+                    onDetailWidthChanged: (value) =>
+                        setState(() => _detailWidth = value),
+                    onSidebarWidthChanged: (value) =>
+                        setState(() => _sidebarWidth = value),
+                    sidebar: ListView(
+                      children: [
+                        KoiSelectableListTile(
+                          title: Text(
+                            _longText
+                                ? '这是一段用来验证侧栏在长中文标题和放大字号下仍可阅读的文字'
+                                : '可选择条目',
+                          ),
+                          selected: true,
+                          leading: const Icon(Icons.description_outlined),
+                          onTap: () => setState(() => _message = '条目已激活'),
+                        ),
+                        const KoiSelectableListTile(
+                          title: Text('已禁用条目'),
+                          enabled: false,
+                        ),
+                      ],
+                    ),
+                    detail: SingleChildScrollView(
+                      padding: const EdgeInsets.all(KoiSpace.md),
+                      child: Text(
+                        '当前侧栏：${_sidebarWidth.round()} px\n当前详情：${_detailWidth.round()} px\n$_message',
+                      ),
+                    ),
+                    body: _content(),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ),
+  );
+
+  Widget _content() {
+    if (_selected == 'states') {
+      return ListView(
+        padding: const EdgeInsets.all(KoiSpace.md),
+        children: [
+          const KoiLoadingState(message: '正在加载内容'),
+          const KoiEmptyState(title: '暂无资料', description: '导入后在这里展示'),
+          KoiErrorState(
+            title: '读取失败',
+            description: _message,
+            onRetry: () => setState(() => _message = '已请求重试'),
+          ),
+        ],
+      );
+    }
+    if (_selected == 'layout') {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(KoiSpace.md),
+          child: Text('拖动分隔线，或聚焦分隔线后使用左右方向键调整侧栏。\n窄布局通过工具栏打开侧栏和详情。\n$_message'),
+        ),
+      );
+    }
+    return ListView(
+      padding: const EdgeInsets.all(KoiSpace.md),
+      children: [
+        KoiSection(
+          title: Text(_longText ? '用于验证中文长标题的通用组件与交互展示区域' : '基础组件'),
+          description: const Text('使用 Tab 查看焦点，Enter/Space 激活，Escape 关闭浮层。'),
+          child: Wrap(
+            spacing: KoiSpace.sm,
+            runSpacing: KoiSpace.sm,
+            children: [
+              FilledButton(
+                onPressed: () => setState(() => _message = '按钮已激活'),
+                child: const Text('执行操作'),
+              ),
+              const FilledButton(onPressed: null, child: Text('禁用按钮')),
+              KoiMenu(
+                items: [
+                  KoiMenuItem(
+                    label: '重命名',
+                    icon: Icons.edit_outlined,
+                    onSelected: () => setState(() => _message = '已选择重命名'),
+                  ),
+                  const KoiMenuItem(label: '不可用操作', enabled: false),
+                ],
+                child: const Text('打开菜单'),
+              ),
+              KoiPopover(
+                child: const Text('打开浮层'),
+                builder: (context, close) => Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const Text('浮层内容：点击外部或按 Escape 关闭'),
+                    TextButton(onPressed: close, child: const Text('关闭浮层')),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: KoiSpace.lg),
+        KoiSection(
+          title: const Text('设计角色与基础组件'),
+          child: Builder(
+            builder: (context) => Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(
+                  '正文与界面文字：中文 Aa 123',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                Text(
+                  '辅助说明：保存状态与时间',
+                  style: Theme.of(context).textTheme.bodySmall,
+                ),
+                const SizedBox(height: KoiSpace.sm),
+                KoiSearchField(
+                  hintText: '搜索设计样例',
+                  onChanged: (value) => setState(() => _message = '搜索：$value'),
+                ),
+                KoiToolbar(
+                  padding: const EdgeInsets.only(top: 8),
+                  actions: [
+                    TextButton(
+                      onPressed: () => setState(() => _message = '已触发工具栏'),
+                      child: const Text('工具栏操作'),
+                    ),
+                    const TextButton(onPressed: null, child: Text('禁用操作')),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(height: KoiSpace.lg),
+        TextField(
+          key: const ValueKey('ui-lab-editor'),
+          controller: _input,
+          decoration: const InputDecoration(labelText: '保持状态的输入框'),
+          maxLines: 3,
+        ),
+        const SizedBox(height: KoiSpace.md),
+        Text(_message),
+      ],
+    );
+  }
+}

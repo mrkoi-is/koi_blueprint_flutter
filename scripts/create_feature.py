@@ -1,36 +1,20 @@
 #!/usr/bin/env python3
+"""Compatibility entry: new features are complete tested source templates."""
 from pathlib import Path
 import sys
-
-TEMPLATE_DIRS = [
-    'data/datasources',
-    'data/repositories',
-    'domain/entities',
-    'domain/repositories',
-    'presentation/providers',
-    'presentation/screens',
-    'presentation/widgets',
-]
-
-
-def main() -> int:
-    if len(sys.argv) != 3:
-        print('用法: python scripts/create_feature.py <app_path> <feature_name>')
-        return 1
-
-    app_path = Path(sys.argv[1]).resolve()
-    feature_name = sys.argv[2].strip()
-    feature_root = app_path / 'lib' / 'features' / feature_name
-
-    for directory in TEMPLATE_DIRS:
-        path = feature_root / directory
-        path.mkdir(parents=True, exist_ok=True)
-        marker = path / '.gitkeep'
-        marker.write_text('')
-
-    print(f'已创建 Feature: {feature_root}')
-    return 0
-
-
+if '--dry-run' in sys.argv[1:]:
+    sys.dont_write_bytecode = True
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from blueprint import main
 if __name__ == '__main__':
-    raise SystemExit(main())
+    arguments = sys.argv[1:]
+    presentation = '--presentation-only' in arguments
+    if presentation:
+        arguments.remove('--presentation-only')
+    explicit_kind = any(value == '--kind' or value.startswith('--kind=') for value in arguments)
+    if presentation and explicit_kind:
+        print('create_feature: use --presentation-only or --kind, not both; no files were changed', file=sys.stderr)
+        raise SystemExit(2)
+    if not explicit_kind:
+        arguments.extend(['--kind', 'presentation' if presentation else 'api'])
+    raise SystemExit(main(['feature', *arguments]))

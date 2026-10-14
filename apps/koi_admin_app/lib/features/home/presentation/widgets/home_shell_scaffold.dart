@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:koi_ui/koi_ui.dart';
 import 'package:koi_admin_app/core/router/app_navigation.dart';
 
+/// Admin has one primary destination; settings is a pinned utility command.
 class HomeShellScaffold extends StatelessWidget {
   const HomeShellScaffold({
     super.key,
@@ -8,66 +10,43 @@ class HomeShellScaffold extends StatelessWidget {
     required this.title,
     required this.child,
   });
-
   final int currentIndex;
   final String title;
   final Widget child;
-
   @override
-  Widget build(BuildContext context) {
-    final wideLayout = MediaQuery.sizeOf(context).width >= 960;
-
-    void onDestinationSelected(int index) {
-      switch (index) {
-        case 1:
-          context.goToSettings();
-          return;
-        default:
-          context.goToDashboard();
-          return;
-      }
-    }
-
-    final destinations = const [
-      NavigationDestination(icon: Icon(Icons.dashboard_outlined), label: '总览'),
-      NavigationDestination(icon: Icon(Icons.settings_outlined), label: '设置'),
-    ];
-
-    if (wideLayout) {
-      return Scaffold(
-        appBar: AppBar(title: Text(title)),
-        body: Row(
-          children: [
-            NavigationRail(
-              selectedIndex: currentIndex,
-              onDestinationSelected: onDestinationSelected,
-              labelType: NavigationRailLabelType.all,
-              destinations: const [
-                NavigationRailDestination(
-                  icon: Icon(Icons.dashboard_outlined),
-                  label: Text('总览'),
-                ),
-                NavigationRailDestination(
-                  icon: Icon(Icons.settings_outlined),
-                  label: Text('设置'),
-                ),
-              ],
-            ),
-            const VerticalDivider(width: 1),
-            Expanded(child: child),
-          ],
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => KoiWorkbenchFrame(
+      destinations: const [
+        KoiNavigationDestination(
+          id: 'dashboard',
+          label: '总览',
+          icon: Icons.dashboard_outlined,
         ),
-      );
-    }
-
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: child,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: currentIndex,
-        destinations: destinations,
-        onDestinationSelected: onDestinationSelected,
+      ],
+      selectedId: currentIndex == 0 ? 'dashboard' : 'settings',
+      onDestinationSelected: (_) => context.goToDashboard(),
+      title: Text(title),
+      actions: [
+        if (currentIndex == 1 && constraints.maxWidth < 600)
+          IconButton(
+            tooltip: '返回总览',
+            icon: const Icon(Icons.dashboard_outlined),
+            onPressed: context.goToDashboard,
+          ),
+      ],
+      navigationTrailing: IconButton(
+        tooltip: '设置',
+        isSelected: currentIndex == 1,
+        icon: const Icon(Icons.settings_outlined),
+        onPressed: context.goToSettings,
       ),
-    );
-  }
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 800),
+          child: child,
+        ),
+      ),
+    ),
+  );
 }

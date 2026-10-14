@@ -1,0 +1,31 @@
+Resolving dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart
+00:00 +0: tokens support themes, fallback, copy and interpolation
+00:00 +1: regular Material host supplies fallback tokens
+00:00 +2: tile activates once by mouse, Enter and Space; disabled ignores
+00:01 +3: menu executes enabled item once and closes
+00:01 +4: popover Escape and outside close restore focus; owner cleanup
+00:01 +5: split supports pointer, keyboard, bounds and controlled updates
+00:01 +6: workbench 320.0 at 200% keeps external editor state
+00:02 +7: workbench 600.0 at 200% keeps external editor state
+00:02 +8: workbench 1024.0 at 200% keeps external editor state
+00:02 +9: workbench 1440.0 at 200% keeps external editor state
+00:02 +10: history arrows activate once by Enter and Space
+00:02 +11: short rail scrolls destinations while settings remain fixed
+00:02 +12: trailing pane drag and arrows follow divider direction
+00:02 +13: resize preserves external editor across layout branches
+00:03 +14: split clamps inside narrower available width
+00:03 +15: section wraps actions and long Chinese in narrow host
+00:03 +16: All tests passed!

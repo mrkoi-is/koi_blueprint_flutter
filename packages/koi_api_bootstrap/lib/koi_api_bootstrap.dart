@@ -18,11 +18,10 @@ export 'src/koi_api_runtime.dart';
 export 'src/koi_memory_token_session.dart';
 export 'src/koi_secure_token_session.dart';
 
-/// Initializes the platform-appropriate API runtime.
+/// 初始化当前平台对应的 API 运行时。
 ///
-/// Native platforms initialize `koi_network`. Web receives an explicit no-op
-/// runtime so importing this public library never pulls native-only networking
-/// code into a web build.
+/// 原生平台会初始化 `koi_network`。Web 使用明确的空操作运行时，确保导入此
+/// 公共库时不会将仅支持原生平台的网络代码带入 Web 构建。
 Future<KoiApiRuntime> bootstrapKoiApi(
   KoiApiBootstrapOptions options, {
   KoiApiBindings? bindings,
@@ -30,15 +29,14 @@ Future<KoiApiRuntime> bootstrapKoiApi(
   return backend.bootstrapKoiApiBackend(options, bindings ?? KoiApiBindings());
 }
 
-/// Disposes the active API runtime, if one exists.
+/// 释放当前活动的 API 运行时（如果存在）。
 Future<void> disposeKoiApi() => backend.disposeKoiApiBackend();
 
-/// Creates the platform-default token session.
+/// 创建当前平台默认的令牌会话。
 ///
-/// Native platforms persist the token in secure storage so a restart keeps
-/// the session. Web keeps the token in memory only, so a refresh starts a
-/// fresh login. The concrete storage implementation never leaks into the
-/// public API.
+/// 原生平台会将令牌保存在安全存储中，但调用方应用仍需在重启后验证令牌并恢复
+/// 用户会话。Web 仅在内存中保存令牌，刷新页面后需要重新登录。具体存储实现不会
+/// 暴露在公共 API 中。
 Future<KoiTokenSession> createDefaultTokenSession() {
   return token_storage.loadDefaultTokenSession();
 }

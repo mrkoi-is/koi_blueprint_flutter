@@ -1,0 +1,57 @@
+{
+  "code": "COMPLETE",
+  "localGate": {
+    "status": "PASS",
+    "command": "python3 blueprint.py validate",
+    "coveragePercent": 88.66,
+    "coveredLines": 3955,
+    "measuredLines": 4461
+  },
+  "targetedFlutterTests": {
+    "status": "PASS",
+    "count": 55
+  },
+  "platformConfigurationTests": {
+    "status": "PASS",
+    "count": 4
+  },
+  "platforms": {
+    "macos": {
+      "releaseBuild": "PASS",
+      "codesign": "PASS",
+      "actualRun": "PASS",
+      "windowLogicalSize": [
+        1280,
+        788
+      ]
+    },
+    "web": {
+      "releaseBuild": "PASS",
+      "chromeStorageBridgeGate": "PASS",
+      "generatedUIManualRun": "NOT_RUN",
+      "safari": "NOT_RUN"
+    },
+    "windows": "NOT_RUN",
+    "linux": "NOT_RUN",
+    "android": "NOT_RUN",
+    "ios": "NOT_RUN"
+  },
+  "nativeObserved": [
+    "Initial window title 设计规范.md",
+    "Sidebar toggle closes/reopens sidebar and accessibility checkbox changes 1/0/1",
+    "Selecting 跨平台检查清单.md updates native window/title label and document body",
+    "Task navigation changes title to 任务 and removes native detail item",
+    "Back restores selected document and detail button, forward restores task page",
+    "Detail toggle closes/reopens details and accessibility checkbox changes 1/0/1",
+    "Light and dark appearance switch through fixture settings, neutral native panel symbols verified visually"
+  ],
+  "observationLimits": [
+    "The document list and theme-menu entries were not exported in this native automation AX snapshot; they were operated using observed screenshot positions. This is not full VoiceOver acceptance.",
+    "An exploratory keyboard action opened a file picker; Cancel closed it without selecting any file. Only the generated fixture retains the cancelled import task.",
+    "Current macOS draws a native backplate around the history group; this is not a pixel-identical Codex toolbar."
+  ],
+  "screenshots": [
+    "macos-dark.png",
+    "macos-light.png"
+  ]
+}

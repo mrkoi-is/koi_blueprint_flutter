@@ -1,0 +1,473 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'workspace_providers.dart';
+
+// **************************************************************************
+// RiverpodGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Borrowed from bootstrap; this provider never closes the workspace.
+
+@ProviderFor(workspaceSession)
+final workspaceSessionProvider = WorkspaceSessionProvider._();
+
+/// Borrowed from bootstrap; this provider never closes the workspace.
+
+final class WorkspaceSessionProvider
+    extends
+        $FunctionalProvider<
+          WorkspaceSession,
+          WorkspaceSession,
+          WorkspaceSession
+        >
+    with $Provider<WorkspaceSession> {
+  /// Borrowed from bootstrap; this provider never closes the workspace.
+  WorkspaceSessionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'workspaceSessionProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$workspaceSessionHash();
+
+  @$internal
+  @override
+  $ProviderElement<WorkspaceSession> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  WorkspaceSession create(Ref ref) {
+    return workspaceSession(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(WorkspaceSession value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<WorkspaceSession>(value),
+    );
+  }
+}
+
+String _$workspaceSessionHash() => r'f9a20bea0e01eb7d9efde7409b8a6d5cad9f4e7e';
+
+/// Bootstrap owns the player and awaits its cleanup before closing storage.
+
+@ProviderFor(mediaPreviewSession)
+final mediaPreviewSessionProvider = MediaPreviewSessionProvider._();
+
+/// Bootstrap owns the player and awaits its cleanup before closing storage.
+
+final class MediaPreviewSessionProvider
+    extends
+        $FunctionalProvider<
+          MediaPreviewSession,
+          MediaPreviewSession,
+          MediaPreviewSession
+        >
+    with $Provider<MediaPreviewSession> {
+  /// Bootstrap owns the player and awaits its cleanup before closing storage.
+  MediaPreviewSessionProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mediaPreviewSessionProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$mediaPreviewSessionHash();
+
+  @$internal
+  @override
+  $ProviderElement<MediaPreviewSession> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  MediaPreviewSession create(Ref ref) {
+    return mediaPreviewSession(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MediaPreviewSession value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MediaPreviewSession>(value),
+    );
+  }
+}
+
+String _$mediaPreviewSessionHash() =>
+    r'4d6bac636e1e32566835b3f68653aaf067825f68';
+
+@ProviderFor(workspaceState)
+final workspaceStateProvider = WorkspaceStateProvider._();
+
+final class WorkspaceStateProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<WorkspaceState>,
+          WorkspaceState,
+          Stream<WorkspaceState>
+        >
+    with $FutureModifier<WorkspaceState>, $StreamProvider<WorkspaceState> {
+  WorkspaceStateProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'workspaceStateProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$workspaceStateHash();
+
+  @$internal
+  @override
+  $StreamProviderElement<WorkspaceState> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
+
+  @override
+  Stream<WorkspaceState> create(Ref ref) {
+    return workspaceState(ref);
+  }
+}
+
+String _$workspaceStateHash() => r'df47cad0ebc6156fa31164c05d4ff7505479ab15';
+
+@ProviderFor(visibleDocuments)
+final visibleDocumentsProvider = VisibleDocumentsFamily._();
+
+final class VisibleDocumentsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<WorkspaceDocument>>,
+          AsyncValue<List<WorkspaceDocument>>,
+          AsyncValue<List<WorkspaceDocument>>
+        >
+    with $Provider<AsyncValue<List<WorkspaceDocument>>> {
+  VisibleDocumentsProvider._({
+    required VisibleDocumentsFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'visibleDocumentsProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$visibleDocumentsHash();
+
+  @override
+  String toString() {
+    return r'visibleDocumentsProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $ProviderElement<AsyncValue<List<WorkspaceDocument>>> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  AsyncValue<List<WorkspaceDocument>> create(Ref ref) {
+    final argument = this.argument as String;
+    return visibleDocuments(ref, argument);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(AsyncValue<List<WorkspaceDocument>> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<AsyncValue<List<WorkspaceDocument>>>(
+        value,
+      ),
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is VisibleDocumentsProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$visibleDocumentsHash() => r'9e1d453773b0f41dad5b55fef017b7945826a67b';
+
+final class VisibleDocumentsFamily extends $Family
+    with
+        $FunctionalFamilyOverride<AsyncValue<List<WorkspaceDocument>>, String> {
+  VisibleDocumentsFamily._()
+    : super(
+        retry: null,
+        name: r'visibleDocumentsProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  VisibleDocumentsProvider call(String query) =>
+      VisibleDocumentsProvider._(argument: query, from: this);
+
+  @override
+  String toString() => r'visibleDocumentsProvider';
+}
+
+@ProviderFor(assetBytes)
+final assetBytesProvider = AssetBytesFamily._();
+
+final class AssetBytesProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<Uint8List>,
+          Uint8List,
+          FutureOr<Uint8List>
+        >
+    with $FutureModifier<Uint8List>, $FutureProvider<Uint8List> {
+  AssetBytesProvider._({
+    required AssetBytesFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'assetBytesProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
+
+  @override
+  String debugGetCreateSourceHash() => _$assetBytesHash();
+
+  @override
+  String toString() {
+    return r'assetBytesProvider'
+        ''
+        '($argument)';
+  }
+
+  @$internal
+  @override
+  $FutureProviderElement<Uint8List> $createElement($ProviderPointer pointer) =>
+      $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<Uint8List> create(Ref ref) {
+    final argument = this.argument as String;
+    return assetBytes(ref, argument);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AssetBytesProvider && other.argument == argument;
+  }
+
+  @override
+  int get hashCode {
+    return argument.hashCode;
+  }
+}
+
+String _$assetBytesHash() => r'3848c9f3d0b61afc2fc45dd453c38f7825021a65';
+
+final class AssetBytesFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<Uint8List>, String> {
+  AssetBytesFamily._()
+    : super(
+        retry: null,
+        name: r'assetBytesProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  AssetBytesProvider call(String storageKey) =>
+      AssetBytesProvider._(argument: storageKey, from: this);
+
+  @override
+  String toString() => r'assetBytesProvider';
+}
+
+/// Search/filter state follows the workspace scope across sidebar and drawer.
+
+@ProviderFor(DocumentSearch)
+final documentSearchProvider = DocumentSearchProvider._();
+
+/// Search/filter state follows the workspace scope across sidebar and drawer.
+final class DocumentSearchProvider
+    extends $NotifierProvider<DocumentSearch, String> {
+  /// Search/filter state follows the workspace scope across sidebar and drawer.
+  DocumentSearchProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'documentSearchProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$documentSearchHash();
+
+  @$internal
+  @override
+  DocumentSearch create() => DocumentSearch();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$documentSearchHash() => r'f18646bd93f671e4204cc7ec236b00fdf0d153e4';
+
+/// Search/filter state follows the workspace scope across sidebar and drawer.
+
+abstract class _$DocumentSearch extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(MediaFilter)
+final mediaFilterProvider = MediaFilterProvider._();
+
+final class MediaFilterProvider
+    extends $NotifierProvider<MediaFilter, MediaKind?> {
+  MediaFilterProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mediaFilterProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$mediaFilterHash();
+
+  @$internal
+  @override
+  MediaFilter create() => MediaFilter();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(MediaKind? value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<MediaKind?>(value),
+    );
+  }
+}
+
+String _$mediaFilterHash() => r'1afe1996b5952df96a42ec792a37e433af70f7e3';
+
+abstract class _$MediaFilter extends $Notifier<MediaKind?> {
+  MediaKind? build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<MediaKind?, MediaKind?>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<MediaKind?, MediaKind?>,
+              MediaKind?,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(MediaSearch)
+final mediaSearchProvider = MediaSearchProvider._();
+
+final class MediaSearchProvider extends $NotifierProvider<MediaSearch, String> {
+  MediaSearchProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'mediaSearchProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$mediaSearchHash();
+
+  @$internal
+  @override
+  MediaSearch create() => MediaSearch();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
+String _$mediaSearchHash() => r'30a60017b920fb0e924a14a9a861e7aa5d4575b2';
+
+abstract class _$MediaSearch extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  WhenComplete runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    return element.handleCreate(ref, build);
+  }
+}

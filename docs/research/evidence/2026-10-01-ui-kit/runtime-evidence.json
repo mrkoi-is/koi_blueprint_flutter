@@ -1,0 +1,68 @@
+{
+  "images": [
+    {
+      "file": "macos-workbench-light-final.png",
+      "sha256": "da331dc76dc319a0cd536c8989eeebedd8bdac781f961eb8aefb3265b50b369d",
+      "platform": "macOS release",
+      "logicalWindow": [
+        1280,
+        788
+      ],
+      "dpr": 2,
+      "textScale": 1,
+      "density": "compact",
+      "windowId": 22632,
+      "windowActive": false,
+      "notes": "Includes window shadow. Current Chinese document is 89 characters, version 1, saved."
+    },
+    {
+      "file": "macos-workbench-dark-final.png",
+      "sha256": "6722e318d569790510b9868ad1db35cd13fbf03a8534c39e8719928e587594b3",
+      "platform": "macOS release",
+      "logicalWindow": [
+        1280,
+        788
+      ],
+      "dpr": 2,
+      "textScale": 1,
+      "density": "compact",
+      "windowId": 22632,
+      "windowActive": false,
+      "notes": "Includes window shadow. Current Chinese document is 89 characters, version 1, saved."
+    }
+  ],
+  "nativeChecks": [
+    "toolbar sidebar toggle closes and reopens",
+    "toolbar detail toggle closes and reopens",
+    "theme menu checked state and light/dark changes",
+    "reopen retains Chinese document and light preference"
+  ],
+  "browser": {
+    "url": "http://127.0.0.1:8791",
+    "title": "Koi UI Lab",
+    "checks": [
+      "Enable accessibility yields semantic tree",
+      "standard catalog and compact dark toggle",
+      "empty submit shows Chinese validation error",
+      "Chinese correction commits catalog form",
+      "dialog initial focus on cancel",
+      "Escape dismisses dialog and restores trigger focus"
+    ],
+    "screenshots": "Inspected in CUA; not persisted as standalone files",
+    "directRunner": {
+      "path": "examples/ui_lab/build/web",
+      "verified": [
+        "reload after switching server to direct build",
+        "enable accessibility",
+        "standard catalog selection",
+        "compact density selection",
+        "visual screenshot inspection"
+      ]
+    }
+  },
+  "limitations": [
+    "Native Flutter menu entries were not exposed by macOS AX bridge; screenshot coordinates used",
+    "No screen reader audio validation",
+    "Other OS and Safari visual/runtime matrix NOT_RUN"
+  ]
+}

@@ -1,0 +1,31 @@
+Resolving dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_material_controls_test.dart
+00:00 +0: Brightness.dark KoiDensity.comfortable standard buttons focus and activate once
+00:00 +1: Brightness.dark KoiDensity.comfortable form keeps Chinese draft through validation at 200%
+00:01 +2: Brightness.dark KoiDensity.comfortable disabled wins over selection and focus
+00:01 +3: Brightness.dark KoiDensity.compact standard buttons focus and activate once
+00:01 +4: Brightness.dark KoiDensity.compact form keeps Chinese draft through validation at 200%
+00:01 +5: Brightness.dark KoiDensity.compact disabled wins over selection and focus
+00:01 +6: Brightness.light KoiDensity.comfortable standard buttons focus and activate once
+00:01 +7: Brightness.light KoiDensity.comfortable form keeps Chinese draft through validation at 200%
+00:01 +8: Brightness.light KoiDensity.comfortable disabled wins over selection and focus
+00:01 +9: Brightness.light KoiDensity.compact standard buttons focus and activate once
+00:01 +10: Brightness.light KoiDensity.compact form keeps Chinese draft through validation at 200%
+00:01 +11: Brightness.light KoiDensity.compact disabled wins over selection and focus
+00:01 +12: standard selection controls keep values and ignore disabled input
+00:02 +13: checked menu reflects owner state and restores trigger focus
+00:02 +14: menu shortcut hint adds no command handler or duplicate action
+00:02 +15: standard table animates into Koi and grows for Chinese text
+00:02 +16: All tests passed!

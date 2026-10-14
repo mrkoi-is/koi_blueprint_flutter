@@ -1,0 +1,6 @@
+arb-dir: lib/l10n
+template-arb-file: koi_ui_en.arb
+output-dir: lib/l10n/generated
+output-localization-file: koi_ui_localizations.dart
+output-class: KoiUiLocalizations
+untranslated-messages-file: .dart_tool/untranslated_messages.json

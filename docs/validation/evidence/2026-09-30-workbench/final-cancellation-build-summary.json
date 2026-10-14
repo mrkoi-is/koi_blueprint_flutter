@@ -1,0 +1,141 @@
+{
+  "source_manifest": "final-cancellation-source-manifest.json",
+  "builds": [
+    {
+      "platform": "web",
+      "command": [
+        "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/.fvm/flutter_sdk/bin/flutter",
+        "build",
+        "web",
+        "--release",
+        "--no-pub"
+      ],
+      "started_at_utc": "2026-09-30T05:21:48.855831+00:00",
+      "elapsed_seconds": 88.618,
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "build-web-final-cancellation.log",
+      "free_bytes_before": 5010808832,
+      "free_bytes_after": 3717840896,
+      "artifacts": [
+        {
+          "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-platform-acceptance-ls6vnuym/workbench/apps/platform_acceptance_app/build/web/main.dart.js",
+          "bytes": 3173579,
+          "sha256": "56b76f504d06ebf570f1a382ebcf8823fb086f54aa10bdb78bd66c5fbf21e5d6"
+        },
+        {
+          "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-platform-acceptance-ls6vnuym/workbench/apps/platform_acceptance_app/build/web/index.html",
+          "bytes": 1534,
+          "sha256": "fe526aafc0ad389b234f5851847a93696be4a82a2c58d45cb37932bec8fab0ff"
+        }
+      ]
+    },
+    {
+      "platform": "android",
+      "command": [
+        "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/.fvm/flutter_sdk/bin/flutter",
+        "build",
+        "apk",
+        "--debug",
+        "--target-platform",
+        "android-arm64",
+        "--no-pub"
+      ],
+      "started_at_utc": "2026-09-30T05:23:17.485239+00:00",
+      "elapsed_seconds": 23.437,
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "build-android-final-cancellation.log",
+      "free_bytes_before": 3717824512,
+      "free_bytes_after": 3630288896,
+      "artifacts": [
+        {
+          "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-platform-acceptance-ls6vnuym/workbench/apps/platform_acceptance_app/build/app/outputs/flutter-apk/app-debug.apk",
+          "bytes": 133183605,
+          "sha256": "8b08ef3de351c8fc565b025f8244409f1bce577d50201fd13661170d8d9f548b"
+        }
+      ]
+    },
+    {
+      "platform": "ios",
+      "command": [
+        "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/.fvm/flutter_sdk/bin/flutter",
+        "build",
+        "ios",
+        "--release",
+        "--no-codesign",
+        "--no-pub"
+      ],
+      "started_at_utc": "2026-09-30T05:23:41.047303+00:00",
+      "elapsed_seconds": 72.576,
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "build-ios-final-cancellation.log",
+      "free_bytes_before": 3628978176,
+      "free_bytes_after": 3186208768,
+      "artifacts": [
+        {
+          "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-platform-acceptance-ls6vnuym/workbench/apps/platform_acceptance_app/build/ios/iphoneos/Runner.app/Info.plist",
+          "bytes": 1861,
+          "sha256": "149b5b29b53f12a39605c1b3d35084c5c457a74b2da76f4a7df2795de3f3b453"
+        },
+        {
+          "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-platform-acceptance-ls6vnuym/workbench/apps/platform_acceptance_app/build/ios/iphoneos/Runner.app/Runner",
+          "bytes": 254864,
+          "sha256": "535b7c407d2e17be7e02eb175666b7ec7aba3112520611254caaf79e7d5efc97"
+        },
+        {
+          "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-platform-acceptance-ls6vnuym/workbench/apps/platform_acceptance_app/build/ios/iphoneos/Runner.app/Frameworks/App.framework/App",
+          "bytes": 7217488,
+          "sha256": "320823a22f81a222237769fec032a03fd23a6188324a08e11982a05562b6d86a"
+        }
+      ]
+    },
+    {
+      "platform": "android_arm64_split",
+      "command": [
+        "/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/.fvm/flutter_sdk/bin/flutter",
+        "build",
+        "apk",
+        "--debug",
+        "--target-platform",
+        "android-arm64",
+        "--split-per-abi",
+        "--no-pub"
+      ],
+      "started_at_utc": "2026-09-30T05:31:32.082777+00:00",
+      "elapsed_seconds": 11.997,
+      "exit_code": 0,
+      "result": "PASS",
+      "log": "build-android-arm64-final-cancellation.log",
+      "artifacts": [
+        {
+          "path": "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-platform-acceptance-ls6vnuym/workbench/apps/platform_acceptance_app/build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk",
+          "bytes": 104766674,
+          "sha256": "15af0e096982cae0c0dd0635fa19cc59a97fc369f7c9077a89f118149e3966c7"
+        }
+      ],
+      "packaged_abis": [
+        "arm64-v8a"
+      ]
+    }
+  ],
+  "runtime_acceptance": "Separate Native macOS/Chrome runtime logs; these three commands only prove builds",
+  "postbuild_source_identity": "PASS: same48 Dart source file sets, only recorded identity transforms; source/host SHAs unchanged after generation/build",
+  "source_manifest_sha256": "ef798716c129be3372a321960f5d2d65fca3ae40fbe524e10b3434da6acca5cf",
+  "workspace_session_source_sha256": "16bca3ce3ea7ca26091247b5cdd376bfc1f84e43220e7757dad1ca446e2594a7",
+  "flutter_version_file": "final-framegate-flutter-version.json",
+  "android_ios_device_runtime": "NOT_RUN; these builds do not claim device execution",
+  "web_output_retained_for_picker_acceptance": true,
+  "unsplit_android_plugin_abis": [
+    "arm64-v8a",
+    "armeabi-v7a",
+    "x86_64"
+  ],
+  "unsplit_android_flutter_engine_abis": [
+    "arm64-v8a"
+  ],
+  "post_all_builds_source_and_artifact_sha_checks": "PASS48 source/target Dart files and all recorded final artifacts",
+  "preferred_android_arm64_artifact": "build/app/outputs/flutter-apk/app-arm64-v8a-debug.apk",
+  "build_outputs_deleted": false
+}

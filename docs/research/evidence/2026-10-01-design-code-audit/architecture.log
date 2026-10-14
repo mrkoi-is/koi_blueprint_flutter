@@ -1,0 +1,4 @@
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run tool/check_architecture.dart --root /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter
+Architecture checks passed (16 workspace members).

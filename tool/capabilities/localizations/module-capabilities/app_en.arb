@@ -1,0 +1,40 @@
+{
+  "@@locale": "en",
+  "moduleCapabilitiesTitle": "Modules and engines",
+  "moduleCapabilitiesEnableCharacters": "Enable character engine",
+  "moduleCapabilitiesFailNext": "Fail the next initialization",
+  "moduleCapabilitiesInput": "Text to analyze",
+  "moduleCapabilitiesRun": "Run current engine",
+  "moduleCapabilitiesOperations": "Available operations: {operations}",
+  "@moduleCapabilitiesOperations": {
+    "placeholders": {
+      "operations": {
+        "type": "String"
+      }
+    }
+  },
+  "moduleCapabilitiesClosed": "Closed instances: {count}",
+  "@moduleCapabilitiesClosed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moduleCapabilitiesWords": "Word engine",
+  "moduleCapabilitiesCharacters": "Character engine",
+  "moduleCapabilitiesAvailable": "Available",
+  "moduleCapabilitiesUnavailable": "Unavailable",
+  "moduleCapabilitiesUnsupported": "Unsupported on this platform",
+  "moduleCapabilitiesResult": "{engine}: {count}",
+  "@moduleCapabilitiesResult": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

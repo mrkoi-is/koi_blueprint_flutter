@@ -1,0 +1,78 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/bootstrap.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/presentation/widgets/workspace_panels.dart';
+import 'presentation_support.dart';
+
+void main() {
+  testWidgets('audit: sidebar geometry and scroll restoration', (tester) async {
+    final bootstrap = await WorkbenchBootstrap.create(
+      openStorage: () async => MemoryStorage(WorkspaceSnapshot(documents: [
+        for (var i = 0; i < 100; i++) WorkspaceDocument(id: '$i', title: '资料 $i', text: ''),
+      ])),
+      fileImportPort: CancelImport(),
+      createPlayback: FakePlayback.new,
+    );
+    final index = ValueNotifier(0);
+    await tester.pumpWidget(UncontrolledProviderScope(
+      container: bootstrap.container,
+      child: MaterialApp(theme: AppTheme.light, home: Scaffold(body: Align(
+        alignment: Alignment.topLeft,
+        child: SizedBox(width: 280, height: 400, child: ValueListenableBuilder<int>(
+          valueListenable: index,
+          builder: (_, value, _) => WorkspaceSidebar(index: value),
+        )),
+      ))),
+    ));
+    await tester.pumpAndSettle();
+    final textOrigin = tester.getTopLeft(find.text('文本资料'));
+    final list = find.byType(ListView);
+    await tester.drag(list, const Offset(0, -500));
+    await tester.pumpAndSettle();
+    final before = tester.state<ScrollableState>(find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)).first).position.pixels;
+    index.value = 1;
+    await tester.pumpAndSettle();
+    final mediaOrigin = tester.getTopLeft(find.text('媒体分类'));
+    index.value = 2;
+    await tester.pumpAndSettle();
+    final taskOrigin = tester.getTopLeft(find.text('任务概览'));
+    index.value = 0;
+    await tester.pumpAndSettle();
+    final after = tester.state<ScrollableState>(find.descendant(of: find.byType(ListView), matching: find.byType(Scrollable)).first).position.pixels;
+    debugPrint('AUDIT heading origins text=$textOrigin media=$mediaOrigin tasks=$taskOrigin; scroll before=$before after=$after');
+    expect(textOrigin, isNot(mediaOrigin));
+    expect(taskOrigin.dx, isNot(textOrigin.dx));
+    expect(before, greaterThan(0));
+    expect(after, 0);
+    await tester.pumpWidget(const SizedBox());
+    var closed = false;
+    bootstrap.disposeAsync().then((_) => closed = true);
+    for (var i = 0; i < 30 && !closed; i++) {
+      await tester.pump(const Duration(milliseconds: 100));
+      await tester.runAsync(() => Future<void>.delayed(Duration.zero));
+    }
+    expect(closed, isTrue);
+    index.dispose();
+  });
+
+  testWidgets('audit: shared error state at 200 percent text in short viewport', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(320, 300);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+    await tester.pumpWidget(MaterialApp(theme: AppTheme.light, home: MediaQuery(
+      data: const MediaQueryData(size: Size(320, 300), textScaler: TextScaler.linear(2)),
+      child: Scaffold(body: KoiErrorState(
+        title: '工作区初始化失败',
+        description: '无法读取当前工作区中的中文资料。请检查存储状态，然后重试。',
+        onRetry: () {},
+      )),
+    )));
+    final exception = tester.takeException();
+    debugPrint('AUDIT error state exception=$exception');
+    expect(exception.toString(), contains('overflowed'));
+  });
+}

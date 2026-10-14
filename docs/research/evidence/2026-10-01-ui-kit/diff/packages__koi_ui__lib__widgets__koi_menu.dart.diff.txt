@@ -1,0 +1,55 @@
+--- packages/koi_ui/lib/widgets/koi_menu.dart (turn baseline)
++++ packages/koi_ui/lib/widgets/koi_menu.dart
+@@ -7,12 +7,21 @@
+     this.onSelected,
+     this.icon,
+     this.enabled = true,
++    this.checked,
++    this.shortcut,
+   });
+ 
+   final String label;
+   final VoidCallback? onSelected;
+   final IconData? icon;
+   final bool enabled;
++
++  /// Null is an ordinary command; true/false is a host-owned checked option.
++  final bool? checked;
++
++  /// Display hint only, as with MenuItemButton. The host owns Shortcuts/Actions
++  /// so a closed menu cannot accidentally add duplicate command handlers.
++  final MenuSerializableShortcut? shortcut;
+ }
+ 
+ class KoiMenu extends StatefulWidget {
+@@ -54,11 +63,25 @@
+       onClose: () => setState(() {}),
+       menuChildren: [
+         for (final item in widget.items)
+-          MenuItemButton(
+-            onPressed: item.enabled ? item.onSelected : null,
+-            leadingIcon: item.icon == null ? null : Icon(item.icon, size: 18),
+-            child: Text(item.label),
+-          ),
++          if (item.checked != null)
++            CheckboxMenuButton(
++              value: item.checked,
++              onChanged: item.enabled && item.onSelected != null
++                  ? (_) => item.onSelected!()
++                  : null,
++              shortcut: item.shortcut,
++              trailingIcon: item.icon == null
++                  ? null
++                  : Icon(item.icon, size: 18),
++              child: Text(item.label),
++            )
++          else
++            MenuItemButton(
++              onPressed: item.enabled ? item.onSelected : null,
++              leadingIcon: item.icon == null ? null : Icon(item.icon, size: 18),
++              shortcut: item.shortcut,
++              child: Text(item.label),
++            ),
+       ],
+       builder: (context, controller, child) => TextButton(
+         focusNode: _focus,

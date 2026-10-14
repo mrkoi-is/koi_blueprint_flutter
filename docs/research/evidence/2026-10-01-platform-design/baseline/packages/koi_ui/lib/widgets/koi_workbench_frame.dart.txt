@@ -1,0 +1,251 @@
+import 'dart:math' as math;
+
+import 'package:flutter/material.dart';
+import 'package:koi_ui/theme/koi_theme_tokens.dart';
+import 'package:koi_ui/widgets/koi_resizable_split_view.dart';
+
+@immutable
+class KoiNavigationDestination {
+  const KoiNavigationDestination({
+    required this.id,
+    required this.label,
+    required this.icon,
+    this.selectedIcon,
+  });
+
+  final String id;
+  final String label;
+  final IconData icon;
+  final IconData? selectedIcon;
+}
+
+/// A pure presentation shell. Hosts retain controllers, routes and sessions.
+class KoiWorkbenchFrame extends StatelessWidget {
+  const KoiWorkbenchFrame({
+    required this.destinations,
+    required this.selectedId,
+    required this.onDestinationSelected,
+    required this.body,
+    this.sidebar,
+    this.detail,
+    this.title,
+    this.showHeader = true,
+    this.headerLeading,
+    this.headerLeadingWidth = 96,
+    this.actions = const [],
+    this.navigationTrailing,
+    this.sidebarWidth = 280,
+    this.onSidebarWidthChanged,
+    this.detailWidth = 280,
+    this.onDetailWidthChanged,
+    super.key,
+  }) : assert(destinations.length >= 2);
+
+  final List<KoiNavigationDestination> destinations;
+  final String selectedId;
+  final ValueChanged<String> onDestinationSelected;
+  final Widget body;
+  final Widget? sidebar;
+  final Widget? detail;
+  final Widget? title;
+
+  /// A native host may own the title bar; drawers still need compact controls.
+  final bool showHeader;
+
+  /// Desktop title-bar controls; compact hosts show these in a second row.
+  final Widget? headerLeading;
+  final double headerLeadingWidth;
+  final List<Widget> actions;
+
+  /// Pinned below the rail destinations; shown in the compact header instead.
+  final Widget? navigationTrailing;
+  final double sidebarWidth;
+  final ValueChanged<double>? onSidebarWidthChanged;
+  final double detailWidth;
+  final ValueChanged<double>? onDetailWidthChanged;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) {
+      final compact = constraints.maxWidth < 600;
+      final expanded = constraints.maxWidth >= 1024;
+      final tokens = KoiThemeTokens.of(context);
+      final chromeBackground = tokens.chromeBackground;
+      final separatorColor = Theme.of(context).colorScheme.onSurface
+          .withValues(alpha: .06);
+      final selected = destinations.indexWhere((item) => item.id == selectedId);
+      final selectedIndex = selected < 0 ? 0 : selected;
+      void select(int index) => onDestinationSelected(destinations[index].id);
+      Widget content = body;
+      if (expanded && detail != null) {
+        content = KoiResizableSplitView(
+          primary: detail!,
+          secondary: content,
+          primaryOnTrailing: true,
+          resizeLabel: '调整详情宽度',
+          width: detailWidth,
+          onWidthChanged: onDetailWidthChanged,
+          minSecondaryWidth: 320,
+        );
+      }
+      if (expanded && sidebar != null) {
+        content = KoiResizableSplitView(
+          primary: sidebar!,
+          secondary: content,
+          width: sidebarWidth,
+          onWidthChanged: onSidebarWidthChanged,
+          minSecondaryWidth: detail == null ? 320 : 560,
+        );
+      }
+      content = Padding(
+        padding: const EdgeInsets.all(KoiSpace.sm),
+        child: Material(
+          key: const ValueKey('koi-workbench-content-surface'),
+          color: tokens.contentBackground,
+          surfaceTintColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(KoiRadius.large),
+            side: BorderSide(color: separatorColor),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: content,
+        ),
+      );
+      if (!compact) {
+        content = Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            NavigationRail(
+              backgroundColor: chromeBackground,
+              minWidth: 64,
+              groupAlignment: -1,
+              scrollable: true,
+              trailingAtBottom: true,
+              trailing: navigationTrailing == null
+                  ? null
+                  : Padding(
+                      padding: const EdgeInsets.only(bottom: KoiSpace.sm),
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 48,
+                          minHeight: 48,
+                        ),
+                        child: navigationTrailing,
+                      ),
+                    ),
+              indicatorShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(KoiRadius.small),
+              ),
+              selectedIndex: selectedIndex,
+              onDestinationSelected: select,
+              labelType: NavigationRailLabelType.none,
+              destinations: [
+                for (final destination in destinations)
+                  NavigationRailDestination(
+                    icon: Icon(destination.icon),
+                    selectedIcon: Icon(
+                      destination.selectedIcon ?? destination.icon,
+                    ),
+                    label: Text(destination.label),
+                  ),
+              ],
+            ),
+            VerticalDivider(width: 1, thickness: 1, color: separatorColor),
+            Expanded(child: content),
+          ],
+        );
+      }
+      final drawerWidth = math.min(360.0, constraints.maxWidth * .85);
+      return Scaffold(
+        backgroundColor: chromeBackground,
+        appBar: showHeader || !expanded
+            ? AppBar(
+                backgroundColor: chromeBackground,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
+                scrolledUnderElevation: 0,
+                title: title,
+                centerTitle: false,
+                leading: !compact && headerLeading != null
+                    ? Row(
+                        children: [
+                          if (!expanded && sidebar != null)
+                            const SizedBox(width: 48, child: DrawerButton()),
+                          SizedBox(
+                            width: headerLeadingWidth,
+                            child: headerLeading,
+                          ),
+                        ],
+                      )
+                    : null,
+                leadingWidth: !compact && headerLeading != null
+                    ? headerLeadingWidth +
+                          (!expanded && sidebar != null ? 48 : 0)
+                    : null,
+                automaticallyImplyLeading: !expanded && sidebar != null,
+                bottom: compact && headerLeading != null
+                    ? PreferredSize(
+                        preferredSize: const Size.fromHeight(48),
+                        child: Align(
+                          alignment: AlignmentDirectional.centerStart,
+                          child: SizedBox(
+                            height: 48,
+                            width: headerLeadingWidth,
+                            child: headerLeading,
+                          ),
+                        ),
+                      )
+                    : null,
+                actions: [
+                  ...actions,
+                  if (compact && navigationTrailing != null)
+                    navigationTrailing!,
+                  if (!expanded && detail != null)
+                    Builder(
+                      builder: (context) => IconButton(
+                        tooltip: '打开详情',
+                        onPressed: () => Scaffold.of(context).openEndDrawer(),
+                        icon: const Icon(Icons.info_outline),
+                      ),
+                    ),
+                ],
+              )
+            : null,
+        drawer: !expanded && sidebar != null
+            ? Drawer(
+                width: drawerWidth,
+                backgroundColor: tokens.contentBackground,
+                child: SafeArea(child: sidebar!),
+              )
+            : null,
+        endDrawer: !expanded && detail != null
+            ? Drawer(
+                width: drawerWidth,
+                backgroundColor: tokens.contentBackground,
+                child: SafeArea(child: detail!),
+              )
+            : null,
+        body: SafeArea(top: false, child: content),
+        bottomNavigationBar: compact
+            ? NavigationBar(
+                backgroundColor: chromeBackground,
+                selectedIndex: selectedIndex,
+                onDestinationSelected: select,
+                labelBehavior:
+                    NavigationDestinationLabelBehavior.onlyShowSelected,
+                destinations: [
+                  for (final destination in destinations)
+                    NavigationDestination(
+                      icon: Icon(destination.icon),
+                      selectedIcon: Icon(
+                        destination.selectedIcon ?? destination.icon,
+                      ),
+                      label: destination.label,
+                    ),
+                ],
+              )
+            : null,
+      );
+    },
+  );
+}

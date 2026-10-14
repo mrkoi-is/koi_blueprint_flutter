@@ -1,0 +1,210 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'workspace_models.dart';
+
+// **************************************************************************
+// JsonSerializableGenerator
+// **************************************************************************
+
+_WorkspaceDocument _$WorkspaceDocumentFromJson(Map<String, dynamic> json) =>
+    _WorkspaceDocument(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      text: json['text'] as String? ?? '',
+      revision: (json['revision'] as num?)?.toInt() ?? 0,
+      savedRevision: (json['savedRevision'] as num?)?.toInt() ?? 0,
+    );
+
+Map<String, dynamic> _$WorkspaceDocumentToJson(_WorkspaceDocument instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'text': instance.text,
+      'revision': instance.revision,
+      'savedRevision': instance.savedRevision,
+    };
+
+_WorkspaceAsset _$WorkspaceAssetFromJson(Map<String, dynamic> json) =>
+    _WorkspaceAsset(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      kind: $enumDecode(_$MediaKindEnumMap, json['kind']),
+      byteLength: (json['byteLength'] as num).toInt(),
+      storageKey: json['storageKey'] as String,
+      thumbnailKey: json['thumbnailKey'] as String?,
+      thumbnailStatus:
+          $enumDecodeNullable(
+            _$ThumbnailStatusEnumMap,
+            json['thumbnailStatus'],
+          ) ??
+          ThumbnailStatus.none,
+      thumbnailError: json['thumbnailError'] as String?,
+    );
+
+Map<String, dynamic> _$WorkspaceAssetToJson(_WorkspaceAsset instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'name': instance.name,
+      'kind': _$MediaKindEnumMap[instance.kind]!,
+      'byteLength': instance.byteLength,
+      'storageKey': instance.storageKey,
+      'thumbnailKey': instance.thumbnailKey,
+      'thumbnailStatus': _$ThumbnailStatusEnumMap[instance.thumbnailStatus]!,
+      'thumbnailError': instance.thumbnailError,
+    };
+
+const _$MediaKindEnumMap = {MediaKind.image: 'image', MediaKind.video: 'video'};
+
+const _$ThumbnailStatusEnumMap = {
+  ThumbnailStatus.none: 'none',
+  ThumbnailStatus.generating: 'generating',
+  ThumbnailStatus.ready: 'ready',
+  ThumbnailStatus.failed: 'failed',
+};
+
+_WorkspaceTodo _$WorkspaceTodoFromJson(Map<String, dynamic> json) =>
+    _WorkspaceTodo(
+      id: json['id'] as String,
+      title: json['title'] as String,
+      completed: json['completed'] as bool? ?? false,
+    );
+
+Map<String, dynamic> _$WorkspaceTodoToJson(_WorkspaceTodo instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'title': instance.title,
+      'completed': instance.completed,
+    };
+
+_WorkspaceJob _$WorkspaceJobFromJson(Map<String, dynamic> json) =>
+    _WorkspaceJob(
+      id: json['id'] as String,
+      kind: $enumDecode(_$JobKindEnumMap, json['kind']),
+      name: json['name'] as String,
+      status:
+          $enumDecodeNullable(_$JobStatusEnumMap, json['status']) ??
+          JobStatus.queued,
+      processedBytes: (json['processedBytes'] as num?)?.toInt() ?? 0,
+      indeterminate: json['indeterminate'] as bool? ?? true,
+      totalBytes: (json['totalBytes'] as num?)?.toInt(),
+      assetId: json['assetId'] as String?,
+      importKind: $enumDecodeNullable(_$ImportKindEnumMap, json['importKind']),
+      error: json['error'] as String?,
+    );
+
+Map<String, dynamic> _$WorkspaceJobToJson(_WorkspaceJob instance) =>
+    <String, dynamic>{
+      'id': instance.id,
+      'kind': _$JobKindEnumMap[instance.kind]!,
+      'name': instance.name,
+      'status': _$JobStatusEnumMap[instance.status]!,
+      'processedBytes': instance.processedBytes,
+      'indeterminate': instance.indeterminate,
+      'totalBytes': instance.totalBytes,
+      'assetId': instance.assetId,
+      'importKind': _$ImportKindEnumMap[instance.importKind],
+      'error': instance.error,
+    };
+
+const _$JobKindEnumMap = {
+  JobKind.importFiles: 'importFiles',
+  JobKind.thumbnail: 'thumbnail',
+};
+
+const _$JobStatusEnumMap = {
+  JobStatus.queued: 'queued',
+  JobStatus.running: 'running',
+  JobStatus.cancelling: 'cancelling',
+  JobStatus.succeeded: 'succeeded',
+  JobStatus.failed: 'failed',
+  JobStatus.cancelled: 'cancelled',
+  JobStatus.interrupted: 'interrupted',
+};
+
+const _$ImportKindEnumMap = {
+  ImportKind.text: 'text',
+  ImportKind.media: 'media',
+};
+
+_WorkspacePreferences _$WorkspacePreferencesFromJson(
+  Map<String, dynamic> json,
+) => _WorkspacePreferences(
+  themeMode:
+      $enumDecodeNullable(_$WorkspaceThemeModeEnumMap, json['themeMode']) ??
+      WorkspaceThemeMode.system,
+  density:
+      $enumDecodeNullable(_$WorkspaceDensityEnumMap, json['density']) ??
+      WorkspaceDensity.comfortable,
+  navId: json['navId'] as String? ?? 'text',
+  sidebarWidth: (json['sidebarWidth'] as num?)?.toDouble() ?? 280,
+  detailsWidth: (json['detailsWidth'] as num?)?.toDouble() ?? 280,
+  selectedDocumentId: json['selectedDocumentId'] as String?,
+  selectedAssetId: json['selectedAssetId'] as String?,
+);
+
+Map<String, dynamic> _$WorkspacePreferencesToJson(
+  _WorkspacePreferences instance,
+) => <String, dynamic>{
+  'themeMode': _$WorkspaceThemeModeEnumMap[instance.themeMode]!,
+  'density': _$WorkspaceDensityEnumMap[instance.density]!,
+  'navId': instance.navId,
+  'sidebarWidth': instance.sidebarWidth,
+  'detailsWidth': instance.detailsWidth,
+  'selectedDocumentId': instance.selectedDocumentId,
+  'selectedAssetId': instance.selectedAssetId,
+};
+
+const _$WorkspaceThemeModeEnumMap = {
+  WorkspaceThemeMode.system: 'system',
+  WorkspaceThemeMode.light: 'light',
+  WorkspaceThemeMode.dark: 'dark',
+};
+
+const _$WorkspaceDensityEnumMap = {
+  WorkspaceDensity.comfortable: 'comfortable',
+  WorkspaceDensity.compact: 'compact',
+};
+
+_WorkspaceSnapshot _$WorkspaceSnapshotFromJson(Map<String, dynamic> json) =>
+    _WorkspaceSnapshot(
+      schemaVersion: (json['schemaVersion'] as num?)?.toInt() ?? 1,
+      revision: (json['revision'] as num?)?.toInt() ?? 0,
+      documents:
+          (json['documents'] as List<dynamic>?)
+              ?.map(
+                (e) => WorkspaceDocument.fromJson(e as Map<String, dynamic>),
+              )
+              .toList() ??
+          const <WorkspaceDocument>[],
+      assets:
+          (json['assets'] as List<dynamic>?)
+              ?.map((e) => WorkspaceAsset.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <WorkspaceAsset>[],
+      todos:
+          (json['todos'] as List<dynamic>?)
+              ?.map((e) => WorkspaceTodo.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <WorkspaceTodo>[],
+      jobs:
+          (json['jobs'] as List<dynamic>?)
+              ?.map((e) => WorkspaceJob.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const <WorkspaceJob>[],
+      preferences: json['preferences'] == null
+          ? const WorkspacePreferences()
+          : WorkspacePreferences.fromJson(
+              json['preferences'] as Map<String, dynamic>,
+            ),
+    );
+
+Map<String, dynamic> _$WorkspaceSnapshotToJson(_WorkspaceSnapshot instance) =>
+    <String, dynamic>{
+      'schemaVersion': instance.schemaVersion,
+      'revision': instance.revision,
+      'documents': instance.documents,
+      'assets': instance.assets,
+      'todos': instance.todos,
+      'jobs': instance.jobs,
+      'preferences': instance.preferences,
+    };

@@ -1,0 +1,214 @@
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter create --no-pub --empty --project-name design_review_app --org com.example --platforms web,macos /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/apps/design_review_app
+Creating project apps/design_review_app...
+Wrote 45 files.
+
+All done!
+You can find general documentation for Flutter at: https://docs.flutter.dev/
+Detailed API documentation is available at: https://api.flutter.dev/
+If you prefer video documentation, consider: https://www.youtube.com/c/flutterdev
+
+In order to run your empty application, type:
+
+  $ cd apps/design_review_app
+  $ flutter run
+
+Your empty application code is in apps/design_review_app/lib/main.dart.
+
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter pub get
+Resolving dependencies...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+These packages are no longer being depended on:
+- dio 5.11.1
+- dio_cache_interceptor 4.0.7
+- dio_smart_retry 7.0.1
+- dio_web_adapter 2.2.2
+- flutter_localizations 0.0.0 from sdk flutter
+- flutter_secure_storage 11.2.0
+- flutter_secure_storage_darwin 0.4.3
+- flutter_secure_storage_linux 3.0.3
+- flutter_secure_storage_platform_interface 2.1.1
+- flutter_secure_storage_web 2.1.1
+- flutter_secure_storage_windows 4.2.2
+- http_cache_core 1.1.4
+- intl 0.20.3
+- koi_network 0.0.5
+- pretty_dio_logger 1.4.0
+Changed 15 dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Deleting old lock-file: `./apps/design_review_app/pubspec.lock`.
+See https://dart.dev/go/workspaces-stray-files for details.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  compiling builders/aot
+  36s compiling builders/aot
+  0s riverpod_generator on 62 inputs; integration_test/support/fixture_import_port.dart
+  2s riverpod_generator on 62 inputs: 1 no-op; spent 2s sdk; integration_test/support/runtime_driver.dart
+  12s riverpod_generator on 62 inputs: 16 no-op; spent 8s analyzing, 2s resolving, 2s sdk; lib/core/router/workbench_navigation_history.dart
+  14s riverpod_generator on 62 inputs: 2 output, 47 no-op; spent 9s analyzing, 2s resolving, 2s sdk; test/features/workspace/application/workspace_session_test.dart
+  14s riverpod_generator on 62 inputs: 2 output, 60 no-op; spent 9s analyzing, 2s resolving, 2s sdk
+  0s freezed on 62 inputs; integration_test/support/fixture_import_port.dart
+  0s freezed on 62 inputs: 2 output, 60 no-op
+  0s json_serializable on 124 inputs; integration_test/support/fixture_import_port.dart
+  1s json_serializable on 124 inputs: 60 skipped, 1 output, 63 no-op
+  0s go_router_builder on 124 inputs; integration_test/support/fixture_import_port.dart
+  0s go_router_builder on 124 inputs: 60 skipped, 1 output, 63 no-op
+  0s source_gen:combining_builder on 124 inputs; integration_test/support/fixture_import_port.dart
+  0s source_gen:combining_builder on 124 inputs: 60 skipped, 4 output, 60 no-op
+  Built with build_runner/aot in 51s; wrote 10 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart format /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/apps/design_review_app/lib /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/apps/design_review_app/test /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/apps/design_review_app/integration_test
+Formatted 68 files (0 changed) in 0.37 seconds.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  compiling builders/aot
+  40s compiling builders/aot
+  0s freezed on 7 inputs; lib/error/app_failure.dart
+  2s freezed on 7 inputs: 1 output; spent 2s sdk; lib/extensions/string_extensions.dart
+  2s freezed on 7 inputs: 1 output, 6 no-op; spent 2s sdk
+  Built with build_runner/aot in 43s; wrote 1 output.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart format /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/packages/koi_core/lib /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/packages/koi_core/test
+Formatted 8 files (0 changed) in 0.05 seconds.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart format /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/packages/koi_ui/lib /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/.blueprint-86if83ip/packages/koi_ui/test
+Formatted 31 files (0 changed) in 0.29 seconds.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter pub get
+Resolving dependencies...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+Created /private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7
+Next: python3 "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7/blueprint.py" validate --workspace "/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7"
+
+COMMAND ['python3', 'blueprint.py', 'check', 'analyze']
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart analyze --fatal-infos
+Analyzing koi-design-review-5vetdfa7...
+No issues found!
+
+COMMAND ['python3', 'blueprint.py', 'build', '--app', 'apps/design_review_app', '--platforms', 'web,macos']
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter build web --release --no-pub
+Compiling lib/main.dart for the Web...                          
+Wasm dry run succeeded. Consider building and testing your application with the `--wasm` flag. See docs for more info: https://docs.flutter.dev/platform-integration/web/wasm
+Use --no-wasm-dry-run to disable these warnings.
+Expected to find fonts for (MaterialIcons, packages/cupertino_icons/CupertinoIcons), but found (MaterialIcons). This usually means you are referring to font families in an IconData class but not including them in the assets section of your pubspec.yaml, are missing the package that would include them, or are missing "uses-material-design: true".
+Font asset "MaterialIcons-Regular.otf" was tree-shaken, reducing it from 1645184 to 11620 bytes (99.3% reduction). Tree-shaking can be disabled by providing the --no-tree-shake-icons flag when building your app.
+Compiling lib/main.dart for the Web...                             71.6s
+✓ Built build/web
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter build macos --release --no-pub
+The following plugins do not support Swift Package Manager for macos:
+  - media_kit_libs_macos_video
+  - media_kit_video
+This will become an error in a future version of Flutter. Please contact the plugin maintainers to request Swift Package Manager adoption.
+Running pod install...                                           1,927ms
+Building macOS application...                                   
+Xcode 27 no longer requires macOS binaries to support the x86_64 architecture. To build ARM-only macOS apps now, run: "flutter config --enable-macos-arm64-only". This will become the default behavior in a future Flutter release.
+/Users/max/Workspace/env/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.5+1/macos/file_selector_macos/Sources/file_selector_macos/FileSelectorPlugin.swift:127:17: warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+125 |         allowedTypes.append(contentsOf: acceptedTypes.utis.map({ $0 }))
+126 |         if !allowedTypes.isEmpty {
+127 |           panel.allowedFileTypes = allowedTypes
+    |                 `- warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+128 |         }
+129 |       }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+/Users/max/Workspace/env/.pub-cache/hosted/pub.dev/file_selector_macos-0.9.5+1/macos/file_selector_macos/Sources/file_selector_macos/FileSelectorPlugin.swift:127:17: warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+125 |         allowedTypes.append(contentsOf: acceptedTypes.utis.map({ $0 }))
+126 |         if !allowedTypes.isEmpty {
+127 |           panel.allowedFileTypes = allowedTypes
+    |                 `- warning: 'allowedFileTypes' was deprecated in macOS 12.0: Use -allowedContentTypes instead [#DeprecatedDeclaration]
+128 |         }
+129 |       }
+
+[#DeprecatedDeclaration]: <https://docs.swift.org/compiler/documentation/diagnostics/deprecated-declaration>
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7/apps/design_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:818:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+816 | SWIFT_CLASS("_TtC15media_kit_video20SafeResizableTexture")
+817 | @interface SafeResizableTexture : NSObject <FlutterTexture>
+818 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+819 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+820 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7/apps/design_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:825:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+823 | SWIFT_CLASS("_TtC15media_kit_video9TextureHW")
+824 | @interface TextureHW : NSObject <FlutterTexture>
+825 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+826 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+827 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+3 warnings generated.
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7/apps/design_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:832:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+830 | SWIFT_CLASS("_TtC15media_kit_video9TextureSW")
+831 | @interface TextureSW : NSObject <FlutterTexture>
+832 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+833 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+834 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7/apps/design_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:387:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+385 | SWIFT_CLASS("_TtC15media_kit_video20SafeResizableTexture")
+386 | @interface SafeResizableTexture : NSObject <FlutterTexture>
+387 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+388 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+389 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7/apps/design_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:394:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+392 | SWIFT_CLASS("_TtC15media_kit_video9TextureHW")
+393 | @interface TextureHW : NSObject <FlutterTexture>
+394 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+395 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+396 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+
+1 | #import "Headers/media_kit_video-umbrella.h"
+2 | #import "Headers/media_kit_video-Swift.h"
+3 | 
+
+3 warnings generated.
+/private/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-design-review-5vetdfa7/apps/design_review_app/build/macos/Build/Products/Release/media_kit_video/media_kit_video.framework/Headers/media_kit_video-Swift.h:401:31: warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+399 | SWIFT_CLASS("_TtC15media_kit_video9TextureSW")
+400 | @interface TextureSW : NSObject <FlutterTexture>
+401 | - (CVPixelBufferRef _Nullable __unsafe_unretained)copyPixelBuffer SWIFT_WARN_UNUSED_RESULT;
+    |                               `- warning: 'objc_ownership' only applies to Objective-C object or block pointer types; type here is 'CVPixelBufferRef _Nullable' (aka 'struct __CVBuffer *')
+402 | - (nonnull instancetype)init SWIFT_UNAVAILABLE;
+403 | + (nonnull instancetype)new SWIFT_UNAVAILABLE_MSG("-init is unavailable");
+warning: Run script build phase 'Run Script' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'Flutter Assemble' from project 'Runner')
+✓ Built build/macos/Build/Products/Release/design_review_app.app (95.1MB)

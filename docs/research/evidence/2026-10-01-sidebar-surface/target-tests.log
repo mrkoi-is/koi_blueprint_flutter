@@ -1,0 +1,79 @@
+Resolving dependencies...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: tokens support themes, fallback, copy and interpolation
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: neutral workspace surfaces reserve chroma for brand actions
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: regular Material host supplies fallback tokens
+00:00 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: regular Material host supplies fallback tokens
+00:00 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: regular Material host supplies fallback tokens
+00:00 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:01 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:01 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: TextDirection.rtl trailing=false follows physical resize input
+00:01 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +12: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +13: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +14: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +15: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +16: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +17: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +18: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +19: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +20: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +21: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +22: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +23: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +24: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +25: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +26: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +27: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +28: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +29: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +30: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +31: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +32: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +33: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +34: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +35: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +36: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +37: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +38: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +39: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +40: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +41: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +42: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +43: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +44: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:04 +45: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: history shortcuts replay pages without ordinary typing navigation
+00:04 +46: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: native toolbar owns the top row and replays the shared history (variant: TargetPlatform.macOS)
+00:04 +47: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: macOS history shortcuts work before focusing a control (variant: TargetPlatform.macOS)
+macOS window chrome unavailable: MissingPluginException(No implementation found for method applyChrome on channel koi/workbench_window)
+macOS window chrome unavailable: MissingPluginException(No implementation found for method applyChrome on channel koi/workbench_window)
+macOS window chrome unavailable: MissingPluginException(No implementation found for method applyChrome on channel koi/workbench_window)
+macOS window chrome unavailable: MissingPluginException(No implementation found for method applyChrome on channel koi/workbench_window)
+00:04 +48: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: sidebar search, rename, todo CRUD and theme settings are real consumers
+00:05 +49: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: 320 width and 200 percent text remain usable across all views
+00:05 +50: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: Cmd/Ctrl+O opens current import and both real panel widths persist
+00:05 +51: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: one job state update does not rebuild theme or unrelated document editor
+00:06 +52: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: text draft, selection and controller survive resize and three navigation branches
+00:06 +53: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: Ctrl+S saves once and save failure keeps the editable draft
+00:06 +54: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: media resize retains player/controller, route exit pauses and does not autoplay on return
+00:06 +55: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: initialization failure offers a real retry
+00:06 +56: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: task retry selects and mounts video B while retaining its failed job
+00:06 +57: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: cancelled import can retry and direct routes persist the last view
+00:07 +58: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: media search, category filters, grid/list selection and image read retry
+00:07 +59: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: image thumbnail retry preserves the failed job and publishes a new stored thumbnail
+00:07 +60: All tests passed!

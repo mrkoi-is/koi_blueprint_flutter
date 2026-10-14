@@ -1,0 +1,26 @@
+--- before/packages/koi_ui/lib/theme/koi_theme_tokens.dart
++++ after/packages/koi_ui/lib/theme/koi_theme_tokens.dart
+@@ -54,7 +54,7 @@
+     ColorScheme colors, {
+     KoiDensity density = KoiDensity.comfortable,
+   }) => KoiThemeTokens(
+-    panelBackground: colors.surface,
++    panelBackground: colors.surfaceContainerLow,
+     chromeBackground: colors.surfaceContainerLow,
+     contentBackground: colors.surface,
+     hoverBackground: colors.surfaceContainerLow,
+@@ -73,12 +73,13 @@
+         KoiThemeTokens.fromScheme(theme.colorScheme);
+   }
+ 
++  /// Supporting content surfaces: resource sidebar and inspector.
+   final Color panelBackground;
+ 
+   /// Window title bar and fixed navigation rail share this surface.
+   final Color chromeBackground;
+ 
+-  /// Content sidebar, main workspace and details share one rounded surface.
++  /// Main workspace surface, distinct from supporting content panels.
+   final Color contentBackground;
+   final Color hoverBackground;
+   final Color overlayBackground;

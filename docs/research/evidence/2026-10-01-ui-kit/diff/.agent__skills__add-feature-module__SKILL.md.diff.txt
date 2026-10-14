@@ -1,0 +1,10 @@
+--- .agent/skills/add-feature-module/SKILL.md (turn baseline)
++++ .agent/skills/add-feature-module/SKILL.md
+@@ -20,6 +20,7 @@
+ - 参照 [Feature Lab](../../../docs/examples.md)；认证专用行为参照 [认证样例](../../../docs/examples.md)。
+ - domain 纯 Dart，presentation 不直接 IO；Feature provider 统一放 presentation/providers。
+ - 业务容器通过 provider 取数，展示 Widget 可以用不可变 props 和回调。
++- 页面先消费 [DESIGN](../../../DESIGN.md) 与 UI Lab 的标准 Flutter 组件主题；跨页面外观统一在 koi_ui 修正，标准组件能表达时不新增平行控件。
+ - 脚手架的示例数据不是已接通的真实 API 或持久化。
+ 
+ ## 验证

@@ -1,4 +1,6 @@
+import 'package:koi_ui/l10n/koi_ui_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:koi_ui/widgets/koi_status_layout.dart';
 
 class KoiErrorState extends StatelessWidget {
   const KoiErrorState({
@@ -14,31 +16,35 @@ class KoiErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.error_outline,
-              size: 40,
-              color: Theme.of(context).colorScheme.error,
-            ),
+    return KoiStatusLayout(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.error_outline,
+            size: 40,
+            color: Theme.of(context).colorScheme.error,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            description,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          if (onRetry != null) ...[
             const SizedBox(height: 16),
-            Text(title, style: Theme.of(context).textTheme.headlineSmall),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium,
+            FilledButton(
+              onPressed: onRetry,
+              child: Text(KoiUiStrings.of(context).retry),
             ),
-            if (onRetry != null) ...[
-              const SizedBox(height: 16),
-              FilledButton(onPressed: onRetry, child: const Text('重试')),
-            ],
           ],
-        ),
+        ],
       ),
     );
   }

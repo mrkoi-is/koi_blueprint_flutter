@@ -1,0 +1,16 @@
+{
+  "@@locale": "zh",
+  "retry": "重试",
+  "loading": "正在准备工作区...",
+  "openMenu": "打开菜单",
+  "openPanel": "打开面板",
+  "closePanel": "关闭面板",
+  "clearSearch": "清除搜索",
+  "back": "后退",
+  "forward": "前进",
+  "toggleSidebar": "切换资料侧栏",
+  "toggleDetail": "切换详情面板",
+  "resizeSidebar": "调整侧栏宽度",
+  "resizeDetail": "调整详情宽度",
+  "resizePanel": "调整面板宽度"
+}

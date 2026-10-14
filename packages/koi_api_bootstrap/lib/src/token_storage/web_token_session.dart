@@ -1,7 +1,7 @@
 import 'package:koi_api_bootstrap/src/koi_memory_token_session.dart';
 
-/// Web keeps the token in memory only: browser storage is readable by any
-/// script on the page, so a refresh simply starts a new login.
+/// Web 仅在内存中保存令牌：页面上的任意脚本都能读取浏览器存储，
+/// 因此刷新页面后会重新登录。
 Future<KoiTokenSession> loadDefaultTokenSession() async {
   return KoiMemoryTokenSession();
 }

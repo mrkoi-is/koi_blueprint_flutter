@@ -1,0 +1,11 @@
+--- before/packages/koi_ui/test/koi_components_test.dart
++++ after/packages/koi_ui/test/koi_components_test.dart
+@@ -330,7 +330,7 @@
+         );
+         expect(railWidget.backgroundColor, tokens.chromeBackground);
+         final settings = tester.getRect(find.byKey(const ValueKey('settings')));
+-        expect(rail.width, 64);
++        expect(rail.width, KoiWorkbenchMetrics.railWidth);
+         expect(rail.bottom - settings.bottom, lessThanOrEqualTo(16));
+       }
+       final settingsButton = tester.widget<TextButton>(

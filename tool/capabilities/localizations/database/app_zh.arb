@@ -1,0 +1,57 @@
+{
+  "@@locale": "zh",
+  "databaseTitle": "资料库",
+  "databaseNew": "新建资料",
+  "databasePersistent": "资料保存在此设备，关闭后可继续编辑。",
+  "databaseTemporary": "当前浏览器仅提供临时存储，关闭后资料不会保留。",
+  "databaseSingleTab": "当前存储模式不支持多个标签页同时编辑，请只保留一个页面。",
+  "databaseSearch": "搜索标题或正文",
+  "databaseArchived": "已归档",
+  "databaseRetry": "重试",
+  "databaseNoArchived": "还没有归档资料",
+  "databaseEmpty": "新建第一份资料；标签会随资料一起保存。",
+  "databaseNoMatch": "没有匹配的资料",
+  "databaseRestore": "恢复资料",
+  "databaseArchive": "归档资料",
+  "databaseEdit": "编辑资料",
+  "databaseDocumentTitle": "标题",
+  "databaseTitleRequired": "请输入标题",
+  "databaseContents": "正文",
+  "databaseTags": "标签",
+  "databaseTagHint": "用逗号分隔；重复标签会自动合并",
+  "databaseCancel": "取消",
+  "databaseSaving": "保存中…",
+  "databaseSave": "保存",
+  "databaseOperationFailed": "操作失败：{error}",
+  "@databaseOperationFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseReadFailed": "读取失败：{error}",
+  "@databaseReadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseSaveFailed": "保存失败：{error}。内容仍保留，可重试。",
+  "@databaseSaveFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "databaseOpenFailed": "无法恢复资料：{error}",
+  "@databaseOpenFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  }
+}

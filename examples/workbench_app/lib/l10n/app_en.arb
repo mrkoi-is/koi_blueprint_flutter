@@ -1,0 +1,377 @@
+{
+  "@@locale": "en",
+  "appTitle": "Koi Workspace",
+  "aboutTitle": "About",
+  "aboutSource": "Source",
+  "aboutChannel": "Channel",
+  "aboutPlatform": "Platform",
+  "text": "Documents",
+  "media": "Media",
+  "tasks": "Tasks",
+  "settings": "Settings",
+  "systemTheme": "System theme",
+  "lightTheme": "Light theme",
+  "darkTheme": "Dark theme",
+  "comfortable": "Comfortable density",
+  "compact": "Compact density",
+  "save": "Save workspace",
+  "saveShortcut": "Save workspace (⌘/Ctrl+S)",
+  "importFiles": "Import files",
+  "retry": "Retry",
+  "restoring": "Restoring workspace…",
+  "initializing": "Initializing local workspace…",
+  "workspaceInUse": "Workspace is already open",
+  "initializationFailed": "Workspace initialization failed",
+  "language": "Language",
+  "systemLanguage": "System language",
+  "accent": "Accent color",
+  "moss": "Moss",
+  "blue": "Blue",
+  "violet": "Violet",
+  "cancel": "Cancel",
+  "confirm": "Confirm",
+  "apply": "Apply",
+  "keyboardShortcuts": "Keyboard shortcuts",
+  "back": "Back",
+  "forward": "Forward",
+  "quit": "Quit workspace",
+  "unsaved": "Unsaved",
+  "saved": "Saved",
+  "saving": "Saving workspace",
+  "saveFailed": "Workspace save failed",
+  "newDocument": "New document",
+  "importText": "Import text",
+  "noDocuments": "No documents yet",
+  "documentsHint": "Create a document or import a UTF-8 TXT/Markdown file",
+  "renameCurrentDocument": "Rename current document",
+  "writeContent": "Start writing…",
+  "documentNameRequired": "Enter a document name",
+  "renameDocument": "Rename document",
+  "documentName": "Document name",
+  "searchDocuments": "Search documents",
+  "noMatchingDocuments": "No matching documents",
+  "mediaCategories": "Media categories",
+  "searchMedia": "Search media",
+  "all": "All",
+  "image": "Image",
+  "video": "Video",
+  "mediaStorageHint": "Imported copies are stored in this workspace. Switching views pauses video and preserves its position.",
+  "taskSummary": "Task overview",
+  "taskRunningHint": "Jobs continue across views. Cancellation stops reading and removes staged content.",
+  "documentDetails": "Document details",
+  "noDocumentSelected": "No document selected",
+  "name": "Name",
+  "characterCountLabel": "Characters",
+  "revisionLabel": "Revision",
+  "saveStatus": "Save status",
+  "autosaveHint": "Automatically saves 500 ms after typing stops",
+  "mediaDetails": "Media details",
+  "noMediaSelected": "No media selected",
+  "size": "Size",
+  "type": "Type",
+  "thumbnailStatus": "Thumbnail status",
+  "thumbnailPending": "Thumbnail pending",
+  "thumbnailGenerating": "Generating thumbnail",
+  "thumbnailSaved": "Thumbnail saved",
+  "thumbnailFailed": "Thumbnail failed",
+  "retryThumbnail": "Retry thumbnail",
+  "taskHelp": "About tasks",
+  "todoHelp": "Create, rename, complete, and delete to-dos.",
+  "jobHelp": "I/O progress reflects bytes read. Thumbnail processing uses indeterminate progress.",
+  "closeHelp": "Closing the workspace cancels jobs and saves current drafts.",
+  "importMedia": "Import images / videos",
+  "showList": "Switch to list",
+  "showGrid": "Switch to grid",
+  "noMatchingMedia": "No matching media",
+  "mediaImportHint": "Import PNG/JPEG images or MP4 videos",
+  "thumbnailReadFailed": "Thumbnail could not be read",
+  "openForThumbnail": "Open preview to generate a thumbnail",
+  "retryRead": "Retry reading",
+  "selectMedia": "Select media",
+  "mediaPreviewHint": "Zoom images; play, pause, and seek videos",
+  "pauseVideo": "Pause video",
+  "playVideo": "Play video",
+  "playbackPosition": "Playback position",
+  "volume": "Volume",
+  "retryVideo": "Retry video preview / thumbnail",
+  "deleteTodo": "Delete to-do",
+  "delete": "Delete",
+  "todos": "To-dos",
+  "todosDescription": "To-dos and I/O jobs are managed separately",
+  "incompleteOnly": "Incomplete only",
+  "addTodo": "Add to-do",
+  "noTodos": "No to-dos yet",
+  "jobs": "I/O jobs",
+  "jobsDescription": "Import bytes and thumbnails reflect actual operations",
+  "noJobs": "Import text or media to see jobs here",
+  "queued": "Queued",
+  "running": "Running",
+  "cancelling": "Cancelling",
+  "succeeded": "Completed",
+  "failed": "Failed",
+  "cancelled": "Cancelled",
+  "interrupted": "Interrupted",
+  "indeterminateProgress": "Progress is indeterminate",
+  "cancelJob": "Cancel job",
+  "retryJob": "Retry job",
+  "todoNameRequired": "Enter a to-do name",
+  "renameTodo": "Rename to-do",
+  "todoName": "To-do name",
+  "characterCount": "{count, plural, =1{1 character} other{{count} characters}}",
+  "@characterCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "revision": "Revision {number}",
+  "@revision": {
+    "placeholders": {
+      "number": {
+        "type": "int"
+      }
+    }
+  },
+  "byteCount": "{count, plural, =1{1 byte} other{{count} bytes}}",
+  "@byteCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "incompleteTodos": "{count, plural, =1{1 incomplete to-do} other{{count} incomplete to-dos}}",
+  "@incompleteTodos": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "activeJobs": "{count, plural, =1{1 active I/O job} other{{count} active I/O jobs}}",
+  "@activeJobs": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteTodoConfirm": "Delete “{name}”? This cannot be undone.",
+  "@deleteTodoConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "renameTodoNamed": "Rename to-do: {name}",
+  "@renameTodoNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteTodoNamed": "Delete to-do: {name}",
+  "@deleteTodoNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "retryThumbnailNamed": "Retry reading thumbnail: {name}",
+  "@retryThumbnailNamed": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "imageDecodeFailed": "Image decoding failed: {error}",
+  "@imageDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imageReadFailed": "Image reading failed: {error}",
+  "@imageReadFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "playbackTime": "Played {position} of {duration}",
+  "@playbackTime": {
+    "placeholders": {
+      "position": {
+        "type": "String"
+      },
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "diagTitle": "Diagnostics",
+  "diagSearch": "Search logs",
+  "diagAllLevels": "All levels",
+  "diagRefresh": "Refresh new records",
+  "diagExportFiltered": "Export filtered",
+  "diagExportAll": "Export all",
+  "diagMore": "Load older records",
+  "diagEmpty": "No matching records",
+  "diagStorageFailed": "Log persistence failed; in-memory diagnostics are available.",
+  "capabilityUnavailable": "Capability is not installed.",
+  "directoryIndexTitle": "Directory index",
+  "chooseDirectory": "Choose directory",
+  "rescanDirectory": "Scan again",
+  "directoryIndexHint": "Only names, sizes and modification times are read; files are not copied. In a browser, select the directory again to refresh its files.",
+  "directoryIndexEmpty": "Choose a directory to start indexing",
+  "directoryIndexCancelled": "Cancelled; the previous index is retained",
+  "directoryIndexFailed": "Some files could not be read. You can scan again.",
+  "directoryIndexCompleted": "Index complete",
+  "directoryIndexProgress": "Found {visited} · Reused {reused} · Failed {failures}",
+  "@directoryIndexProgress": {
+    "placeholders": {
+      "visited": {
+        "type": "int"
+      },
+      "reused": {
+        "type": "int"
+      },
+      "failures": {
+        "type": "int"
+      }
+    }
+  },
+  "bulkDocumentsTitle": "Document selection",
+  "bulkFilter": "Filter documents",
+  "bulkSelected": "{count} selected",
+  "bulkClear": "Clear selection",
+  "bulkDelete": "Delete selected",
+  "bulkDeleteConfirm": "Delete {count} documents?",
+  "bulkReorder": "Drag to reorder; Alt+Up/Down with keyboard",
+  "@bulkSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "@bulkDeleteConfirm": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "diagSource": "Source",
+  "settingsTitle": "Settings",
+  "settingsSearch": "Search settings",
+  "settingsNoResults": "No matching settings",
+  "settingsLanguageGroup": "Language",
+  "settingsLanguage": "Display language",
+  "settingsLanguageDescription": "Changes apply immediately. Follow system uses your device language; unsupported languages use Simplified Chinese.",
+  "settingsAppearanceGroup": "Appearance",
+  "settingsTheme": "Color mode",
+  "settingsThemeDescription": "Follow system adapts to your device appearance.",
+  "settingsDensity": "Interface density",
+  "settingsDensityDescription": "Automatic uses comfortable spacing for touch or pen and compact spacing for a mouse. Manual choices always take priority.",
+  "settingsAccent": "Accent color",
+  "settingsAccentDescription": "Changes highlights and selection while preserving status colors.",
+  "settingsSystem": "Follow system",
+  "settingsLight": "Light",
+  "settingsDark": "Dark",
+  "settingsComfortable": "Comfortable",
+  "settingsCompact": "Compact",
+  "settingsMoss": "Moss",
+  "settingsBlue": "Blue",
+  "settingsViolet": "Violet",
+  "settingsReset": "Restore defaults",
+  "settingsResetDescription": "Restore language, color mode, density and accent. Your documents and other settings remain intact.",
+  "settingsCancel": "Cancel",
+  "settingsRetry": "Retry",
+  "settingsSaveError": "Settings could not be saved. Retry to persist your choices.",
+  "historyTitle": "Task history",
+  "historySearch": "Search name or task ID",
+  "historyClear": "Clear history",
+  "historyClearConfirm": "Clear previous attempts? Current tasks will remain.",
+  "historyEmpty": "No previous attempts",
+  "historyAttempt": "Attempt {count} (0: historical count unknown)",
+  "@historyAttempt": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "platformCapabilities": "Platform capabilities",
+  "platformDesktopWindow": "Desktop window",
+  "platformWindowUnavailable": "Desktop window unavailable",
+  "platformWindowUninitialized": "The desktop capability has not initialized.",
+  "platformGeometrySaved": "Window geometry is restored and saved automatically.",
+  "platformWindowFallback": "Native window controls unavailable. The app remains usable.",
+  "platformSaveGeometry": "Save current window position",
+  "platformCloseToTray": "Close to tray",
+  "platformCloseWindowToTray": "Close window to tray",
+  "platformTrayRequirement": "Available only while a working tray is enabled.",
+  "platformShowWindow": "Show window",
+  "platformSystemTray": "System tray",
+  "platformTrayUnavailable": "Tray unavailable",
+  "platformDesktopRequired": "Desktop window initialization is required.",
+  "platformTrayDescription": "The tray can show this window or request a normal, cancellable app exit.",
+  "platformTrayRetry": "Retry tray initialization",
+  "platformSystemMedia": "System media",
+  "platformAudio": "Audio",
+  "platformMediaUnavailable": "System media unavailable",
+  "platformMediaUninitialized": "Initialize the optional media capability first.",
+  "platformOpenAudio": "Open audio file",
+  "platformBackgroundAudio": "Continue audio in the background",
+  "platformNoAudio": "No audio selected",
+  "platformPlaybackPosition": "Playback position",
+  "platformPlay": "Play",
+  "platformPause": "Pause",
+  "platformVolume": "Volume",
+  "platformMiniPlayer": "Mini player",
+  "platformMiniRequirement": "Desktop and media initialization required",
+  "platformMiniHint": "Open an audio file in System media, then return here.",
+  "platformMediaLayout": "Media layout",
+  "platformRestoreWindow": "Restore window",
+  "platformEnterMini": "Enter mini mode",
+  "platformHomeWidget": "Home widget",
+  "platformSnapshotTitle": "Workspace snapshot",
+  "platformWidgetDescription": "Publish a versioned snapshot to the installed native home widget. The widget can reopen this app.",
+  "platformTitle": "Title",
+  "platformIncrementCompleted": "Increment completed count",
+  "platformUpdateWidget": "Update home widget",
+  "platformSnapshotSent": "Snapshot sent to the native widget.",
+  "platformControlsUnavailable": "System controls unavailable",
+  "platformCompleted": "Completed: {count}",
+  "@platformCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsDensityAutomatic": "Automatic (current input)",
+  "platformEngineTitle": "Playback engine",
+  "platformEnginePolicy": "Selection is explicit. If the requested engine fails, the current engine remains active; no automatic replacement is made.",
+  "platformEngineReady": "Available: engine initialization succeeded",
+  "platformEngineSelect": "Check and select engine",
+  "documentSegmentPrevious": "Previous segment",
+  "documentSegmentNext": "Next segment",
+  "documentSegmentPosition": "Segment {index}. Changes are saved to the complete document.",
+  "documentSegmentComposing": "Finish composing text before changing segments.",
+  "@documentSegmentPosition": {
+    "placeholders": {
+      "index": {
+        "type": "int"
+      }
+    }
+  }
+}

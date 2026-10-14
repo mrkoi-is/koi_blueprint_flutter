@@ -1,0 +1,21 @@
+{
+  "archive": "/Applications/ChatGPT.app/Contents/Resources/app.asar",
+  "inspection": "Read-only local packaged CSS; not a source repository or proof every sidebar uses these tokens",
+  "definitions": [
+    {
+      "asset": "webview/assets/app-initial-a3898107ddbb.css",
+      "sha256": "fd6c8526fc184dfbe9abfee7220614d5b9bc549fb1860857159eb63ba26343fc",
+      "selected_style_definitions": [
+        "--app-shell-main-content-border-width:var(--border-width-hairline)"
+      ]
+    },
+    {
+      "asset": "webview/assets/app-primary-547a6c7b4fb3.css",
+      "sha256": "658cc9377542b4d04ade79be0ae4f520d9695008cd72fb6db8af58d91d1e0cdd",
+      "selected_style_definitions": [
+        "--color-border-light:var(--lightningcss-light,#0000000d)var(--lightningcss-dark,#ffffff0d)",
+        "--color-border-subtle:var(--color-border-light)"
+      ]
+    }
+  ]
+}

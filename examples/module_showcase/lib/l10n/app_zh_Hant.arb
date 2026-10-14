@@ -1,0 +1,40 @@
+{
+  "@@locale": "zh_Hant",
+  "moduleCapabilitiesTitle": "模塊與引擎",
+  "moduleCapabilitiesEnableCharacters": "啓用字符引擎",
+  "moduleCapabilitiesFailNext": "下次初始化注入失敗",
+  "moduleCapabilitiesInput": "待分析文本",
+  "moduleCapabilitiesRun": "運行當前引擎",
+  "moduleCapabilitiesOperations": "可用操作：{operations}",
+  "@moduleCapabilitiesOperations": {
+    "placeholders": {
+      "operations": {
+        "type": "String"
+      }
+    }
+  },
+  "moduleCapabilitiesClosed": "已關閉實例：{count}",
+  "@moduleCapabilitiesClosed": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "moduleCapabilitiesWords": "詞數引擎",
+  "moduleCapabilitiesCharacters": "字符引擎",
+  "moduleCapabilitiesAvailable": "可用",
+  "moduleCapabilitiesUnavailable": "暫不可用",
+  "moduleCapabilitiesUnsupported": "此平台不支持",
+  "moduleCapabilitiesResult": "{engine}：{count}",
+  "@moduleCapabilitiesResult": {
+    "placeholders": {
+      "engine": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}

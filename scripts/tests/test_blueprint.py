@@ -1,0 +1,588 @@
+import argparse
+import contextlib
+import importlib.util
+import io
+import json
+import os
+from pathlib import Path
+import re
+import subprocess
+import tempfile
+import unittest
+from unittest.mock import patch
+
+SPEC = importlib.util.spec_from_file_location('blueprint', Path(__file__).resolve().parents[2] / 'blueprint.py')
+blueprint = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(blueprint)
+REAL_RUN = blueprint.run
+REAL_SDK = blueprint.SDK
+
+
+def write(path, text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(text, encoding='utf-8')
+
+
+def fixture_members(root, sdk):
+    # Controlled fixture response for the SDK's authoritative workspace listing.
+    text = (root / 'pubspec.yaml').read_text(encoding='utf-8')
+    return [root / value for value in re.findall(r'^  - ([^\n]+)$', text, re.M)]
+
+
+class BlueprintTest(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory(prefix='blueprint tests 中文 ')
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+        self.app = self.root / 'apps/demo'
+        write(self.root / 'pubspec.yaml', 'name: example\nworkspace:\n  - apps/demo\n\ndev_dependencies:\n  analyzer: 14.4.0\n')
+        write(self.app / 'pubspec.yaml', 'name: demo\nresolution: workspace\n# 用户自己的注释\n')
+        self.enterContext(patch.object(blueprint, 'SDK', return_value=argparse.Namespace(flutter='flutter', dart='dart')))
+        self.enterContext(patch.object(blueprint, 'members', side_effect=fixture_members))
+        self.enterContext(patch.object(blueprint, 'run', side_effect=self.fake_run))
+        self.enterContext(contextlib.redirect_stdout(io.StringIO()))
+
+    def feature(self, kind, name=None, dry_run=False):
+        blueprint.feature(argparse.Namespace(path=str(self.app), name=name or f'{kind}_thing', kind=kind, dry_run=dry_run))
+
+    def module(self, name='sales_reports', dry_run=False):
+        blueprint.module(argparse.Namespace(workspace=str(self.root), name=name, dry_run=dry_run))
+
+    def snapshot(self):
+        return {str(path.relative_to(self.root)): path.read_bytes() for path in self.root.rglob('*') if path.is_file()}
+
+    def test_launch_uses_active_app_and_selected_workspace_sdk(self):
+        write(self.app / 'lib/main.dart', 'void main() {}')
+        with patch.object(blueprint, 'run') as run:
+            blueprint.launch(argparse.Namespace(app=str(self.app), device='chrome'))
+            self.assertEqual(run.call_args.args, (['flutter', 'run', '-d', 'chrome'], self.app))
+        with self.assertRaises(blueprint.BlueprintError):
+            blueprint.launch(argparse.Namespace(app=str(self.root / 'not_an_app'), device='chrome'))
+
+    def test_release_build_refreshes_platform_plugin_registrants(self):
+        (self.app / 'android').mkdir()
+        import zipfile
+        write(self.root / '.fvmrc', '{"flutter":"3.47.2"}')
+        write(self.root / 'pubspec.lock', '# test lock\n')
+        def produce(command, cwd):
+            if command[1:3] == ['pub', 'get']:
+                self.assertIn('--enforce-lockfile', command)
+                write(self.app / '.flutter-plugins-dependencies', '{}')
+                return
+            self.assertTrue((self.app / '.flutter-plugins-dependencies').is_file())
+            if '--config-only' in command:
+                self.assertIn('--pub', command)
+                self.assertNotIn('--no-pub', command)
+                return
+            target = self.app / 'build/app/outputs/flutter-apk/app-release.apk'
+            target.parent.mkdir(parents=True, exist_ok=True)
+            with zipfile.ZipFile(target, 'w') as archive:
+                native = bytearray(64)
+                native[:6] = b'\x7fELF\x02\x01'
+                native[18:20] = (183).to_bytes(2, 'little')
+                archive.writestr('lib/arm64-v8a/libapp.so', native)
+        with patch.object(blueprint, 'run', side_effect=produce) as run:
+            blueprint.build(argparse.Namespace(app=str(self.app), platforms='android'))
+            command, cwd = run.call_args.args
+            self.assertEqual(command[:4], ['flutter', 'build', 'apk', '--release'])
+            self.assertIn('--no-pub', command)
+            self.assertEqual(len(run.call_args_list), 3)
+            self.assertEqual(run.call_args_list[0].args, (['flutter', 'pub', 'get', '--enforce-lockfile'], self.app))
+            self.assertIn('--config-only', run.call_args_list[1].args[0])
+            self.assertEqual(cwd, self.app)
+            manifest = json.loads((self.app / 'build/blueprint/android-release.json').read_text(encoding='utf-8'))
+            self.assertEqual(manifest['status'], 'PASS')
+            self.assertEqual(manifest['runtime'], 'NOT_RUN')
+            self.assertEqual(manifest['actualArchitectures'], ['arm64-v8a'])
+            artifact = manifest['artifacts'][0]
+            self.assertEqual(artifact['path'], 'apps/demo/build/app/outputs/flutter-apk/app-release.apk')
+            import hashlib
+            self.assertEqual(artifact['sha256'], hashlib.sha256((self.root / artifact['path']).read_bytes()).hexdigest())
+
+    def test_doctor_does_not_require_source_only_node_for_minimal(self):
+        with patch.object(blueprint, 'run'), patch.dict(os.environ, {'CHROME_EXECUTABLE': str(self.app / 'chrome')}), patch.object(blueprint.shutil, 'which', return_value=None):
+            blueprint.doctor(argparse.Namespace(workspace=str(self.root), purpose='validate'))
+            write(self.root / 'packages/koi_api_bootstrap/test/web_compile_smoke.dart', 'void main() {}')
+            with self.assertRaisesRegex(blueprint.BlueprintError, 'Node'):
+                blueprint.doctor(argparse.Namespace(workspace=str(self.root), purpose='validate'))
+
+    def test_chrome_is_required_only_for_active_browser_tests(self):
+        write(self.root / '.blueprint/reference/examples/workbench_app/test/browser/storage_test.dart', '// inert')
+        with patch.object(blueprint.shutil, 'which', return_value=None), patch.dict(os.environ, {'CHROME_EXECUTABLE': str(self.root / 'missing-chrome')}):
+            blueprint.validation_prerequisites(self.root, [self.app])
+            write(self.app / 'test/browser/storage_test.dart', '// active')
+            with self.assertRaisesRegex(blueprint.BlueprintError, 'Chrome'):
+                blueprint.validation_prerequisites(self.root, [self.app])
+            write(self.root / 'chrome', 'fixture executable')
+            with patch.dict(os.environ, {'CHROME_EXECUTABLE': str(self.root / 'chrome')}):
+                blueprint.validation_prerequisites(self.root, [self.app])
+
+    def test_generated_readme_uses_the_workspace_sdk_pin(self):
+        write(self.root / '.fvmrc', json.dumps({'flutter': '9.8.7'}))
+        with patch.object(blueprint, 'ROOT', self.root):
+            readme = blueprint.generated_readme('demo', 'minimal', ['web'])
+        self.assertIn('fvm use 9.8.7', readme)
+        self.assertNotIn('3.47.2', readme)
+
+    def test_cli_help_explains_commands_and_phase_semantics(self):
+        for arguments, phrase in (([], 'Launch an active App'), (['check'], 'reproducibility'), (['doctor'], 'active members'), (['feature'], 'persistent draft')):
+            with self.subTest(arguments=arguments), contextlib.redirect_stdout(io.StringIO()) as output, self.assertRaises(SystemExit) as result:
+                blueprint.main([*arguments, '--help'])
+            self.assertEqual(result.exception.code, 0)
+            self.assertIn(phrase, ' '.join(output.getvalue().split()))
+
+    def test_name_and_platform_validation(self):
+        for value in ['../bad', 'Bad', 'a-b', 'class', 'enum', 'extends', 'void', 'await', 'con', 'lpt1', '']:
+            with self.subTest(value=value), self.assertRaises(blueprint.BlueprintError):
+                blueprint.valid_name(value)
+        self.assertEqual(blueprint.valid_name('my_app'), 'my_app')
+        self.assertEqual(blueprint.platforms('web,ios'), ['web', 'ios'])
+        for value in ['web,web', 'web,bad', '', '../web']:
+            with self.assertRaises(blueprint.BlueprintError):
+                blueprint.platforms(value)
+
+    def test_feature_multiword_identifiers_imports_and_duplicate_protection(self):
+        for kind in ['presentation', 'api', 'local']:
+            self.feature(kind)
+            destination = self.app / f'lib/features/{kind}_thing'
+            self.assertTrue((destination / f'{kind}_thing.dart').is_file())
+            self.assertTrue(list((self.app / f'test/features/{kind}_thing').rglob('*_test.dart')))
+            for dart in destination.rglob('*.dart'):
+                text = dart.read_text(encoding='utf-8')
+                self.assertNotIn('package:feature_lab/', text)
+                self.assertNotIn(f'{kind}_thingController', text)
+                for imported in re.findall(r"(?:import|export|part) '([^']+)'", text):
+                    if imported.endswith(('.g.dart', '.freezed.dart')) or imported.startswith(('dart:', 'package:')):
+                        continue
+                    self.assertTrue((dart.parent / imported).is_file(), f'{dart}: {imported}')
+            before = self.snapshot()
+            with self.assertRaises(blueprint.BlueprintError):
+                self.feature(kind)
+            self.assertEqual(before, self.snapshot())
+        api = (self.app / 'lib/features/api_thing/presentation/providers/api_thing_providers.dart').read_text(encoding='utf-8')
+        self.assertIn('apiThingRepositoryProvider', api)
+        self.assertIn('_$ApiThingController', api)
+        local = (self.app / 'lib/features/local_thing/data/file_local_thing_repository_native.dart').read_text(encoding='utf-8')
+        self.assertIn('FileLocalThingRepository', local)
+        model = (self.app / 'lib/features/local_thing/presentation/models/local_thing_editor_state.dart').read_text(encoding='utf-8')
+        self.assertIn('_LocalThingEditorState', model)
+
+    def test_name_containing_template_name_is_replaced_only_once(self):
+        self.feature('api', 'catalog_search')
+        text = (self.app / 'lib/features/catalog_search/presentation/providers/catalog_search_providers.dart').read_text(encoding='utf-8')
+        self.assertIn('catalogSearchRepositoryProvider', text)
+        self.assertNotIn('catalog_searchSearch', text)
+        self.assertIn('features/catalog_search/', text)
+
+    def test_presentation_adds_only_required_dependencies(self):
+        self.feature('presentation')
+        spec = (self.app / 'pubspec.yaml').read_text(encoding='utf-8')
+        self.assertIn('flutter:\n    sdk: flutter', spec)
+        self.assertIn('flutter_test:\n    sdk: flutter', spec)
+        self.assertNotIn('riverpod', spec)
+        self.assertNotIn('koi_core', spec)
+        self.assertFalse((self.root / 'packages').exists())
+
+    def test_api_adds_generation_deps_and_registers_core_preserving_existing_constraint(self):
+        with (self.app / 'pubspec.yaml').open('a', encoding='utf-8') as target:
+            target.write('dependencies:\n  flutter_riverpod: ^3.4.0 # chosen by user\n')
+        self.feature('api')
+        spec = (self.app / 'pubspec.yaml').read_text(encoding='utf-8')
+        self.assertIn('flutter_riverpod: ^3.4.0 # chosen by user', spec)
+        self.assertIn('# 用户自己的注释', spec)
+        for key in ['riverpod_annotation', 'freezed_annotation', 'json_annotation', 'koi_core', 'riverpod_generator', 'freezed', 'json_serializable', 'build_runner']:
+            self.assertRegex(spec, rf'(?m)^  {key}:')
+        self.assertTrue((self.root / 'packages/koi_core/pubspec.yaml').is_file())
+        self.assertEqual((self.root / 'pubspec.yaml').read_text(encoding='utf-8').count('  - packages/koi_core'), 1)
+        self.feature('local')
+        self.assertEqual((self.root / 'pubspec.yaml').read_text(encoding='utf-8').count('  - packages/koi_core'), 1)
+        self.assertNotIn('koi_network', spec)
+
+    def test_registered_nested_support_is_reused_but_unregistered_collision_is_preserved(self):
+        nested = self.root / 'vendor/base'
+        write(nested / 'pubspec.yaml', 'name: koi_core\nresolution: workspace\n')
+        blueprint.add_members(self.root / 'pubspec.yaml', ['vendor/base'])
+        self.feature('local')
+        self.assertFalse((self.root / 'packages/koi_core').exists())
+        self.assertEqual((nested / 'pubspec.yaml').read_text(encoding='utf-8'), 'name: koi_core\nresolution: workspace\n')
+        # An unregistered package cannot masquerade as the actual support member.
+        root_spec = self.root / 'pubspec.yaml'
+        root_spec.write_text(root_spec.read_text(encoding='utf-8').replace('  - vendor/base\n', ''), encoding='utf-8')
+        write(self.root / 'packages/koi_core/user.txt', 'keep')
+        before = self.snapshot()
+        with self.assertRaises(blueprint.BlueprintError):
+            self.feature('api')
+        self.assertEqual(before, self.snapshot())
+
+    def test_missing_workspace_membership_fails_without_mutation(self):
+        before = self.snapshot()
+        with patch.object(blueprint, 'members', return_value=[]), self.assertRaises(blueprint.BlueprintError):
+            self.feature('api')
+        self.assertEqual(before, self.snapshot())
+
+    def test_feature_rolls_back_source_tests_support_and_exact_manifest_bytes(self):
+        (self.app / 'pubspec.yaml').write_bytes(b'name: demo\r\nresolution: workspace\r\n# keep bytes\r\n')
+        before = self.snapshot()
+        real = blueprint.atomic_bytes
+        def fail_root_write(path, content):
+            if path == self.root / 'pubspec.yaml':
+                raise OSError('disk write denied')
+            real(path, content)
+        with patch.object(blueprint, 'atomic_bytes', side_effect=fail_root_write), self.assertRaises(OSError):
+            self.feature('api')
+        self.assertEqual(before, self.snapshot())
+        self.assertFalse((self.app / 'lib').exists())
+        self.assertFalse((self.root / 'packages').exists())
+        self.assertFalse(list(self.root.glob('.feature-*')))
+
+    def test_feature_layout_is_shared_by_sources_tests_and_dry_run(self):
+        for relative, existing in [('apps/demo', None), ('modules/demo', None),
+                                   ('packages/demo', None), ('apps/demo', 'src/features'),
+                                   ('modules/demo', 'features')]:
+            with self.subTest(relative=relative, existing=existing):
+                with tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    member = root / relative
+                    write(root / 'pubspec.yaml', f'name: fixture\nworkspace:\n  - {relative}\n')
+                    write(member / 'pubspec.yaml', 'name: demo\nresolution: workspace\n')
+                    if existing:
+                        (member / 'lib' / existing).mkdir(parents=True)
+                    prefix = existing or ('features' if relative.startswith('apps/') else 'src/features')
+                    args = argparse.Namespace(path=str(member), name='inventory', kind='api', dry_run=True)
+                    before = {str(f.relative_to(root)): f.read_bytes() for f in root.rglob('*') if f.is_file()}
+                    with patch.object(blueprint, 'SDK', side_effect=AssertionError('dry-run used SDK')), patch.object(blueprint, 'run', side_effect=AssertionError('dry-run ran command')):
+                        blueprint.feature(args)
+                    self.assertEqual(before, {str(f.relative_to(root)): f.read_bytes() for f in root.rglob('*') if f.is_file()})
+                    args.dry_run = False
+                    blueprint.feature(args)
+                    self.assertTrue((member / f'lib/{prefix}/inventory/inventory.dart').is_file())
+                    tests = list((member / 'test/features/inventory').rglob('*_test.dart'))
+                    self.assertTrue(tests)
+                    for test in tests:
+                        self.assertIn('package:demo/' + prefix + '/inventory/', test.read_text(encoding='utf-8'))
+
+    def test_module_entry_identifies_example_without_registering_a_package_role(self):
+        member = self.root / 'examples/minimal_module'
+        write(member / 'pubspec.yaml', 'name: minimal_module\n')
+        write(member / 'lib/minimal_module.dart', "export 'src/module.dart';")
+        write(member / 'lib/src/module.dart', 'void module() {}')
+        self.assertEqual(blueprint.feature_layout(self.root, member)['import_prefix'], 'src/features')
+
+    def test_feature_dual_layout_conflict_preserves_all_files_before_sdk(self):
+        for dry_run in (True, False):
+            (self.app / 'lib/features').mkdir(parents=True, exist_ok=True)
+            (self.app / 'lib/src/features').mkdir(parents=True, exist_ok=True)
+            before = self.snapshot()
+            with patch.object(blueprint, 'SDK', side_effect=AssertionError('layout conflict used SDK')):
+                with self.assertRaisesRegex(blueprint.BlueprintError, 'both lib/features and lib/src/features'):
+                    self.feature('local', dry_run=dry_run)
+            self.assertEqual(before, self.snapshot())
+
+    def test_module_is_minimal_multiword_and_registers_support(self):
+        self.module()
+        module = self.root / 'modules/sales_reports'
+        text = (module / 'lib/src/module.dart').read_text(encoding='utf-8')
+        self.assertIn('createSalesReports()', text)
+        self.assertIn('SalesReportsRoute', text)
+        self.assertIn("id: 'sales_reports'", text)
+        self.assertTrue((module / 'test/sales_reports_test.dart').is_file())
+        self.assertTrue((self.root / 'packages/koi_modules/pubspec.yaml').is_file())
+        spec = (module / 'pubspec.yaml').read_text(encoding='utf-8')
+        self.assertNotIn('showcase_contracts:', spec)
+        self.assertNotIn('koi_core', spec)
+        before = self.snapshot()
+        with self.assertRaises(blueprint.BlueprintError):
+            self.module()
+        self.assertEqual(before, self.snapshot())
+
+    def test_module_name_collision_with_other_member_fails(self):
+        with self.assertRaises(blueprint.BlueprintError):
+            self.module('demo')
+        with self.assertRaises(blueprint.BlueprintError):
+            self.module('koi_modules')
+        self.assertFalse((self.root / 'modules').exists())
+
+    def test_module_rolls_back_all_new_paths_when_registration_fails(self):
+        before = self.snapshot()
+        with patch.object(blueprint, 'atomic_bytes', side_effect=OSError('manifest denied')), self.assertRaises(OSError):
+            self.module()
+        self.assertEqual(before, self.snapshot())
+        self.assertFalse((self.root / 'modules').exists())
+        self.assertFalse((self.root / 'packages').exists())
+
+    def test_dry_runs_have_no_side_effects_or_sdk_calls(self):
+        before = self.snapshot()
+        with patch.object(blueprint, 'SDK') as sdk:
+            blueprint.create(argparse.Namespace(name='renamed', org='org.example', platforms='web,android', output=str(self.root / 'new workspace'), dry_run=True))
+            self.feature('api', dry_run=True)
+            self.module(dry_run=True)
+        sdk.assert_not_called()
+        self.assertEqual(before, self.snapshot())
+
+    def test_create_refuses_nonempty_before_running_sdk(self):
+        target = self.root / 'existing'
+        write(target / 'user.txt', 'keep')
+        with patch.object(blueprint, 'SDK') as sdk, self.assertRaises(blueprint.BlueprintError):
+            blueprint.create(argparse.Namespace(name='renamed', org='org.example', platforms='web', output=str(target), dry_run=False))
+        sdk.assert_not_called()
+        self.assertEqual((target / 'user.txt').read_text(encoding='utf-8'), 'keep')
+
+    def test_member_registration_preserves_other_manifest_fields(self):
+        spec = self.root / 'pubspec.yaml'
+        blueprint.add_members(spec, ['modules/sample'])
+        blueprint.add_members(spec, ['modules/sample'])
+        self.assertEqual(spec.read_text(encoding='utf-8').count('  - modules/sample'), 1)
+        self.assertIn('dev_dependencies:\n  analyzer: 14.4.0', spec.read_text(encoding='utf-8'))
+
+    def symlink(self, link, target):
+        link.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            link.symlink_to(target, target_is_directory=target.is_dir())
+        except OSError:
+            self.skipTest('symlink privileges unavailable')
+
+    def test_symlink_escape_and_in_workspace_redirect_are_rejected(self):
+        outside = self.root / 'outside'
+        outside.mkdir()
+        self.symlink(self.app / 'lib/features', outside)
+        with self.assertRaises(blueprint.BlueprintError):
+            self.feature('api')
+        self.assertFalse(any(outside.iterdir()))
+
+    def test_symlink_manifest_module_parent_and_template_are_rejected(self):
+        outside = self.root / 'outside'
+        outside.mkdir()
+        self.symlink(self.root / 'modules', outside)
+        with self.assertRaises(blueprint.BlueprintError):
+            self.module()
+        self.assertFalse(any(outside.iterdir()))
+        template = self.root / 'template'
+        template.mkdir()
+        write(self.root / 'secret.txt', 'do not copy')
+        self.symlink(template / 'linked.txt', self.root / 'secret.txt')
+        with self.assertRaises(blueprint.BlueprintError):
+            blueprint.copy(template, self.root / 'copied')
+
+    def create_fixture(self):
+        source = self.root / 'blueprint-source'
+        write(source / 'pubspec.yaml', 'name: source_blueprint\nversion: 0.1.0\ndescription: Old blueprint\nrepository: https://old.invalid/repo\nhomepage: https://old.invalid\nissue_tracker: https://old.invalid/issues\n\nenvironment:\n  sdk: ^3.13.0\nworkspace:\n  - examples/starter_app\n  - packages/koi_core\n\ndev_dependencies:\n  analyzer: 14.4.0\n')
+        write(source / 'analysis_options.yaml', 'analyzer:\n  exclude:\n    - "**/*.g.dart"\n')
+        write(source / 'examples/starter_app/pubspec.yaml', 'name: starter_app\ndescription: Executable blueprint reference, also used by the generator\nresolution: workspace\ndev_dependencies:\n  build_runner: 2.16.1\n')
+        write(source / 'examples/starter_app/lib/main.dart', 'class StarterApp {}\n// starter_app\n')
+        write(source / 'examples/starter_app/test/main_test.dart', '// starter_app test\n')
+        write(source / 'packages/koi_core/pubspec.yaml', 'name: koi_core\nresolution: workspace\n')
+        write(source / 'packages/koi_ui/pubspec.yaml', 'name: koi_ui\nresolution: workspace\n')
+        write(source / 'examples/workbench_app/pubspec.yaml', 'name: workbench_app\nresolution: workspace\n')
+        write(source / 'examples/workbench_app/lib/main.dart', 'class WorkbenchApp {}\n// workbench_app\n// Koi 工作区\n')
+        write(source / 'examples/workbench_app/test/main_test.dart', '// workbench_app test\n')
+        for template in ('starter_app', 'workbench_app'):
+            write(source / f'examples/{template}/lib/core/capabilities/installed_capabilities.dart', '// source-only demonstration must be cleared\n')
+        fixture = source / 'examples/workbench_app/assets/sample.mp4'
+        fixture.parent.mkdir(parents=True, exist_ok=True)
+        fixture.write_bytes(b'workbench_app\x00\xff\xfe')
+        write(source / 'examples/workbench_app/assets/identity.md', 'workbench_app Koi 工作区\n')
+        write(source / 'DESIGN.md', '# Project design\n\n[Examples](docs/examples.md)\n')
+        write(source / 'docs/examples.md', '[Starter](../examples/starter_app/lib/main.dart)\n')
+        write(source / 'docs/validation/old-result.md', 'SOURCE_BLUEPRINT_PASSED_SIX_PLATFORMS\n')
+        write(source / 'docs/validation/old-result.json', '{"sourceOnly": true}\n')
+        write(source / 'docs/research/old-exploration.md', 'SOURCE_BLUEPRINT_RESEARCH\n')
+        write(source / 'CHANGELOG.md', '# Changelog\n\nSOURCE_BLUEPRINT_RELEASE_HISTORY\n')
+        write(source / 'AGENTS.md', '# Koi Flutter 蓝图 — Agent 入口\n\nRead docs/ai-quickstart.md.\n')
+        write(source / '.fvmrc', '{"flutter":"test"}')
+        return source
+
+    def fake_run(self, command, cwd, capture=False):
+        command = [str(item) for item in command]
+        cwd = Path(cwd)
+        if command[1:2] == ['create']:
+            write(Path(command[-1]) / 'lib/main.dart', 'temporary flutter skeleton')
+            write(Path(command[-1]) / 'web/runner_identity.txt', command[command.index('--project-name') + 1])
+            write(Path(command[-1]) / 'web/manifest.json', json.dumps({'name': 'original', 'short_name': 'original'}))
+            write(Path(command[-1]) / 'web/index.html', '<html><head><title>original</title></head></html>\n')
+        if command[1:3] == ['pub', 'get']:
+            write(cwd / '.dart_tool/package_config.json', json.dumps({'rootUri': cwd.as_uri()}))
+        return ''
+
+    def test_create_serializes_display_name_in_generated_pubspec(self):
+        source = self.create_fixture()
+        for input_kind in ('cli', 'config'):
+            for index, display_name in enumerate(('Koi: Pocket', '锦鲤: "Pocket" # 工作台')):
+                with self.subTest(input_kind=input_kind, display_name=display_name):
+                    name = f'display_{input_kind}_{index}'
+                    target = self.root / name
+                    arguments = ['create', name, '--org', 'org.example', '--platforms', 'web', '--output', str(target)]
+                    if input_kind == 'cli':
+                        arguments.extend(['--display-name', display_name])
+                    else:
+                        config = self.root / f'{name}.json'
+                        write(config, json.dumps({'schema': 1, 'brand': {'displayName': display_name}}))
+                        arguments.extend(['--config', str(config)])
+                    with patch.object(blueprint, 'ROOT', source):
+                        self.assertEqual(blueprint.main(arguments), 0)
+                    app = target / 'apps' / f'{name}_app'
+                    pubspec = (app / 'pubspec.yaml').read_text(encoding='utf-8')
+                    description = re.search(r'^description: (.*)$', pubspec, re.M).group(1)
+                    # JSON string syntax is a YAML subset, so parse the actual
+                    # emitted scalar without adding a Python YAML dependency.
+                    self.assertEqual(json.loads(description), f'{display_name} Flutter application')
+                    manifest = json.loads((app / 'web/manifest.json').read_text(encoding='utf-8'))
+                    self.assertEqual(manifest['name'], display_name)
+                    self.assertEqual(manifest['short_name'], display_name)
+
+    def test_create_clears_blueprint_identity_and_refreshes_config_after_move(self):
+        source = self.create_fixture()
+        source_history = (source / 'CHANGELOG.md').read_bytes()
+        source_result = (source / 'docs/validation/old-result.md').read_bytes()
+        source_research = (source / 'docs/research/old-exploration.md').read_bytes()
+        target = self.root / 'generated 中文 app'
+        args = argparse.Namespace(name='my_workspace', org='org.example', platforms='web', output=str(target), dry_run=False)
+        with patch.object(blueprint, 'ROOT', source), patch.object(blueprint, 'run', side_effect=self.fake_run) as run:
+            blueprint.create(args)
+        spec = (target / 'pubspec.yaml').read_text(encoding='utf-8')
+        self.assertIn('name: my_workspace\n', spec)
+        self.assertNotIn('old.invalid', spec)
+        self.assertNotIn('Old blueprint', spec)
+        self.assertIn('  - apps/my_workspace_app', spec)
+        self.assertIn('  - packages/koi_ui', spec)
+        self.assertNotIn('  - examples/starter_app', spec)
+        self.assertIn('analyzer: 14.4.0', spec)
+        config = json.loads((target / '.dart_tool/package_config.json').read_text(encoding='utf-8'))
+        self.assertEqual(config['rootUri'], target.as_uri())
+        self.assertEqual(run.call_args.args[1], target)
+        self.assertTrue((target / '.blueprint/reference/examples/starter_app/lib/main.dart').is_file())
+        self.assertIn('../.blueprint/reference/examples/', (target / 'docs/examples.md').read_text(encoding='utf-8'))
+        self.assertEqual(json.loads((target / 'blueprint.json').read_text(encoding='utf-8'))['platforms'], ['web'])
+        self.assertEqual(json.loads((target / 'apps/my_workspace_app/web/manifest.json').read_text(encoding='utf-8'))['name'], 'My Workspace')
+        self.assertFalse((target / 'docs/validation').exists())
+        self.assertFalse((target / 'docs/research').exists())
+        self.assertNotIn('SOURCE_BLUEPRINT_RELEASE_HISTORY', (target / 'CHANGELOG.md').read_text(encoding='utf-8'))
+        self.assertIn('Initialize my_workspace', (target / 'CHANGELOG.md').read_text(encoding='utf-8'))
+        self.assertIn('Python 3.11+', (target / 'README.md').read_text(encoding='utf-8'))
+        self.assertTrue((target / 'AGENTS.md').read_text(encoding='utf-8').startswith('# MyWorkspace — Agent 入口'))
+        self.assertEqual((source / 'CHANGELOG.md').read_bytes(), source_history)
+        self.assertEqual((source / 'docs/validation/old-result.md').read_bytes(), source_result)
+        self.assertEqual((source / 'docs/research/old-exploration.md').read_bytes(), source_research)
+        self.assertFalse(list(self.root.glob('.blueprint-*')))
+
+        descendant = self.root / 'second generation'
+        with patch.object(blueprint, 'ROOT', target), patch.object(blueprint, 'run', side_effect=self.fake_run):
+            blueprint.create(argparse.Namespace(name='second_workspace', org='org.example', platforms='web', output=str(descendant), dry_run=False))
+        self.assertFalse((descendant / 'docs/validation').exists())
+        self.assertFalse((descendant / 'docs/research').exists())
+        self.assertIn('Initialize second_workspace', (descendant / 'CHANGELOG.md').read_text(encoding='utf-8'))
+        self.assertNotIn('my_workspace', (descendant / 'CHANGELOG.md').read_text(encoding='utf-8'))
+
+    def test_templates_recursive_combinations_and_asset_identity(self):
+        source = self.create_fixture()
+        for parent_template in ('minimal', 'workbench'):
+            parent = self.root / f'parent_{parent_template}'
+            args = argparse.Namespace(name=f'{parent_template}_workbench_app', org='org.example', platforms='web', output=str(parent), dry_run=False, template=parent_template)
+            with patch.object(blueprint, 'ROOT', source):
+                blueprint.create(args)
+            self.assertEqual((parent / f'apps/{args.name}_app/web/runner_identity.txt').read_text(encoding='utf-8'), f'{args.name}_app')
+            self.assertTrue((parent / 'packages/koi_ui/pubspec.yaml').exists())
+            self.assertEqual((parent / 'DESIGN.md').read_bytes(), (source / 'DESIGN.md').read_bytes())
+            self.assertIn('[DESIGN.md](DESIGN.md)', (parent / 'README.md').read_text(encoding='utf-8'))
+            # Product-specific edits must survive all recursive template pairs.
+            design = (parent / 'DESIGN.md').read_text(encoding='utf-8') + 'Product typography decision 中文\n'
+            (parent / 'DESIGN.md').write_text(design, encoding='utf-8')
+            self.assertEqual(json.loads((parent / 'blueprint.json').read_text(encoding='utf-8'))['template'], parent_template)
+            if parent_template == 'workbench':
+                self.assertEqual((parent / f'apps/{args.name}_app/assets/sample.mp4').read_bytes(), b'workbench_app\x00\xff\xfe')
+                self.assertEqual((parent / f'apps/{args.name}_app/assets/identity.md').read_text(encoding='utf-8'), 'workbench_app Koi 工作区\n')
+                self.assertIn(blueprint.pascal(args.name) + ' 工作区', (parent / f'apps/{args.name}_app/lib/main.dart').read_text(encoding='utf-8'))
+            for child_template in ('minimal', 'workbench'):
+                child = self.root / f'{parent_template}_to_{child_template}'
+                with patch.object(blueprint, 'ROOT', parent):
+                    blueprint.create(argparse.Namespace(name='child', org='org.example', platforms='web', output=str(child), dry_run=False, template=child_template))
+                self.assertEqual(json.loads((child / 'blueprint.json').read_text(encoding='utf-8'))['template'], child_template)
+                self.assertTrue((child / 'packages/koi_ui/pubspec.yaml').exists())
+                self.assertEqual((child / 'DESIGN.md').read_text(encoding='utf-8'), design)
+                self.assertIn('[DESIGN.md](DESIGN.md)', (child / 'README.md').read_text(encoding='utf-8'))
+
+    def test_invalid_template_and_required_ui_name_fail_before_sdk(self):
+        for name, template in (('koi_ui', 'minimal'), ('valid', 'missing')):
+            with patch.object(blueprint, 'SDK') as sdk, self.assertRaises(blueprint.BlueprintError):
+                blueprint.create(argparse.Namespace(name=name, org='org.example', platforms='web', output=str(self.root / 'new'), dry_run=False, template=template))
+            sdk.assert_not_called()
+
+    def test_missing_template_input_fails_without_output(self):
+        source = self.create_fixture()
+        shutil_target = source / 'examples/workbench_app/test/main_test.dart'
+        shutil_target.unlink()
+        shutil_target.parent.rmdir()
+        target = self.root / 'new'
+        with patch.object(blueprint, 'ROOT', source), patch.object(blueprint, 'SDK') as sdk, self.assertRaises(blueprint.BlueprintError):
+            blueprint.create(argparse.Namespace(name='valid', org='org.example', platforms='web', output=str(target), dry_run=False, template='workbench'))
+        sdk.assert_not_called()
+        self.assertFalse(target.exists())
+
+    def test_unsupported_python_fails_before_sdk_or_filesystem_changes(self):
+        target = self.root / 'never-created'
+        before = self.snapshot()
+        error = io.StringIO()
+        with patch.object(blueprint.sys, 'version_info', (3, 10, 9)), \
+             patch.object(blueprint, 'SDK') as sdk, contextlib.redirect_stderr(error):
+            status = blueprint.main(['create', 'older_python', '--org', 'org.example', '--output', str(target)])
+        self.assertEqual(status, 2)
+        self.assertIn('Python 3.11 or newer', error.getvalue())
+        sdk.assert_not_called()
+        self.assertEqual(before, self.snapshot())
+        self.assertFalse(target.exists())
+
+    def test_sdk_precedence_and_dart_share_one_flutter_installation(self):
+        sdk_root = self.root / 'sdk-choice'
+        write(sdk_root / '.fvmrc', '{"flutter":"3.47.2"}')
+        suffix = '.bat' if os.name == 'nt' else ''
+        environment_flutter = self.root / 'env-sdk/bin' / ('flutter' + suffix)
+        project_flutter = sdk_root / '.fvm/flutter_sdk/bin' / ('flutter' + suffix)
+        path_flutter = self.root / 'path-sdk/bin' / ('flutter' + suffix)
+        for path in (environment_flutter, project_flutter, path_flutter):
+            write(path, '')
+        for selected, expected in ((str(environment_flutter), environment_flutter),
+                                   (None, project_flutter)):
+            variables = {'PATH': 'original'}
+            if selected:
+                variables['FLUTTER_BIN'] = selected
+            with patch.dict(os.environ, variables, clear=True), \
+                 patch.object(blueprint, 'SDK', REAL_SDK), \
+                 patch.object(blueprint.shutil, 'which', return_value=str(path_flutter)), \
+                 patch.object(blueprint, 'run', return_value='{"frameworkVersion":"3.47.2"}') as run:
+                sdk = blueprint.SDK(sdk_root)
+                self.assertEqual(sdk.flutter, expected.resolve())
+                self.assertEqual(sdk.dart, expected.parent / ('dart' + suffix))
+                self.assertEqual(run.call_args.args[0][0], expected.resolve())
+                self.assertEqual(os.environ['PATH'].split(os.pathsep)[0], str(expected.parent))
+
+    def test_create_final_resolution_failure_restores_original_empty_output(self):
+        source = self.create_fixture()
+        target = self.root / 'empty destination'
+        target.mkdir()
+        args = argparse.Namespace(name='renamed', org='org.example', platforms='web', output=str(target), dry_run=False)
+        def fail_final(command, cwd, capture=False):
+            if Path(cwd) == target:
+                raise blueprint.BlueprintError('final pub get failed')
+            return self.fake_run(command, cwd, capture)
+        with patch.object(blueprint, 'ROOT', source), patch.object(blueprint, 'run', side_effect=fail_final), self.assertRaises(blueprint.BlueprintError):
+            blueprint.create(args)
+        self.assertTrue(target.is_dir())
+        self.assertEqual(list(target.iterdir()), [])
+        self.assertFalse(list(self.root.glob('.blueprint-*')))
+
+    def test_create_stage_failure_never_exposes_output(self):
+        source = self.create_fixture()
+        target = self.root / 'new destination'
+        args = argparse.Namespace(name='renamed', org='org.example', platforms='web', output=str(target), dry_run=False)
+        with patch.object(blueprint, 'ROOT', source), patch.object(blueprint, 'run', side_effect=blueprint.BlueprintError('flutter create failed')), self.assertRaises(blueprint.BlueprintError):
+            blueprint.create(args)
+        self.assertFalse(target.exists())
+        self.assertFalse(list(self.root.glob('.blueprint-*')))
+
+    def test_subprocess_capture_decodes_utf8_explicitly(self):
+        with patch.object(blueprint.subprocess, 'run', return_value=subprocess.CompletedProcess([], 0, stdout='中文', stderr='')) as run:
+            self.assertEqual(REAL_RUN(['tool'], self.root, capture=True), '中文')
+        self.assertEqual(run.call_args.kwargs['encoding'], 'utf-8')
+
+
+if __name__ == '__main__':
+    unittest.main()

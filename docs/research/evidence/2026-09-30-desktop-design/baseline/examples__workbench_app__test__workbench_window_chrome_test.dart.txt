@@ -1,0 +1,228 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/core/window/workbench_window_chrome.dart';
+
+const _channel = MethodChannel('koi/workbench_window');
+const _content = ValueKey('window-content');
+
+Widget _host(
+  Brightness brightness, {
+  double safeTop = 0,
+  bool canGoBack = false,
+  bool canGoForward = false,
+  VoidCallback? onBack,
+  VoidCallback? onForward,
+  VoidCallback? onSave,
+}) => MaterialApp(
+  theme: AppTheme.build(brightness: brightness),
+  themeAnimationDuration: Duration.zero,
+  builder: (context, child) => MediaQuery(
+    data: MediaQuery.of(context)
+        .copyWith(padding: EdgeInsets.only(top: safeTop)),
+    child: child!,
+  ),
+  home: WorkbenchWindowChrome(
+    canGoBack: canGoBack,
+    canGoForward: canGoForward,
+    onBack: onBack,
+    onForward: onForward,
+    onSave: onSave,
+    child: const ColoredBox(key: _content, color: Colors.green),
+  ),
+);
+
+void main() {
+  final binding = TestWidgetsFlutterBinding.ensureInitialized();
+  tearDown(() {
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, null);
+  });
+
+  testWidgets('native theme and safe inset follow the rendered app theme', (
+    tester,
+  ) async {
+    final calls = <MethodCall>[];
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, (
+      call,
+    ) async {
+      calls.add(call);
+      return 28.0;
+    });
+    await tester.pumpWidget(_host(Brightness.light));
+    await tester.pumpAndSettle();
+    expect(calls.single.method, 'applyChrome');
+    expect(calls.single.arguments, {
+      'color': AppTheme.light
+          .extension<KoiThemeTokens>()!
+          .chromeBackground
+          .toARGB32(),
+      'dark': false,
+      'title': 'Koi 工作区',
+    });
+    expect(tester.getTopLeft(find.byKey(_content)).dy, 28);
+    await tester.pumpWidget(_host(Brightness.light, safeTop: 28));
+    await tester.pumpAndSettle();
+    expect(calls, hasLength(1));
+    expect(tester.getTopLeft(find.byKey(_content)).dy, 0);
+    await tester.pumpWidget(_host(Brightness.dark));
+    await tester.pumpAndSettle();
+    expect(calls.last.arguments, {
+      'color': AppTheme.dark
+          .extension<KoiThemeTokens>()!
+          .chromeBackground
+          .toARGB32(),
+      'dark': true,
+      'title': 'Koi 工作区',
+    });
+    expect(tester.takeException(), isNull);
+  }, variant: const TargetPlatformVariant({TargetPlatform.macOS}));
+
+  testWidgets(
+    'late chrome replies cannot change current insets or disposed UI',
+    (tester) async {
+      final replies = <Completer<double>>[];
+      binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, (_) {
+        final reply = Completer<double>();
+        replies.add(reply);
+        return reply.future;
+      });
+      await tester.pumpWidget(_host(Brightness.light));
+      await tester.pump();
+      await tester.pumpWidget(_host(Brightness.dark));
+      await tester.pump();
+      expect(replies, hasLength(2));
+      replies.last.complete(28);
+      await tester.pumpAndSettle();
+      replies.first.complete(80);
+      await tester.pumpAndSettle();
+      expect(tester.getTopLeft(find.byKey(_content)).dy, 28);
+      await tester.pumpWidget(_host(Brightness.light));
+      await tester.pump();
+      await tester.pumpWidget(const SizedBox());
+      replies.last.complete(40);
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull);
+    },
+    variant: const TargetPlatformVariant({TargetPlatform.macOS}),
+  );
+
+  testWidgets('missing or failed chrome leaves app content usable', (
+    tester,
+  ) async {
+    await tester.pumpWidget(_host(Brightness.light));
+    await tester.pumpAndSettle();
+    expect(find.byKey(_content), findsOneWidget);
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, (
+      _,
+    ) async {
+      throw PlatformException(code: 'WINDOW_CLOSED');
+    });
+    await tester.pumpWidget(_host(Brightness.dark));
+    await tester.pumpAndSettle();
+    expect(find.byKey(_content), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  }, variant: const TargetPlatformVariant({TargetPlatform.macOS}));
+
+  testWidgets(
+    'native toolbar syncs availability and dispatches enabled commands',
+    (tester) async {
+      final calls = <MethodCall>[];
+      binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, (
+        call,
+      ) async {
+        calls.add(call);
+        if (call.method == 'applyChrome') {
+          return {'titlebarHeight': 44.0, 'nativeToolbar': true};
+        }
+        return null;
+      });
+      Future<Object?> command(String method) async {
+        const codec = StandardMethodCodec();
+        final reply = Completer<ByteData?>();
+        binding.channelBuffers.push(
+          _channel.name,
+          codec.encodeMethodCall(MethodCall(method)),
+          reply.complete,
+        );
+        return codec.decodeEnvelope((await reply.future)!);
+      }
+
+      var back = 0;
+      var forward = 0;
+      var saves = 0;
+      await tester.pumpWidget(
+        _host(
+          Brightness.light,
+          canGoBack: true,
+          onBack: () => back++,
+          onForward: () => forward++,
+          onSave: () => saves++,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(
+        WorkbenchWindowInfo.nativeToolbarOf(
+          tester.element(find.byKey(_content)),
+        ),
+        isTrue,
+      );
+      expect(calls.last.method, 'updateNavigation');
+      expect(calls.last.arguments, {'canGoBack': true, 'canGoForward': false});
+      await command('navigateBack');
+      await command('navigateForward');
+      await command('saveWorkspace');
+      expect((back, forward, saves), (1, 0, 1));
+      await tester.pumpWidget(
+        _host(
+          Brightness.light,
+          canGoForward: true,
+          onBack: () => back++,
+          onForward: () => forward++,
+        ),
+      );
+      await tester.pumpAndSettle();
+      expect(calls.last.arguments, {'canGoBack': false, 'canGoForward': true});
+      await command('navigateBack');
+      await command('navigateForward');
+      expect((back, forward), (1, 1));
+      await tester.pumpWidget(const SizedBox());
+      final before = calls.length;
+      await tester.pump();
+      expect(calls, hasLength(before));
+      expect(tester.takeException(), isNull);
+    },
+    variant: const TargetPlatformVariant({TargetPlatform.macOS}),
+  );
+
+  testWidgets('native toolbar errors leave the session usable', (tester) async {
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, (
+      call,
+    ) async {
+      if (call.method == 'applyChrome') {
+        return {'titlebarHeight': 44.0, 'nativeToolbar': true};
+      }
+      throw PlatformException(code: 'WINDOW_CLOSED');
+    });
+    await tester.pumpWidget(_host(Brightness.light));
+    await tester.pumpAndSettle();
+    expect(find.byKey(_content), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  }, variant: const TargetPlatformVariant({TargetPlatform.macOS}));
+
+  testWidgets('non macOS hosts never request native chrome', (tester) async {
+    var calls = 0;
+    binding.defaultBinaryMessenger.setMockMethodCallHandler(_channel, (
+      _,
+    ) async {
+      calls++;
+      return 28.0;
+    });
+    await tester.pumpWidget(_host(Brightness.light));
+    await tester.pumpAndSettle();
+    expect(calls, 0);
+    expect(tester.getTopLeft(find.byKey(_content)).dy, 0);
+  }, variant: const TargetPlatformVariant({TargetPlatform.linux}));
+}

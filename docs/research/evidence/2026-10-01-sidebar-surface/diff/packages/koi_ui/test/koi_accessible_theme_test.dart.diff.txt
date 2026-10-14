@@ -1,0 +1,26 @@
+--- before/packages/koi_ui/test/koi_accessible_theme_test.dart
++++ after/packages/koi_ui/test/koi_accessible_theme_test.dart
+@@ -13,6 +13,7 @@
+       for (final color in [
+         tokens.chromeBackground,
+         tokens.contentBackground,
++        tokens.panelBackground,
+         tokens.overlayBackground,
+         tokens.selectedBackground,
+         tokens.hoverBackground,
+@@ -22,6 +23,7 @@
+         expect((rgb >> 16) & 255, (rgb >> 8) & 255);
+         expect((rgb >> 8) & 255, rgb & 255);
+       }
++      expect(tokens.panelBackground, isNot(tokens.contentBackground));
+       expect(
+         theme.navigationRailTheme.selectedIconTheme!.color,
+         theme.colorScheme.onSurface,
+@@ -60,6 +62,7 @@
+         final surfaces = <String, Color>{
+           'chrome': tokens.chromeBackground,
+           'content': tokens.contentBackground,
++          'sidebar and inspector': tokens.panelBackground,
+           'input': colors.surfaceContainerLow,
+           'overlay': tokens.overlayBackground,
+           'selected': tokens.selectedBackground,

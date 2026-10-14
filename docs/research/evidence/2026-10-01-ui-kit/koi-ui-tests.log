@@ -1,0 +1,77 @@
+Resolving dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:02 +12: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:02 +13: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:02 +14: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:02 +15: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:02 +16: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:02 +17: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:02 +18: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: menu executes enabled item once and closes
+00:02 +19: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +20: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +21: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +22: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +23: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +24: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +25: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +26: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +27: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +28: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +29: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +30: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +31: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:03 +32: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:03 +33: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:03 +34: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:04 +35: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:04 +36: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:04 +37: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:04 +38: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:04 +39: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:04 +40: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:04 +41: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:04 +42: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:04 +43: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:05 +44: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:05 +45: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:05 +46: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:05 +47: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:05 +48: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:05 +49: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:05 +50: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 1440.0 at 200% keeps external editor state
+00:05 +51: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: popover content stays above keyboard and is scrollable
+00:06 +52: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: popover content stays above keyboard and is scrollable
+00:06 +53: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: short rail scrolls destinations while settings remain fixed
+00:06 +54: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: late popover close is safe after closing or removing its owner
+00:06 +55: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: trailing pane drag and arrows follow divider direction
+00:06 +56: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: system Back closes the popover before leaving its page
+00:06 +57: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: resize preserves external editor across layout branches
+00:06 +58: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: resize preserves external editor across layout branches
+00:06 +59: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: menu trigger exposes one label and expanded state
+00:06 +60: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: menu trigger exposes one label and expanded state
+00:06 +61: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: section wraps actions and long Chinese in narrow host
+00:06 +62: All tests passed!

@@ -1,0 +1,86 @@
+--- before/examples/workbench_app/lib/app.dart
++++ after/examples/workbench_app/lib/app.dart
+@@ -7,6 +7,7 @@
+ import 'package:workbench_app/core/window/workbench_window_chrome.dart';
+ import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+ import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
++import 'package:workbench_app/features/workspace/presentation/providers/navigation_providers.dart';
+ 
+ class WorkbenchApp extends StatefulWidget {
+   const WorkbenchApp({super.key, required this.bootstrap});
+@@ -82,7 +83,7 @@
+       routerConfig: bootstrap.router,
+       builder: (context, child) => ListenableBuilder(
+         listenable: bootstrap.history,
+-        builder: (context, content) => WorkbenchWindowChrome(
++        builder: (context, content) => _WindowChrome(
+           panels: panels,
+           canGoBack: bootstrap.history.canGoBack,
+           canGoForward: bootstrap.history.canGoForward,
+@@ -108,3 +109,66 @@
+     );
+   }
+ }
++
++/// Selecting only the visible title avoids rebuilding app themes for IO progress.
++class _WindowChrome extends ConsumerWidget {
++  const _WindowChrome({
++    required this.panels,
++    required this.canGoBack,
++    required this.canGoForward,
++    required this.onBack,
++    required this.onForward,
++    required this.onSave,
++    required this.child,
++  });
++  final KoiWorkbenchController panels;
++  final bool canGoBack;
++  final bool canGoForward;
++  final VoidCallback onBack;
++  final VoidCallback onForward;
++  final VoidCallback onSave;
++  final Widget child;
++
++  @override
++  Widget build(BuildContext context, WidgetRef ref) {
++    final history = ref.watch(navigationHistoryProvider);
++    final session = ref.watch(workspaceSessionProvider);
++    final path = history.current?.location.path ?? '/text';
++    String titleOf(WorkspaceSnapshot snapshot) => switch (path) {
++      '/text' =>
++        snapshot.documents
++                .where(
++                  (document) =>
++                      document.id == snapshot.preferences.selectedDocumentId,
++                )
++                .firstOrNull
++                ?.title ??
++            snapshot.documents.firstOrNull?.title ??
++            '文本资料',
++      '/media' =>
++        snapshot.assets
++                .where(
++                  (asset) => asset.id == snapshot.preferences.selectedAssetId,
++                )
++                .firstOrNull
++                ?.name ??
++            '媒体素材',
++      _ => '任务',
++    };
++    final title = ref.watch(
++      workspaceStateProvider.select(
++        (value) => titleOf(value.value?.snapshot ?? session.state.snapshot),
++      ),
++    );
++    return WorkbenchWindowChrome(
++      title: title,
++      panels: panels,
++      canGoBack: canGoBack,
++      canGoForward: canGoForward,
++      onBack: onBack,
++      onForward: onForward,
++      onSave: onSave,
++      child: child,
++    );
++  }
++}

@@ -1,0 +1,243 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:koi_ui/koi_ui.dart';
+import 'package:workbench_app/core/window/workbench_window_chrome.dart';
+import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/navigation_providers.dart';
+import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
+import 'package:workbench_app/features/workspace/presentation/widgets/workspace_panels.dart';
+
+class SaveWorkspaceIntent extends Intent {
+  const SaveWorkspaceIntent();
+}
+
+class OpenWorkspaceIntent extends Intent {
+  const OpenWorkspaceIntent();
+}
+
+class BackWorkspaceIntent extends Intent {
+  const BackWorkspaceIntent();
+}
+
+class ForwardWorkspaceIntent extends Intent {
+  const ForwardWorkspaceIntent();
+}
+
+class WorkspaceShell extends ConsumerWidget {
+  const WorkspaceShell({super.key, required this.navigationShell});
+  final StatefulNavigationShell navigationShell;
+  static const _ids = ['text', 'media', 'tasks'];
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final session = ref.watch(workspaceSessionProvider);
+    final history = ref.watch(navigationHistoryProvider);
+    final nativeToolbar = WorkbenchWindowInfo.nativeToolbarOf(context);
+    final state = ref.watch(
+      workspaceStateProvider.select(
+        (value) => (
+          saving: value.value?.saving ?? session.state.saving,
+          error: value.value?.error ?? session.state.error,
+          initialized: value.value?.initialized ?? session.state.initialized,
+          density:
+              value.value?.snapshot.preferences.density ??
+              session.state.snapshot.preferences.density,
+          sidebarWidth:
+              value.value?.snapshot.preferences.sidebarWidth ??
+              session.state.snapshot.preferences.sidebarWidth,
+          detailsWidth:
+              value.value?.snapshot.preferences.detailsWidth ??
+              session.state.snapshot.preferences.detailsWidth,
+        ),
+      ),
+    );
+    WorkspacePreferences preferences() => session.state.snapshot.preferences;
+    return Shortcuts(
+      shortcuts: {
+        const SingleActivator(LogicalKeyboardKey.bracketLeft, meta: true):
+            const BackWorkspaceIntent(),
+        const SingleActivator(LogicalKeyboardKey.bracketRight, meta: true):
+            const ForwardWorkspaceIntent(),
+        if (defaultTargetPlatform != TargetPlatform.macOS) ...{
+          const SingleActivator(LogicalKeyboardKey.arrowLeft, alt: true):
+              const BackWorkspaceIntent(),
+          const SingleActivator(LogicalKeyboardKey.arrowRight, alt: true):
+              const ForwardWorkspaceIntent(),
+        },
+        const SingleActivator(LogicalKeyboardKey.keyS, control: true):
+            const SaveWorkspaceIntent(),
+        const SingleActivator(LogicalKeyboardKey.keyS, meta: true):
+            const SaveWorkspaceIntent(),
+        const SingleActivator(LogicalKeyboardKey.keyO, control: true):
+            const OpenWorkspaceIntent(),
+        const SingleActivator(LogicalKeyboardKey.keyO, meta: true):
+            const OpenWorkspaceIntent(),
+      },
+      child: Actions(
+        actions: {
+          BackWorkspaceIntent: CallbackAction<BackWorkspaceIntent>(
+            onInvoke: (_) {
+              history.goBack();
+              return null;
+            },
+          ),
+          ForwardWorkspaceIntent: CallbackAction<ForwardWorkspaceIntent>(
+            onInvoke: (_) {
+              history.goForward();
+              return null;
+            },
+          ),
+          OpenWorkspaceIntent: CallbackAction<OpenWorkspaceIntent>(
+            onInvoke: (_) {
+              if (navigationShell.currentIndex < 2) {
+                unawaited(
+                  session.importFiles(
+                    navigationShell.currentIndex == 0
+                        ? ImportKind.text
+                        : ImportKind.media,
+                  ),
+                );
+              }
+              return null;
+            },
+          ),
+          SaveWorkspaceIntent: CallbackAction<SaveWorkspaceIntent>(
+            onInvoke: (_) {
+              unawaited(session.save());
+              return null;
+            },
+          ),
+        },
+        child: KoiWorkbenchFrame(
+          sidebar: WorkspaceSidebar(index: navigationShell.currentIndex),
+          detail: WorkspaceDetails(index: navigationShell.currentIndex),
+          sidebarWidth: state.sidebarWidth,
+          detailWidth: state.detailsWidth,
+          onSidebarWidthChanged: (width) => session.updatePreferences(
+            preferences().copyWith(sidebarWidth: width),
+          ),
+          onDetailWidthChanged: (width) => session.updatePreferences(
+            preferences().copyWith(detailsWidth: width),
+          ),
+          showHeader: !nativeToolbar,
+          title: nativeToolbar ? null : const Text('Koi 工作区'),
+          headerLeading: nativeToolbar
+              ? null
+              : ListenableBuilder(
+                  listenable: history,
+                  builder: (context, _) => KoiNavigationHistoryControls(
+                    onBack: history.canGoBack ? history.goBack : null,
+                    onForward: history.canGoForward ? history.goForward : null,
+                  ),
+                ),
+          destinations: const [
+            KoiNavigationDestination(
+              id: 'text',
+              label: '文本资料',
+              icon: Icons.description_outlined,
+            ),
+            KoiNavigationDestination(
+              id: 'media',
+              label: '媒体素材',
+              icon: Icons.perm_media_outlined,
+            ),
+            KoiNavigationDestination(
+              id: 'tasks',
+              label: '任务',
+              icon: Icons.task_alt_outlined,
+            ),
+          ],
+          selectedId: _ids[navigationShell.currentIndex],
+          onDestinationSelected: (id) {
+            session.updatePreferences(preferences().copyWith(navId: id));
+            navigationShell.goBranch(_ids.indexOf(id));
+          },
+          navigationTrailing: Tooltip(
+            message: '设置',
+            child: KoiMenu(
+              key: const ValueKey('workspace-settings'),
+              label: '设置',
+              items: [
+                KoiMenuItem(
+                  label: '跟随系统主题',
+                  onSelected: () => session.updatePreferences(
+                    preferences().copyWith(
+                      themeMode: WorkspaceThemeMode.system,
+                    ),
+                  ),
+                ),
+                KoiMenuItem(
+                  label: '明亮主题',
+                  onSelected: () => session.updatePreferences(
+                    preferences().copyWith(themeMode: WorkspaceThemeMode.light),
+                  ),
+                ),
+                KoiMenuItem(
+                  label: '深色主题',
+                  onSelected: () => session.updatePreferences(
+                    preferences().copyWith(themeMode: WorkspaceThemeMode.dark),
+                  ),
+                ),
+                KoiMenuItem(
+                  label: state.density == WorkspaceDensity.compact
+                      ? '舒适密度'
+                      : '紧凑密度',
+                  onSelected: () => session.updatePreferences(
+                    preferences().copyWith(
+                      density: state.density == WorkspaceDensity.compact
+                          ? WorkspaceDensity.comfortable
+                          : WorkspaceDensity.compact,
+                    ),
+                  ),
+                ),
+              ],
+              child: const Icon(Icons.settings_outlined),
+            ),
+          ),
+          actions: [
+            if (state.saving && !nativeToolbar)
+              const SizedBox(
+                width: 18,
+                height: 18,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              ),
+            if (!nativeToolbar)
+              IconButton(
+                tooltip: '保存工作区 (⌘/Ctrl+S)',
+                icon: const Icon(Icons.save_outlined),
+                onPressed: () => unawaited(session.save()),
+              ),
+          ],
+          body: Column(
+            children: [
+              if (state.error != null)
+                MaterialBanner(
+                  content: Text(state.error!),
+                  actions: [
+                    TextButton(
+                      onPressed: () => unawaited(
+                        state.initialized
+                            ? session.save()
+                            : session.initialize(),
+                      ),
+                      child: const Text('重试'),
+                    ),
+                  ],
+                ),
+              Expanded(
+                child: !state.initialized
+                    ? const KoiLoadingState(message: '正在恢复工作区…')
+                    : navigationShell,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

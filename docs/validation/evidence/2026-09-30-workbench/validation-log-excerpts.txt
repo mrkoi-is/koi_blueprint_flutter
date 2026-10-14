@@ -1,0 +1,105 @@
+LOG: /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-validation-complete-bsc3qkei/validate.log
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
+00:02 +35: All tests passed!
+00:00 +24: All tests passed!
+00:00 +4: All tests passed!
+00:00 +8: All tests passed!
+00:00 +3: All tests passed!
+00:01 +20: All tests passed!
+00:00 +15: All tests passed!
+00:00 +1: All tests passed!
+00:02 +3: All tests passed!
+00:04 +57: All tests passed!
+00:00 +3: All tests passed!
+00:01 +14: All tests passed!
+00:01 +12: All tests passed!
+00:00 +2: All tests passed!
+00:00 +3: All tests passed!
+00:00 +3: All tests passed!
+Ran 28 tests in 0.558s
+Ran 22 tests in 0.097s
+74 architecture tests passed.
+00:02 +8: All tests passed!
+00:08 +35: All tests passed!
+00:00 +24: All tests passed!
+00:00 +4: All tests passed!
+00:00 +8: All tests passed!
+00:00 +3: All tests passed!
+00:03 +20: All tests passed!
+00:00 +15: All tests passed!
+00:01 +1: All tests passed!
+00:04 +3: All tests passed!
+00:12 +58: All tests passed!
+00:01 +3: All tests passed!
+00:06 +14: All tests passed!
+00:06 +12: All tests passed!
+00:00 +2: All tests passed!
+00:01 +3: All tests passed!
+00:01 +3: All tests passed!
+Handwritten Dart coverage: 86.32% (3143/3641), minimum 80%
+Validation passed; platform builds are separate and must run on their matching hosts.
+LOG: /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-complete-3bxtok6b/generator-smoke.log
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/blueprint.py create renamed_project --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文 --org io.blueprint.smoke --platforms web
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py create second_project --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/second generation --org io.blueprint.smoke --platforms web
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py create template_descendant --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/minimal-to-workbench --org io.blueprint.smoke --template workbench --platforms web
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/blueprint.py create renamed_workbench --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/workbench parent --org io.blueprint.smoke --template workbench --platforms web
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/workbench parent/blueprint.py validate --workspace /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/workbench parent
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
+00:09 +58: All tests passed!
+00:00 +8: All tests passed!
+00:03 +20: All tests passed!
+Ran 28 tests in 1.301s
+Ran 22 tests in 0.214s
+74 architecture tests passed.
+00:02 +8: All tests passed!
+00:13 +58: All tests passed!
+00:00 +8: All tests passed!
+00:03 +20: All tests passed!
+Handwritten Dart coverage: 82.86% (1944/2346), minimum 80%
+Validation passed; platform builds are separate and must run on their matching hosts.
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/workbench parent/blueprint.py create template_descendant --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/workbench-to-minimal --org io.blueprint.smoke --template minimal --platforms web
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/workbench parent/blueprint.py create template_descendant --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/workbench-to-workbench --org io.blueprint.smoke --template workbench --platforms web
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py feature /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/apps/renamed_project_app new_api --kind api
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py feature /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/apps/renamed_project_app local_draft --kind local
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py feature /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/apps/renamed_project_app welcome_panel --kind presentation
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py module warehouse_ops --workspace /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py feature /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/modules/warehouse_ops inventory --kind api
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文/blueprint.py validate --workspace /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-generator-smoke-5056atyd/renamed workspace 中文
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
+00:04 +15: All tests passed!
+00:00 +8: All tests passed!
+00:03 +20: All tests passed!
+00:00 +15: All tests passed!
+00:02 +11: All tests passed!
+Ran 28 tests in 1.100s
+Ran 22 tests in 0.161s
+74 architecture tests passed.
+00:04 +15: All tests passed!
+00:01 +8: All tests passed!
+00:03 +20: All tests passed!
+00:00 +15: All tests passed!
+00:02 +11: All tests passed!
+Handwritten Dart coverage: 96.97% (768/792), minimum 80%
+Validation passed; platform builds are separate and must run on their matching hosts.
+Generator smoke passed: both templates, four recursive combinations, three features, module and module API feature.
+LOG: /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-final-recursive-source-auzyd__b/recursive-minimal-workbench.log
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/blueprint.py create final_minimal --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-final-recursive-source-auzyd__b/minimal parent --org io.blueprint.final --platforms web
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-final-recursive-source-auzyd__b/minimal parent/blueprint.py create final_workbench --output /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-final-recursive-source-auzyd__b/workbench child --org io.blueprint.final --platforms web --template workbench
++ /opt/homebrew/opt/python@3.14/bin/python3.14 /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-final-recursive-source-auzyd__b/workbench child/blueprint.py validate --workspace /var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-final-recursive-source-auzyd__b/workbench child
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
+00:06 +58: All tests passed!
+00:00 +8: All tests passed!
+00:02 +20: All tests passed!
+Ran 28 tests in 0.739s
+Ran 22 tests in 0.113s
+74 architecture tests passed.
+00:01 +8: All tests passed!
+00:09 +58: All tests passed!
+00:00 +8: All tests passed!
+00:02 +20: All tests passed!
+Handwritten Dart coverage: 82.86% (1944/2346), minimum 80%
+Validation passed; platform builds are separate and must run on their matching hosts.

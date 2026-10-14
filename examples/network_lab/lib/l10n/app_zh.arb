@@ -1,0 +1,138 @@
+{
+  "@@locale": "zh",
+  "networkTitle": "网络",
+  "networkLabTitle": "网络实验室",
+  "networkRetry": "重试",
+  "networkEndpointRequired": "请在下方输入 HTTP(S) 服务地址，或通过 --dart-define 提供 NETWORK_LAB_URL。",
+  "networkStartupFailed": "网络启动失败：{error}",
+  "@networkStartupFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkSearchLabel": "搜索（300 ms 防抖）",
+  "networkReachability": "连通性：{status}，实际请求单独处理结果",
+  "@networkReachability": {
+    "placeholders": {
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "networkReachabilityState": "{state, select, reachable{可连接} unreachable{无法连接} other{未知}}",
+  "@networkReachabilityState": {
+    "placeholders": {
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "networkEnterQuery": "输入关键字连接测试服务",
+  "networkSearching": "正在搜索…",
+  "networkNoResults": "没有结果",
+  "networkRequestFailed": "请求失败，可重试",
+  "networkErrorDetails": "请求错误：{error}",
+  "@networkErrorDetails": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkRefresh": "刷新",
+  "networkLoadMore": "加载更多",
+  "networkClearQueryCache": "清理查询缓存",
+  "networkTransferPhase": "{phase, select, idle{空闲} downloading{下载中} cancelling{正在取消} cancelled{已取消} complete{已完成} failed{失败} other{未知}}",
+  "@networkTransferPhase": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      }
+    }
+  },
+  "networkTransferProgress": "传输：{phase} · {received} / {total} 字节",
+  "@networkTransferProgress": {
+    "placeholders": {
+      "phase": {
+        "type": "String"
+      },
+      "received": {
+        "type": "int"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "networkTransferError": "传输错误：{error}",
+  "@networkTransferError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "networkDownloadRetry": "下载 / 重试",
+  "networkCancel": "取消",
+  "networkEndpointLabel": "服务地址（HTTP/HTTPS）",
+  "networkEndpointHelp": "输入测试服务地址，提交后才开始连接。",
+  "networkConnect": "连接",
+  "networkChangeEndpoint": "更换服务",
+  "networkKeepEndpoint": "保留当前服务",
+  "imagesTitle": "图片来源",
+  "imagesInputLabel": "HTTP(S) 图片 URL / 本地路径",
+  "imagesAsset": "内置资源",
+  "imagesMemory": "内存图片",
+  "imagesPickLocal": "选择本地图片",
+  "imagesReadPath": "读取本地路径",
+  "imagesNetwork": "网络图片",
+  "imagesInvalidUrl": "请输入有效的 HTTP(S) 图片 URL",
+  "imagesReadError": "无法读取图片：{error}",
+  "@imagesReadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesLayout": "布局 {width} dp · DPR {dpr} · 解码上限 {pixels} px",
+  "@imagesLayout": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "dpr": {
+        "type": "String"
+      },
+      "pixels": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesRetry": "重试",
+  "imagesCacheHit": "缓存命中，可离线读取",
+  "imagesValidated": "已读取并校验图像",
+  "imagesClearCache": "清理本页图片缓存并重试",
+  "imagesDecodeFailed": "图像解码失败：{error}",
+  "@imagesDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesDecodedSize": "实际解码 {width} × {height} px",
+  "@imagesDecodedSize": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "height": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesPreview": "图片预览"
+}

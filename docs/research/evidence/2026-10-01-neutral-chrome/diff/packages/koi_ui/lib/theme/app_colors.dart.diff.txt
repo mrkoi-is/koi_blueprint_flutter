@@ -1,0 +1,15 @@
+--- before/packages/koi_ui/lib/theme/app_colors.dart
++++ after/packages/koi_ui/lib/theme/app_colors.dart
+@@ -7,8 +7,8 @@
+   static const sand = Color(0xFFF5EFE6);
+   static const amber = Color(0xFFC98324);
+   static const paper = Color(0xFFFFFBF5);
+-  static const content = Color(0xFFFCFCFB);
+-  static const night = Color(0xFF202522);
+-  static const chrome = Color(0xFFF2F3F1);
+-  static const nightPanel = Color(0xFF171C19);
++  static const content = Color(0xFFFCFCFC);
++  static const night = Color(0xFF222222);
++  static const chrome = Color(0xFFF3F3F3);
++  static const nightPanel = Color(0xFF161616);
+ }

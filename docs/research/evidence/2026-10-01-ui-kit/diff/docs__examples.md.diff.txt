@@ -1,0 +1,11 @@
+--- docs/examples.md (turn baseline)
++++ docs/examples.md
+@@ -5,7 +5,7 @@
+ | 样例 | 学习重点 | 源码 |
+ | --- | --- | --- |
+ | Starter | 最小宿主、基础注入和运行测试，不附带登录/API | [starter_app](../examples/starter_app/) |
+-| UI Lab | 主题、密度、输入焦点、自适应组件与长中文 | [ui_lab](../examples/ui_lab/) |
++| UI Lab | 标准组件六类目录、主题/密度、表单校验、选择/排序、菜单/反馈与自适应工作区 | [ui_lab](../examples/ui_lab/) |
+ | Workbench | 文本、图片/视频、任务、Native/Web 持久化；可选生成模板 | [workbench_app](../examples/workbench_app/) |
+ | Feature Lab | presentation/api/local 三类 Feature、provider 和测试 | [feature_lab](../examples/feature_lab/) |
+ | 认证样例 | 完整 auth、loading/error、并发防护、bootstrap 和路由 | [auth](../apps/koi_admin_app/lib/features/auth/)、[bootstrap](../apps/koi_admin_app/lib/bootstrap.dart)、[router](../apps/koi_admin_app/lib/core/router/)、[测试](../apps/koi_admin_app/test/) |

@@ -1,0 +1,2070 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// coverage:ignore-file
+// ignore_for_file: type=lint, type=warning, deprecated_member_use, deprecated_member_use_from_same_package
+// ignore_for_file: unused_element, deprecated_member_use, deprecated_member_use_from_same_package, use_function_type_syntax_for_parameters, unnecessary_const, avoid_init_to_null, invalid_override_different_default_values_named, prefer_expression_function_bodies, annotate_overrides, invalid_annotation_target, unnecessary_question_mark
+
+part of 'workspace_models.dart';
+
+// **************************************************************************
+// FreezedGenerator
+// **************************************************************************
+
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format off
+T _$identity<T>(T value) => value;
+
+/// @nodoc
+mixin _$WorkspaceDocument {
+
+ String get id; String get title; String get text; int get revision; int get savedRevision;
+/// Create a copy of WorkspaceDocument
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WorkspaceDocumentCopyWith<WorkspaceDocument> get copyWith => _$WorkspaceDocumentCopyWithImpl<WorkspaceDocument>(this as WorkspaceDocument, _$identity);
+
+  /// Serializes this WorkspaceDocument to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as WorkspaceDocument;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceDocument&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.text, _this.text) || other.text == _this.text)&&(identical(other.revision, _this.revision) || other.revision == _this.revision)&&(identical(other.savedRevision, _this.savedRevision) || other.savedRevision == _this.savedRevision));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as WorkspaceDocument;
+  return Object.hash(runtimeType,_this.id,_this.title,_this.text,_this.revision,_this.savedRevision);
+}
+
+@override
+String toString() {
+  final _this = this as WorkspaceDocument;
+  return 'WorkspaceDocument(id: ${_this.id}, title: ${_this.title}, text: ${_this.text}, revision: ${_this.revision}, savedRevision: ${_this.savedRevision})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WorkspaceDocumentCopyWith<$Res>  {
+  factory $WorkspaceDocumentCopyWith(WorkspaceDocument value, $Res Function(WorkspaceDocument) _then) = _$WorkspaceDocumentCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title, String text, int revision, int savedRevision
+});
+
+
+
+
+}
+/// @nodoc
+class _$WorkspaceDocumentCopyWithImpl<$Res>
+    implements $WorkspaceDocumentCopyWith<$Res> {
+  _$WorkspaceDocumentCopyWithImpl(this._self, this._then);
+
+  final WorkspaceDocument _self;
+  final $Res Function(WorkspaceDocument) _then;
+
+/// Create a copy of WorkspaceDocument
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? text = null,Object? revision = null,Object? savedRevision = null,}) {
+  return _then(WorkspaceDocument(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,revision: null == revision ? _self.revision : revision // ignore: cast_nullable_to_non_nullable
+as int,savedRevision: null == savedRevision ? _self.savedRevision : savedRevision // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [WorkspaceDocument].
+extension WorkspaceDocumentPatterns on WorkspaceDocument {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkspaceDocument value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WorkspaceDocument() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkspaceDocument value)  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceDocument():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkspaceDocument value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceDocument() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  String text,  int revision,  int savedRevision)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WorkspaceDocument() when $default != null:
+return $default(_that.id,_that.title,_that.text,_that.revision,_that.savedRevision);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  String text,  int revision,  int savedRevision)  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceDocument():
+return $default(_that.id,_that.title,_that.text,_that.revision,_that.savedRevision);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  String text,  int revision,  int savedRevision)?  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceDocument() when $default != null:
+return $default(_that.id,_that.title,_that.text,_that.revision,_that.savedRevision);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WorkspaceDocument extends WorkspaceDocument {
+  const _WorkspaceDocument({required this.id, required this.title, this.text = '', this.revision = 0, this.savedRevision = 0}): super._();
+  factory _WorkspaceDocument.fromJson(Map<String, dynamic> json) => _$WorkspaceDocumentFromJson(json);
+
+@override final  String id;
+@override final  String title;
+@override@JsonKey() final  String text;
+@override@JsonKey() final  int revision;
+@override@JsonKey() final  int savedRevision;
+
+/// Create a copy of WorkspaceDocument
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkspaceDocumentCopyWith<_WorkspaceDocument> get copyWith => __$WorkspaceDocumentCopyWithImpl<_WorkspaceDocument>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WorkspaceDocumentToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceDocument&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.text, text) || other.text == text)&&(identical(other.revision, revision) || other.revision == revision)&&(identical(other.savedRevision, savedRevision) || other.savedRevision == savedRevision));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,title,text,revision,savedRevision);
+}
+
+@override
+String toString() {
+    return 'WorkspaceDocument(id: $id, title: $title, text: $text, revision: $revision, savedRevision: $savedRevision)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkspaceDocumentCopyWith<$Res> implements $WorkspaceDocumentCopyWith<$Res> {
+  factory _$WorkspaceDocumentCopyWith(_WorkspaceDocument value, $Res Function(_WorkspaceDocument) _then) = __$WorkspaceDocumentCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String title, String text, int revision, int savedRevision
+});
+
+
+
+
+}
+/// @nodoc
+class __$WorkspaceDocumentCopyWithImpl<$Res>
+    implements _$WorkspaceDocumentCopyWith<$Res> {
+  __$WorkspaceDocumentCopyWithImpl(this._self, this._then);
+
+  final _WorkspaceDocument _self;
+  final $Res Function(_WorkspaceDocument) _then;
+
+/// Create a copy of WorkspaceDocument
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? text = null,Object? revision = null,Object? savedRevision = null,}) {
+  return _then(_WorkspaceDocument(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,text: null == text ? _self.text : text // ignore: cast_nullable_to_non_nullable
+as String,revision: null == revision ? _self.revision : revision // ignore: cast_nullable_to_non_nullable
+as int,savedRevision: null == savedRevision ? _self.savedRevision : savedRevision // ignore: cast_nullable_to_non_nullable
+as int,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WorkspaceAsset {
+
+ String get id; String get name; MediaKind get kind; int get byteLength; String get storageKey; String? get thumbnailKey; ThumbnailStatus get thumbnailStatus; String? get thumbnailError;
+/// Create a copy of WorkspaceAsset
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WorkspaceAssetCopyWith<WorkspaceAsset> get copyWith => _$WorkspaceAssetCopyWithImpl<WorkspaceAsset>(this as WorkspaceAsset, _$identity);
+
+  /// Serializes this WorkspaceAsset to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as WorkspaceAsset;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceAsset&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.byteLength, _this.byteLength) || other.byteLength == _this.byteLength)&&(identical(other.storageKey, _this.storageKey) || other.storageKey == _this.storageKey)&&(identical(other.thumbnailKey, _this.thumbnailKey) || other.thumbnailKey == _this.thumbnailKey)&&(identical(other.thumbnailStatus, _this.thumbnailStatus) || other.thumbnailStatus == _this.thumbnailStatus)&&(identical(other.thumbnailError, _this.thumbnailError) || other.thumbnailError == _this.thumbnailError));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as WorkspaceAsset;
+  return Object.hash(runtimeType,_this.id,_this.name,_this.kind,_this.byteLength,_this.storageKey,_this.thumbnailKey,_this.thumbnailStatus,_this.thumbnailError);
+}
+
+@override
+String toString() {
+  final _this = this as WorkspaceAsset;
+  return 'WorkspaceAsset(id: ${_this.id}, name: ${_this.name}, kind: ${_this.kind}, byteLength: ${_this.byteLength}, storageKey: ${_this.storageKey}, thumbnailKey: ${_this.thumbnailKey}, thumbnailStatus: ${_this.thumbnailStatus}, thumbnailError: ${_this.thumbnailError})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WorkspaceAssetCopyWith<$Res>  {
+  factory $WorkspaceAssetCopyWith(WorkspaceAsset value, $Res Function(WorkspaceAsset) _then) = _$WorkspaceAssetCopyWithImpl;
+@useResult
+$Res call({
+ String id, String name, MediaKind kind, int byteLength, String storageKey, String? thumbnailKey, ThumbnailStatus thumbnailStatus, String? thumbnailError
+});
+
+
+
+
+}
+/// @nodoc
+class _$WorkspaceAssetCopyWithImpl<$Res>
+    implements $WorkspaceAssetCopyWith<$Res> {
+  _$WorkspaceAssetCopyWithImpl(this._self, this._then);
+
+  final WorkspaceAsset _self;
+  final $Res Function(WorkspaceAsset) _then;
+
+/// Create a copy of WorkspaceAsset
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? kind = null,Object? byteLength = null,Object? storageKey = null,Object? thumbnailKey = freezed,Object? thumbnailStatus = null,Object? thumbnailError = freezed,}) {
+  return _then(WorkspaceAsset(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as MediaKind,byteLength: null == byteLength ? _self.byteLength : byteLength // ignore: cast_nullable_to_non_nullable
+as int,storageKey: null == storageKey ? _self.storageKey : storageKey // ignore: cast_nullable_to_non_nullable
+as String,thumbnailKey: freezed == thumbnailKey ? _self.thumbnailKey : thumbnailKey // ignore: cast_nullable_to_non_nullable
+as String?,thumbnailStatus: null == thumbnailStatus ? _self.thumbnailStatus : thumbnailStatus // ignore: cast_nullable_to_non_nullable
+as ThumbnailStatus,thumbnailError: freezed == thumbnailError ? _self.thumbnailError : thumbnailError // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [WorkspaceAsset].
+extension WorkspaceAssetPatterns on WorkspaceAsset {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkspaceAsset value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WorkspaceAsset() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkspaceAsset value)  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceAsset():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkspaceAsset value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceAsset() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  MediaKind kind,  int byteLength,  String storageKey,  String? thumbnailKey,  ThumbnailStatus thumbnailStatus,  String? thumbnailError)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WorkspaceAsset() when $default != null:
+return $default(_that.id,_that.name,_that.kind,_that.byteLength,_that.storageKey,_that.thumbnailKey,_that.thumbnailStatus,_that.thumbnailError);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  MediaKind kind,  int byteLength,  String storageKey,  String? thumbnailKey,  ThumbnailStatus thumbnailStatus,  String? thumbnailError)  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceAsset():
+return $default(_that.id,_that.name,_that.kind,_that.byteLength,_that.storageKey,_that.thumbnailKey,_that.thumbnailStatus,_that.thumbnailError);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  MediaKind kind,  int byteLength,  String storageKey,  String? thumbnailKey,  ThumbnailStatus thumbnailStatus,  String? thumbnailError)?  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceAsset() when $default != null:
+return $default(_that.id,_that.name,_that.kind,_that.byteLength,_that.storageKey,_that.thumbnailKey,_that.thumbnailStatus,_that.thumbnailError);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WorkspaceAsset implements WorkspaceAsset {
+  const _WorkspaceAsset({required this.id, required this.name, required this.kind, required this.byteLength, required this.storageKey, this.thumbnailKey, this.thumbnailStatus = ThumbnailStatus.none, this.thumbnailError});
+  factory _WorkspaceAsset.fromJson(Map<String, dynamic> json) => _$WorkspaceAssetFromJson(json);
+
+@override final  String id;
+@override final  String name;
+@override final  MediaKind kind;
+@override final  int byteLength;
+@override final  String storageKey;
+@override final  String? thumbnailKey;
+@override@JsonKey() final  ThumbnailStatus thumbnailStatus;
+@override final  String? thumbnailError;
+
+/// Create a copy of WorkspaceAsset
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkspaceAssetCopyWith<_WorkspaceAsset> get copyWith => __$WorkspaceAssetCopyWithImpl<_WorkspaceAsset>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WorkspaceAssetToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceAsset&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.byteLength, byteLength) || other.byteLength == byteLength)&&(identical(other.storageKey, storageKey) || other.storageKey == storageKey)&&(identical(other.thumbnailKey, thumbnailKey) || other.thumbnailKey == thumbnailKey)&&(identical(other.thumbnailStatus, thumbnailStatus) || other.thumbnailStatus == thumbnailStatus)&&(identical(other.thumbnailError, thumbnailError) || other.thumbnailError == thumbnailError));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,name,kind,byteLength,storageKey,thumbnailKey,thumbnailStatus,thumbnailError);
+}
+
+@override
+String toString() {
+    return 'WorkspaceAsset(id: $id, name: $name, kind: $kind, byteLength: $byteLength, storageKey: $storageKey, thumbnailKey: $thumbnailKey, thumbnailStatus: $thumbnailStatus, thumbnailError: $thumbnailError)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkspaceAssetCopyWith<$Res> implements $WorkspaceAssetCopyWith<$Res> {
+  factory _$WorkspaceAssetCopyWith(_WorkspaceAsset value, $Res Function(_WorkspaceAsset) _then) = __$WorkspaceAssetCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String name, MediaKind kind, int byteLength, String storageKey, String? thumbnailKey, ThumbnailStatus thumbnailStatus, String? thumbnailError
+});
+
+
+
+
+}
+/// @nodoc
+class __$WorkspaceAssetCopyWithImpl<$Res>
+    implements _$WorkspaceAssetCopyWith<$Res> {
+  __$WorkspaceAssetCopyWithImpl(this._self, this._then);
+
+  final _WorkspaceAsset _self;
+  final $Res Function(_WorkspaceAsset) _then;
+
+/// Create a copy of WorkspaceAsset
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? kind = null,Object? byteLength = null,Object? storageKey = null,Object? thumbnailKey = freezed,Object? thumbnailStatus = null,Object? thumbnailError = freezed,}) {
+  return _then(_WorkspaceAsset(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as MediaKind,byteLength: null == byteLength ? _self.byteLength : byteLength // ignore: cast_nullable_to_non_nullable
+as int,storageKey: null == storageKey ? _self.storageKey : storageKey // ignore: cast_nullable_to_non_nullable
+as String,thumbnailKey: freezed == thumbnailKey ? _self.thumbnailKey : thumbnailKey // ignore: cast_nullable_to_non_nullable
+as String?,thumbnailStatus: null == thumbnailStatus ? _self.thumbnailStatus : thumbnailStatus // ignore: cast_nullable_to_non_nullable
+as ThumbnailStatus,thumbnailError: freezed == thumbnailError ? _self.thumbnailError : thumbnailError // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WorkspaceTodo {
+
+ String get id; String get title; bool get completed;
+/// Create a copy of WorkspaceTodo
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WorkspaceTodoCopyWith<WorkspaceTodo> get copyWith => _$WorkspaceTodoCopyWithImpl<WorkspaceTodo>(this as WorkspaceTodo, _$identity);
+
+  /// Serializes this WorkspaceTodo to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as WorkspaceTodo;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceTodo&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.title, _this.title) || other.title == _this.title)&&(identical(other.completed, _this.completed) || other.completed == _this.completed));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as WorkspaceTodo;
+  return Object.hash(runtimeType,_this.id,_this.title,_this.completed);
+}
+
+@override
+String toString() {
+  final _this = this as WorkspaceTodo;
+  return 'WorkspaceTodo(id: ${_this.id}, title: ${_this.title}, completed: ${_this.completed})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WorkspaceTodoCopyWith<$Res>  {
+  factory $WorkspaceTodoCopyWith(WorkspaceTodo value, $Res Function(WorkspaceTodo) _then) = _$WorkspaceTodoCopyWithImpl;
+@useResult
+$Res call({
+ String id, String title, bool completed
+});
+
+
+
+
+}
+/// @nodoc
+class _$WorkspaceTodoCopyWithImpl<$Res>
+    implements $WorkspaceTodoCopyWith<$Res> {
+  _$WorkspaceTodoCopyWithImpl(this._self, this._then);
+
+  final WorkspaceTodo _self;
+  final $Res Function(WorkspaceTodo) _then;
+
+/// Create a copy of WorkspaceTodo
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? title = null,Object? completed = null,}) {
+  return _then(WorkspaceTodo(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,completed: null == completed ? _self.completed : completed // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [WorkspaceTodo].
+extension WorkspaceTodoPatterns on WorkspaceTodo {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkspaceTodo value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WorkspaceTodo() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkspaceTodo value)  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceTodo():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkspaceTodo value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceTodo() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String title,  bool completed)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WorkspaceTodo() when $default != null:
+return $default(_that.id,_that.title,_that.completed);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String title,  bool completed)  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceTodo():
+return $default(_that.id,_that.title,_that.completed);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String title,  bool completed)?  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceTodo() when $default != null:
+return $default(_that.id,_that.title,_that.completed);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WorkspaceTodo implements WorkspaceTodo {
+  const _WorkspaceTodo({required this.id, required this.title, this.completed = false});
+  factory _WorkspaceTodo.fromJson(Map<String, dynamic> json) => _$WorkspaceTodoFromJson(json);
+
+@override final  String id;
+@override final  String title;
+@override@JsonKey() final  bool completed;
+
+/// Create a copy of WorkspaceTodo
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkspaceTodoCopyWith<_WorkspaceTodo> get copyWith => __$WorkspaceTodoCopyWithImpl<_WorkspaceTodo>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WorkspaceTodoToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceTodo&&(identical(other.id, id) || other.id == id)&&(identical(other.title, title) || other.title == title)&&(identical(other.completed, completed) || other.completed == completed));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,title,completed);
+}
+
+@override
+String toString() {
+    return 'WorkspaceTodo(id: $id, title: $title, completed: $completed)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkspaceTodoCopyWith<$Res> implements $WorkspaceTodoCopyWith<$Res> {
+  factory _$WorkspaceTodoCopyWith(_WorkspaceTodo value, $Res Function(_WorkspaceTodo) _then) = __$WorkspaceTodoCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, String title, bool completed
+});
+
+
+
+
+}
+/// @nodoc
+class __$WorkspaceTodoCopyWithImpl<$Res>
+    implements _$WorkspaceTodoCopyWith<$Res> {
+  __$WorkspaceTodoCopyWithImpl(this._self, this._then);
+
+  final _WorkspaceTodo _self;
+  final $Res Function(_WorkspaceTodo) _then;
+
+/// Create a copy of WorkspaceTodo
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? title = null,Object? completed = null,}) {
+  return _then(_WorkspaceTodo(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,title: null == title ? _self.title : title // ignore: cast_nullable_to_non_nullable
+as String,completed: null == completed ? _self.completed : completed // ignore: cast_nullable_to_non_nullable
+as bool,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WorkspaceJob {
+
+ String get id; JobKind get kind; String get name; JobStatus get status; int get processedBytes; bool get indeterminate; int? get totalBytes; String? get assetId; ImportKind? get importKind; String? get error;
+/// Create a copy of WorkspaceJob
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WorkspaceJobCopyWith<WorkspaceJob> get copyWith => _$WorkspaceJobCopyWithImpl<WorkspaceJob>(this as WorkspaceJob, _$identity);
+
+  /// Serializes this WorkspaceJob to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as WorkspaceJob;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceJob&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.kind, _this.kind) || other.kind == _this.kind)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.processedBytes, _this.processedBytes) || other.processedBytes == _this.processedBytes)&&(identical(other.indeterminate, _this.indeterminate) || other.indeterminate == _this.indeterminate)&&(identical(other.totalBytes, _this.totalBytes) || other.totalBytes == _this.totalBytes)&&(identical(other.assetId, _this.assetId) || other.assetId == _this.assetId)&&(identical(other.importKind, _this.importKind) || other.importKind == _this.importKind)&&(identical(other.error, _this.error) || other.error == _this.error));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as WorkspaceJob;
+  return Object.hash(runtimeType,_this.id,_this.kind,_this.name,_this.status,_this.processedBytes,_this.indeterminate,_this.totalBytes,_this.assetId,_this.importKind,_this.error);
+}
+
+@override
+String toString() {
+  final _this = this as WorkspaceJob;
+  return 'WorkspaceJob(id: ${_this.id}, kind: ${_this.kind}, name: ${_this.name}, status: ${_this.status}, processedBytes: ${_this.processedBytes}, indeterminate: ${_this.indeterminate}, totalBytes: ${_this.totalBytes}, assetId: ${_this.assetId}, importKind: ${_this.importKind}, error: ${_this.error})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WorkspaceJobCopyWith<$Res>  {
+  factory $WorkspaceJobCopyWith(WorkspaceJob value, $Res Function(WorkspaceJob) _then) = _$WorkspaceJobCopyWithImpl;
+@useResult
+$Res call({
+ String id, JobKind kind, String name, JobStatus status, int processedBytes, bool indeterminate, int? totalBytes, String? assetId, ImportKind? importKind, String? error
+});
+
+
+
+
+}
+/// @nodoc
+class _$WorkspaceJobCopyWithImpl<$Res>
+    implements $WorkspaceJobCopyWith<$Res> {
+  _$WorkspaceJobCopyWithImpl(this._self, this._then);
+
+  final WorkspaceJob _self;
+  final $Res Function(WorkspaceJob) _then;
+
+/// Create a copy of WorkspaceJob
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? kind = null,Object? name = null,Object? status = null,Object? processedBytes = null,Object? indeterminate = null,Object? totalBytes = freezed,Object? assetId = freezed,Object? importKind = freezed,Object? error = freezed,}) {
+  return _then(WorkspaceJob(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as JobKind,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as JobStatus,processedBytes: null == processedBytes ? _self.processedBytes : processedBytes // ignore: cast_nullable_to_non_nullable
+as int,indeterminate: null == indeterminate ? _self.indeterminate : indeterminate // ignore: cast_nullable_to_non_nullable
+as bool,totalBytes: freezed == totalBytes ? _self.totalBytes : totalBytes // ignore: cast_nullable_to_non_nullable
+as int?,assetId: freezed == assetId ? _self.assetId : assetId // ignore: cast_nullable_to_non_nullable
+as String?,importKind: freezed == importKind ? _self.importKind : importKind // ignore: cast_nullable_to_non_nullable
+as ImportKind?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [WorkspaceJob].
+extension WorkspaceJobPatterns on WorkspaceJob {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkspaceJob value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WorkspaceJob() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkspaceJob value)  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceJob():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkspaceJob value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceJob() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  JobKind kind,  String name,  JobStatus status,  int processedBytes,  bool indeterminate,  int? totalBytes,  String? assetId,  ImportKind? importKind,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WorkspaceJob() when $default != null:
+return $default(_that.id,_that.kind,_that.name,_that.status,_that.processedBytes,_that.indeterminate,_that.totalBytes,_that.assetId,_that.importKind,_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  JobKind kind,  String name,  JobStatus status,  int processedBytes,  bool indeterminate,  int? totalBytes,  String? assetId,  ImportKind? importKind,  String? error)  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceJob():
+return $default(_that.id,_that.kind,_that.name,_that.status,_that.processedBytes,_that.indeterminate,_that.totalBytes,_that.assetId,_that.importKind,_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  JobKind kind,  String name,  JobStatus status,  int processedBytes,  bool indeterminate,  int? totalBytes,  String? assetId,  ImportKind? importKind,  String? error)?  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceJob() when $default != null:
+return $default(_that.id,_that.kind,_that.name,_that.status,_that.processedBytes,_that.indeterminate,_that.totalBytes,_that.assetId,_that.importKind,_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WorkspaceJob extends WorkspaceJob {
+  const _WorkspaceJob({required this.id, required this.kind, required this.name, this.status = JobStatus.queued, this.processedBytes = 0, this.indeterminate = true, this.totalBytes, this.assetId, this.importKind, this.error}): super._();
+  factory _WorkspaceJob.fromJson(Map<String, dynamic> json) => _$WorkspaceJobFromJson(json);
+
+@override final  String id;
+@override final  JobKind kind;
+@override final  String name;
+@override@JsonKey() final  JobStatus status;
+@override@JsonKey() final  int processedBytes;
+@override@JsonKey() final  bool indeterminate;
+@override final  int? totalBytes;
+@override final  String? assetId;
+@override final  ImportKind? importKind;
+@override final  String? error;
+
+/// Create a copy of WorkspaceJob
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkspaceJobCopyWith<_WorkspaceJob> get copyWith => __$WorkspaceJobCopyWithImpl<_WorkspaceJob>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WorkspaceJobToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceJob&&(identical(other.id, id) || other.id == id)&&(identical(other.kind, kind) || other.kind == kind)&&(identical(other.name, name) || other.name == name)&&(identical(other.status, status) || other.status == status)&&(identical(other.processedBytes, processedBytes) || other.processedBytes == processedBytes)&&(identical(other.indeterminate, indeterminate) || other.indeterminate == indeterminate)&&(identical(other.totalBytes, totalBytes) || other.totalBytes == totalBytes)&&(identical(other.assetId, assetId) || other.assetId == assetId)&&(identical(other.importKind, importKind) || other.importKind == importKind)&&(identical(other.error, error) || other.error == error));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,id,kind,name,status,processedBytes,indeterminate,totalBytes,assetId,importKind,error);
+}
+
+@override
+String toString() {
+    return 'WorkspaceJob(id: $id, kind: $kind, name: $name, status: $status, processedBytes: $processedBytes, indeterminate: $indeterminate, totalBytes: $totalBytes, assetId: $assetId, importKind: $importKind, error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkspaceJobCopyWith<$Res> implements $WorkspaceJobCopyWith<$Res> {
+  factory _$WorkspaceJobCopyWith(_WorkspaceJob value, $Res Function(_WorkspaceJob) _then) = __$WorkspaceJobCopyWithImpl;
+@override @useResult
+$Res call({
+ String id, JobKind kind, String name, JobStatus status, int processedBytes, bool indeterminate, int? totalBytes, String? assetId, ImportKind? importKind, String? error
+});
+
+
+
+
+}
+/// @nodoc
+class __$WorkspaceJobCopyWithImpl<$Res>
+    implements _$WorkspaceJobCopyWith<$Res> {
+  __$WorkspaceJobCopyWithImpl(this._self, this._then);
+
+  final _WorkspaceJob _self;
+  final $Res Function(_WorkspaceJob) _then;
+
+/// Create a copy of WorkspaceJob
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? kind = null,Object? name = null,Object? status = null,Object? processedBytes = null,Object? indeterminate = null,Object? totalBytes = freezed,Object? assetId = freezed,Object? importKind = freezed,Object? error = freezed,}) {
+  return _then(_WorkspaceJob(
+id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
+as String,kind: null == kind ? _self.kind : kind // ignore: cast_nullable_to_non_nullable
+as JobKind,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
+as JobStatus,processedBytes: null == processedBytes ? _self.processedBytes : processedBytes // ignore: cast_nullable_to_non_nullable
+as int,indeterminate: null == indeterminate ? _self.indeterminate : indeterminate // ignore: cast_nullable_to_non_nullable
+as bool,totalBytes: freezed == totalBytes ? _self.totalBytes : totalBytes // ignore: cast_nullable_to_non_nullable
+as int?,assetId: freezed == assetId ? _self.assetId : assetId // ignore: cast_nullable_to_non_nullable
+as String?,importKind: freezed == importKind ? _self.importKind : importKind // ignore: cast_nullable_to_non_nullable
+as ImportKind?,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WorkspacePreferences {
+
+ WorkspaceThemeMode get themeMode; WorkspaceDensity get density; String get navId; double get sidebarWidth; double get detailsWidth; String? get selectedDocumentId; String? get selectedAssetId;
+/// Create a copy of WorkspacePreferences
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WorkspacePreferencesCopyWith<WorkspacePreferences> get copyWith => _$WorkspacePreferencesCopyWithImpl<WorkspacePreferences>(this as WorkspacePreferences, _$identity);
+
+  /// Serializes this WorkspacePreferences to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as WorkspacePreferences;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspacePreferences&&(identical(other.themeMode, _this.themeMode) || other.themeMode == _this.themeMode)&&(identical(other.density, _this.density) || other.density == _this.density)&&(identical(other.navId, _this.navId) || other.navId == _this.navId)&&(identical(other.sidebarWidth, _this.sidebarWidth) || other.sidebarWidth == _this.sidebarWidth)&&(identical(other.detailsWidth, _this.detailsWidth) || other.detailsWidth == _this.detailsWidth)&&(identical(other.selectedDocumentId, _this.selectedDocumentId) || other.selectedDocumentId == _this.selectedDocumentId)&&(identical(other.selectedAssetId, _this.selectedAssetId) || other.selectedAssetId == _this.selectedAssetId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as WorkspacePreferences;
+  return Object.hash(runtimeType,_this.themeMode,_this.density,_this.navId,_this.sidebarWidth,_this.detailsWidth,_this.selectedDocumentId,_this.selectedAssetId);
+}
+
+@override
+String toString() {
+  final _this = this as WorkspacePreferences;
+  return 'WorkspacePreferences(themeMode: ${_this.themeMode}, density: ${_this.density}, navId: ${_this.navId}, sidebarWidth: ${_this.sidebarWidth}, detailsWidth: ${_this.detailsWidth}, selectedDocumentId: ${_this.selectedDocumentId}, selectedAssetId: ${_this.selectedAssetId})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WorkspacePreferencesCopyWith<$Res>  {
+  factory $WorkspacePreferencesCopyWith(WorkspacePreferences value, $Res Function(WorkspacePreferences) _then) = _$WorkspacePreferencesCopyWithImpl;
+@useResult
+$Res call({
+ WorkspaceThemeMode themeMode, WorkspaceDensity density, String navId, double sidebarWidth, double detailsWidth, String? selectedDocumentId, String? selectedAssetId
+});
+
+
+
+
+}
+/// @nodoc
+class _$WorkspacePreferencesCopyWithImpl<$Res>
+    implements $WorkspacePreferencesCopyWith<$Res> {
+  _$WorkspacePreferencesCopyWithImpl(this._self, this._then);
+
+  final WorkspacePreferences _self;
+  final $Res Function(WorkspacePreferences) _then;
+
+/// Create a copy of WorkspacePreferences
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? themeMode = null,Object? density = null,Object? navId = null,Object? sidebarWidth = null,Object? detailsWidth = null,Object? selectedDocumentId = freezed,Object? selectedAssetId = freezed,}) {
+  return _then(WorkspacePreferences(
+themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as WorkspaceThemeMode,density: null == density ? _self.density : density // ignore: cast_nullable_to_non_nullable
+as WorkspaceDensity,navId: null == navId ? _self.navId : navId // ignore: cast_nullable_to_non_nullable
+as String,sidebarWidth: null == sidebarWidth ? _self.sidebarWidth : sidebarWidth // ignore: cast_nullable_to_non_nullable
+as double,detailsWidth: null == detailsWidth ? _self.detailsWidth : detailsWidth // ignore: cast_nullable_to_non_nullable
+as double,selectedDocumentId: freezed == selectedDocumentId ? _self.selectedDocumentId : selectedDocumentId // ignore: cast_nullable_to_non_nullable
+as String?,selectedAssetId: freezed == selectedAssetId ? _self.selectedAssetId : selectedAssetId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+}
+
+
+/// Adds pattern-matching-related methods to [WorkspacePreferences].
+extension WorkspacePreferencesPatterns on WorkspacePreferences {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkspacePreferences value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WorkspacePreferences() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkspacePreferences value)  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspacePreferences():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkspacePreferences value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspacePreferences() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( WorkspaceThemeMode themeMode,  WorkspaceDensity density,  String navId,  double sidebarWidth,  double detailsWidth,  String? selectedDocumentId,  String? selectedAssetId)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WorkspacePreferences() when $default != null:
+return $default(_that.themeMode,_that.density,_that.navId,_that.sidebarWidth,_that.detailsWidth,_that.selectedDocumentId,_that.selectedAssetId);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( WorkspaceThemeMode themeMode,  WorkspaceDensity density,  String navId,  double sidebarWidth,  double detailsWidth,  String? selectedDocumentId,  String? selectedAssetId)  $default,) {final _that = this;
+switch (_that) {
+case _WorkspacePreferences():
+return $default(_that.themeMode,_that.density,_that.navId,_that.sidebarWidth,_that.detailsWidth,_that.selectedDocumentId,_that.selectedAssetId);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( WorkspaceThemeMode themeMode,  WorkspaceDensity density,  String navId,  double sidebarWidth,  double detailsWidth,  String? selectedDocumentId,  String? selectedAssetId)?  $default,) {final _that = this;
+switch (_that) {
+case _WorkspacePreferences() when $default != null:
+return $default(_that.themeMode,_that.density,_that.navId,_that.sidebarWidth,_that.detailsWidth,_that.selectedDocumentId,_that.selectedAssetId);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WorkspacePreferences implements WorkspacePreferences {
+  const _WorkspacePreferences({this.themeMode = WorkspaceThemeMode.system, this.density = WorkspaceDensity.comfortable, this.navId = 'text', this.sidebarWidth = 280, this.detailsWidth = 280, this.selectedDocumentId, this.selectedAssetId});
+  factory _WorkspacePreferences.fromJson(Map<String, dynamic> json) => _$WorkspacePreferencesFromJson(json);
+
+@override@JsonKey() final  WorkspaceThemeMode themeMode;
+@override@JsonKey() final  WorkspaceDensity density;
+@override@JsonKey() final  String navId;
+@override@JsonKey() final  double sidebarWidth;
+@override@JsonKey() final  double detailsWidth;
+@override final  String? selectedDocumentId;
+@override final  String? selectedAssetId;
+
+/// Create a copy of WorkspacePreferences
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkspacePreferencesCopyWith<_WorkspacePreferences> get copyWith => __$WorkspacePreferencesCopyWithImpl<_WorkspacePreferences>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WorkspacePreferencesToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspacePreferences&&(identical(other.themeMode, themeMode) || other.themeMode == themeMode)&&(identical(other.density, density) || other.density == density)&&(identical(other.navId, navId) || other.navId == navId)&&(identical(other.sidebarWidth, sidebarWidth) || other.sidebarWidth == sidebarWidth)&&(identical(other.detailsWidth, detailsWidth) || other.detailsWidth == detailsWidth)&&(identical(other.selectedDocumentId, selectedDocumentId) || other.selectedDocumentId == selectedDocumentId)&&(identical(other.selectedAssetId, selectedAssetId) || other.selectedAssetId == selectedAssetId));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,themeMode,density,navId,sidebarWidth,detailsWidth,selectedDocumentId,selectedAssetId);
+}
+
+@override
+String toString() {
+    return 'WorkspacePreferences(themeMode: $themeMode, density: $density, navId: $navId, sidebarWidth: $sidebarWidth, detailsWidth: $detailsWidth, selectedDocumentId: $selectedDocumentId, selectedAssetId: $selectedAssetId)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkspacePreferencesCopyWith<$Res> implements $WorkspacePreferencesCopyWith<$Res> {
+  factory _$WorkspacePreferencesCopyWith(_WorkspacePreferences value, $Res Function(_WorkspacePreferences) _then) = __$WorkspacePreferencesCopyWithImpl;
+@override @useResult
+$Res call({
+ WorkspaceThemeMode themeMode, WorkspaceDensity density, String navId, double sidebarWidth, double detailsWidth, String? selectedDocumentId, String? selectedAssetId
+});
+
+
+
+
+}
+/// @nodoc
+class __$WorkspacePreferencesCopyWithImpl<$Res>
+    implements _$WorkspacePreferencesCopyWith<$Res> {
+  __$WorkspacePreferencesCopyWithImpl(this._self, this._then);
+
+  final _WorkspacePreferences _self;
+  final $Res Function(_WorkspacePreferences) _then;
+
+/// Create a copy of WorkspacePreferences
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? themeMode = null,Object? density = null,Object? navId = null,Object? sidebarWidth = null,Object? detailsWidth = null,Object? selectedDocumentId = freezed,Object? selectedAssetId = freezed,}) {
+  return _then(_WorkspacePreferences(
+themeMode: null == themeMode ? _self.themeMode : themeMode // ignore: cast_nullable_to_non_nullable
+as WorkspaceThemeMode,density: null == density ? _self.density : density // ignore: cast_nullable_to_non_nullable
+as WorkspaceDensity,navId: null == navId ? _self.navId : navId // ignore: cast_nullable_to_non_nullable
+as String,sidebarWidth: null == sidebarWidth ? _self.sidebarWidth : sidebarWidth // ignore: cast_nullable_to_non_nullable
+as double,detailsWidth: null == detailsWidth ? _self.detailsWidth : detailsWidth // ignore: cast_nullable_to_non_nullable
+as double,selectedDocumentId: freezed == selectedDocumentId ? _self.selectedDocumentId : selectedDocumentId // ignore: cast_nullable_to_non_nullable
+as String?,selectedAssetId: freezed == selectedAssetId ? _self.selectedAssetId : selectedAssetId // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+
+}
+
+
+/// @nodoc
+mixin _$WorkspaceSnapshot {
+
+ int get schemaVersion; int get revision; List<WorkspaceDocument> get documents; List<WorkspaceAsset> get assets; List<WorkspaceTodo> get todos; List<WorkspaceJob> get jobs; WorkspacePreferences get preferences;
+/// Create a copy of WorkspaceSnapshot
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WorkspaceSnapshotCopyWith<WorkspaceSnapshot> get copyWith => _$WorkspaceSnapshotCopyWithImpl<WorkspaceSnapshot>(this as WorkspaceSnapshot, _$identity);
+
+  /// Serializes this WorkspaceSnapshot to a JSON map.
+  Map<String, dynamic> toJson();
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as WorkspaceSnapshot;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceSnapshot&&(identical(other.schemaVersion, _this.schemaVersion) || other.schemaVersion == _this.schemaVersion)&&(identical(other.revision, _this.revision) || other.revision == _this.revision)&&const DeepCollectionEquality().equals(other.documents, _this.documents)&&const DeepCollectionEquality().equals(other.assets, _this.assets)&&const DeepCollectionEquality().equals(other.todos, _this.todos)&&const DeepCollectionEquality().equals(other.jobs, _this.jobs)&&(identical(other.preferences, _this.preferences) || other.preferences == _this.preferences));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+  final _this = this as WorkspaceSnapshot;
+  return Object.hash(runtimeType,_this.schemaVersion,_this.revision,const DeepCollectionEquality().hash(_this.documents),const DeepCollectionEquality().hash(_this.assets),const DeepCollectionEquality().hash(_this.todos),const DeepCollectionEquality().hash(_this.jobs),_this.preferences);
+}
+
+@override
+String toString() {
+  final _this = this as WorkspaceSnapshot;
+  return 'WorkspaceSnapshot(schemaVersion: ${_this.schemaVersion}, revision: ${_this.revision}, documents: ${_this.documents}, assets: ${_this.assets}, todos: ${_this.todos}, jobs: ${_this.jobs}, preferences: ${_this.preferences})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WorkspaceSnapshotCopyWith<$Res>  {
+  factory $WorkspaceSnapshotCopyWith(WorkspaceSnapshot value, $Res Function(WorkspaceSnapshot) _then) = _$WorkspaceSnapshotCopyWithImpl;
+@useResult
+$Res call({
+ int schemaVersion, int revision, List<WorkspaceDocument> documents, List<WorkspaceAsset> assets, List<WorkspaceTodo> todos, List<WorkspaceJob> jobs, WorkspacePreferences preferences
+});
+
+
+$WorkspacePreferencesCopyWith<$Res> get preferences;
+
+}
+/// @nodoc
+class _$WorkspaceSnapshotCopyWithImpl<$Res>
+    implements $WorkspaceSnapshotCopyWith<$Res> {
+  _$WorkspaceSnapshotCopyWithImpl(this._self, this._then);
+
+  final WorkspaceSnapshot _self;
+  final $Res Function(WorkspaceSnapshot) _then;
+
+/// Create a copy of WorkspaceSnapshot
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? schemaVersion = null,Object? revision = null,Object? documents = null,Object? assets = null,Object? todos = null,Object? jobs = null,Object? preferences = null,}) {
+  return _then(WorkspaceSnapshot(
+schemaVersion: null == schemaVersion ? _self.schemaVersion : schemaVersion // ignore: cast_nullable_to_non_nullable
+as int,revision: null == revision ? _self.revision : revision // ignore: cast_nullable_to_non_nullable
+as int,documents: null == documents ? _self.documents : documents // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceDocument>,assets: null == assets ? _self.assets : assets // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceAsset>,todos: null == todos ? _self.todos : todos // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceTodo>,jobs: null == jobs ? _self.jobs : jobs // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceJob>,preferences: null == preferences ? _self.preferences : preferences // ignore: cast_nullable_to_non_nullable
+as WorkspacePreferences,
+  ));
+}
+/// Create a copy of WorkspaceSnapshot
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WorkspacePreferencesCopyWith<$Res> get preferences {
+  
+  return $WorkspacePreferencesCopyWith<$Res>(_self.preferences, (value) {
+    return _then(_self.copyWith(preferences: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [WorkspaceSnapshot].
+extension WorkspaceSnapshotPatterns on WorkspaceSnapshot {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkspaceSnapshot value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WorkspaceSnapshot() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkspaceSnapshot value)  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceSnapshot():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkspaceSnapshot value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceSnapshot() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( int schemaVersion,  int revision,  List<WorkspaceDocument> documents,  List<WorkspaceAsset> assets,  List<WorkspaceTodo> todos,  List<WorkspaceJob> jobs,  WorkspacePreferences preferences)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WorkspaceSnapshot() when $default != null:
+return $default(_that.schemaVersion,_that.revision,_that.documents,_that.assets,_that.todos,_that.jobs,_that.preferences);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( int schemaVersion,  int revision,  List<WorkspaceDocument> documents,  List<WorkspaceAsset> assets,  List<WorkspaceTodo> todos,  List<WorkspaceJob> jobs,  WorkspacePreferences preferences)  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceSnapshot():
+return $default(_that.schemaVersion,_that.revision,_that.documents,_that.assets,_that.todos,_that.jobs,_that.preferences);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( int schemaVersion,  int revision,  List<WorkspaceDocument> documents,  List<WorkspaceAsset> assets,  List<WorkspaceTodo> todos,  List<WorkspaceJob> jobs,  WorkspacePreferences preferences)?  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceSnapshot() when $default != null:
+return $default(_that.schemaVersion,_that.revision,_that.documents,_that.assets,_that.todos,_that.jobs,_that.preferences);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+@JsonSerializable()
+
+class _WorkspaceSnapshot implements WorkspaceSnapshot {
+  const _WorkspaceSnapshot({this.schemaVersion = 1, this.revision = 0,  List<WorkspaceDocument> documents = const <WorkspaceDocument>[],  List<WorkspaceAsset> assets = const <WorkspaceAsset>[],  List<WorkspaceTodo> todos = const <WorkspaceTodo>[],  List<WorkspaceJob> jobs = const <WorkspaceJob>[], this.preferences = const WorkspacePreferences()}): _documents = documents,_assets = assets,_todos = todos,_jobs = jobs;
+  factory _WorkspaceSnapshot.fromJson(Map<String, dynamic> json) => _$WorkspaceSnapshotFromJson(json);
+
+@override@JsonKey() final  int schemaVersion;
+@override@JsonKey() final  int revision;
+ final  List<WorkspaceDocument> _documents;
+@override@JsonKey() List<WorkspaceDocument> get documents {
+  if (_documents is EqualUnmodifiableListView) return _documents;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_documents);
+}
+
+ final  List<WorkspaceAsset> _assets;
+@override@JsonKey() List<WorkspaceAsset> get assets {
+  if (_assets is EqualUnmodifiableListView) return _assets;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_assets);
+}
+
+ final  List<WorkspaceTodo> _todos;
+@override@JsonKey() List<WorkspaceTodo> get todos {
+  if (_todos is EqualUnmodifiableListView) return _todos;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_todos);
+}
+
+ final  List<WorkspaceJob> _jobs;
+@override@JsonKey() List<WorkspaceJob> get jobs {
+  if (_jobs is EqualUnmodifiableListView) return _jobs;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableListView(_jobs);
+}
+
+@override@JsonKey() final  WorkspacePreferences preferences;
+
+/// Create a copy of WorkspaceSnapshot
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkspaceSnapshotCopyWith<_WorkspaceSnapshot> get copyWith => __$WorkspaceSnapshotCopyWithImpl<_WorkspaceSnapshot>(this, _$identity);
+
+@override
+Map<String, dynamic> toJson() {
+  return _$WorkspaceSnapshotToJson(this, );
+}
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceSnapshot&&(identical(other.schemaVersion, schemaVersion) || other.schemaVersion == schemaVersion)&&(identical(other.revision, revision) || other.revision == revision)&&const DeepCollectionEquality().equals(other.documents, _documents)&&const DeepCollectionEquality().equals(other.assets, _assets)&&const DeepCollectionEquality().equals(other.todos, _todos)&&const DeepCollectionEquality().equals(other.jobs, _jobs)&&(identical(other.preferences, preferences) || other.preferences == preferences));
+}
+
+@JsonKey(includeFromJson: false, includeToJson: false)
+@override
+int get hashCode {
+    return Object.hash(runtimeType,schemaVersion,revision,const DeepCollectionEquality().hash(_documents),const DeepCollectionEquality().hash(_assets),const DeepCollectionEquality().hash(_todos),const DeepCollectionEquality().hash(_jobs),preferences);
+}
+
+@override
+String toString() {
+    return 'WorkspaceSnapshot(schemaVersion: $schemaVersion, revision: $revision, documents: $documents, assets: $assets, todos: $todos, jobs: $jobs, preferences: $preferences)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkspaceSnapshotCopyWith<$Res> implements $WorkspaceSnapshotCopyWith<$Res> {
+  factory _$WorkspaceSnapshotCopyWith(_WorkspaceSnapshot value, $Res Function(_WorkspaceSnapshot) _then) = __$WorkspaceSnapshotCopyWithImpl;
+@override @useResult
+$Res call({
+ int schemaVersion, int revision, List<WorkspaceDocument> documents, List<WorkspaceAsset> assets, List<WorkspaceTodo> todos, List<WorkspaceJob> jobs, WorkspacePreferences preferences
+});
+
+
+@override $WorkspacePreferencesCopyWith<$Res> get preferences;
+
+}
+/// @nodoc
+class __$WorkspaceSnapshotCopyWithImpl<$Res>
+    implements _$WorkspaceSnapshotCopyWith<$Res> {
+  __$WorkspaceSnapshotCopyWithImpl(this._self, this._then);
+
+  final _WorkspaceSnapshot _self;
+  final $Res Function(_WorkspaceSnapshot) _then;
+
+/// Create a copy of WorkspaceSnapshot
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? schemaVersion = null,Object? revision = null,Object? documents = null,Object? assets = null,Object? todos = null,Object? jobs = null,Object? preferences = null,}) {
+  return _then(_WorkspaceSnapshot(
+schemaVersion: null == schemaVersion ? _self.schemaVersion : schemaVersion // ignore: cast_nullable_to_non_nullable
+as int,revision: null == revision ? _self.revision : revision // ignore: cast_nullable_to_non_nullable
+as int,documents: null == documents ? _self._documents : documents // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceDocument>,assets: null == assets ? _self._assets : assets // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceAsset>,todos: null == todos ? _self._todos : todos // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceTodo>,jobs: null == jobs ? _self._jobs : jobs // ignore: cast_nullable_to_non_nullable
+as List<WorkspaceJob>,preferences: null == preferences ? _self.preferences : preferences // ignore: cast_nullable_to_non_nullable
+as WorkspacePreferences,
+  ));
+}
+
+/// Create a copy of WorkspaceSnapshot
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WorkspacePreferencesCopyWith<$Res> get preferences {
+  
+  return $WorkspacePreferencesCopyWith<$Res>(_self.preferences, (value) {
+    return _then(_self.copyWith(preferences: value));
+  });
+}
+}
+
+/// @nodoc
+mixin _$WorkspaceState {
+
+ WorkspaceSnapshot get snapshot; bool get initialized; bool get saving; String? get error;
+/// Create a copy of WorkspaceState
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$WorkspaceStateCopyWith<WorkspaceState> get copyWith => _$WorkspaceStateCopyWithImpl<WorkspaceState>(this as WorkspaceState, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+  final _this = this as WorkspaceState;
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is WorkspaceState&&(identical(other.snapshot, _this.snapshot) || other.snapshot == _this.snapshot)&&(identical(other.initialized, _this.initialized) || other.initialized == _this.initialized)&&(identical(other.saving, _this.saving) || other.saving == _this.saving)&&(identical(other.error, _this.error) || other.error == _this.error));
+}
+
+
+@override
+int get hashCode {
+  final _this = this as WorkspaceState;
+  return Object.hash(runtimeType,_this.snapshot,_this.initialized,_this.saving,_this.error);
+}
+
+@override
+String toString() {
+  final _this = this as WorkspaceState;
+  return 'WorkspaceState(snapshot: ${_this.snapshot}, initialized: ${_this.initialized}, saving: ${_this.saving}, error: ${_this.error})';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $WorkspaceStateCopyWith<$Res>  {
+  factory $WorkspaceStateCopyWith(WorkspaceState value, $Res Function(WorkspaceState) _then) = _$WorkspaceStateCopyWithImpl;
+@useResult
+$Res call({
+ WorkspaceSnapshot snapshot, bool initialized, bool saving, String? error
+});
+
+
+$WorkspaceSnapshotCopyWith<$Res> get snapshot;
+
+}
+/// @nodoc
+class _$WorkspaceStateCopyWithImpl<$Res>
+    implements $WorkspaceStateCopyWith<$Res> {
+  _$WorkspaceStateCopyWithImpl(this._self, this._then);
+
+  final WorkspaceState _self;
+  final $Res Function(WorkspaceState) _then;
+
+/// Create a copy of WorkspaceState
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') @override $Res call({Object? snapshot = null,Object? initialized = null,Object? saving = null,Object? error = freezed,}) {
+  return _then(WorkspaceState(
+snapshot: null == snapshot ? _self.snapshot : snapshot // ignore: cast_nullable_to_non_nullable
+as WorkspaceSnapshot,initialized: null == initialized ? _self.initialized : initialized // ignore: cast_nullable_to_non_nullable
+as bool,saving: null == saving ? _self.saving : saving // ignore: cast_nullable_to_non_nullable
+as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+/// Create a copy of WorkspaceState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WorkspaceSnapshotCopyWith<$Res> get snapshot {
+  
+  return $WorkspaceSnapshotCopyWith<$Res>(_self.snapshot, (value) {
+    return _then(_self.copyWith(snapshot: value));
+  });
+}
+}
+
+
+/// Adds pattern-matching-related methods to [WorkspaceState].
+extension WorkspaceStatePatterns on WorkspaceState {
+/// A variant of `map` that fallback to returning `orElse`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>(TResult Function( _WorkspaceState value)?  $default,{required TResult orElse(),}){
+final _that = this;
+switch (_that) {
+case _WorkspaceState() when $default != null:
+return $default(_that);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// Callbacks receives the raw object, upcasted.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case final Subclass2 value:
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult map<TResult extends Object?>(TResult Function( _WorkspaceState value)  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceState():
+return $default(_that);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `map` that fallback to returning `null`.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case final Subclass value:
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>(TResult? Function( _WorkspaceState value)?  $default,){
+final _that = this;
+switch (_that) {
+case _WorkspaceState() when $default != null:
+return $default(_that);case _:
+  return null;
+
+}
+}
+/// A variant of `when` that fallback to an `orElse` callback.
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return orElse();
+/// }
+/// ```
+
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( WorkspaceSnapshot snapshot,  bool initialized,  bool saving,  String? error)?  $default,{required TResult orElse(),}) {final _that = this;
+switch (_that) {
+case _WorkspaceState() when $default != null:
+return $default(_that.snapshot,_that.initialized,_that.saving,_that.error);case _:
+  return orElse();
+
+}
+}
+/// A `switch`-like method, using callbacks.
+///
+/// As opposed to `map`, this offers destructuring.
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case Subclass2(:final field2):
+///     return ...;
+/// }
+/// ```
+
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( WorkspaceSnapshot snapshot,  bool initialized,  bool saving,  String? error)  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceState():
+return $default(_that.snapshot,_that.initialized,_that.saving,_that.error);case _:
+  throw StateError('Unexpected subclass');
+
+}
+}
+/// A variant of `when` that fallback to returning `null`
+///
+/// It is equivalent to doing:
+/// ```dart
+/// switch (sealedClass) {
+///   case Subclass(:final field):
+///     return ...;
+///   case _:
+///     return null;
+/// }
+/// ```
+
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( WorkspaceSnapshot snapshot,  bool initialized,  bool saving,  String? error)?  $default,) {final _that = this;
+switch (_that) {
+case _WorkspaceState() when $default != null:
+return $default(_that.snapshot,_that.initialized,_that.saving,_that.error);case _:
+  return null;
+
+}
+}
+
+}
+
+/// @nodoc
+
+
+class _WorkspaceState implements WorkspaceState {
+  const _WorkspaceState({this.snapshot = const WorkspaceSnapshot(), this.initialized = false, this.saving = false, this.error});
+  
+
+@override@JsonKey() final  WorkspaceSnapshot snapshot;
+@override@JsonKey() final  bool initialized;
+@override@JsonKey() final  bool saving;
+@override final  String? error;
+
+/// Create a copy of WorkspaceState
+/// with the given fields replaced by the non-null parameter values.
+@override @JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$WorkspaceStateCopyWith<_WorkspaceState> get copyWith => __$WorkspaceStateCopyWithImpl<_WorkspaceState>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _WorkspaceState&&(identical(other.snapshot, snapshot) || other.snapshot == snapshot)&&(identical(other.initialized, initialized) || other.initialized == initialized)&&(identical(other.saving, saving) || other.saving == saving)&&(identical(other.error, error) || other.error == error));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,snapshot,initialized,saving,error);
+}
+
+@override
+String toString() {
+    return 'WorkspaceState(snapshot: $snapshot, initialized: $initialized, saving: $saving, error: $error)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$WorkspaceStateCopyWith<$Res> implements $WorkspaceStateCopyWith<$Res> {
+  factory _$WorkspaceStateCopyWith(_WorkspaceState value, $Res Function(_WorkspaceState) _then) = __$WorkspaceStateCopyWithImpl;
+@override @useResult
+$Res call({
+ WorkspaceSnapshot snapshot, bool initialized, bool saving, String? error
+});
+
+
+@override $WorkspaceSnapshotCopyWith<$Res> get snapshot;
+
+}
+/// @nodoc
+class __$WorkspaceStateCopyWithImpl<$Res>
+    implements _$WorkspaceStateCopyWith<$Res> {
+  __$WorkspaceStateCopyWithImpl(this._self, this._then);
+
+  final _WorkspaceState _self;
+  final $Res Function(_WorkspaceState) _then;
+
+/// Create a copy of WorkspaceState
+/// with the given fields replaced by the non-null parameter values.
+@override @pragma('vm:prefer-inline') $Res call({Object? snapshot = null,Object? initialized = null,Object? saving = null,Object? error = freezed,}) {
+  return _then(_WorkspaceState(
+snapshot: null == snapshot ? _self.snapshot : snapshot // ignore: cast_nullable_to_non_nullable
+as WorkspaceSnapshot,initialized: null == initialized ? _self.initialized : initialized // ignore: cast_nullable_to_non_nullable
+as bool,saving: null == saving ? _self.saving : saving // ignore: cast_nullable_to_non_nullable
+as bool,error: freezed == error ? _self.error : error // ignore: cast_nullable_to_non_nullable
+as String?,
+  ));
+}
+
+/// Create a copy of WorkspaceState
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$WorkspaceSnapshotCopyWith<$Res> get snapshot {
+  
+  return $WorkspaceSnapshotCopyWith<$Res>(_self.snapshot, (value) {
+    return _then(_self.copyWith(snapshot: value));
+  });
+}
+}
+
+// dart format on

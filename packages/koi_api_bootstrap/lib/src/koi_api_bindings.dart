@@ -1,8 +1,10 @@
 import 'package:koi_api_bootstrap/src/koi_api_log.dart';
 import 'package:koi_api_bootstrap/src/koi_memory_token_session.dart';
 
-typedef KoiApiUnauthorizedCallback =
-    Future<void> Function(int? statusCode, String? message);
+typedef KoiApiUnauthorizedCallback = Future<void> Function(
+  int? statusCode,
+  String? message,
+);
 
 typedef KoiApiErrorCallback = void Function(String message);
 
@@ -16,8 +18,8 @@ class KoiApiBindings {
          tokenStorage ?? KoiMemoryTokenSession(),
        );
 
-  /// The canonical session used by both repositories and network adapters.
-  /// Persisted storage passed to the constructor must not be used directly.
+  /// 仓库和网络适配器共用的规范会话。
+  /// 传入构造函数的持久化存储不得绕过此会话直接使用。
   final KoiRevocableTokenSession tokenSession;
   final KoiApiUnauthorizedCallback? onUnauthorized;
   final KoiApiErrorCallback? onError;
@@ -27,10 +29,10 @@ class KoiApiBindings {
   String? _unauthorizedToken;
   int? _unauthorizedRevision;
 
-  /// Clears the token and invokes the unauthorized callback once.
+  /// 清除令牌，并且只调用一次未授权回调。
   ///
-  /// Multiple interceptors can observe the same 401 response. Concurrent calls
-  /// share one operation, and later calls become no-ops after the token clears.
+  /// 多个拦截器可能观察到同一个 401 响应。并发调用会共用同一操作；令牌清除后，
+  /// 后续调用将不再产生效果。
   Future<bool> handleUnauthorized({
     int? statusCode,
     String? message,

@@ -1,0 +1,226 @@
+[
+  {
+    "source": "packages/koi_ui/lib/koi_ui.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/theme/app_theme.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/theme/app_colors.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/theme/koi_material_theme.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_menu.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_error_state.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_panel_icon.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_loading_state.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_property_row.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_popover.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_navigation_history_controls.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_resizable_split_view.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_toolbar.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_section.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_reading_pane.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_status_layout.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_selectable_list_tile.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_search_field.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_empty_state.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "packages/koi_ui/lib/widgets/koi_panel.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/bootstrap.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/main.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/app.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/application/workspace_session.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/selected_source_cleanup.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/selected_source_cleanup_web.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/workspace_storage_types.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/workspace_storage.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/selected_source_cleanup_stub.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/workspace_storage_native.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/image_thumbnail.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/workspace_storage_web.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/file_selector_import_port.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/data/workspace_storage_stub.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/domain/workspace_ports.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/domain/workspace_models.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/providers/workspace_providers.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/providers/navigation_providers.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/models/text_view_state.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/screens/tasks_page.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/screens/text_page.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/screens/media_page.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/services/media_frame_gate.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/services/media_preview_session.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/services/media_frame_gate_stub.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/services/media_frame_gate_web.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/services/media_retry.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_shell.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_panels.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/features/workspace/presentation/widgets/workspace_save_status.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/core/window/workbench_window_chrome.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/core/router/workbench_navigation_history.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/core/router/app_routes.dart",
+    "matches_final_source": true
+  },
+  {
+    "source": "examples/workbench_app/lib/core/router/app_navigation.dart",
+    "matches_final_source": true
+  }
+]

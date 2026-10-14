@@ -1,0 +1,26 @@
+[
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "sha256": "90099a917dfdd9a09bb274f7a9684515e89bc9efe1eccfceef9f3b2fb76c6743"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+    "sha256": "809e1fa32f77ce9d502b2a11aaa497a6aebe43b65825adda8d542e092338b427"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_components_test.dart",
+    "sha256": "08105c05c0896f8a0fef4f89e4802a754f80b875af2c2cc02a2cd352a8c285b2"
+  },
+  {
+    "path": "packages/koi_ui/README.md",
+    "sha256": "94406c130c3f3fcbd3479fed34cabbc064b77b9bbbd49f8c0f8d4d86fef9f6d7"
+  },
+  {
+    "path": "docs/architecture/ui-and-adaptive.md",
+    "sha256": "79ed2429d8e6923c61a8a7efbaf8574c57ea73f99c413129ef875c68d0d4d3a7"
+  },
+  {
+    "path": "docs/validation/2026-09-30-workbench.md",
+    "sha256": "1abfb313c3c3eb111616f8d3c69904eef2bb3feee7284a8d9eafa3485444ba39"
+  }
+]

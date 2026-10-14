@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:koi_admin_app/bootstrap.dart';
 import 'package:koi_admin_app/core/bootstrap/bootstrap_failure_app.dart';
@@ -14,6 +15,6 @@ Future<void> main() async {
         library: 'koi_admin_app bootstrap',
       ),
     );
-    runApp(BootstrapFailureApp(error: error));
+    runApp(ProviderScope(child: BootstrapFailureApp(error: error)));
   }
 }

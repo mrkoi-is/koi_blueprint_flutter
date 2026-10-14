@@ -1,19 +1,25 @@
+import 'package:koi_ui/l10n/koi_ui_strings.dart';
 import 'package:flutter/material.dart';
+import 'package:koi_ui/widgets/koi_status_layout.dart';
 
 class KoiLoadingState extends StatelessWidget {
-  const KoiLoadingState({super.key, this.message = '正在准备工作区...'});
+  const KoiLoadingState({super.key, this.message});
 
-  final String message;
+  final String? message;
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return KoiStatusLayout(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           const CircularProgressIndicator(),
           const SizedBox(height: 16),
-          Text(message, style: Theme.of(context).textTheme.titleMedium),
+          Text(
+            message ?? KoiUiStrings.of(context).loading,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.titleMedium,
+          ),
         ],
       ),
     );

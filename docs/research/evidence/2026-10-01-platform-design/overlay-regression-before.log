@@ -1,0 +1,100 @@
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart
+00:00 +0: modal popover hides the background and traps focus until Escape
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: '资料操作'
+  Actual: '资料操作\n'
+            '资料操作'
+   Which: is different. Both strings start the same, but the actual value also has the following
+trailing characters: \n资料操作
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart:32:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart line 32
+The test description was:
+  modal popover hides the background and traps focus until Escape
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:00 +0 -1: modal popover hides the background and traps focus until Escape [E]
+  Test failed. See exception logs above.
+  The test description was: modal popover hides the background and traps focus until Escape
+  
+00:00 +0 -1: popover content stays above keyboard and is scrollable
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: a value less than or equal to <284>
+  Actual: <360.0>
+   Which: is not a value less than or equal to <284>
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart:77:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart line 77
+The test description was:
+  popover content stays above keyboard and is scrollable
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -2: popover content stays above keyboard and is scrollable [E]
+  Test failed. See exception logs above.
+  The test description was: popover content stays above keyboard and is scrollable
+  
+00:01 +0 -2: menu trigger exposes one label and expanded state
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following TestFailure was thrown running a test:
+Expected: has semantics with label: 工作区设置 with actions: [tap, focus]  without actions: [longPress,
+scrollLeft, scrollRight, scrollUp, scrollDown, increase, decrease, showOnScreen,
+moveCursorForwardByCharacter, moveCursorBackwardByCharacter, setSelection, copy, cut, paste,
+didGainAccessibilityFocus, didLoseAccessibilityFocus, dismiss, moveCursorForwardByWord,
+moveCursorBackwardByWord, setText]  with flags:
+isButton,isFocusable,hasEnabledState,isEnabled,hasExpandedState  without flags: hasCheckedState,
+isChecked, isCheckStateMixed, isSelected, hasSelectedState, isSlider, isKeyboardKey, isLink,
+isTextField, isReadOnly, isFocused, isInMutuallyExclusiveGroup, isHeader, isObscured, isMultiline,
+namesRoute, scopesRoute, isHidden, isImage, isLiveRegion, hasToggledState, isToggled,
+hasImplicitScrolling, isExpanded, hasRequiredState, isRequired  with validation result:
+SemanticsValidationResult.none
+  Actual: SemanticsNode:<SemanticsNode#5(Rect.fromLTRB(0.0, 0.0, 94.5, 48.0), actions: [focus, tap],
+flags: [isButton, hasEnabledState, isEnabled, isFocusable], label: "工作区设置\n工作区设置", textDirection:
+ltr)>
+   Which: label was 工作区设置
+          工作区设置
+
+When the exception was thrown, this was the stack:
+#4      main.<anonymous closure> (file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart:96:5)
+<asynchronous suspension>
+#5      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#6      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+This was caught by the test expectation on the following line:
+  file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart line 96
+The test description was:
+  menu trigger exposes one label and expanded state
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:01 +0 -3: menu trigger exposes one label and expanded state [E]
+  Test failed. See exception logs above.
+  The test description was: menu trigger exposes one label and expanded state
+  
+00:01 +0 -3: Some tests failed.
+
+Failing tests:
+  /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: menu trigger exposes one label and expanded state
+  /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+  /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: popover content stays above keyboard and is scrollable

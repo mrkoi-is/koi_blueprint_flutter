@@ -1,0 +1,76 @@
+{
+  "date": "2026-09-30",
+  "scope": "Subtle structural edges and contextual short resize grips",
+  "baseline": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-subtle-divider-baseline-20260930-0bn9wgnr",
+  "validation": {
+    "result": "PASS",
+    "coverage_percent": 87.23,
+    "covered_lines": 3422,
+    "handwritten_lines": 3923,
+    "targeted_ui_tests": 16,
+    "targeted_workspace_tests": 16,
+    "workbench_vm_tests": 72,
+    "chrome_storage_tests": 8
+  },
+  "macos": {
+    "debug_build": "PASS",
+    "real_runtime": "PASS",
+    "native_window_id": 19731,
+    "observations": [
+      "Default full-height resize lines are absent",
+      "Sidebar drag moves boundary; restoring width preserves selected Chinese document",
+      "Short brand-colored grip appears during active resize/focus",
+      "Dark/light switching keeps default divider lines hidden",
+      "Returned to light theme after capture"
+    ]
+  },
+  "screenshots": [
+    {
+      "file": "text-light.png",
+      "bytes": 1639448,
+      "sha256": "a01af56f04e54534a6700b8043512d869a476afb937d712a65673d90c00204f3",
+      "original": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/codex-shot-2026-09-30_16-59-26.png",
+      "modified": false
+    },
+    {
+      "file": "text-dark.png",
+      "bytes": 1466661,
+      "sha256": "c01b91edb3eda0f7231ad19b7efd91cb5aa339b6c802cdb08c8413babd358e07",
+      "original": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/codex-shot-2026-09-30_16-58-18.png",
+      "modified": false
+    }
+  ],
+  "logs": [
+    {
+      "file": "validate.log",
+      "bytes": 110714,
+      "sha256": "5c03785f91cc3ed6b7125753ad68c2f0922524a4062087a437f064f4e5535844"
+    },
+    {
+      "file": "macos-build.log",
+      "bytes": 1097,
+      "sha256": "034d0abe7799803cae3ae6be32f4a35aea59777dbbe050b6f91cb101b01164c7"
+    },
+    {
+      "file": "ui-tests.log",
+      "bytes": 1816,
+      "sha256": "7e682433746249f3c9014818578e2fb64899ccb2b300d32870ce2a137a4dc9f2"
+    },
+    {
+      "file": "workspace-tests.log",
+      "bytes": 2256,
+      "sha256": "a6861371d4c45159d16092cb0b63cb9aa79ee59d298794ef435728d906db20a7"
+    }
+  ],
+  "reference": {
+    "file": "codex-style-reference.json",
+    "bytes": 857,
+    "sha256": "fa86d5521bf4734d922e07b41ed8616d5c131181658de5b8605fa525addee210"
+  },
+  "source_verification": "Two modified shared UI sources exactly match the running fixture host after capture",
+  "not_run": [
+    "Other target platform builds and real runs",
+    "Fresh template generation for this appearance-only change",
+    "Remote CI"
+  ]
+}

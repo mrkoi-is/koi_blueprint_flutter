@@ -1,0 +1,5 @@
+{
+  "parent": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-content-surface-generator-s_yo9ctb/新工作台",
+  "child": "/var/folders/lz/612zcv0d71q1c4v_mbpbcz1c0000gn/T/koi-content-surface-generator-s_yo9ctb/递归工作台",
+  "verification": "PASS: macos/web create, analyze, exact transformed source, one native toolbar and fixture bytes"
+}

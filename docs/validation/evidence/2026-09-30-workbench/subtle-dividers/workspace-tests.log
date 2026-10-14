@@ -1,0 +1,32 @@
+Resolving dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies in `/Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter`!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart
+00:00 +0: toolbar replays content history and retains editors and player
+00:01 +1: history shortcuts replay pages without ordinary typing navigation
+00:01 +2: native toolbar owns the top row and replays the shared history (variant: TargetPlatform.macOS)
+00:01 +3: macOS history shortcuts work before focusing a control (variant: TargetPlatform.macOS)
+macOS window chrome unavailable: MissingPluginException(No implementation found for method applyChrome on channel koi/workbench_window)
+00:01 +4: sidebar search, rename, todo CRUD and theme settings are real consumers
+00:02 +5: 320 width and 200 percent text remain usable across all views
+00:02 +6: Cmd/Ctrl+O opens current import and both real panel widths persist
+00:02 +7: one job state update does not rebuild theme or unrelated document editor
+00:02 +8: text draft, selection and controller survive resize and three navigation branches
+00:03 +9: Ctrl+S saves once and save failure keeps the editable draft
+00:03 +10: media resize retains player/controller, route exit pauses and does not autoplay on return
+00:03 +11: initialization failure offers a real retry
+00:03 +12: task retry selects and mounts video B while retaining its failed job
+00:03 +13: cancelled import can retry and direct routes persist the last view
+00:03 +14: media search, category filters, grid/list selection and image read retry
+00:03 +15: image thumbnail retry preserves the failed job and publishes a new stored thumbnail
+00:04 +16: All tests passed!

@@ -1,0 +1,52 @@
+[
+  {
+    "path": "DESIGN.md",
+    "beforeSha256": "91400c0fff138cd13c21301192cdccb4dc14d9d573201e6832b69db4c3d79938",
+    "afterSha256": "ee1453e171a46493a1bb5ffaa2883f1605ec74903f645b38ca00d80970fc3dec"
+  },
+  {
+    "path": "packages/koi_ui/README.md",
+    "beforeSha256": "214e3a4d79f6ec9576ecc8ff470ab8ac0d4e9d4c0553a410a02edae2ecc8c689",
+    "afterSha256": "974982e92cf867c2601a77e95db9619c0bcbd73114e6781799f55b6203bd8630"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/app_colors.dart",
+    "beforeSha256": "66061242573a82513774c19df4db954ecd78f3d4d2d8daf8442c0e3e44d6dcb8",
+    "afterSha256": "0ddbe9e16c32d52f2ceaf6f2f0a17e0e24291aee44fc69d763afdc9ccb138023"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/app_theme.dart",
+    "beforeSha256": "5b874d5297a05d5e25b023dc0f917c2881cfe21b0771431bb3597b66ece93a10",
+    "afterSha256": "7225ea2c6575bcaff583925d1918cbd16c9d59550bf1d00ef903883626658043"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+    "beforeSha256": "c68841e1393287921ce2567f70e181d1fe59d0d0444ea6bf2307b7672160dd8d",
+    "afterSha256": "ee94dd348dcc5aa3ae1897b58a79719b35f060197be2ca1546f337c02403f63f"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "beforeSha256": "cae7f0fb2c68b7f330d502a1cb958ccad5de3ae37b95649c041924cd7e877c64",
+    "afterSha256": "470ef6a6442a70d55c862ce60cf1aa6b5cbffcf05928409420b42dfda8ab7dfd"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_components_test.dart",
+    "beforeSha256": "022986ed55dc8e284c290c239f3edbb98e7b2e772c1f00c912e40f5a53781054",
+    "afterSha256": "3d173af7fa14272f5b145f6fbd93f0e6d304e396ad776431352192d926dab431"
+  },
+  {
+    "path": "packages/koi_ui/test/koi_accessible_theme_test.dart",
+    "beforeSha256": "93523acef20d7fd2d9b232d12007b62603806ac2fca5320bcf4cc5ba1d675291",
+    "afterSha256": "c6e799924b8110b23279f5a43b858a2a135793381f6f98915c20e7123a184210"
+  },
+  {
+    "path": "tool/platform_configuration.py",
+    "beforeSha256": "e148d4b20d313e93931fbec40d08b4458e90df01d0727b58cfcdbb508a5c8c14",
+    "afterSha256": "3da5b35246b9c890feb05ad346172554761dfcbdab95413216dabe1030e66fdb"
+  },
+  {
+    "path": "tool/tests/test_platform_configuration.py",
+    "beforeSha256": "99fe83a110ef1f346e89da3c9c827dd4ec3c7aa005bc7a736e1ebb161a62d2e8",
+    "afterSha256": "9a9f16e3aa059a7badda67bf759e4bf508f56c0939d71663abd8d49959fe8cab"
+  }
+]

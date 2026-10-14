@@ -2,17 +2,15 @@
 <html>
 <head>
   <!--
-    If you are serving your web app in a path other than the root, change the
-    href value below to reflect the base path you are serving from.
+    如果 Web 应用部署在根路径以外，请将下方 href 值改为实际部署的基础路径。
 
-    The path provided below has to start and end with a slash "/" in order for
-    it to work correctly.
+    为确保路径生效，下方路径必须以斜杠 "/" 开头并结尾。
 
-    For more details:
+    详细信息：
     * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
 
-    This is a placeholder for base href that will be replaced by the value of
-    the `--base-href` argument provided to `flutter build`.
+    这是基础路径占位符，Flutter 构建时会将其替换为 `flutter build` 命令
+    中 `--base-href` 参数指定的值。
   -->
   <base href="$FLUTTER_BASE_HREF">
 
@@ -20,13 +18,13 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Koi Flutter workspace admin blueprint.">
 
-  <!-- iOS meta tags & icons -->
+  <!-- iOS 元数据标签和图标 -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="Koi Admin">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
-  <!-- Favicon -->
+  <!-- 网站图标 -->
   <link rel="icon" type="image/png" href="favicon.png"/>
 
   <title>Koi Blueprint Admin</title>
@@ -34,11 +32,10 @@
 </head>
 <body>
   <!--
-    You can customize the "flutter_bootstrap.js" script.
-    This is useful to provide a custom configuration to the Flutter loader
-    or to give the user feedback during the initialization process.
+    可以自定义 "flutter_bootstrap.js" 脚本，为 Flutter 加载器提供自定义配置，
+    或在初始化过程中向用户显示反馈。
 
-    For more details:
+    详细信息：
     * https://docs.flutter.dev/platform-integration/web/initialization
   -->
   <script src="flutter_bootstrap.js" async></script>

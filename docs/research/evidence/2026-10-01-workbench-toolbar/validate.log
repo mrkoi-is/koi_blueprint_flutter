@@ -1,0 +1,430 @@
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter pub get --enforce-lockfile
+Resolving dependencies...
+Downloading packages...
+  built_collection 5.1.1 (5.1.2 available)
+  cross_file 0.3.5+5 (0.4.0 available)
+  go_router 17.5.0 (18.0.2 available)
+  material_color_utilities 0.13.0 (0.13.1 available)
+  petitparser 7.0.2 (7.1.0 available)
+  platform 3.1.6 (3.2.0 available)
+  test_api 0.7.12 (0.7.14 available)
+  xml 7.0.1 (7.1.0 available)
+Got dependencies!
+8 packages have newer versions incompatible with dependency constraints.
+Try `flutter pub outdated` for more information.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 27 inputs; lib/app.dart
+  3s riverpod_generator on 27 inputs: 5 skipped, 1 same; spent 2s analyzing; lib/core/router/app_routes.dart
+  3s riverpod_generator on 27 inputs: 25 skipped, 1 same, 1 no-op; spent 2s analyzing
+  0s go_router_builder on 27 inputs; lib/app.dart
+  0s go_router_builder on 27 inputs: 13 skipped, 1 same, 13 no-op
+  0s source_gen:combining_builder on 27 inputs; lib/app.dart
+  0s source_gen:combining_builder on 27 inputs: 25 skipped, 2 same
+  0s freezed on 54 inputs; lib/app.dart
+  0s freezed on 54 inputs: 52 skipped, 2 no-op
+  Built with build_runner/aot in 3s; wrote 4 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s freezed on 3 inputs; lib/koi_auth.dart
+  0s freezed on 3 inputs: 3 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s freezed on 7 inputs; lib/error/app_failure.dart
+  0s freezed on 7 inputs: 7 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s freezed on 5 inputs; lib/entities/koi_user.dart
+  0s freezed on 5 inputs: 5 skipped
+  0s json_serializable on 10 inputs; lib/entities/koi_user.dart
+  0s json_serializable on 10 inputs: 10 skipped
+  0s source_gen:combining_builder on 10 inputs; lib/entities/koi_user.dart
+  0s source_gen:combining_builder on 10 inputs: 10 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 5 inputs; lib/app.dart
+  0s riverpod_generator on 5 inputs: 5 skipped
+  0s freezed on 5 inputs; lib/app.dart
+  0s freezed on 5 inputs: 5 skipped
+  0s json_serializable on 10 inputs; lib/app.dart
+  2s json_serializable on 10 inputs: 1 no-op; spent 2s analyzing; lib/app.freezed.dart
+  3s json_serializable on 10 inputs: 7 skipped, 3 no-op; spent 2s analyzing
+  0s go_router_builder on 10 inputs; lib/app.dart
+  0s go_router_builder on 10 inputs: 7 skipped, 3 no-op
+  0s source_gen:combining_builder on 10 inputs; lib/app.dart
+  0s source_gen:combining_builder on 10 inputs: 10 skipped
+  Built with build_runner/aot in 3s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 60 inputs; integration_test/support/fixture_import_port.dart
+  6s riverpod_generator on 60 inputs: 14 skipped, 2 no-op; spent 5s analyzing; lib/core/router/workbench_navigation_history.dart
+  6s riverpod_generator on 60 inputs: 54 skipped, 6 no-op; spent 5s analyzing
+  0s freezed on 60 inputs; integration_test/support/fixture_import_port.dart
+  0s freezed on 60 inputs: 54 skipped, 6 no-op
+  0s json_serializable on 120 inputs; integration_test/support/fixture_import_port.dart
+  0s json_serializable on 120 inputs: 102 skipped, 18 no-op
+  0s go_router_builder on 120 inputs; integration_test/support/fixture_import_port.dart
+  0s go_router_builder on 120 inputs: 102 skipped, 1 same, 17 no-op
+  0s source_gen:combining_builder on 120 inputs; integration_test/support/fixture_import_port.dart
+  0s source_gen:combining_builder on 120 inputs: 119 skipped, 1 same
+  Built with build_runner/aot in 7s; wrote 2 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s go_router_builder on 6 inputs; lib/minimal_module.dart
+  0s go_router_builder on 6 inputs: 6 skipped
+  0s source_gen:combining_builder on 6 inputs; lib/minimal_module.dart
+  0s source_gen:combining_builder on 6 inputs: 6 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 22 inputs; lib/feature_lab.dart
+  0s riverpod_generator on 22 inputs: 22 skipped
+  0s freezed on 22 inputs; lib/feature_lab.dart
+  0s freezed on 22 inputs: 22 skipped
+  0s json_serializable on 44 inputs; lib/feature_lab.dart
+  0s json_serializable on 44 inputs: 44 skipped
+  0s go_router_builder on 44 inputs; lib/feature_lab.dart
+  0s go_router_builder on 44 inputs: 44 skipped
+  0s source_gen:combining_builder on 44 inputs; lib/feature_lab.dart
+  0s source_gen:combining_builder on 44 inputs: 44 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 8 inputs; lib/app.dart
+  0s riverpod_generator on 8 inputs: 8 skipped
+  0s source_gen:combining_builder on 8 inputs; lib/app.dart
+  0s source_gen:combining_builder on 8 inputs: 8 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 4 inputs; lib/showcase_contracts.dart
+  0s riverpod_generator on 4 inputs: 4 skipped
+  0s source_gen:combining_builder on 4 inputs; lib/showcase_contracts.dart
+  0s source_gen:combining_builder on 4 inputs: 4 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 7 inputs; lib/showcase_alpha.dart
+  0s riverpod_generator on 7 inputs: 7 skipped
+  0s go_router_builder on 7 inputs; lib/showcase_alpha.dart
+  0s go_router_builder on 7 inputs: 7 skipped
+  0s source_gen:combining_builder on 7 inputs; lib/showcase_alpha.dart
+  0s source_gen:combining_builder on 7 inputs: 7 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run build_runner build
+  0s riverpod_generator on 7 inputs; lib/showcase_beta.dart
+  0s riverpod_generator on 7 inputs: 7 skipped
+  0s go_router_builder on 7 inputs; lib/showcase_beta.dart
+  0s go_router_builder on 7 inputs: 7 skipped
+  0s source_gen:combining_builder on 7 inputs; lib/showcase_beta.dart
+  0s source_gen:combining_builder on 7 inputs: 7 skipped
+  Built with build_runner/aot in 0s; wrote 0 outputs.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart format --output=none --set-exit-if-changed tool/include_browser_coverage.dart tool/check_architecture.dart tool/check_coverage_sources.dart tool/tests/coverage_sources_test.dart tool/tests/browser_coverage_test.dart tool/tests/architecture_test.dart tool/architecture/checker.dart apps/koi_admin_app/lib apps/koi_admin_app/test packages/koi_api_bootstrap/lib packages/koi_api_bootstrap/test packages/koi_auth/lib packages/koi_auth/test packages/koi_core/lib packages/koi_core/test packages/koi_domain/lib packages/koi_domain/test packages/koi_ui/lib packages/koi_ui/test packages/koi_modules/lib packages/koi_modules/test examples/starter_app/lib examples/starter_app/test examples/ui_lab/lib examples/ui_lab/test examples/workbench_app/lib examples/workbench_app/test examples/workbench_app/integration_test examples/minimal_module/lib examples/minimal_module/test examples/feature_lab/lib examples/feature_lab/test examples/module_showcase/lib examples/module_showcase/test examples/module_showcase/packages/showcase_contracts/lib examples/module_showcase/packages/showcase_contracts/test examples/module_showcase/modules/alpha/lib examples/module_showcase/modules/alpha/test examples/module_showcase/modules/beta/lib examples/module_showcase/modules/beta/test
+Formatted 243 files (0 changed) in 0.49 seconds.
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart run tool/check_architecture.dart --root /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter
+Architecture checks passed (16 workspace members).
++ /opt/homebrew/opt/python@3.14/bin/python3.14 tool/check_ai_assets.py --root /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter
+AI asset checks passed (canonical skills, discovery adapters, references and template inputs).
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart analyze --fatal-infos
+Analyzing koi_blueprint_flutter...
+No issues found!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter --version --machine
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/dart pub workspace list --json
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/config/app_environment_test.dart: AppEnvironment.fromName dev 是唯一允许 Mock 认证的环境
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_failure_app_test.dart: 启动失败时显示安全的兜底页面
+00:00 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:00 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:00 +12: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:00 +13: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:00 +14: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +15: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +16: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +17: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +18: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +19: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +20: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +21: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +22: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +23: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +24: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +25: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +26: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart: dev bootstrap wires auth, router, and the demo login
+00:01 +27: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/router/app_router_test.dart: 路由认证回归 登录成功后离开登录页，退出后返回登录页
+00:01 +28: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/router/app_router_test.dart: 路由认证回归 登录成功后离开登录页，退出后返回登录页
+00:01 +29: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/router/app_router_test.dart: 路由认证回归 登录成功后离开登录页，退出后返回登录页
+00:01 +30: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/core/router/app_router_test.dart: 路由认证回归 登录成功后离开登录页，退出后返回登录页
+00:02 +31: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/app_test.dart: 未登录时会进入登录页
+00:02 +32: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/app_test.dart: 未登录时会进入登录页
+00:02 +33: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/app_test.dart: 未登录时会进入登录页
+00:02 +34: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/apps/koi_admin_app/test/features/auth/data/repositories/auth_repository_impl_test.dart: AuthRepositoryImpl 只有令牌的新仓库实例会撤销缺失用户的孤立令牌
+00:02 +35: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiMemoryTokenSession saves, reads, and clears a token
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiMemoryTokenSession rejects an empty token
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiRevocableTokenSession masks a token before a failing clear reaches storage
+00:00 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiRevocableTokenSession successful save makes a replacement token readable again
+00:00 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiApiBindings clears the token before invoking unauthorized callback
+00:00 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiApiBindings coalesces concurrent unauthorized callbacks
+00:00 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiApiBindings forwards error and log callbacks without network types
+00:00 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiApiBindings revokes requests and notifies logout when token clear fails
+00:00 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiApiBindings ignores an unauthorized response from a replaced token
+00:00 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: KoiApiBindings does not notify logout when a new login starts during token clear
+00:00 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native runtime initializes with secure and quiet defaults
+00:00 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_secure_token_session_test.dart: KoiSecureTokenSession hydrates the persisted token on load
+00:00 +12: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +13: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +14: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +15: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +16: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +17: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +18: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +19: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: native error handler clears token and reports one 401
+00:00 +20: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: a whitelisted 401 does not revoke the current session
+00:00 +21: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: a structured 401 message still revokes the session
+00:00 +22: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: delayed 401 from an old request preserves a newer token
+00:00 +23: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart: delayed 401 cannot revoke a replacement session with the same token
+00:00 +24: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_auth/test/auth_session_test.dart
+00:00 +0: AuthSession 各状态只在 authenticated 时标记为已登录
+00:00 +1: AuthSession authenticated 暴露用户和令牌给模式匹配
+00:00 +2: AuthSession toString 不泄露认证令牌
+00:00 +3: AuthSession failure 保留可展示消息
+00:00 +4: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_failure_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_failure_test.dart: AppFailure displayMessage 返回各失败类型的可展示文案
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_failure_test.dart: AppFailure UnauthorizedFailure 有默认提示
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_failure_test.dart: AppFailure SerializationFailure 有安全的默认提示
+00:00 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_logger_test.dart: AppLogger 按级别转发消息、错误与堆栈
+00:00 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_logger_test.dart: AppLogger 按级别转发消息、错误与堆栈
+00:00 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_logger_test.dart: AppLogger 按级别转发消息、错误与堆栈
+00:00 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_logger_test.dart: AppLogger 按级别转发消息、错误与堆栈
+00:00 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_core/test/app_logger_test.dart: AppLogger sink 置空后恢复默认输出且不抛错
+00:00 +8: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_domain/test/koi_user_test.dart
+00:00 +0: KoiUser JSON roundtrip 保留全部字段并使用 snake_case
+00:00 +1: KoiUser tryFromJson 对缺失字段返回 SerializationFailure
+00:00 +2: KoiUser tryFromJson 对错误字段类型返回 SerializationFailure
+00:00 +3: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +12: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +13: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +14: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +15: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 320.0 need no second bar
+00:01 +16: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_design_behavior_test.dart: KoiDensity.comfortable Brightness.dark grows controls for large Chinese text
+00:01 +17: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_design_behavior_test.dart: KoiDensity.comfortable Brightness.dark grows controls for large Chinese text
+00:01 +18: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: menu executes enabled item once and closes
+00:01 +19: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 800.0 need no second bar
+00:01 +20: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: host panel commands at 800.0 need no second bar
+00:01 +21: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:01 +22: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:01 +23: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:01 +24: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +25: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +26: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +27: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +28: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +29: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_platform_layout_test.dart: frame rail targets stay 48 px in both densities and themes
+00:02 +30: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: Flutter fallback has panel icons in one compact header
+00:02 +31: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: Flutter fallback has panel icons in one compact header
+00:02 +32: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: Flutter fallback has panel icons in one compact header
+00:02 +33: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_workbench_toolbar_test.dart: Flutter fallback has panel icons in one compact header
+00:02 +34: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:02 +35: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:02 +36: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:02 +37: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:02 +38: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: workbench 320.0 at 200% keeps external editor state
+00:02 +39: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:02 +40: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:02 +41: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_accessible_theme_test.dart: KoiDensity.comfortable TextDirection.rtl selected marker preserves row geometry
+00:03 +42: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +43: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +44: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +45: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +46: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +47: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +48: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +49: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +50: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: modal popover hides the background and traps focus until Escape
+00:03 +51: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: short rail scrolls destinations while settings remain fixed
+00:03 +52: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: popover content stays above keyboard and is scrollable
+00:03 +53: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: popover content stays above keyboard and is scrollable
+00:03 +54: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: resize preserves external editor across layout branches
+00:03 +55: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_components_test.dart: resize preserves external editor across layout branches
+00:03 +56: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: system Back closes the popover before leaving its page
+00:04 +57: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: system Back closes the popover before leaving its page
+00:04 +58: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: system Back closes the popover before leaving its page
+00:04 +59: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: system Back closes a menu before leaving its page
+00:04 +60: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_ui/test/koi_overlay_accessibility_test.dart: menu trigger exposes one label and expanded state
+00:04 +61: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/packages/koi_modules/test/module_lifecycle_test.dart
+00:00 +0: immutable compile-time catalog preserves contributions without a global registry
+00:00 +1: immutable compile-time catalog rejects empty or duplicate module and navigation ids
+00:00 +2: immutable compile-time catalog rejects duplicate full paths through shells and route names
+00:00 +3: session ownership guard preserves active values and errors
+00:00 +4: session ownership late success and failure are both rejected after invalidation
+00:00 +5: session ownership cleanup is awaited, LIFO, once, and continues after failure
+00:00 +6: runtime transitions account change can explicitly restart the same module
+00:00 +7: runtime transitions switch invalidates immediately and awaits cleanup before constructing
+00:00 +8: runtime transitions unknown module does not invalidate current session
+00:00 +9: runtime transitions failed creation cleans partial resources and can retry
+00:00 +10: runtime transitions creation and cleanup errors are both retained
+00:00 +11: runtime transitions previous cleanup failure stops next factory and remains recoverable
+00:00 +12: runtime transitions rapid selections reject obsolete factories and keep the latest
+00:00 +13: runtime transitions dispose during factory rejects completion and closes partial state
+00:00 +14: runtime transitions ChangeNotifier disposal delegates to asynchronous owned cleanup
+00:00 +15: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/starter_app/test/app_test.dart
+00:00 +0: opens the initial typed route and disposes router
+00:00 +1: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/ui_lab_test.dart
+00:00 +0: theme, density, type size and long text switches are real
+00:02 +1: menu, popover, disabled button and status views work
+00:02 +2: width presets, side selection, editor state and layout tab work
+00:03 +3: All tests passed!
++ /Users/max/Workspace/env/fvm/versions/3.47.2/bin/flutter test --no-pub
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +12: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +13: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +14: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +15: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +16: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +17: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +18: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +19: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +20: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +21: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +22: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +23: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +24: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +25: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +26: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +27: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +28: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +28: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workbench_window_chrome_test.dart: missing or failed chrome leaves app content usable (variant: TargetPlatform.macOS)
+macOS window chrome failed: PlatformException(WINDOW_CLOSED, null, null, null)
+00:00 +29: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +30: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:00 +31: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +31: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workbench_window_chrome_test.dart: native toolbar errors leave the session usable (variant: TargetPlatform.macOS)
+macOS navigation toolbar failed: PlatformException(WINDOW_CLOSED, null, null, null)
+00:01 +32: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +33: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +34: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +35: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +36: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +37: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +38: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +39: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +40: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +41: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +42: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +43: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +44: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +45: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +46: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +47: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +48: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +49: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +50: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +51: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:01 +52: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +53: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +54: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +55: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:02 +56: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: toolbar replays content history and retains editors and player
+00:03 +57: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_accessibility_test.dart: media exposes selection, full names and adjustable labeled values
+00:03 +58: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_accessibility_test.dart: media exposes selection, full names and adjustable labeled values
+00:03 +59: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: native toolbar owns the top row and replays the shared history (variant: TargetPlatform.macOS)
+00:04 +60: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: native toolbar owns the top row and replays the shared history (variant: TargetPlatform.macOS)
+00:04 +61: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_accessibility_test.dart: thumbnail read retry stays separate from selection at scale 2.0
+00:04 +62: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: macOS history shortcuts work before focusing a control (variant: TargetPlatform.macOS)
+macOS window chrome unavailable: MissingPluginException(No implementation found for method applyChrome on channel koi/workbench_window)
+00:04 +63: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_accessibility_test.dart: todo controls are named and deletion requires a specific confirmation
+00:05 +64: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: sidebar search, rename, todo CRUD and theme settings are real consumers
+00:05 +65: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: sidebar search, rename, todo CRUD and theme settings are real consumers
+00:05 +66: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: sidebar search, rename, todo CRUD and theme settings are real consumers
+00:05 +67: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_accessibility_test.dart: short narrow views handle 200 percent text, pending media and keyboard
+00:06 +68: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: 320 width and 200 percent text remain usable across all views
+══╡ EXCEPTION CAUGHT BY FLUTTER TEST FRAMEWORK ╞════════════════════════════════════════════════════
+The following assertion was thrown running a test:
+The finder "Found 0 widgets with widget matching predicate: []" (used in a call to "tap()") could
+not find any matching widgets.
+
+When the exception was thrown, this was the stack:
+#0      WidgetController._getElementPoint (package:flutter_test/src/controller.dart:2095:7)
+#1      WidgetController.getCenter (package:flutter_test/src/controller.dart:1947:12)
+#2      WidgetController.tap (package:flutter_test/src/controller.dart:1080:7)
+#3      main.<anonymous closure> (file:///Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart:492:18)
+<asynchronous suspension>
+#4      testWidgets.<anonymous closure>.<anonymous closure> (package:flutter_test/src/widget_tester.dart:192:15)
+<asynchronous suspension>
+#5      TestWidgetsFlutterBinding._runTestBody (package:flutter_test/src/binding.dart:1953:5)
+<asynchronous suspension>
+<asynchronous suspension>
+(elided one frame from package:stack_trace)
+
+The test description was:
+  320 width and 200 percent text remain usable across all views
+════════════════════════════════════════════════════════════════════════════════════════════════════
+00:06 +68 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: 320 width and 200 percent text remain usable across all views [E]
+  Test failed. See exception logs above.
+  The test description was: 320 width and 200 percent text remain usable across all views
+  
+00:06 +68 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: Cmd/Ctrl+O opens current import and both real panel widths persist
+00:06 +69 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: one job state update does not rebuild theme or unrelated document editor
+00:06 +70 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: text draft, selection and controller survive resize and three navigation branches
+00:07 +71 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: Ctrl+S saves once and save failure keeps the editable draft
+00:07 +72 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: media resize retains player/controller, route exit pauses and does not autoplay on return
+00:07 +73 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: initialization failure offers a real retry
+00:07 +74 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: task retry selects and mounts video B while retaining its failed job
+00:07 +75 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: cancelled import can retry and direct routes persist the last view
+00:07 +76 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: media search, category filters, grid/list selection and image read retry
+00:08 +77 -1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: image thumbnail retry preserves the failed job and publishes a new stored thumbnail
+00:08 +78 -1: Some tests failed.
+
+Failing tests:
+  /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/workbench_app/test/workspace_presentation_test.dart: 320 width and 200 percent text remain usable across all views
+blueprint: Command failed (1)

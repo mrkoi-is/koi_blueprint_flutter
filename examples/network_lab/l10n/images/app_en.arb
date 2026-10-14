@@ -1,0 +1,57 @@
+{
+  "@@locale": "en",
+  "imagesTitle": "Images",
+  "imagesInputLabel": "HTTP(S) image URL / local path",
+  "imagesAsset": "Asset",
+  "imagesMemory": "Memory",
+  "imagesPickLocal": "Choose local image",
+  "imagesReadPath": "Read local path",
+  "imagesNetwork": "Network",
+  "imagesInvalidUrl": "Enter a valid HTTP(S) image URL",
+  "imagesReadError": "Could not read image: {error}",
+  "@imagesReadError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesLayout": "Layout {width} dp · DPR {dpr} · Decode limit {pixels} px",
+  "@imagesLayout": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "dpr": {
+        "type": "String"
+      },
+      "pixels": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesRetry": "Retry",
+  "imagesCacheHit": "Cache hit; available offline",
+  "imagesValidated": "Image loaded and validated",
+  "imagesClearCache": "Clear this page’s image cache and retry",
+  "imagesDecodeFailed": "Could not decode image: {error}",
+  "@imagesDecodeFailed": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "imagesDecodedSize": "Decoded {width} × {height} px",
+  "@imagesDecodedSize": {
+    "placeholders": {
+      "width": {
+        "type": "int"
+      },
+      "height": {
+        "type": "int"
+      }
+    }
+  },
+  "imagesPreview": "Image preview"
+}

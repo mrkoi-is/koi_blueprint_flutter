@@ -1,0 +1,16 @@
+00:00 +0: loading /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart
+00:00 +0: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: button hierarchy and menus execute distinct actions
+00:10 +1: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/ui_lab_test.dart: theme, density, type size and long text switches are real
+00:18 +2: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: validation, dropdown and unsaved inputs survive theme and tabs
+00:19 +3: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/ui_lab_test.dart: menu, popover, disabled button and status views work
+00:22 +4: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: selection, navigation and table sorting preserve user choices
+00:27 +5: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/ui_lab_test.dart: width presets, side selection, editor state and layout tab work
+00:28 +6: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/ui_lab_test.dart: width presets, side selection, editor state and layout tab work
+00:30 +7: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: dialog cancel does not commit, validation and confirm do
+00:30 +8: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: feedback supports undo, banner actions and sheet cancellation
+00:33 +9: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: keyboard stays in active catalog and narrow overlays remain usable
+00:35 +10: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: 320 wide at 200% retains usable categories and feedback
+00:38 +11: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: 600 wide at 200% retains usable categories and feedback
+00:41 +12: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: 1024 wide at 200% retains usable categories and feedback
+00:44 +13: /Users/max/Workspace/SourceCode/mrkoi/koi_blueprint_flutter/examples/ui_lab/test/standard_component_catalog_test.dart: 1440 wide at 200% retains usable categories and feedback
+00:47 +14: All tests passed!

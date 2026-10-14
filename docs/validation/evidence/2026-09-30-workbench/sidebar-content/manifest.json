@@ -1,0 +1,95 @@
+{
+  "date": "2026-09-30",
+  "scope": "Place content sidebar, main body and details inside the same rounded surface; fixed icon rail and title bar keep chrome background",
+  "code": "COMPLETE",
+  "targeted_tests": {
+    "koi_ui": {
+      "status": "PASS",
+      "tests": 16
+    },
+    "workspace_presentation": {
+      "status": "PASS",
+      "tests": 16
+    }
+  },
+  "macos": {
+    "build": "PASS",
+    "runtime": "PASS",
+    "window_id": 19938,
+    "observed": [
+      "Single rounded panel includes sidebar title, search and document list, editor and details",
+      "Light and dark themes checked; original light theme restored",
+      "Chinese document remained selected: 32 characters, revision 1, saved",
+      "Media category sidebar observed inside the same content surface"
+    ],
+    "screenshots_unmodified": [
+      "text-light.png",
+      "text-dark.png"
+    ]
+  },
+  "not_run": [
+    "Android/iOS/Windows/Linux/Web builds in this iteration",
+    "Android/iOS/Windows/Linux/Web/Safari runtime in this iteration",
+    "Fresh project generation and recursive generation smoke in this iteration"
+  ],
+  "first_validate": "FAILED: baseline Dart source copies were analyzed as root sources; retained as .dart.txt evidence and reran without expanding exclusions",
+  "full_validate": {
+    "status": "PASS",
+    "exit_code": 0,
+    "coverage_percent": 87.23,
+    "covered_lines": 3423,
+    "executable_lines": 3924,
+    "workbench_vm_tests": 72,
+    "chrome_storage_tests": 8
+  },
+  "artifacts": {
+    "ui-components.log": {
+      "sha256": "876f79fb9cce6c609e15f71d7f7b9935e14597fd5f296359ad299a9ee35877d7",
+      "bytes": 1816
+    },
+    "workspace-presentation.log": {
+      "sha256": "11eaf2479396073b5eed9f27f93fa488e11051863c8f102642486e28b95254fe",
+      "bytes": 2323
+    },
+    "macos-build.log": {
+      "sha256": "034d0abe7799803cae3ae6be32f4a35aea59777dbbe050b6f91cb101b01164c7",
+      "bytes": 1097
+    },
+    "text-light.png": {
+      "sha256": "8be01310857f4c82e6b998f5871aedb6acd60fc21e159db42e8dcab5f8a92c3a",
+      "bytes": 1667322
+    },
+    "text-dark.png": {
+      "sha256": "33df004c68b357e370d1ee8488bd5cef688d2bc96bbdf98d8cd622158a5dae9d",
+      "bytes": 1683584
+    },
+    "runtime-sources.json": {
+      "sha256": "1ee92a619b4538f918e7273f1251f5153075372d380ee25e33daab677b4bd25e",
+      "bytes": 721
+    },
+    "surface-colors.json": {
+      "sha256": "960efcfdfcd4251e7cb6326c9a1bfaa7bffdf3bda7ba1de943638a8938b5cc57",
+      "bytes": 1564
+    },
+    "changes-from-baseline.diff": {
+      "sha256": "b724b67ce791f0b65d7149735f9e07b765f37da0b68473c1675ecc6bad231c1a",
+      "bytes": 10672
+    },
+    "validate-baseline-artifact-failed.log": {
+      "sha256": "203200e5d91bebb9a08e277c8dc936fd28a62ccd70bdcf9ae8b2d374f75383cc",
+      "bytes": 11856
+    },
+    "baseline.json": {
+      "sha256": "93446e1ca5bdad9013ffa849ae66820036f1204d58768a7294df07f97fde7346",
+      "bytes": 1367
+    },
+    "validate.log": {
+      "sha256": "da9068dac758818afd37b607a355ee712877531777197c3c2f30e03d2e9e1fc1",
+      "bytes": 110097
+    },
+    "source-manifest.json": {
+      "sha256": "da511afb9e581929a0e7d7e1758e70852493a523e0869e5937e95066e9a727ed",
+      "bytes": 883
+    }
+  }
+}

@@ -1,0 +1,82 @@
+--- before/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
++++ after/packages/koi_ui/lib/widgets/koi_workbench_frame.dart
+@@ -237,13 +237,15 @@
+         );
+       }
+       content = Padding(
+-        padding: const EdgeInsets.all(KoiSpace.sm),
++        padding: const EdgeInsets.all(KoiWorkbenchMetrics.contentInset),
+         child: Material(
+           key: const ValueKey('koi-workbench-content-surface'),
+           color: tokens.contentBackground,
+           surfaceTintColor: Colors.transparent,
+           shape: RoundedRectangleBorder(
+-            borderRadius: BorderRadius.circular(KoiRadius.large),
++            borderRadius: BorderRadius.circular(
++              KoiWorkbenchMetrics.contentRadius,
++            ),
+             side: BorderSide(color: separatorColor),
+           ),
+           clipBehavior: Clip.antiAlias,
+@@ -258,7 +260,7 @@
+           children: [
+             NavigationRail(
+               backgroundColor: chromeBackground,
+-              minWidth: 64,
++              minWidth: KoiWorkbenchMetrics.railWidth,
+               groupAlignment: -1,
+               scrollable: true,
+               trailingAtBottom: true,
+@@ -274,6 +276,7 @@
+                         child: widget.navigationTrailing,
+                       ),
+                     ),
++              indicatorColor: Colors.transparent,
+               indicatorShape: RoundedRectangleBorder(
+                 borderRadius: BorderRadius.circular(KoiRadius.small),
+               ),
+@@ -288,8 +291,14 @@
+                     // both densities.
+                     padding: const EdgeInsets.symmetric(vertical: 2),
+                     icon: Icon(destination.icon),
+-                    selectedIcon: Icon(
+-                      destination.selectedIcon ?? destination.icon,
++                    selectedIcon: Container(
++                      width: KoiWorkbenchMetrics.navigationIndicatorSize,
++                      height: KoiWorkbenchMetrics.navigationIndicatorSize,
++                      decoration: BoxDecoration(
++                        color: tokens.selectedBackground,
++                        borderRadius: BorderRadius.circular(KoiRadius.small),
++                      ),
++                      child: Icon(destination.selectedIcon ?? destination.icon),
+                     ),
+                     label: Text(destination.label),
+                   ),
+@@ -391,7 +400,19 @@
+     },
+   );
+ 
++  ButtonStyle _panelStyle() {
++    final colors = Theme.of(context).colorScheme;
++    return ButtonStyle(
++      foregroundColor: WidgetStateProperty.resolveWith(
++        (states) => states.contains(WidgetState.selected)
++            ? colors.onSurface
++            : colors.onSurfaceVariant,
++      ),
++    );
++  }
++
+   Widget _sidebarButton() => IconButton(
++    style: _panelStyle(),
+     tooltip: '切换资料侧栏',
+     isSelected: _controller.sidebarOpen,
+     onPressed: _controller.toggleSidebar,
+@@ -399,6 +420,7 @@
+   );
+ 
+   Widget _detailButton() => IconButton(
++    style: _panelStyle(),
+     tooltip: '切换详情面板',
+     isSelected: _controller.detailOpen,
+     onPressed: _controller.toggleDetail,

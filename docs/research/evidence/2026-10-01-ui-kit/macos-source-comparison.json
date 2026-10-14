@@ -1,0 +1,122 @@
+[
+  {
+    "path": "packages/koi_ui/lib/koi_ui.dart",
+    "same": true,
+    "currentSha256": "5590856783f1a77421f2e218889a06d8bc5230d46cc3f9c4558ee26f591d85b1",
+    "builtSourceSha256": "5590856783f1a77421f2e218889a06d8bc5230d46cc3f9c4558ee26f591d85b1"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/koi_theme_tokens.dart",
+    "same": true,
+    "currentSha256": "ee94dd348dcc5aa3ae1897b58a79719b35f060197be2ca1546f337c02403f63f",
+    "builtSourceSha256": "ee94dd348dcc5aa3ae1897b58a79719b35f060197be2ca1546f337c02403f63f"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/app_theme.dart",
+    "same": false,
+    "currentSha256": "a7b38efb845d2960b6718a4b64798046fe4b826e2d9b005eec2c94d15646559d",
+    "builtSourceSha256": "8f004b230cb36b02cf63d28c470035114b15db84754fa6fb184271ccfde6144d"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/app_colors.dart",
+    "same": true,
+    "currentSha256": "0ddbe9e16c32d52f2ceaf6f2f0a17e0e24291aee44fc69d763afdc9ccb138023",
+    "builtSourceSha256": "0ddbe9e16c32d52f2ceaf6f2f0a17e0e24291aee44fc69d763afdc9ccb138023"
+  },
+  {
+    "path": "packages/koi_ui/lib/theme/koi_material_theme.dart",
+    "same": false,
+    "currentSha256": "ea6cba7bd1fb08a0722499f432e773b53fe2a15b6ab38afa5520c53670b2c95c",
+    "builtSourceSha256": "f08376c26c69cd04a9e58dc6bf0569df7e4f530101a60dff0fc3282210dc4e71"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_menu.dart",
+    "same": false,
+    "currentSha256": "c7fbc4c18631759dd7767a51bc756ea02915dbd7299d0090d6bb82ca03ece491",
+    "builtSourceSha256": "d19618b76a5c09f9387c8b3ae848e1dc2da26921dae4708f5b3d9aa0af68b452"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_error_state.dart",
+    "same": true,
+    "currentSha256": "41379773c5b0186e34bde80ffe8b5dc8b34688bcaa1127411457867e9bc971ae",
+    "builtSourceSha256": "41379773c5b0186e34bde80ffe8b5dc8b34688bcaa1127411457867e9bc971ae"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_panel_icon.dart",
+    "same": true,
+    "currentSha256": "9a083e63111f5627e8e3a061d68d6109727e46486f03127570c2a796fc777713",
+    "builtSourceSha256": "9a083e63111f5627e8e3a061d68d6109727e46486f03127570c2a796fc777713"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_loading_state.dart",
+    "same": true,
+    "currentSha256": "66ba8b6587f2392a2b07ff6dc5a5162ce1b8a3f654948b052733987af3bdd24f",
+    "builtSourceSha256": "66ba8b6587f2392a2b07ff6dc5a5162ce1b8a3f654948b052733987af3bdd24f"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_property_row.dart",
+    "same": true,
+    "currentSha256": "b8253a2921e1bff3d9ffa07d1e0859717461ba184c6796b3c757f35f057787ae",
+    "builtSourceSha256": "b8253a2921e1bff3d9ffa07d1e0859717461ba184c6796b3c757f35f057787ae"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_popover.dart",
+    "same": true,
+    "currentSha256": "ec4eccfcdc939a4a89b0c8d3295ec14a6b564f433a8ec6da99b2933688012462",
+    "builtSourceSha256": "ec4eccfcdc939a4a89b0c8d3295ec14a6b564f433a8ec6da99b2933688012462"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_navigation_history_controls.dart",
+    "same": true,
+    "currentSha256": "d05895065d2f855d0da64966135ecd79161931989f6f13a4ff29a62ae197d550",
+    "builtSourceSha256": "d05895065d2f855d0da64966135ecd79161931989f6f13a4ff29a62ae197d550"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_resizable_split_view.dart",
+    "same": true,
+    "currentSha256": "91f80a7c5210ecc1079c6b5fdaae664b97d476572b445246fe7ede2cbaa2a764",
+    "builtSourceSha256": "91f80a7c5210ecc1079c6b5fdaae664b97d476572b445246fe7ede2cbaa2a764"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_toolbar.dart",
+    "same": true,
+    "currentSha256": "9e921cee1ede66d81f579e64b28e1d3d6419b6b8169ecb896647f09f6ea0ec46",
+    "builtSourceSha256": "9e921cee1ede66d81f579e64b28e1d3d6419b6b8169ecb896647f09f6ea0ec46"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_section.dart",
+    "same": true,
+    "currentSha256": "9576d47955ef8528b8355bc246411f5263208fd273dd775ce8eac4c4d2c84f3b",
+    "builtSourceSha256": "9576d47955ef8528b8355bc246411f5263208fd273dd775ce8eac4c4d2c84f3b"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_reading_pane.dart",
+    "same": true,
+    "currentSha256": "314a459b5f00e812fe920a66547b5650b9a37a65b5d5f2c54b76a935007b3293",
+    "builtSourceSha256": "314a459b5f00e812fe920a66547b5650b9a37a65b5d5f2c54b76a935007b3293"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_selectable_list_tile.dart",
+    "same": true,
+    "currentSha256": "cf52756a07bea4e15c1546952714a2bee941920a399a65c860cc68f25912ffe3",
+    "builtSourceSha256": "cf52756a07bea4e15c1546952714a2bee941920a399a65c860cc68f25912ffe3"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_search_field.dart",
+    "same": true,
+    "currentSha256": "161b8f9fe60af3e639a7ae522a4b29296da122ea929e26af4759796a449a2cb2",
+    "builtSourceSha256": "161b8f9fe60af3e639a7ae522a4b29296da122ea929e26af4759796a449a2cb2"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_workbench_frame.dart",
+    "same": true,
+    "currentSha256": "470ef6a6442a70d55c862ce60cf1aa6b5cbffcf05928409420b42dfda8ab7dfd",
+    "builtSourceSha256": "470ef6a6442a70d55c862ce60cf1aa6b5cbffcf05928409420b42dfda8ab7dfd"
+  },
+  {
+    "path": "packages/koi_ui/lib/widgets/koi_empty_state.dart",
+    "same": true,
+    "currentSha256": "5ed3a94670f1f16f76072c2ea0ad074d26695d7f0c1a04bb551087a342ecf383",
+    "builtSourceSha256": "5ed3a94670f1f16f76072c2ea0ad074d26695d7f0c1a04bb551087a342ecf383"
+  }
+]

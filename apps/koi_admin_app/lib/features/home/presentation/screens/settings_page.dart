@@ -33,7 +33,7 @@ class SettingsPage extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('环境与基建', style: Theme.of(context).textTheme.titleLarge),
+                  Text('环境与基建', style: Theme.of(context).textTheme.titleMedium),
                   const SizedBox(height: 12),
                   Text('当前环境：${AppEnvironment.current.name}'),
                   Text('API Base URL：${AppEnvironment.current.apiBaseUrl}'),
