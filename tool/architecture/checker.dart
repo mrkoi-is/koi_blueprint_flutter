@@ -1150,6 +1150,27 @@ final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
   }
 
   @override
+  void visitAsExpression(AsExpression node) {
+    super.visitAsExpression(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitPostfixExpression(PostfixExpression node) {
+    super.visitPostfixExpression(node);
+    // Both a failed null assertion and an overloaded update can throw.
+    _mayThrow();
+  }
+
+  @override
+  void visitPrefixExpression(PrefixExpression node) {
+    super.visitPrefixExpression(node);
+    // Boolean negation itself is not an overloaded operation. Its operand's
+    // effects are visited, while _condition preserves mounted guard facts.
+    if (node.operator.lexeme != '!') _mayThrow();
+  }
+
+  @override
   void visitFunctionExpression(FunctionExpression node) {}
 
   @override
@@ -1219,6 +1240,9 @@ final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
       pending = _join(yes, no);
     } else {
       super.visitBinaryExpression(node);
+      // Arithmetic, comparison and equality can throw or call user operators.
+      // Null coalescing only contributes the effects of its operands.
+      if (node.operator.lexeme != '??') _mayThrow();
     }
   }
 

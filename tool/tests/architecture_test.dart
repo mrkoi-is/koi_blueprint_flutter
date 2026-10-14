@@ -1330,5 +1330,54 @@ if (ref.mounted case true when await ready()) { state = 1; }
     'if (value case final item when await ready()) { state = 1; }',
     rejected: true,
   );
+  for (final operation in [
+    'value as String',
+    'value!',
+    '1 ~/ zero',
+    'left + right',
+    'left == right',
+    '~value',
+    '-value',
+    '++value',
+    'value++',
+  ]) {
+    mountedCase(
+      'reject a catch write when $operation can throw before the guard',
+      '''
+await Future.value(1);
+try {
+  final result = $operation;
+  if (!ref.mounted) return;
+  state = 1;
+} catch (error) {
+  state = 0;
+}
+''',
+      rejected: true,
+    );
+    mountedCase(
+      'allow a catch write when $operation executes after the guard',
+      '''
+await Future.value(1);
+try {
+  if (!ref.mounted) return;
+  final result = $operation;
+  state = 1;
+} catch (error) {
+  state = 0;
+}
+''',
+      rejected: false,
+    );
+  }
+  mountedCase('preserve short circuit mounted facts before a possibly throwing comparison', '''
+await Future.value(1);
+try {
+  if (!ref.mounted || operation != currentOperation) return;
+  state = 1;
+} catch (error) {
+  state = 0;
+}
+''', rejected: false);
   stdout.writeln('$_passed architecture tests passed.');
 }
