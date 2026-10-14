@@ -3,11 +3,15 @@
 根 `pubspec.yaml` 的 workspace 是成员清单的唯一来源；成员设置 `resolution: workspace`。新增 App、module 或 package 必须登记、解析依赖，并确认生成/分析/测试发现它。不要另写一份脚本硬编码清单。
 
 ```text
-apps/       宿主与组合根
-modules/    独立业务模块（按需）
-packages/   公共契约、基础设施、UI 等稳定共享能力
-examples/   蓝图维护用的可运行示范
+apps/       宿主与组合根。Feature 在 lib/features。
+packages/   公共契约、基础设施、UI 等稳定共享能力。Feature 在 lib/src/features。
+examples/   蓝图维护用的可运行示范。
 ```
+
+仓库根没有 `modules/`。需要会话边界时，模块样例放在
+`examples/module_showcase/modules/{alpha,beta}` 和 `examples/minimal_module`，
+源码使用 `lib/src/features`。`lib/shell` 可以组合 feature 页面；
+`lib/shell/coordinators` 只依赖 domain 或 application。
 
 ## 依赖方向
 

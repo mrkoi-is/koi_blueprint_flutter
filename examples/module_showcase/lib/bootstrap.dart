@@ -1,3 +1,7 @@
+import 'package:showcase_beta/showcase_beta.dart' show betaMessage;
+import 'package:showcase_alpha/showcase_alpha.dart' show alphaMessage;
+import 'package:riverpod_annotation/experimental/scope.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -12,6 +16,7 @@ import 'package:showcase_beta/showcase_beta.dart' as beta;
 import 'package:showcase_contracts/showcase_contracts.dart';
 
 /// Owns infrastructure, the root provider container and one stable router.
+@Dependencies([alphaMessage, betaMessage])
 final class ShowcaseBootstrap {
   ShowcaseBootstrap._(this.services, this.runtime, this.container, this.router);
 
@@ -61,9 +66,16 @@ final class ShowcaseBootstrap {
       final container = ProviderContainer(
         retry: (_, _) => null,
         overrides: [
-          moduleRuntimeProvider.overrideWithValue(runtime),
+          moduleRuntimeProvider.overrideWithValue((runtime: runtime)),
           showcaseServicesProvider.overrideWithValue(services),
-          activeShowcaseRepositoryProvider.overrideWith((ref) {
+          alpha.showcaseRepositoryProvider.overrideWith((ref) {
+            final session = ref.watch(moduleSnapshotProvider).session;
+            if (session == null) {
+              throw StateError('Module session is switching.');
+            }
+            return session.capability;
+          }),
+          beta.showcaseRepositoryProvider.overrideWith((ref) {
             final session = ref.watch(moduleSnapshotProvider).session;
             if (session == null) {
               throw StateError('Module session is switching.');

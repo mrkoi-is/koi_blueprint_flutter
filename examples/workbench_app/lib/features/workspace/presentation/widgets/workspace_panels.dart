@@ -9,7 +9,7 @@ import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/presentation/models/text_view_state.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_retry.dart';
+import 'package:workbench_app/features/workspace/presentation/media_retry.dart';
 
 class WorkspaceSidebar extends ConsumerWidget {
   const WorkspaceSidebar({super.key, required this.index});
@@ -19,12 +19,10 @@ class WorkspaceSidebar extends ConsumerWidget {
     final session = ref.watch(workspaceSessionProvider);
     if (index == 0) {
       final state = ref.watch(
-        workspaceStateProvider.select(
+        workspaceSnapshotProvider.select(
           (value) => TextViewState(
-            documents:
-                value.value?.snapshot.documents ??
-                session.state.snapshot.documents,
-            selectedId: value.value?.snapshot.preferences.selectedDocumentId,
+            documents: value.snapshot.documents,
+            selectedId: value.snapshot.preferences.selectedDocumentId,
             sidebarWidth: 0,
           ),
         ),
@@ -84,13 +82,9 @@ class WorkspaceSidebar extends ConsumerWidget {
       );
     }
     if (index == 1) {
-      final assets =
-          ref.watch(
-            workspaceStateProvider.select(
-              (value) => value.value?.snapshot.assets,
-            ),
-          ) ??
-          session.state.snapshot.assets;
+      final assets = ref.watch(
+        workspaceSnapshotProvider.select((value) => value.snapshot.assets),
+      );
       final kind = ref.watch(mediaFilterProvider);
       final query = ref.watch(mediaSearchProvider);
       return KoiPanel(
@@ -141,16 +135,10 @@ class WorkspaceSidebar extends ConsumerWidget {
       );
     }
     final counts = ref.watch(
-      workspaceStateProvider.select(
+      workspaceSnapshotProvider.select(
         (value) => (
-          todos:
-              value.value?.snapshot.todos
-                  .where((todo) => !todo.completed)
-                  .length ??
-              0,
-          jobs:
-              value.value?.snapshot.jobs.where((job) => !job.terminal).length ??
-              0,
+          todos: value.snapshot.todos.where((todo) => !todo.completed).length,
+          jobs: value.snapshot.jobs.where((job) => !job.terminal).length,
         ),
       ),
     );
@@ -182,9 +170,9 @@ class WorkspaceDetails extends ConsumerWidget {
     final session = ref.watch(workspaceSessionProvider);
     if (index == 0) {
       final document = ref.watch(
-        workspaceStateProvider.select((value) {
-          final snapshot = value.value?.snapshot;
-          return snapshot?.documents
+        workspaceSnapshotProvider.select((value) {
+          final snapshot = value.snapshot;
+          return snapshot.documents
               .where(
                 (document) =>
                     document.id == snapshot.preferences.selectedDocumentId,
@@ -228,9 +216,9 @@ class WorkspaceDetails extends ConsumerWidget {
     }
     if (index == 1) {
       final asset = ref.watch(
-        workspaceStateProvider.select((value) {
-          final snapshot = value.value?.snapshot;
-          return snapshot?.assets
+        workspaceSnapshotProvider.select((value) {
+          final snapshot = value.snapshot;
+          return snapshot.assets
               .where(
                 (asset) => asset.id == snapshot.preferences.selectedAssetId,
               )

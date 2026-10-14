@@ -1,3 +1,5 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -28,6 +30,7 @@ final class TestRepository implements ShowcaseRepository {
   Future<String> loadMessage({Duration delay = Duration.zero}) => pending;
 }
 
+@Dependencies([betaMessage])
 void main() {
   test(
     'public factory owns timers and subscription but keeps host bus open',
@@ -88,7 +91,7 @@ void main() {
         ProviderScope(
           retry: (_, _) => null,
           overrides: [
-            activeShowcaseRepositoryProvider.overrideWithValue(
+            showcaseRepositoryProvider.overrideWithValue(
               TestRepository(pending.future),
             ),
           ],
@@ -124,7 +127,7 @@ void main() {
       ProviderScope(
         retry: (_, _) => null,
         overrides: [
-          activeShowcaseRepositoryProvider.overrideWithValue(
+          showcaseRepositoryProvider.overrideWithValue(
             TestRepository(pending.future),
           ),
         ],

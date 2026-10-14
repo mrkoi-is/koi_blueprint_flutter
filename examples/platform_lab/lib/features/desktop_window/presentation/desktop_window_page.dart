@@ -15,7 +15,7 @@ class DesktopWindowPage extends ConsumerWidget {
   const DesktopWindowPage({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final host = ref.watch(desktopWindowHostProvider);
+    final host = ref.watch(desktopWindowHostProvider).host;
     Future<void> retry() async {
       await initializeDesktopWindow();
       ref.invalidate(desktopWindowHostProvider);

@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:workbench_app/features/workspace/application/workspace_session.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_preview_session.dart';
+import 'package:workbench_app/features/workspace/application/media_preview_session.dart';
 
 import 'presentation_support.dart';
 

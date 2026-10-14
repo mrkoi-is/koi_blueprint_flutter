@@ -604,7 +604,7 @@ void main() {
     },
   );
 
-  test('failed thumbnail save rolls back missing key and keeps previous durable thumbnail', () async {
+  test('failed thumbnail save and compensation retain new bytes until storage recovers', () async {
     picker.results.add(FilesSelected([_Source('image.png', _png)]));
     await session.importFiles(ImportKind.media);
     final original = session.state.snapshot.assets.single;
@@ -619,21 +619,23 @@ void main() {
     await session.initialize();
     repository.fail = true;
     await session.storeThumbnail(original.id, [255, 216, 255, 1]);
-    expect(
-      session.state.snapshot.assets.single.thumbnailKey,
-      original.thumbnailKey,
-    );
+    final retainedKey = session.state.snapshot.assets.single.thumbnailKey!;
+    expect(retainedKey, isNot(original.thumbnailKey));
+    expect(await storage.readBytes(retainedKey), [255, 216, 255, 1]);
     expect(await storage.readBytes(original.thumbnailKey!), _png);
     expect(
       session.state.snapshot.assets.single.thumbnailStatus,
-      ThumbnailStatus.failed,
+      ThumbnailStatus.ready,
     );
     expect(session.state.snapshot.jobs.last.status, JobStatus.failed);
     expect(
       (await Directory('${directory.path}/assets').list().toList()).length,
-      2,
+      3,
     );
+    expect(session.state.snapshot.jobs.last.error, contains('回滚保存失败'));
     repository.fail = false;
+    expect((await session.save()).succeeded, isTrue);
+    expect(repository.saved.last.assets.single.thumbnailKey, retainedKey);
   });
 
   for (final failRollback in [false, true]) {
@@ -805,6 +807,92 @@ void main() {
     await subscription.cancel();
   });
 
+  for (final phase in _ThumbnailStoragePhase.values) {
+    for (final prepare in [true, false]) {
+      test(
+        '${prepare ? 'prepared' : 'direct'} close waits for direct thumbnail ${phase.name} and all cancellation cleanup',
+        () async {
+          picker.results.add(FilesSelected([_Source('image.png', _png)]));
+          await session.importFiles(ImportKind.media);
+          final original = session.state.snapshot.assets.single;
+          await session.dispose();
+          final gatedStore = _ThumbnailStorageGate(
+            storage,
+            phase: phase,
+            oldKey: original.thumbnailKey!,
+          );
+          session = WorkspaceSession(
+            repository: storage,
+            assetStore: gatedStore,
+            fileImportPort: picker,
+            debounce: const Duration(days: 1),
+          );
+          await session.initialize();
+          final replacementBytes = [255, 216, 255, 9];
+          final replacing = session.storeThumbnail(
+            original.id,
+            replacementBytes,
+          );
+          await gatedStore.entered.future;
+          var closed = false;
+          final closing = (() async {
+            if (prepare) {
+              expect((await session.prepareToClose()).succeeded, isTrue);
+            }
+            await session.dispose();
+            // Storage belongs to the caller and may only close after the session.
+            await storage.close();
+            closed = true;
+          })();
+          try {
+            await Future<void>.delayed(const Duration(milliseconds: 20));
+            expect(closed, isFalse, reason: 'thumbnail cleanup is still gated');
+            expect(gatedStore.completedCleanup, isEmpty);
+          } finally {
+            gatedStore.release.complete();
+            await replacing;
+            await closing;
+          }
+          expect(closed, isTrue);
+          storage = NativeWorkspaceStorage(directory.path);
+          await storage.initialize();
+          final persisted = await storage.load();
+          final asset = persisted.assets.single;
+          if (phase == _ThumbnailStoragePhase.cleanup) {
+            expect(asset.thumbnailKey, isNot(original.thumbnailKey));
+            expect(
+              await storage.readBytes(asset.thumbnailKey!),
+              replacementBytes,
+            );
+            expect(gatedStore.completedCleanup, [original.thumbnailKey]);
+            await expectLater(
+              storage.readBytes(original.thumbnailKey!),
+              throwsA(isA<FileSystemException>()),
+            );
+          } else {
+            expect(asset.thumbnailKey, original.thumbnailKey);
+            expect(await storage.readBytes(asset.thumbnailKey!), _png);
+            expect(gatedStore.completedCleanup, hasLength(1));
+          }
+          if (prepare) {
+            expect(asset.thumbnailStatus, ThumbnailStatus.ready);
+            expect(persisted.jobs.last.status, JobStatus.cancelled);
+          }
+          expect(
+            await Directory('${directory.path}/staging').list().toList(),
+            isEmpty,
+          );
+          expect(
+            (await Directory(
+              '${directory.path}/assets',
+            ).list().toList()).length,
+            2,
+          );
+        },
+      );
+    }
+  }
+
   test('media import cancellation retains durable bytes and fails visibly when compensation fails', () async {
     await session.dispose();
     final repository = _GatedNativeRepository(storage)
@@ -831,6 +919,138 @@ void main() {
     expect(await storage.readBytes(persisted.assets.single.storageKey), _png);
     repository.failWrites = false;
   });
+  for (final thumbnail in [false, true]) {
+    for (final cancel in [false, true]) {
+      for (final failRollback in [false, true]) {
+        test(
+          '${thumbnail ? 'thumbnail' : 'import'} queued reference survives own save failure: cancel=$cancel, rollbackFails=$failRollback',
+          () async {
+            WorkspaceAsset? original;
+            if (thumbnail) {
+              picker.results.add(FilesSelected([_Source('image.png', _png)]));
+              await session.importFiles(ImportKind.media);
+              original = session.state.snapshot.assets.single;
+            }
+            await session.dispose();
+            final repository = _QueuedFailureRepository(
+              storage,
+              failRollback: failRollback,
+            );
+            final guardedStore = _ReferenceCheckingStore(storage);
+            session = WorkspaceSession(
+              repository: repository,
+              assetStore: guardedStore,
+              fileImportPort: picker,
+              debounce: const Duration(days: 1),
+            );
+            await session.initialize();
+            // The queued save captures the new reference at execution time,
+            // before this workflow's own save is allowed to fail.
+            final blockingSave = session.save();
+            await repository.entered.future;
+            final queuedSave = session.save();
+            final bytes = thumbnail
+                ? [255, 216, 255, 9]
+                : [0, 0, 0, 16, 102, 116, 121, 112, 105, 115, 111, 109];
+            final source = _Source('video.mp4', bytes);
+            if (!thumbnail) picker.results.add(FilesSelected([source]));
+            final published = session.changes.firstWhere(
+              (state) => thumbnail
+                  ? state.snapshot.assets.single.thumbnailKey !=
+                        original!.thumbnailKey
+                  : state.snapshot.assets.isNotEmpty,
+            );
+            final operation = thumbnail
+                ? session.storeThumbnail(original!.id, bytes)
+                : session.importFiles(ImportKind.media);
+            final publishedState = await published;
+            final key = thumbnail
+                ? publishedState.snapshot.assets.single.thumbnailKey!
+                : publishedState.snapshot.assets.single.storageKey;
+            if (cancel) session.cancelJob(session.state.snapshot.jobs.last.id);
+            repository.release.complete();
+            expect((await blockingSave).succeeded, isTrue);
+            expect((await queuedSave).succeeded, isTrue);
+            await operation;
+            final durable = await storage.load();
+            expect(guardedStore.removedWhileReferenced, isEmpty);
+            expect(
+              await Directory('${directory.path}/staging').list().toList(),
+              isEmpty,
+            );
+            if (!thumbnail) expect(source.closed, isTrue);
+            if (thumbnail) {
+              expect(await storage.readBytes(original!.thumbnailKey!), _png);
+            }
+            if (failRollback) {
+              final retained = session.state.snapshot.assets.single;
+              expect(
+                thumbnail ? retained.thumbnailKey : retained.storageKey,
+                key,
+              );
+              expect(
+                thumbnail
+                    ? durable.assets.single.thumbnailKey
+                    : durable.assets.single.storageKey,
+                key,
+              );
+              expect(await storage.readBytes(key), bytes);
+              expect(session.state.snapshot.jobs.last.status, JobStatus.failed);
+              expect(
+                session.state.snapshot.jobs.last.error,
+                contains('回滚保存失败'),
+              );
+              expect((await session.prepareToClose()).succeeded, isFalse);
+              expect(session.preparingToClose, isFalse);
+              // Failed close remains reversible, and a recovered disk can save
+              // both the retained media reference and subsequent user edits.
+              final documentId = session.createDocument(
+                text: 'after failed close',
+              );
+              repository.recovered = true;
+              expect((await session.prepareToClose()).succeeded, isTrue);
+              await session.dispose();
+              session = WorkspaceSession(
+                repository: storage,
+                assetStore: storage,
+                fileImportPort: picker,
+              );
+              await session.initialize();
+              final reopened = session.state.snapshot.assets.single;
+              expect(
+                thumbnail ? reopened.thumbnailKey : reopened.storageKey,
+                key,
+              );
+              expect(await storage.readBytes(key), bytes);
+              expect(session.state.snapshot.documents.single.id, documentId);
+              expect(
+                session.state.snapshot.documents.single.text,
+                'after failed close',
+              );
+            } else {
+              expect(
+                session.state.snapshot.jobs.last.status,
+                cancel ? JobStatus.cancelled : JobStatus.failed,
+              );
+              expect(guardedStore.removed, contains(key));
+              expect(
+                await File('${directory.path}/assets/$key').exists(),
+                isFalse,
+              );
+              if (thumbnail) {
+                expect(
+                  durable.assets.single.thumbnailKey,
+                  original!.thumbnailKey,
+                );
+              } else {
+                expect(durable.assets, isEmpty);
+              }
+            }
+          },
+        );
+      }
+    }
+  }
 }
 
 final _png = Uint8List.fromList(
@@ -980,6 +1200,131 @@ final class _ThumbnailCleanupGate implements AssetStore {
       entered.complete();
       await release.future;
     }
+    await delegate.remove(key);
+  }
+
+  @override
+  Future<String> stage(
+    Stream<List<int>> bytes, {
+    required String name,
+    void Function(int)? onBytes,
+  }) => delegate.stage(bytes, name: name, onBytes: onBytes);
+  @override
+  Future<String> commit(String key) => delegate.commit(key);
+  @override
+  Future<void> abort(String key) => delegate.abort(key);
+  @override
+  Stream<List<int>> read(String key) => delegate.read(key);
+  @override
+  Future<Uint8List> readBytes(String key) => delegate.readBytes(key);
+  @override
+  Future<void> cleanupStaging() => delegate.cleanupStaging();
+}
+
+enum _ThumbnailStoragePhase { stage, commit, cleanup }
+
+final class _ThumbnailStorageGate implements AssetStore {
+  _ThumbnailStorageGate(
+    this.delegate, {
+    required this.phase,
+    required this.oldKey,
+  });
+  final AssetStore delegate;
+  final _ThumbnailStoragePhase phase;
+  final String oldKey;
+  final entered = Completer<void>();
+  final release = Completer<void>();
+  final completedCleanup = <String>[];
+
+  Future<void> _wait(_ThumbnailStoragePhase at) async {
+    if (phase == at) {
+      entered.complete();
+      await release.future;
+    }
+  }
+
+  @override
+  Future<String> stage(
+    Stream<List<int>> bytes, {
+    required String name,
+    void Function(int)? onBytes,
+  }) async {
+    final key = await delegate.stage(bytes, name: name, onBytes: onBytes);
+    await _wait(_ThumbnailStoragePhase.stage);
+    return key;
+  }
+
+  @override
+  Future<String> commit(String key) async {
+    final committed = await delegate.commit(key);
+    await _wait(_ThumbnailStoragePhase.commit);
+    return committed;
+  }
+
+  @override
+  Future<void> abort(String key) async {
+    await delegate.abort(key);
+    completedCleanup.add(key);
+  }
+
+  @override
+  Future<void> remove(String key) async {
+    if (key == oldKey) await _wait(_ThumbnailStoragePhase.cleanup);
+    await delegate.remove(key);
+    completedCleanup.add(key);
+  }
+
+  @override
+  Stream<List<int>> read(String key) => delegate.read(key);
+  @override
+  Future<Uint8List> readBytes(String key) => delegate.readBytes(key);
+  @override
+  Future<void> cleanupStaging() => delegate.cleanupStaging();
+}
+
+/// First write blocks, second captures the workflow reference, third fails.
+/// Later writes model either a recoverable save failure or a full disk.
+final class _QueuedFailureRepository implements WorkspaceRepository {
+  _QueuedFailureRepository(this.delegate, {required this.failRollback});
+  final WorkspaceRepository delegate;
+  final bool failRollback;
+  final entered = Completer<void>();
+  final release = Completer<void>();
+  int saves = 0;
+  bool recovered = false;
+  @override
+  int get persistedVersion => delegate.persistedVersion;
+  @override
+  Future<WorkspaceSnapshot> load() => delegate.load();
+  @override
+  Future<void> save(WorkspaceSnapshot snapshot, {int? expectedVersion}) async {
+    final count = ++saves;
+    if (count == 1) {
+      entered.complete();
+      await release.future;
+    }
+    if (!recovered && (count == 3 || failRollback && count >= 3)) {
+      throw StateError('disk full after queued snapshot commits');
+    }
+    await delegate.save(snapshot, expectedVersion: expectedVersion);
+  }
+}
+
+/// Observes the durable reference immediately before any destructive byte IO.
+final class _ReferenceCheckingStore implements AssetStore {
+  _ReferenceCheckingStore(this.delegate);
+  final NativeWorkspaceStorage delegate;
+  final removed = <String>[];
+  final removedWhileReferenced = <String>[];
+  @override
+  Future<void> remove(String key) async {
+    final durable = await delegate.load();
+    if (durable.assets.any(
+      (asset) => asset.storageKey == key || asset.thumbnailKey == key,
+    )) {
+      removedWhileReferenced.add(key);
+    }
+    removed.add(key);
     await delegate.remove(key);
   }
 

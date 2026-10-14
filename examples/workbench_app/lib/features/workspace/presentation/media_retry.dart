@@ -11,7 +11,7 @@ Future<void> retryVideoThumbnail(
   WorkspaceAsset asset,
 ) async {
   final session = ref.read(workspaceSessionProvider);
-  final preview = ref.read(mediaPreviewSessionProvider);
+  final preview = ref.read(mediaPreviewSessionProvider).session;
   final previousAttempts = {
     for (final job in session.state.snapshot.jobs) job.id: job.currentAttempt,
   };

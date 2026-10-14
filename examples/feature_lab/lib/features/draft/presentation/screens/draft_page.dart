@@ -1,13 +1,23 @@
 import 'package:feature_lab/features/draft/presentation/providers/draft_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/experimental/scope.dart';
 
+@Dependencies([DraftController])
 class DraftPage extends ConsumerWidget {
-  const DraftPage({super.key});
+  const DraftPage({
+    super.key,
+    this.draftId = 'default',
+    this.editorId = 'primary',
+  });
+  final String draftId;
+  final String editorId;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final value = ref.watch(draftControllerProvider);
+    final value = ref.watch(
+      draftControllerProvider(draftId: draftId, editorId: editorId),
+    );
     final busy = value.isLoading || (value.value?.isSaving ?? false);
     return Scaffold(
       appBar: AppBar(title: const Text('Draft')),
@@ -19,12 +29,25 @@ class DraftPage extends ConsumerWidget {
           if (value.hasValue)
             _DraftTextField(
               text: value.value!.text,
-              onChanged: (text) =>
-                  ref.read(draftControllerProvider.notifier).edit(text),
+              onChanged: (text) => ref
+                  .read(
+                    draftControllerProvider(
+                      draftId: draftId,
+                      editorId: editorId,
+                    ).notifier,
+                  )
+                  .edit(text),
             ),
           FilledButton(
             onPressed: value.hasValue && !busy
-                ? () => ref.read(draftControllerProvider.notifier).save()
+                ? () => ref
+                      .read(
+                        draftControllerProvider(
+                          draftId: draftId,
+                          editorId: editorId,
+                        ).notifier,
+                      )
+                      .save()
                 : null,
             child: const Text('Save'),
           ),

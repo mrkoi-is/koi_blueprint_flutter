@@ -28,17 +28,40 @@ class DocumentTextEditor extends StatefulWidget {
   State<DocumentTextEditor> createState() => _DocumentTextEditorState();
 }
 
+/// Owns large-document segmentation so the State field list stays view chrome.
+class DocumentSegmentModel {
+  final segment = TextEditingController();
+  final previousStarts = <int>[];
+  late String sourceText;
+  bool segmented = false;
+  int start = 0;
+  int end = 0;
+  int generation = 0;
+  bool updatingFull = false;
+  bool updatingSegment = false;
+  bool resegmentScheduled = false;
+}
+
 class _DocumentTextEditorState extends State<DocumentTextEditor> {
-  final _segment = TextEditingController();
-  final _previousStarts = <int>[];
-  late String _sourceText;
-  var _segmented = false;
-  var _start = 0;
-  var _end = 0;
-  var _generation = 0;
-  var _updatingFull = false;
-  var _updatingSegment = false;
-  var _resegmentScheduled = false;
+  final _segments = DocumentSegmentModel();
+  TextEditingController get _segment => _segments.segment;
+  List<int> get _previousStarts => _segments.previousStarts;
+  String get _sourceText => _segments.sourceText;
+  set _sourceText(String value) => _segments.sourceText = value;
+  bool get _segmented => _segments.segmented;
+  set _segmented(bool value) => _segments.segmented = value;
+  int get _start => _segments.start;
+  set _start(int value) => _segments.start = value;
+  int get _end => _segments.end;
+  set _end(int value) => _segments.end = value;
+  int get _generation => _segments.generation;
+  set _generation(int value) => _segments.generation = value;
+  bool get _updatingFull => _segments.updatingFull;
+  set _updatingFull(bool value) => _segments.updatingFull = value;
+  bool get _updatingSegment => _segments.updatingSegment;
+  set _updatingSegment(bool value) => _segments.updatingSegment = value;
+  bool get _resegmentScheduled => _segments.resegmentScheduled;
+  set _resegmentScheduled(bool value) => _segments.resegmentScheduled = value;
 
   @override
   void initState() {

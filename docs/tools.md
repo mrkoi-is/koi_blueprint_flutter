@@ -23,6 +23,12 @@
 
 每条子命令的参数含义以 `--help` 为准。升级命令是 `upgrade-report`，没有 upgrade/apply 子命令。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
 
+Feature 的源码布局、导入和 dry-run 使用同一解析结果，双布局会明确拒绝；测试统一放 test/features。API/local 的注入声明来自 composition 入口，独立 module 的外部消费仍经过模块根入口。
+
+dry-run 与 upgrade-report 不写项目文件，也不创建 Python 字节码缓存；Feature dry-run 在 SDK 发现之前返回。兼容的 create_feature.py 入口遵循同一合同。
+
+指导资产采用 blueprint.py 的显式复制计划；研究、迁移评分和历史运行记录保留在源仓 docs/research、docs/validation，不下发。README/CHANGELOG 按新项目生成，参照源码仅放 .blueprint/reference。来源登记复用 schema 2 managedFiles；升级报告用 untrackedGuidance 标识旧指导文件的 NO_BASELINE 缺口，参照 [升级指南](upgrade-guide.md)。
+
 能力安装只接受 schema 2 主 App，来源仅为内置配方及其继承参照。相同版本/配置的重复安装先核对既有输出摘要；发现用户修改、未知目标文件或 registry/native wiring 变化时拒绝覆盖。安装事务包含根锁文件和受管基线，避免并发 pub get/codegen；受管 registry 之外的自有接线放到 App 的 app_capabilities 文件。schema 1 旧工程只能得到人工迁移报告，不能通过修改 schema 数字绕过缺少的装配与基线。
 
 构建先严格 pub get 刷新插件登记，再以 no-pub 构建；成功时打印版本、构建号、source、channel、platform、architecture 和 manifest 路径，完整清单保留在文件。package 在打包前后核对源与产物。清单位于生成 App 的 `apps/<app>/build/blueprint/<profile>.json` 和 `apps/<app>/build/packages/<profile>/package-manifest.json`，已有包目录拒绝覆盖。实际运行与安装初始为 NOT_RUN。无签名 iOS 可构建但不产生可安装 app 包；Windows/Linux 必须匹配宿主，AppImage 需要显式提供固定 runtime 文件。
@@ -68,5 +74,6 @@ doctor 的 JSON 区分工具 AVAILABLE、能力依赖 MATCH、库 LOADABLE、Web
 | [tool/platform_configuration.py](../tool/platform_configuration.py)、[tool/platform_capabilities.py](../tool/platform_capabilities.py)、[tool/device_capabilities.py](../tool/device_capabilities.py) | workbench 与可选能力原生配置计划，由统一安装事务合并，不是独立发布入口 |
 | [tool/create_media_fixtures.py](../tool/create_media_fixtures.py)，`python3 tool/create_media_fixtures.py` | 重新生成并覆盖已登记的合成图片/视频集成素材，需要 ffmpeg 与 ffprobe；仅在维护 fixture 时执行，不读用户素材库 |
 | [tool/platform_evidence.py](../tool/platform_evidence.py)，`python3 tool/platform_evidence.py --output PATH` | 记录源码指纹，不执行也不宣称平台通过；日志与 NOT_RUN 按 [平台验收](platform-acceptance.md) 另记 |
+| [tool/macos_media_preflight.swift](../tool/macos_media_preflight.swift)，`swift tool/macos_media_preflight.swift` | 检查 media_kit_video 所需的 macOS OpenGL 像素格式和上下文；只报告运行前提，不替代真实媒体验收 |
 
 Python 工具测试位于 `scripts/tests` 与 `tool/tests`，在 check test 中执行；Dart 工具行为测试也纳入同一阶段。修改 Skill 时另读 [维护契约](../.agents/skills/GOVERNANCE.md)。

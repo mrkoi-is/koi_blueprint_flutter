@@ -1,9 +1,11 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter/material.dart';
 import 'package:network_lab/l10n/generated/app_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:network_lab/features/network/domain/network_models.dart';
 import 'package:network_lab/features/network/presentation/providers/network_providers.dart';
 
+@Dependencies([networkSession, networkSnapshot])
 class NetworkPage extends ConsumerStatefulWidget {
   const NetworkPage({this.onChangeEndpoint, super.key});
   final VoidCallback? onChangeEndpoint;

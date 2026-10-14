@@ -1,112 +1,11 @@
 import 'dart:async';
-import 'dart:typed_data';
 
-import 'package:flutter/material.dart';
-import 'package:media_kit/media_kit.dart';
-import 'package:media_kit_video/media_kit_video.dart';
+import 'package:flutter/foundation.dart';
 import 'package:workbench_app/features/workspace/application/workspace_session.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_frame_gate.dart';
+import 'package:workbench_app/features/workspace/application/media_playback.dart';
 
-/// Presentation resource. The URI and its lifetime never enter a domain model.
-final class PreviewSource {
-  const PreviewSource({required this.uri, required this.release});
-  final String uri;
-  final Future<void> Function() release;
-}
-
-abstract interface class MediaPlayback implements Listenable {
-  Widget get surface;
-  bool get playing;
-  Duration get position;
-  Duration get duration;
-  double get volume;
-  Stream<String> get errors;
-  Future<void> open(String uri);
-  Future<void> get firstFrame;
-  Future<Uint8List?> screenshot();
-  Future<void> play();
-  Future<void> pause();
-  Future<void> seek(Duration position);
-  Future<void> setVolume(double value);
-  Future<void> close();
-}
-
-typedef MediaPlaybackFactory = MediaPlayback Function();
-typedef PreviewSourceFactory = Future<PreviewSource> Function(String key);
-
-final class MediaKitPlayback extends ChangeNotifier implements MediaPlayback {
-  MediaKitPlayback() {
-    _video = VideoController(_player);
-    _frameGate = MediaFrameGate(_player);
-    _subscriptions.add(
-      _player.stream.position.listen((_) => notifyListeners()),
-    );
-    _subscriptions.add(
-      _player.stream.duration.listen((_) => notifyListeners()),
-    );
-    _subscriptions.add(_player.stream.playing.listen((_) => notifyListeners()));
-    _subscriptions.add(_player.stream.volume.listen((_) => notifyListeners()));
-  }
-  final Player _player = Player();
-  late final VideoController _video;
-  late final MediaFrameGate _frameGate;
-  final _videoKey = GlobalKey(debugLabel: 'persistent-video-surface');
-  final _subscriptions = <StreamSubscription<Object?>>[];
-  Future<void>? _closing;
-  @override
-  Widget get surface =>
-      Video(key: _videoKey, controller: _video, controls: null);
-  @override
-  bool get playing => _player.state.playing;
-  @override
-  Duration get position => _player.state.position;
-  @override
-  Duration get duration => _player.state.duration;
-  @override
-  double get volume => _player.state.volume;
-  @override
-  Stream<String> get errors => _player.stream.error;
-  @override
-  Future<void> open(String uri) async {
-    _video;
-    await _player.open(Media(uri), play: false);
-  }
-
-  @override
-  Future<void> get firstFrame =>
-      _frameGate.wait(_video.waitUntilFirstFrameRendered);
-  @override
-  Future<Uint8List?> screenshot() => _player.screenshot(format: 'image/jpeg');
-  @override
-  Future<void> play() => _player.play();
-  @override
-  Future<void> pause() => _player.pause();
-  @override
-  Future<void> seek(Duration position) => _player.seek(position);
-  @override
-  Future<void> setVolume(double value) => _player.setVolume(value);
-  @override
-  Future<void> close() => _closing ??= _close();
-  Future<void> _close() async {
-    final failures = <Object>[];
-    for (final close in <Future<void> Function()>[
-      _frameGate.close,
-      for (final subscription in _subscriptions) subscription.cancel,
-      _player.dispose,
-    ]) {
-      try {
-        await close();
-      } catch (error) {
-        failures.add(error);
-      }
-    }
-    super.dispose();
-    if (failures.isNotEmpty) {
-      throw StateError('播放器清理失败：${failures.join('; ')}');
-    }
-  }
-}
+export 'package:workbench_app/features/workspace/application/media_playback.dart';
 
 /// One selected-video owner for the entire workspace, independent of layout.
 final class MediaPreviewSession extends ChangeNotifier {
@@ -114,7 +13,7 @@ final class MediaPreviewSession extends ChangeNotifier {
     required this.workspace,
     required this.openSource,
     required this.encodeThumbnail,
-    this.createPlayback = MediaKitPlayback.new,
+    required this.createPlayback,
     this.thumbnailTimeout = const Duration(seconds: 10),
   }) {
     _workspaceSubscription = workspace.changes.listen((_) {

@@ -12,6 +12,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/bootstrap.dart';
 import 'package:workbench_app/core/window/workbench_window_chrome.dart';
+import 'package:workbench_app/core/window/workbench_exit_binding.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/navigation_providers.dart';
@@ -28,13 +29,24 @@ class _WorkbenchAppState extends State<WorkbenchApp>
   final _panels = KoiWorkbenchController();
   late final WorkbenchCommands _commands;
   late final void Function() _detachNavigation;
+  late final VoidCallback _detachExit;
+  Future<AppExitResponse>? _exitRequest;
+  bool _renderWorkbench = true;
   @override
   void initState() {
     super.initState();
     _commands = WorkbenchCommands(bootstrap: widget.bootstrap, panels: _panels);
     WidgetsBinding.instance.addObserver(this);
+    final binding = WidgetsBinding.instance;
+    _detachExit = binding is WorkbenchExitBinding
+        ? binding.attachWorkbenchExit(_requestAppExit)
+        : () {};
     _detachNavigation = CapabilityNavigation.instance.attach((id) async {
-      if (!mounted || widget.bootstrap.preparingToClose.value) return false;
+      if (!mounted ||
+          !_renderWorkbench ||
+          widget.bootstrap.preparingToClose.value) {
+        return false;
+      }
       if (!appCapabilities.any((capability) => capability.id == id)) {
         return true;
       }
@@ -46,6 +58,7 @@ class _WorkbenchAppState extends State<WorkbenchApp>
       final saved = await widget.bootstrap.session.save();
       if (!saved.succeeded ||
           !mounted ||
+          !_renderWorkbench ||
           widget.bootstrap.preparingToClose.value) {
         return false;
       }
@@ -56,6 +69,7 @@ class _WorkbenchAppState extends State<WorkbenchApp>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (!_renderWorkbench) return;
     if (state == AppLifecycleState.inactive ||
         state == AppLifecycleState.paused) {
       if (!widget.bootstrap.preparingToClose.value) {
@@ -65,10 +79,24 @@ class _WorkbenchAppState extends State<WorkbenchApp>
     }
   }
 
-  @override
-  Future<AppExitResponse> didRequestAppExit() async {
+  Future<AppExitResponse> _requestAppExit() =>
+      _exitRequest ??= _closeWorkbench();
+
+  Future<AppExitResponse> _closeWorkbench() async {
     final result = await widget.bootstrap.prepareToClose();
-    if (!result.succeeded) return AppExitResponse.cancel;
+    if (!result.succeeded) {
+      _exitRequest = null;
+      return AppExitResponse.cancel;
+    }
+    if (mounted) {
+      setState(() => _renderWorkbench = false);
+      final binding = WidgetsBinding.instance;
+      final unmounted = binding.endOfFrame;
+      // Exit must also finish when a hidden/paused window receives no vsync.
+      // A warm-up frame unmounts router/Consumer borrowers before their owners.
+      binding.scheduleWarmUpFrame();
+      await unmounted;
+    }
     // Destruction is irreversible; a cleanup error after a successful save is
     // reported, but must not leave a destroyed window pretending to be usable.
     try {
@@ -88,6 +116,7 @@ class _WorkbenchAppState extends State<WorkbenchApp>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _detachExit();
     _detachNavigation();
     _commands.dispose();
     _panels.dispose();
@@ -96,24 +125,26 @@ class _WorkbenchAppState extends State<WorkbenchApp>
   }
 
   @override
-  Widget build(BuildContext context) => UncontrolledProviderScope(
-    container: widget.bootstrap.container,
-    child: ValueListenableBuilder<bool>(
-      valueListenable: widget.bootstrap.preparingToClose,
-      builder: (_, closing, child) => ExcludeFocus(
-        excluding: closing,
-        child: AbsorbPointer(absorbing: closing, child: child),
-      ),
-      child: WorkbenchCommandScope(
-        commands: _commands,
-        child: _ThemedWorkbench(
-          bootstrap: widget.bootstrap,
-          panels: _panels,
-          commands: _commands,
-        ),
-      ),
-    ),
-  );
+  Widget build(BuildContext context) => !_renderWorkbench
+      ? const SizedBox.shrink()
+      : UncontrolledProviderScope(
+          container: widget.bootstrap.container,
+          child: ValueListenableBuilder<bool>(
+            valueListenable: widget.bootstrap.preparingToClose,
+            builder: (_, closing, child) => ExcludeFocus(
+              excluding: closing,
+              child: AbsorbPointer(absorbing: closing, child: child),
+            ),
+            child: WorkbenchCommandScope(
+              commands: _commands,
+              child: _ThemedWorkbench(
+                bootstrap: widget.bootstrap,
+                panels: _panels,
+                commands: _commands,
+              ),
+            ),
+          ),
+        );
 }
 
 class _ThemedWorkbench extends ConsumerWidget {
@@ -129,14 +160,10 @@ class _ThemedWorkbench extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final appearance = ref.watch(workbenchAppearanceProvider).value;
     final preferences = ref.watch(
-      workspaceStateProvider.select(
+      workspaceSnapshotProvider.select(
         (value) => (
-          themeMode:
-              value.value?.snapshot.preferences.themeMode ??
-              bootstrap.session.state.snapshot.preferences.themeMode,
-          density:
-              value.value?.snapshot.preferences.density ??
-              bootstrap.session.state.snapshot.preferences.density,
+          themeMode: value.snapshot.preferences.themeMode,
+          density: value.snapshot.preferences.density,
         ),
       ),
     );
@@ -249,8 +276,7 @@ class _WindowChrome extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final history = ref.watch(navigationHistoryProvider);
-    final session = ref.watch(workspaceSessionProvider);
+    final history = ref.watch(navigationHistoryProvider).history;
     final path = history.current?.location.path ?? '/text';
     String titleOf(WorkspaceSnapshot snapshot) => switch (path) {
       '/text' =>
@@ -274,9 +300,7 @@ class _WindowChrome extends ConsumerWidget {
       _ => context.l10n.tasks,
     };
     final title = ref.watch(
-      workspaceStateProvider.select(
-        (value) => titleOf(value.value?.snapshot ?? session.state.snapshot),
-      ),
+      workspaceSnapshotProvider.select((value) => titleOf(value.snapshot)),
     );
     return WorkbenchWindowChrome(
       title: title,

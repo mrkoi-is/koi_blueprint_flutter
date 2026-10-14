@@ -177,9 +177,9 @@ void main() {
             home: Scaffold(
               body: Consumer(
                 builder: (context, ref, _) {
-                  final snapshot =
-                      ref.watch(workspaceStateProvider).value?.snapshot ??
-                      bootstrap.session.state.snapshot;
+                  final snapshot = ref
+                      .watch(workspaceSnapshotProvider)
+                      .snapshot;
                   return WorkspaceSaveStatus(
                     document: snapshot.documents.single,
                     includeCount: true,

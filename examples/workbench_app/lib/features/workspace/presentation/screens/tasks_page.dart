@@ -7,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_models.dart';
 import 'package:workbench_app/features/workspace/presentation/providers/workspace_providers.dart';
-import 'package:workbench_app/features/workspace/presentation/services/media_retry.dart';
+import 'package:workbench_app/features/workspace/presentation/media_retry.dart';
 
 class TasksPage extends ConsumerStatefulWidget {
   const TasksPage({super.key});
@@ -74,13 +74,9 @@ class _TasksPageState extends ConsumerState<TasksPage> {
   Widget build(BuildContext context) {
     final session = ref.watch(workspaceSessionProvider);
     final state = ref.watch(
-      workspaceStateProvider.select(
-        (value) => (
-          todos: value.value?.snapshot.todos ?? session.state.snapshot.todos,
-          jobCount:
-              value.value?.snapshot.jobs.length ??
-              session.state.snapshot.jobs.length,
-        ),
+      workspaceSnapshotProvider.select(
+        (value) =>
+            (todos: value.snapshot.todos, jobCount: value.snapshot.jobs.length),
       ),
     );
     final todos = state.todos
@@ -210,9 +206,8 @@ class _JobTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final session = ref.watch(workspaceSessionProvider);
     final job = ref.watch(
-      workspaceStateProvider.select(
-        (value) =>
-            value.value?.snapshot.jobs.where((job) => job.id == id).firstOrNull,
+      workspaceSnapshotProvider.select(
+        (value) => value.snapshot.jobs.where((job) => job.id == id).firstOrNull,
       ),
     );
     if (job == null) return const SizedBox();

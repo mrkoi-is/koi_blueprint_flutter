@@ -41,12 +41,7 @@ Future<void> main(List<String> arguments) async {
       File(exceptionsPath ?? '${root.path}/tool/architecture_exceptions.json'),
     );
     if (json) {
-      stdout.writeln(
-        jsonEncode({
-          'ok': issues.isEmpty,
-          'issues': [for (final issue in issues) issue.toJson()],
-        }),
-      );
+      stdout.writeln(jsonEncode(architectureReport(issues)));
     } else if (issues.isEmpty) {
       stdout.writeln(
         'Architecture checks passed (${members.length - 1} workspace members).',
@@ -56,7 +51,9 @@ Future<void> main(List<String> arguments) async {
         stderr.writeln(issue);
       }
     }
-    if (issues.isNotEmpty) exitCode = 1;
+    if (issues.any((issue) => issue.severity == ArchitectureSeverity.error)) {
+      exitCode = 1;
+    }
   } on Object catch (error) {
     stderr.writeln('Architecture checker failed: $error');
     exitCode = 2;
