@@ -1,3 +1,4 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -26,6 +27,7 @@ Future<void> openPage(WidgetTester tester) async {
   await settleResources(tester);
 }
 
+@Dependencies([analysisSession])
 AnalysisSession session(WidgetTester tester) =>
     ProviderScope.containerOf(tester.element(find.byType(TextField)))
         .read(analysisSessionProvider);
@@ -36,6 +38,7 @@ Future<void> tapText(WidgetTester tester, String text) async {
   await settleResources(tester);
 }
 
+@Dependencies([analysisSession])
 void main() {
   testWidgets(
     'embedded page executes both typed engines and releases on removal',

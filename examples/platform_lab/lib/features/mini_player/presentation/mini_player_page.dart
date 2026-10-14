@@ -30,7 +30,7 @@ class _MiniPlayerPageState extends ConsumerState<MiniPlayerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final host = ref.watch(desktopWindowHostProvider);
+    final host = ref.watch(desktopWindowHostProvider).host;
     _window = host;
     final media = ref.watch(systemMediaControllerProvider);
     if (host == null || !host.ready || media == null) {

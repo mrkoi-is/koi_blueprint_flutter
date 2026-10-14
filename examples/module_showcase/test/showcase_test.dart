@@ -1,3 +1,4 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -17,6 +18,7 @@ Future<void> settleResources(WidgetTester tester) async {
   await tester.pumpAndSettle();
 }
 
+@Dependencies([alphaMessage, betaMessage])
 void main() {
   testWidgets('query deep link activates its module before first frame', (
     tester,
@@ -102,7 +104,10 @@ void main() {
         initialLocation: '/beta/details',
       );
       final router = app.router;
-      final first = app.container.read(activeShowcaseRepositoryProvider);
+      final first = app.container
+          .read(moduleSnapshotProvider)
+          .session!
+          .capability;
       expect(first.moduleId, 'beta');
       expect(await first.loadMessage(), 'Beta capability · session 1');
       final pending = first.loadMessage(delay: const Duration(hours: 1));
@@ -112,7 +117,10 @@ void main() {
       );
       await app.runtime.activate('alpha');
       await rejected;
-      final second = app.container.read(activeShowcaseRepositoryProvider);
+      final second = app.container
+          .read(moduleSnapshotProvider)
+          .session!
+          .capability;
       expect(second.moduleId, 'alpha');
       expect(second.generation, greaterThan(first.generation));
       expect(app.router, same(router));
@@ -150,9 +158,39 @@ void main() {
     },
   );
 
+  test('runtime 重绑定重置命令代次，借用服务不被 provider 关闭', () async {
+    final first = await ShowcaseBootstrap.create();
+    final second = await ShowcaseBootstrap.create();
+    addTearDown(first.disposeAsync);
+    addTearDown(second.disposeAsync);
+    final container = ProviderContainer(
+      overrides: [
+        moduleRuntimeProvider.overrideWithValue((runtime: first.runtime)),
+        showcaseServicesProvider.overrideWithValue(first.services),
+      ],
+    );
+    addTearDown(container.dispose);
+    container.listen(moduleControlsProvider, (_, _) {});
+    final commands = container.read(moduleControlsProvider.notifier);
+    final pending = commands.demonstrateStaleResult();
+    container.updateOverrides([
+      moduleRuntimeProvider.overrideWithValue((runtime: second.runtime)),
+      showcaseServicesProvider.overrideWithValue(second.services),
+    ]);
+    final freshStatus = container.read(moduleControlsProvider);
+    await pending;
+    expect(container.read(moduleControlsProvider), freshStatus);
+    expect(second.runtime.state.session?.moduleId, 'alpha');
+    expect(first.services.isClosed, false);
+    expect(second.services.isClosed, false);
+  });
+
   test('runtime injection is required and switching does not return old capability', () async {
     final missing = ProviderContainer(retry: (_, _) => null);
-    expect(() => missing.read(moduleRuntimeProvider), throwsA(anything));
+    expect(
+      () => missing.read(moduleRuntimeProvider).runtime,
+      throwsA(anything),
+    );
     missing.dispose();
     final app = await ShowcaseBootstrap.create();
     // Watch the bridge so that invalidation reaches all dependents immediately.
@@ -162,12 +200,12 @@ void main() {
     );
     final switching = app.runtime.activate('beta');
     expect(
-      () => app.container.read(activeShowcaseRepositoryProvider),
+      () => app.container.read(moduleSnapshotProvider).session!.capability,
       throwsA(anything),
     );
     await switching;
     expect(
-      app.container.read(activeShowcaseRepositoryProvider).moduleId,
+      app.container.read(moduleSnapshotProvider).session!.capability.moduleId,
       'beta',
     );
     subscription.close();

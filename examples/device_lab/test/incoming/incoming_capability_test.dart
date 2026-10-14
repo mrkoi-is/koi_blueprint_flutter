@@ -1,6 +1,7 @@
 @TestOn('vm')
 library;
 
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:device_lab/incoming_capability.dart';
 import 'package:device_lab/features/devices/data/incoming_links.dart';
 import 'package:device_lab/features/local_setup/presentation/providers/local_setup_providers.dart';
@@ -13,6 +14,7 @@ import 'package:koi_core/koi_core.dart';
 
 import '../local_setup/native_capability_support.dart';
 
+@Dependencies([localSetupSession, localSetupChanges])
 void main() {
   testWidgets(
     'incoming initializer queues cold link, borrows inbox and restores after disposal',

@@ -42,15 +42,15 @@ class DisplayNameTest(unittest.TestCase):
                 self.assertEqual(new['CFBundleDisplayName'], name)
                 self.assertEqual(new['CFBundleName'], name)
                 self.assertEqual(new['CFBundleIdentifier'], old['CFBundleIdentifier'])
-            windows = (app / 'windows/runner/main.cpp').read_text()
+            windows = (app / 'windows/runner/main.cpp').read_text(encoding='utf-8')
             self.assertIn(r'\U0001d11e', windows)
             self.assertIn(r'\"Studio\"', windows)
-            rc = (app / 'windows/runner/Runner.rc').read_text()
+            rc = (app / 'windows/runner/Runner.rc').read_text(encoding='utf-8')
             self.assertIn('锦鲤', rc)
             self.assertIn('#pragma code_page(65001)', rc)
             self.assertIn('"platform_lab.exe"', rc)
-            self.assertEqual(json.loads((app / 'web/manifest.json').read_text())['name'], name)
-            self.assertIn('&lt;工具&gt;', (app / 'web/index.html').read_text())
+            self.assertEqual(json.loads((app / 'web/manifest.json').read_text(encoding='utf-8'))['name'], name)
+            self.assertIn('&lt;工具&gt;', (app / 'web/index.html').read_text(encoding='utf-8'))
             xib = ET.fromstring((app / 'macos/Runner/Base.lproj/MainMenu.xib').read_bytes())
             window = next(element for element in xib.iter('window') if element.get('customClass') == 'MainFlutterWindow')
             self.assertEqual(window.get('title'), name)
@@ -63,6 +63,35 @@ class DisplayNameTest(unittest.TestCase):
             with self.assertRaises(ValueError): plan_display_name(app, 'Name', ['web'])
             (app / 'web').symlink_to(EXAMPLES / 'platform_lab/web', target_is_directory=True)
             with self.assertRaises(ValueError): plan_display_name(app, 'Name', ['web'])
+
+    def test_create_cli_display_name_and_config_conflict(self):
+        import io
+        from contextlib import redirect_stdout, redirect_stderr
+        import blueprint
+        with tempfile.TemporaryDirectory() as temporary:
+            out = Path(temporary) / 'demo_out'
+            buf = io.StringIO()
+            with redirect_stdout(buf):
+                code = blueprint.main([
+                    'create', 'koi_pocket', '--output', str(out),
+                    '--org', 'com.example', '--display-name', 'Koi AI Pocket',
+                    '--platforms', 'ios,android', '--dry-run',
+                ])
+            self.assertEqual(code, 0)
+            plan = json.loads(buf.getvalue())
+            self.assertEqual(plan['configuration']['brand']['displayName'], 'Koi AI Pocket')
+
+            cfg = Path(temporary) / 'config.json'
+            cfg.write_text(json.dumps({'schema': 1, 'brand': {'displayName': 'Other Name'}}), encoding='utf-8')
+            err = io.StringIO()
+            with redirect_stderr(err):
+                code = blueprint.main([
+                    'create', 'koi_pocket', '--output', str(out),
+                    '--org', 'com.example', '--display-name', 'Koi AI Pocket',
+                    '--config', str(cfg), '--dry-run',
+                ])
+            self.assertEqual(code, 2)
+            self.assertIn('Conflicting --display-name', err.getvalue())
 
 
 class CapabilityDoctorTest(unittest.TestCase):

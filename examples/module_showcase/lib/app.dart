@@ -1,3 +1,6 @@
+import 'package:showcase_alpha/showcase_alpha.dart' show alphaMessage;
+import 'package:showcase_beta/showcase_beta.dart' show betaMessage;
+import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:module_showcase/l10n/generated/app_localizations.dart';
 
 import 'dart:async';
@@ -7,6 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:module_showcase/bootstrap.dart';
 
+@Dependencies([alphaMessage, betaMessage])
 class ModuleShowcaseApp extends StatefulWidget {
   const ModuleShowcaseApp({super.key, required this.bootstrap});
 

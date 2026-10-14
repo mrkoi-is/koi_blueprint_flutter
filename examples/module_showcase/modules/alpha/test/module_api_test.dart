@@ -1,3 +1,5 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -28,7 +30,22 @@ final class TestRepository implements ShowcaseRepository {
   Future<String> loadMessage({Duration delay = Duration.zero}) => pending;
 }
 
+@Dependencies([showcaseRepository, alphaMessage])
 void main() {
+  test('missing session injection fails explicitly', () {
+    final container = ProviderContainer(retry: (_, _) => null);
+    addTearDown(container.dispose);
+    expect(
+      () => container.read(showcaseRepositoryProvider),
+      throwsA(
+        predicate<Object>(
+          (error) =>
+              error.toString().contains('Inject the active module session'),
+        ),
+      ),
+    );
+  });
+
   test(
     'public factory owns timers and subscription but keeps host bus open',
     () async {
@@ -88,7 +105,7 @@ void main() {
         ProviderScope(
           retry: (_, _) => null,
           overrides: [
-            activeShowcaseRepositoryProvider.overrideWithValue(
+            showcaseRepositoryProvider.overrideWithValue(
               TestRepository(pending.future),
             ),
           ],
@@ -124,7 +141,7 @@ void main() {
       ProviderScope(
         retry: (_, _) => null,
         overrides: [
-          activeShowcaseRepositoryProvider.overrideWithValue(
+          showcaseRepositoryProvider.overrideWithValue(
             TestRepository(pending.future),
           ),
         ],

@@ -14,12 +14,13 @@ Future<void> main() async {
     write('modules/child/lib/child.dart', 'int childValue() => 2;');
     final report = File('${temporary.path}/lcov.info')
       ..writeAsStringSync('SF:lib/own.dart\nDA:1,1\nend_of_record\n');
-    Future<ProcessResult> check() => Process.run(Platform.resolvedExecutable, [
-      'run',
-      'tool/check_coverage_sources.dart',
-      member.path,
-      report.path,
-    ]);
+    Future<ProcessResult> check({String? memberArgument}) =>
+        Process.run(Platform.resolvedExecutable, [
+          'run',
+          'tool/check_coverage_sources.dart',
+          memberArgument ?? member.path,
+          report.path,
+        ]);
     final covered = await check();
     if (covered.exitCode != 0) {
       throw StateError(
@@ -31,6 +32,12 @@ Future<void> main() async {
     if (windowsPaths.exitCode != 0) {
       throw StateError(
         'LCOV Windows separators must normalize: ${windowsPaths.stderr}',
+      );
+    }
+    final trailingSeparator = await check(memberArgument: '${member.path}/');
+    if (trailingSeparator.exitCode != 0) {
+      throw StateError(
+        'Member paths may end in a separator: ${trailingSeparator.stderr}',
       );
     }
     write(
@@ -54,7 +61,7 @@ Future<void> main() async {
           'String userAsset() => "handwritten";',
     );
     final manualAssets = await check();
-    if (manualAssets.exitCode == 0 ||
+    if (manualAssets.exitCode != 1 ||
         !(manualAssets.stderr as String).contains(
           'lib/shared/assets/manual_assets.dart',
         )) {
@@ -63,11 +70,22 @@ Future<void> main() async {
     File('${member.path}/lib/shared/assets/manual_assets.dart').deleteSync();
     write('lib/missing.dart', 'int missing() => 3;');
     final missing = await check();
-    if (missing.exitCode == 0 ||
+    if (missing.exitCode != 1 ||
         !(missing.stderr as String).contains('lib/missing.dart')) {
-      throw StateError('Missing executable source must still fail');
+      throw StateError(
+        'Missing executable source must still fail with exit 1: '
+        '${missing.exitCode}; ${missing.stderr}',
+      );
     }
-    stdout.writeln('5 coverage-source regression cases passed.');
+    final missingWithSeparator = await check(memberArgument: '${member.path}/');
+    if (missingWithSeparator.exitCode != 1 ||
+        !(missingWithSeparator.stderr as String).contains('lib/missing.dart')) {
+      throw StateError(
+        'Trailing separators must preserve missing-source errors: '
+        '${missingWithSeparator.exitCode}; ${missingWithSeparator.stderr}',
+      );
+    }
+    stdout.writeln('7 coverage-source regression cases passed.');
   } finally {
     temporary.deleteSync(recursive: true);
   }

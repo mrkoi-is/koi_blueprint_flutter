@@ -18,6 +18,16 @@ The Native test owns a temporary directory. The Web test owns a unique IndexedDB
 and verifies that released Blob URLs cannot be fetched. Cleanup closes playback,
 leases, workspace and storage before removing the sandbox.
 
+Headless Windows CI has no audio device and passes
+`--dart-define=KOI_TEST_NATIVE_AUDIO_OUTPUT=null` and
+`--dart-define=KOI_TEST_NATIVE_HWDEC=no`. This selects libmpv's real null
+audio output before opening media, while retaining AAC decoding, video rendering,
+time advancement and the volume API checks. Hardware decoding is disabled on
+this virtual host; the actual VideoController texture rendering path stays
+enabled. The structured evidence records both settings; speaker output is not
+exercised. Normal app startup and runs
+without this test define keep the system's audio output.
+
 Generate a workbench host with macOS/Web runners outside this source workspace;
 these runner directories are intentionally absent here. Run from its app member:
 
