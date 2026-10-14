@@ -43,7 +43,7 @@ def main() -> None:
                         '-c:a', 'aac', '-profile:a', 'aac_low', '-b:a', '24k', '-ac', '1',
                         '-movflags', '+faststart', '-metadata', 'comment=Koi synthetic runtime fixture',
                         str(DESTINATION / f'{name}.mp4')], check=True)
-    (DESTINATION / '中文资料.md').write_text('# 本地工作区\n\n这是用于验证真实持久化与重开恢复的中文资料。\n', encoding='utf-8')
+    (DESTINATION / '中文资料.md').write_text('# 本地工作区\n\n这是用于验证真实持久化与重开恢复的中文资料。\n', encoding='utf-8', newline='\n')
     records = []
     total = 0
     fixture_names = {'gradient.png', 'gradient.jpg', 'landscape.mp4',
@@ -63,7 +63,7 @@ def main() -> None:
     if total >= 300 * 1024:
         raise SystemExit(f'Fixture total {total} exceeds 300 KiB')
     (DESTINATION / 'manifest.json').write_text(json.dumps({'total_bytes': total, 'fixtures': records},
-                                                         ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+                                                         ensure_ascii=False, indent=2) + '\n', encoding='utf-8', newline='\n')
     print(json.dumps({'total_bytes': total, 'files': len(records), 'directory': str(DESTINATION)}))
 
 
