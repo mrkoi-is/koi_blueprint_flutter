@@ -1,0 +1,186 @@
+{
+  "$schema": "./egress_manifest.schema.json",
+  "schemaVersion": 1,
+  "gateScope": "basic_lint",
+  "template": true,
+  "project": "koi_blueprint_flutter",
+  "boundaries": {
+    "presentationPathSegments": [
+      "presentation",
+      "page",
+      "pages",
+      "controller",
+      "controllers",
+      "logic",
+      "logics",
+      "view",
+      "views",
+      "widget",
+      "widgets"
+    ],
+    "forbiddenSymbols": [
+      "RetrofitClient",
+      "RequestToolMixin",
+      "getClient(",
+      "getClientDio(",
+      "AppNetworkContainer"
+    ],
+    "transportConstructionPaths": [
+      "examples/network_lab/lib/shared/network/http_transport_native.dart"
+    ]
+  },
+  "migration": {
+    "enabled": false,
+    "manifest": "tool/network/migration_manifest.json",
+    "requireZeroLegacy": false,
+    "defaultStack": "koi_generated"
+  },
+  "nativeSecurityExceptions": [],
+  "entries": [
+    {
+      "id": "main_api",
+      "category": "business_api",
+      "purpose": "认证样例的可选 Native API 基础设施与生成健康契约演示；按需调用，dev 为 Mock，staging/prod 缺真实仓库时拒绝启动",
+      "owner": "apps/koi_admin_app/lib/bootstrap.dart",
+      "dataClassification": "template",
+      "transport": "koi_network",
+      "contract": "openapi",
+      "authentication": "project_adapter",
+      "authFailurePolicy": "global_session",
+      "retryPolicy": "never",
+      "dynamicUrlPolicy": "fixed_origin",
+      "hostPolicy": "declared",
+      "securityPolicy": "strict_tls",
+      "securityPolicyDetails": "staging/production 强制 HTTPS、strict TLS 且禁止证书绕过",
+      "hosts": {
+        "development": "https://dev-api.example.com/",
+        "staging": "https://staging-api.example.com/",
+        "production": "https://api.example.com/"
+      },
+      "tls": {
+        "staging": "strict",
+        "production": "strict"
+      },
+      "testEvidence": [
+        "packages/koi_api_bootstrap/test/koi_api_bootstrap_test.dart",
+        "apps/koi_admin_app/test/core/bootstrap/bootstrap_integration_test.dart",
+        "apps/koi_admin_app/test/core/network/app_network_container_test.dart",
+        "packages/koi_admin_api/test/admin_api_contract_test.dart"
+      ]
+    },
+    {
+      "id": "network_lab_http",
+      "category": "business_api",
+      "purpose": "Network Lab 的 catalog/health 开发示例，默认连接本地 fixture，可由 NETWORK_LAB_URL 替换",
+      "owner": "examples/network_lab/lib/bootstrap.dart",
+      "dataClassification": "template",
+      "transport": "Dio Native / Fetch Web",
+      "contract": "manual",
+      "authentication": "none",
+      "authFailurePolicy": "none",
+      "retryPolicy": "never",
+      "dynamicUrlPolicy": "runtime_supplied",
+      "hostPolicy": "declared",
+      "securityPolicy": "development_only",
+      "securityPolicyDetails": "仅验证 HTTP(S) scheme 与 host；默认本地 HTTP，无生产 allowlist 或强制 HTTPS 保证。",
+      "developmentOnly": true,
+      "hosts": {
+        "development": "http://127.0.0.1:8765/"
+      },
+      "tls": {},
+      "testEvidence": [
+        "examples/network_lab/test/data/native_transport_test.dart",
+        "examples/network_lab/test/http/network_http_test.dart"
+      ]
+    },
+    {
+      "id": "network_lab_transfer",
+      "category": "transfer",
+      "purpose": "Network Lab 的 Range 下载与断点恢复示例",
+      "owner": "examples/network_lab/lib/features/network/application/transfer_engine.dart",
+      "dataClassification": "template",
+      "transport": "Dio Native / Fetch Web",
+      "contract": "manual",
+      "authentication": "none",
+      "authFailurePolicy": "none",
+      "retryPolicy": "never",
+      "dynamicUrlPolicy": "runtime_supplied",
+      "hostPolicy": "runtime_supplied",
+      "securityPolicy": "development_only",
+      "securityPolicyDetails": "来自 Network Lab baseUri 的 /file 或调用者 URI；检查响应范围与完整性，未配置生产 URL allowlist。",
+      "developmentOnly": true,
+      "hosts": null,
+      "tls": null,
+      "testEvidence": [
+        "examples/network_lab/test/application/transfer_engine_test.dart"
+      ]
+    },
+    {
+      "id": "network_lab_images",
+      "category": "remote_asset",
+      "purpose": "按需远程图片与缓存示例",
+      "owner": "examples/network_lab/lib/features/images/data/image_repository.dart",
+      "dataClassification": "template",
+      "transport": "Dio Native / Fetch Web",
+      "contract": "manual",
+      "authentication": "none",
+      "authFailurePolicy": "none",
+      "retryPolicy": "never",
+      "dynamicUrlPolicy": "runtime_supplied",
+      "hostPolicy": "runtime_supplied",
+      "securityPolicy": "development_only",
+      "securityPolicyDetails": "验证 HTTP(S) scheme/host、图片大小与解码；允许 HTTP，未提供生产 origin allowlist。",
+      "developmentOnly": true,
+      "hosts": null,
+      "tls": null,
+      "testEvidence": [
+        "examples/network_lab/test/images/image_repository_test.dart"
+      ]
+    },
+    {
+      "id": "device_lab_pairing",
+      "category": "device_link",
+      "purpose": "本地设备 WebSocket 配对、会话与命令示例；Native 另有本地监听服务",
+      "owner": "examples/device_lab/lib/features/devices/data/device_client.dart",
+      "dataClassification": "template",
+      "transport": "web_socket_channel / dart:io WebSocket",
+      "contract": "manual",
+      "authentication": "project_adapter",
+      "authFailurePolicy": "business_error",
+      "retryPolicy": "never",
+      "dynamicUrlPolicy": "runtime_supplied",
+      "hostPolicy": "runtime_supplied",
+      "securityPolicy": "development_only",
+      "securityPolicyDetails": "运行时 ws/wss 地址；配对码、token 和 generation 隔离；没有强制 WSS 或生产设备身份验收。",
+      "developmentOnly": true,
+      "hosts": null,
+      "tls": null,
+      "testEvidence": [
+        "examples/device_lab/test/data/device_socket_test.dart",
+        "examples/device_lab/test/application/device_protocol_test.dart"
+      ]
+    },
+    {
+      "id": "platform_lab_media",
+      "category": "media",
+      "purpose": "媒体示例可将调用者 URI 交给播放器；本地文件之外可能产生平台网络出口",
+      "owner": "examples/platform_lab/lib/features/system_media/data/audioplayers_engine.dart",
+      "dataClassification": "template",
+      "transport": "audioplayers UrlSource",
+      "contract": "plugin",
+      "authentication": "none",
+      "authFailurePolicy": "none",
+      "retryPolicy": "never",
+      "dynamicUrlPolicy": "runtime_supplied",
+      "hostPolicy": "runtime_supplied",
+      "securityPolicy": "development_only",
+      "securityPolicyDetails": "协议和证书行为委托平台播放器；源码不限制远程 origin，现有单元测试不等于目标平台或生产媒体源验收。",
+      "developmentOnly": true,
+      "hosts": null,
+      "tls": null,
+      "testEvidence": [
+        "examples/platform_lab/test/features/system_media/audioplayers_engine_test.dart"
+      ]
+    }
+  ]
+}

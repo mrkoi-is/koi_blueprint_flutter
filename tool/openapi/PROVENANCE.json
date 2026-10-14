@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "contracts": [
+    {
+      "id": "admin_example",
+      "authority": "template_example",
+      "sourceUrl": "local-template://tool/openapi/admin.openapi.json",
+      "fetchedAt": "2026-08-03T04:12:01Z",
+      "sourceFile": "tool/openapi/admin.openapi.json",
+      "sourceSha256": "068fd08ac34558560dd6e09c4c41622716a50ee7bff4b3d07c6bdabc075dfac7",
+      "overlayFile": null,
+      "overlaySha256": null,
+      "overlayOwner": null,
+      "overlayRemovalCriteria": null,
+      "parser": "koi_swagger_parser",
+      "parserVersion": "0.2.0",
+      "configFile": "tool/koi_swagger_parser/admin.yaml",
+      "configSha256": "a07ef206b6f566d3c4ec5d8d27e039a6b1d775b9242ade6d1f682412de04eb79",
+      "generationCommand": "python3 blueprint.py check generate",
+      "outputPackage": "packages/koi_admin_api"
+    }
+  ]
+}

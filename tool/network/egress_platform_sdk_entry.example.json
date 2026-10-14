@@ -1,0 +1,22 @@
+{
+  "id": "vendor_platform_sdk",
+  "category": "platform_sdk",
+  "purpose": "由厂商 SDK 内部管理、App 无法枚举 origin 的联网能力",
+  "owner": "apps/<app>/lib/core/platform",
+  "dataClassification": "internal",
+  "transport": "platform_sdk",
+  "contract": "platform",
+  "authentication": "platform_sdk",
+  "authFailurePolicy": "plugin_managed",
+  "retryPolicy": "plugin_managed",
+  "dynamicUrlPolicy": "platform_managed",
+  "hostPolicy": "provider_managed",
+  "securityPolicy": "provider_managed",
+  "securityPolicyDetails": "记录厂商的 TLS、证书、升级与安全响应责任；接入项目必须替换为真实评审结论",
+  "provider": "replace-with-sdk-provider",
+  "hosts": null,
+  "tls": null,
+  "testEvidence": [
+    "替换为真实存在的SDK安全评审或测试证据路径"
+  ]
+}

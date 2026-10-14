@@ -1,0 +1,6 @@
+include: ../../analysis_options.yaml
+
+# 生成器在聚合 Client 中使用相对导入；仅在纯生成包中忽略该风格规则。
+analyzer:
+  errors:
+    always_use_package_imports: ignore

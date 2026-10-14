@@ -11,6 +11,7 @@ environment:
 
 workspace:
   - apps/koi_admin_app
+  - packages/koi_admin_api
   - packages/koi_api_bootstrap
   - packages/koi_auth
   - packages/koi_core
@@ -32,6 +33,11 @@ workspace:
   - examples/module_showcase/modules/beta
 
 dev_dependencies:
+  crypto: ^3.0.7
+  json_schema: ^5.2.2
+  koi_swagger_parser: 0.2.0
+  flutter_test:
+    sdk: flutter
   analyzer: 14.5.0
   yaml: ^3.1.3
   flutter_lints: ^6.0.0
@@ -63,5 +69,7 @@ melos:
       run: python blueprint.py check test
     coverage:
       run: python blueprint.py check coverage
+    network:verify:
+      run: python blueprint.py check network
     precommit:
       run: python blueprint.py validate

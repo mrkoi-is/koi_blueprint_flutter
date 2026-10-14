@@ -68,9 +68,9 @@ API/local Feature 的 `<feature>.dart` 是业务入口，导出模型、端口�
 
 [认证样例](../examples.md) 演示认证：dev 可使用 Mock；staging/prod 缺少真实认证/API 时拒绝启动。登录、登出与 401 共享可撤销 token session；延迟 401 通过 token + revision 隔离。Native 持久化 token，Web 使用内存会话。示例没有跨进程用户会话恢复，也没有真实 token refresh。
 
-`koi_api_bootstrap` 公共 API 不泄漏 Dio 或 koi_network 类型；Web 后端为 no-op，真实 Web API 需自己的实现。额外网络模块安装自己的 session-aware 401 保护。以上属于认证/API 场景，不强加到最小项目或离线工具。
+`koi_api_bootstrap` 公共 API 不泄漏 Dio 或 koi_network 类型；Web 后端为 no-op，真实 Web API 需自己的实现。Native 多 Host 共用同一组 bindings 和安全/会话策略，每个后端安装 session-aware 401 保护；生成 Client 通过独立 Native 装配入口取得受管传输。独立认证域或不兼容协议需隔离的 Transport。以上属于认证/API 场景，不强加到最小项目或离线工具。
 
-生成 API 置于 `<project>_api`，消费适配置于 `<project>_network`；生成源码不手工补丁，修改输入或生成器。见对应 Skill。
+生成 API 置于 `<project>_api`，消费适配置于 `<project>_network`；生成源码不手工补丁，修改输入或生成器。联网项目登记实际出口，OpenAPI 输入、配置和输出通过 provenance 追溯。装配、环境/TLS、日志、生成及静态门禁的详细边界见 [网络标准](NETWORK_ARCHITECTURE_STANDARD.md)。
 
 ## 维护契约
 

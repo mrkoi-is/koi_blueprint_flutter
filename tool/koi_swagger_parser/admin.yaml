@@ -1,0 +1,43 @@
+input:
+  swagger_urls:
+    - url: ../openapi/admin.openapi.json
+      enabled: true
+
+output:
+  base_dir: ../../packages/koi_admin_api/lib/src/generated
+  api_dir: ../../packages/koi_admin_api/lib/src/generated/api
+  models_dir: ../../packages/koi_admin_api/lib/src/generated/api_models
+  # 0.2.0 的非 tag 聚合在 v1 会产生字段/导入别名冲突；模板固定按 tag 分组。
+  split_by_tags: true
+  extract_version_from_url: false
+  clean_stale_files: true
+  manifest_path: ../../.dart_tool/koi_swagger_parser/admin.json
+
+generation:
+  preset:
+    name: koi_flutter
+  api:
+    enabled: true
+    use_retrofit: true
+    cancel_token_support: true
+    client:
+      class_name: AdminApiClient
+      file_name: admin_api_client
+    response_wrapper:
+      mode: passthrough
+  models:
+    enabled: true
+    class_prefix: Admin
+    enum_unknown_fallback: true
+    enum_mappings:
+      ServiceStatus:
+        unknown: unknownValue
+    default_non_nullable_list_to_empty: true
+    json_serializable:
+      checked: true
+      explicit_to_json: true
+      include_if_null: false
+
+formatting:
+  run_dart_format: true
+  run_build_runner: false

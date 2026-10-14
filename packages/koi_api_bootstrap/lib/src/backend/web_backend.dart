@@ -5,11 +5,15 @@ import 'package:koi_api_bootstrap/src/koi_api_runtime.dart';
 _WebKoiApiRuntime? _activeRuntime;
 
 Future<KoiApiRuntime> bootstrapKoiApiBackend(
-  KoiApiBootstrapOptions _,
+  KoiApiBootstrapOptions options,
   KoiApiBindings bindings,
 ) async {
+  final backends = options.validatedBackends();
   await disposeKoiApiBackend();
-  final runtime = _WebKoiApiRuntime(bindings);
+  final runtime = _WebKoiApiRuntime(
+    bindings,
+    Set.unmodifiable(backends.map((backend) => backend.key)),
+  );
   _activeRuntime = runtime;
   return runtime;
 }
@@ -20,7 +24,10 @@ Future<void> disposeKoiApiBackend() async {
 }
 
 final class _WebKoiApiRuntime implements KoiApiRuntime {
-  _WebKoiApiRuntime(this.bindings);
+  _WebKoiApiRuntime(this.bindings, this.backendKeys);
+
+  @override
+  final Set<String> backendKeys;
 
   @override
   final KoiApiBindings bindings;

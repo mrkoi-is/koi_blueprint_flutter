@@ -776,7 +776,7 @@
         "titleKey": "localSetupIncomingIntents"
       },
       "pubspecDependencies": {
-        "app_links": "7.2.1"
+        "app_links": "7.2.2"
       },
       "initializer": {
         "import": "incoming_capability.dart",

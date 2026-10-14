@@ -9,16 +9,19 @@
 - router/bootstrap：宿主到页面可达、参数解析、注入完整、redirect、router 稳定与释放。
 - modules：重复 ID/路由拒绝、会话切换、异步旧结果隔离、模块资源释放而共享服务存活。
 - generator：干净目标生成、改名、三类 Feature、module、非法参数、冲突目标和跨平台命令路径。
+- network（按需）：请求/响应 fixture、DTO 字段投影、环境/TLS、多个 Host 的共享策略与资源释放；启用认证时验证并发 401、旧 token/revision 隔离，启用刷新或重试时验证相应失败与幂等语义。
 
 ## 门禁
 
 统一入口 `python3 blueprint.py validate`。默认手写代码合并行覆盖率不低于 **80%**，可用 `--coverage-min` 提高项目门槛。不要为了通过检查扩展排除范围或降低标准。
 
-源仓库另含 `templates` 真实继承资产检查。存在 API Web 冒烟入口时另执行 JS 编译和 Node 运行。Chrome 仅在活动 workspace 成员包含浏览器测试时要求，参照快照里的测试不触发前置要求。门禁包括 AI 资产/引用检查、架构边界、代码生成、只读格式检查、fatal-infos 分析、成员测试和覆盖率。生成物 `*.g.dart / *.freezed.dart` 不入库，不计手写覆盖率。含可执行逻辑的手写文件不能因为没有被测试导入就从统计消失；入口/平台代码若以构建验证，必须有明确范围和对应证据。
+源仓库另含 `templates` 真实继承资产检查。存在 API Web 冒烟入口时另执行 JS 编译和 Node 运行。Chrome 仅在活动 workspace 成员包含浏览器测试时要求，参照快照里的测试不触发前置要求。门禁包括 AI 资产/引用检查、架构边界、代码生成、只读格式检查、fatal-infos 分析、成员测试和覆盖率。存在网络出口清单时执行 `network` 静态检查，蓝图源仓另运行 schema 与 validator 黑盒回归；没有网络配置或 API 包的项目返回 NOT_RUN。生成物 `*.g.dart / *.freezed.dart` 不入库，不计手写覆盖率。含可执行逻辑的手写文件不能因为没有被测试导入就从统计消失；入口/平台代码若以构建验证，必须有明确范围和对应证据。
 
 带 `dart:js_interop` 或 `package:web` 的浏览器实现不在 VM 中执行；覆盖率工具将其可执行行以 **零命中** 加入总分母，不能当作已覆盖或从统计消失。`check browser` 在真实 Chrome 中运行各成员 `test/browser`，已进入 validate。Browser 测试证明 IndexedDB/Blob 行为，VM LCOV 证明可测业务/UI/Native 分支；二者分别报告。Safari 和其他目标 OS 的实际运行另行记录。
 
-分项检查使用 `python3 blueprint.py check <phase>`；可选 phase 见 `check --help`。`generate-check` 与 `generate` 都重建未入库的 Dart part，验证可重复生成，不是只读差异检查。工具说明见 [工具清单](tools.md)。新增或调整依赖后先执行 `check bootstrap`，再生成和检查。
+分项检查使用 `python3 blueprint.py check <phase>`；可选 phase 见 `check --help`。`generate-check` 与 `generate` 在存在活动 OpenAPI 配置时先生成客户端，再重建未入库的 Dart part；`generate-check` 对 parser 生成的普通 Dart 源码做前后字节比较，漂移失败。两者都会写文件，不是只读差异检查。工具说明见 [工具清单](tools.md)。新增或调整依赖后先执行 `check bootstrap`，再生成和检查。
+
+网络静态检查验证已登记出口、常见平台安全模式、生成包依赖与 provenance，不能证明全部动态 URL、重定向、SDK 内部出口或真实服务行为。按 [网络标准](architecture/NETWORK_ARCHITECTURE_STANDARD.md) 保留契约/会话/取消的行为证据；Web no-op 的 JS 编译成功不代表已实现真实 Web HTTP。
 
 目标平台构建使用 `python3 blueprint.py build --app <path> --platforms <platforms>`。不同平台需要匹配主机与 SDK；验证矩阵分别记录生成、依赖、分析、测试、构建与实际运行。不得把 Web 构建成功折算成六端成功。
 

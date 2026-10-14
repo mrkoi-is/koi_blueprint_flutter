@@ -7,5 +7,8 @@ abstract interface class KoiApiRuntime {
   KoiApiBindings get bindings;
   bool get isNoop;
 
+  /// 本次装配声明的后端名称；Web no-op 仅保留声明，不提供网络能力。
+  Set<String> get backendKeys;
+
   Future<void> dispose();
 }

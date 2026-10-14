@@ -1,0 +1,23 @@
+{
+  "$schema": "./migration_manifest.schema.json",
+  "schemaVersion": 1,
+  "project": "replace-with-project-name",
+  "entries": [
+    {
+      "backend": "main",
+      "method": "GET",
+      "path": "/api/v1/example",
+      "uiReachable": true,
+      "consumer": "features/example/data/example_repository.dart",
+      "currentStack": "koi_generated",
+      "targetStack": "koi_generated",
+      "status": "migrated",
+      "owner": "example-team",
+      "reason": "示例接口已完成生成 Client 与字段消费验证",
+      "expiresAt": null,
+      "evidence": [
+        "test/example_contract_test.dart"
+      ]
+    }
+  ]
+}

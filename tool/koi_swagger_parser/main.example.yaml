@@ -1,0 +1,43 @@
+input:
+  swagger_urls:
+    - url: ../openapi/main.openapi.json
+      enabled: true
+
+output:
+  base_dir: ../../packages/project_main_api/lib/src/generated
+  api_dir: ../../packages/project_main_api/lib/src/generated/api
+  models_dir: ../../packages/project_main_api/lib/src/generated/api_models
+  split_by_tags: true
+  extract_version_from_url: false
+  clean_stale_files: true
+  manifest_path: ../../.dart_tool/koi_swagger_parser/main.json
+
+generation:
+  preset:
+    name: koi_flutter
+  api:
+    enabled: true
+    use_retrofit: true
+    cancel_token_support: true
+    client:
+      class_name: MainApiClient
+      file_name: main_api_client
+    response_wrapper:
+      mode: passthrough
+  models:
+    enabled: true
+    class_prefix: Main
+    enum_unknown_fallback: true
+    enum_mappings:
+      ExampleStatus:
+        pending: waiting
+        done: completed
+    default_non_nullable_list_to_empty: true
+    json_serializable:
+      checked: true
+      explicit_to_json: true
+      include_if_null: false
+
+formatting:
+  run_dart_format: true
+  run_build_runner: false

@@ -14,6 +14,7 @@ description: 对 Koi workspace 审查依赖边界、状态归属、模块生命�
 2. 抽样一条从宿主入口到 Feature/provider/repository 的真实链路，对照对应 Skill 与样例。
 3. 检查 domain/IO/UI、App/package、module 横向边界，以及 bootstrap 资源拥有者。
 4. 检查 loading/error、取消与迟到结果、provider 生命周期、稳定 router、模块会话隔离。
+   涉及网络时另读 [网络标准](../../../docs/architecture/NETWORK_ARCHITECTURE_STANDARD.md)，核对实际出口、环境/TLS、生成来源、多 Host 的 bindings 兼容性和 session-aware 401；离线项目无需引入网络。
 5. 执行适用只读检查，按严重性记录路径/行号、触发条件、影响和修复建议。
 
 ## 核心规则
@@ -23,6 +24,7 @@ description: 对 Koi workspace 审查依赖边界、状态归属、模块生命�
 - 新生成指导文件复用 managedFiles 的内容基线与源摘要；旧 schema 2 缺基线以 untrackedGuidance/NO_BASELINE 报告，不补造或覆盖。
 - family 不保证局部重建，覆盖率不证明平台运行，文档不证明实现。
 - 架构/Skill/模板/测试应同改；失效路径和未登记成员必须指出。
+- 网络静态 lint 不证明动态 URL、重定向、第三方 SDK 的全部出口或真实服务行为。模板占位、Web no-op 与尚未实现的刷新必须按其实际能力报告。
 
 消费 scoped provider 时，为 Widget、路由和辅助函数补 `@Dependencies`，依赖链声明 `dependencies`。Riverpod lint 3.1.9 的 15 条已全部启用；不使用 lint ignore 绕过。生成注解与消费元数据的边界见状态管理规范。
 

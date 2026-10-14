@@ -51,6 +51,64 @@ class BlueprintTest(unittest.TestCase):
     def snapshot(self):
         return {str(path.relative_to(self.root)): path.read_bytes() for path in self.root.rglob('*') if path.is_file()}
 
+    def test_openapi_generation_precedes_build_runner_and_ignores_examples(self):
+        write(self.root / 'tool/koi_swagger_parser/admin.yaml', 'input: {}')
+        write(self.root / 'tool/koi_swagger_parser/main.example.yaml', 'input: {}')
+        write(self.app / 'pubspec.yaml', 'name: demo\ndev_dependencies:\n  build_runner: any\n')
+        with patch.object(blueprint, 'run') as run:
+            blueprint.check(argparse.Namespace(workspace=str(self.root), phase='generate'))
+        commands = [call.args[0] for call in run.call_args_list]
+        self.assertEqual(commands[0], ['dart', 'run', 'scripts/validate_network_architecture.dart'])
+        self.assertEqual(commands[1][1:5], ['run', 'koi_swagger_parser', 'generate', '--all'])
+        self.assertEqual(commands[2], ['dart', 'run', 'build_runner', 'build'])
+        self.assertEqual(len(commands), 3)
+
+    def test_openapi_generate_check_rejects_drift_in_parser_output(self):
+        write(self.root / 'tool/koi_swagger_parser/admin.yaml', 'input: {}')
+        output = self.root / 'packages/demo_api/lib/src/generated/client.dart'
+        write(output, 'old source')
+        def regenerate(command, cwd):
+            if 'koi_swagger_parser' in command:
+                output.write_text('new source', encoding='utf-8')
+        with patch.object(blueprint, 'run', side_effect=regenerate):
+            with self.assertRaisesRegex(blueprint.BlueprintError, 'OpenAPI source drift'):
+                blueprint.check(argparse.Namespace(workspace=str(self.root), phase='generate-check'))
+
+    def test_openapi_generate_check_ignores_build_runner_parts(self):
+        write(self.root / 'tool/koi_swagger_parser/admin.yaml', 'input: {}')
+        output = self.root / 'packages/demo_api/lib/src/generated/client.dart'
+        write(output, 'source')
+        def regenerate(command, cwd):
+            if 'koi_swagger_parser' in command:
+                write(output.with_suffix('.g.dart'), 'rebuilt part')
+        with patch.object(blueprint, 'run', side_effect=regenerate):
+            blueprint.check(argparse.Namespace(workspace=str(self.root), phase='generate-check'))
+
+    def test_network_is_optional_without_active_contracts(self):
+        with patch.object(blueprint, 'run') as run:
+            blueprint.check(argparse.Namespace(workspace=str(self.root), phase='network'))
+        run.assert_not_called()
+        write(self.root / 'tool/koi_swagger_parser/admin.yaml', 'input: {}')
+        with self.assertRaisesRegex(blueprint.BlueprintError, 'manifest required'):
+            blueprint.check(argparse.Namespace(workspace=str(self.root), phase='network'))
+
+    def test_generated_projects_do_not_activate_source_network_inputs(self):
+        write(self.root / 'tool/network/egress_manifest.json', '{}')
+        write(self.root / 'tool/network/egress_manifest.schema.json', '{}')
+        write(self.root / 'tool/openapi/PROVENANCE.json', '{}')
+        write(self.root / 'tool/openapi/PROVENANCE.example.json', '{}')
+        write(self.root / 'tool/koi_swagger_parser/admin.yaml', 'input: {}')
+        write(self.root / 'tool/koi_swagger_parser/main.example.yaml', 'input: {}')
+        with patch.object(blueprint, 'generated_readme', return_value='readme'):
+            plan = blueprint.workspace_asset_plan(self.root, 'example')
+        destinations = {entry['destination'] for entry in plan}
+        self.assertNotIn('tool/network/egress_manifest.json', destinations)
+        self.assertNotIn('tool/openapi/PROVENANCE.json', destinations)
+        self.assertNotIn('tool/koi_swagger_parser/admin.yaml', destinations)
+        self.assertIn('tool/network/egress_manifest.schema.json', destinations)
+        self.assertIn('tool/openapi/PROVENANCE.example.json', destinations)
+        self.assertIn('tool/koi_swagger_parser/main.example.yaml', destinations)
+
     def test_launch_uses_active_app_and_selected_workspace_sdk(self):
         write(self.app / 'lib/main.dart', 'void main() {}')
         with patch.object(blueprint, 'run') as run:
