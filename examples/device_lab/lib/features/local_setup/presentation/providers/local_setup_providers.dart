@@ -4,10 +4,11 @@ import 'package:device_lab/features/local_setup/application/local_setup_session.
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'local_setup_providers.g.dart';
 
-@Riverpod(keepAlive: true)
+@Riverpod(keepAlive: true, dependencies: [])
 LocalSetupSession localSetupSession(Ref ref) =>
     throw UnimplementedError('Composition owns local setup');
-@riverpod
+
+@Riverpod(dependencies: [localSetupSession])
 Stream<int> localSetupChanges(Ref ref) {
   final session = ref.watch(localSetupSessionProvider);
   final controller = StreamController<int>();

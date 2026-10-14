@@ -1,14 +1,16 @@
+import 'package:riverpod_annotation/experimental/scope.dart';
+
 import 'dart:async';
 import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:network_lab/l10n/generated/app_localizations.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:network_lab/features/images/domain/image_source.dart';
 import 'package:network_lab/features/images/presentation/providers/images_providers.dart';
 
+@Dependencies([loadedImage, imageRepository, ImageSelection])
 class ImagesPage extends ConsumerStatefulWidget {
   const ImagesPage({required this.localReader, super.key});
   final LocalImageReader localReader;
@@ -17,46 +19,38 @@ class ImagesPage extends ConsumerStatefulWidget {
 }
 
 class _ImagesPageState extends ConsumerState<ImagesPage> {
-  ImageSource _source = const AssetImageSource('assets/images/sample.png');
-  final _input = TextEditingController();
-  double _width = 240;
-  Object? _inputError;
-  bool _invalidUrl = false;
+  late final TextEditingController _input;
+  @override
+  void initState() {
+    super.initState();
+    _input = TextEditingController(
+      text: ref.read(imageSelectionProvider).input,
+    );
+  }
+
+  ImageSelection get _selection => ref.read(imageSelectionProvider.notifier);
+  ImageSource get _source => ref.watch(imageSelectionProvider).source;
+  double get _width => ref.watch(imageSelectionProvider).width;
+  Object? get _inputError => ref.watch(imageSelectionProvider).error;
+  bool get _invalidUrl => ref.watch(imageSelectionProvider).invalidUrl;
   @override
   void dispose() {
     _input.dispose();
     super.dispose();
   }
 
-  void _select(ImageSource source) => setState(() {
-    _source = source;
-    _inputError = null;
-    _invalidUrl = false;
-  });
-  Future<void> _memory() async {
-    final data = await rootBundle.load('assets/images/sample.png');
-    if (mounted) {
-      _select(
-        MemoryImageSource(
-          data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
-        ),
-      );
-    }
-  }
-
-  Future<void> _local() async {
-    try {
-      final key = await widget.localReader.pick(maxBytes: 8 * 1024 * 1024);
-      if (mounted && key != null && key.isNotEmpty) {
-        _select(LocalImageSource(key));
-      }
-    } catch (error) {
-      if (mounted) setState(() => _inputError = error);
-    }
-  }
+  void _select(ImageSource source) => _selection.select(source);
+  Future<void> _memory() => _selection.memory();
+  Future<void> _local() => _selection.pick(widget.localReader);
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(imageSelectionProvider.select((value) => value.input), (
+      _,
+      value,
+    ) {
+      if (_input.text != value) _input.text = value;
+    });
     final strings = AppLocalizations.of(context)!;
     final state = ref.watch(loadedImageProvider(_source));
     final dpr = MediaQuery.devicePixelRatioOf(context);
@@ -68,6 +62,7 @@ class _ImagesPageState extends ConsumerState<ImagesPage> {
         children: [
           TextField(
             controller: _input,
+            onChanged: _selection.setInput,
             decoration: InputDecoration(labelText: strings.imagesInputLabel),
           ),
           Wrap(
@@ -85,20 +80,14 @@ class _ImagesPageState extends ConsumerState<ImagesPage> {
               ),
               if (!kIsWeb)
                 TextButton(
-                  onPressed: () => _select(LocalImageSource(_input.text)),
+                  onPressed: () => _select(
+                    LocalImageSource(ref.read(imageSelectionProvider).input),
+                  ),
                   child: Text(strings.imagesReadPath),
                 ),
               TextButton(
                 onPressed: () {
-                  final uri = Uri.tryParse(_input.text);
-                  if (uri == null) {
-                    setState(() {
-                      _invalidUrl = true;
-                      _inputError = null;
-                    });
-                  } else {
-                    _select(NetworkImageSource(uri));
-                  }
+                  _selection.selectUrl();
                 },
                 child: Text(strings.imagesNetwork),
               ),
@@ -111,7 +100,7 @@ class _ImagesPageState extends ConsumerState<ImagesPage> {
             value: _width,
             min: 80,
             max: 360,
-            onChanged: (value) => setState(() => _width = value),
+            onChanged: (value) => _selection.setWidth(value),
           ),
           Text(
             strings.imagesLayout(

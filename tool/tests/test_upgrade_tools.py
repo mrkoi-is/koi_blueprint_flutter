@@ -204,10 +204,11 @@ class UpgradeToolsTest(unittest.TestCase):
         for command in commands:
             with self.subTest(command=command):
                 result = subprocess.run([sys.executable, *command], cwd=project, env=environment,
-                                        capture_output=True, text=True)
+                                        capture_output=True, text=True, encoding='utf-8')
                 self.assertEqual(result.returncode, 0, result.stderr)
-                self.assertIn('lib/features/quick_panel', result.stdout)
-                self.assertIn('test/features/quick_panel', result.stdout)
+                output = result.stdout.replace('\\', '/')
+                self.assertIn('lib/features/quick_panel', output)
+                self.assertIn('test/features/quick_panel', output)
                 self.assertEqual(snapshot(), before)
 
     def test_upgrade_report_recognizes_identical_upstream_fix_already_applied(self):

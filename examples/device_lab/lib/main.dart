@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:device_lab/l10n/generated/app_localizations.dart';
 
 import 'dart:ui' show AppExitResponse;
@@ -11,13 +12,15 @@ import 'package:device_lab/features/devices/data/incoming_links.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-    MaterialApp(
-      title: 'Device Lab',
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      home: const _StandaloneOwner(),
+    ProviderScope(
+      child: MaterialApp(
+        title: 'Device Lab',
+        supportedLocales: AppLocalizations.supportedLocales,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        home: const _StandaloneOwner(),
+      ),
     ),
   );
 }
