@@ -80,6 +80,93 @@ class Tasks extends _\$Tasks {
 }
 
 void main() {
+  test('Windows workspace root identity ignores drive and directory case', () {
+    expect(
+      relativePathWithin(
+            r'D:\a\_temp\koi-blueprint-generated',
+            r'd:\A\_TEMP\koi-blueprint-generated\',
+            windows: true,
+          ) ==
+          '.',
+      'Pub may spell the same Windows root with a lowercase drive',
+    );
+  });
+  test(
+    'Windows children preserve relative spelling and normalize separators',
+    () {
+      expect(
+        relativePathWithin(
+              r'D:\a\_temp\workspace',
+              'd:/A/_temp/WORKSPACE/apps/Demo/lib/../lib/Feature.dart',
+              windows: true,
+            ) ==
+            'apps/Demo/lib/Feature.dart',
+        'Containment must not lowercase the reported member or source path',
+      );
+      expect(
+        relativePathWithin(r'D:\', r'd:\Apps\Demo', windows: true) ==
+            'Apps/Demo',
+        'Drive roots are valid workspace roots',
+      );
+    },
+  );
+  test(
+    'Windows containment rejects adjacent roots, traversal and other drives',
+    () {
+      for (final outside in [
+        r'd:\a\workspace-other\apps\demo',
+        r'd:\a\workspace\..\outside',
+        r'e:\a\workspace\apps\demo',
+      ]) {
+        expect(
+          relativePathWithin(r'D:\a\workspace', outside, windows: true) == null,
+          'Expected path outside workspace: $outside',
+        );
+      }
+    },
+  );
+  test('Windows UNC containment observes the share boundary', () {
+    expect(
+      relativePathWithin(
+            r'\\Server\Share\Workspace',
+            r'\\server\share\WORKSPACE\Apps\Demo',
+            windows: true,
+          ) ==
+          'Apps/Demo',
+      'UNC server and share casing should not change identity',
+    );
+    expect(
+      relativePathWithin(
+            r'\\Server\Share\Workspace',
+            r'\\server\other\workspace\Apps\Demo',
+            windows: true,
+          ) ==
+          null,
+      'Another UNC share is outside the workspace',
+    );
+  });
+  test(
+    'POSIX containment retains case sensitivity and supports filesystem root',
+    () {
+      expect(
+        relativePathWithin(
+              '/Work/Repo',
+              '/work/Repo/lib/a.dart',
+              windows: false,
+            ) ==
+            null,
+        'Windows case folding must not apply to POSIX paths',
+      );
+      expect(
+        relativePathWithin('/', '/Apps/Demo', windows: false) == 'Apps/Demo',
+        'Filesystem root must contain its descendants',
+      );
+      expect(
+        relativePathWithin('/', '/', windows: false) == '.',
+        'Filesystem root must equal itself',
+      );
+    },
+  );
   test('Dart CLI exit codes and JSON contract', () {
     final fixture = Fixture();
     try {
@@ -1220,6 +1307,28 @@ switch (choice) {
     'allow an explicit guard in an async for loop',
     'await for (final item in items) { if (!ref.mounted) return; state = item; }',
     rejected: false,
+  );
+  mountedCase(
+    'allow a guard before every potentially throwing try operation',
+    '''
+await Future.value(1);
+try {
+  if (!ref.mounted) return;
+  state = 1;
+} catch (error) {
+  state = 0;
+}
+''',
+    rejected: false,
+  );
+  mountedCase('reject a suspension in an if case when clause', '''
+await Future.value(1);
+if (ref.mounted case true when await ready()) { state = 1; }
+''', rejected: true);
+  mountedCase(
+    'reject a when suspension even with no earlier await',
+    'if (value case final item when await ready()) { state = 1; }',
+    rejected: true,
   );
   stdout.writeln('$_passed architecture tests passed.');
 }

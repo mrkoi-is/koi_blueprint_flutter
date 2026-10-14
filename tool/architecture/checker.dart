@@ -50,12 +50,32 @@ bool _isCommandCallback(
 }
 
 String relativeTo(Directory root, String path) {
-  final base = normalized(root.absolute.path).replaceFirst(RegExp(r'/$'), '');
-  final absolute = normalized(File(path).absolute.path);
-  if (absolute == base) return '.';
-  if (!absolute.startsWith('$base/')) {
+  final relative = relativePathWithin(
+    root.absolute.path,
+    File(path).absolute.path,
+  );
+  if (relative == null) {
     throw FormatException('Path is outside workspace: $path');
   }
+  return relative;
+}
+
+/// Lexical containment using the host's path semantics; no filesystem access.
+/// Windows comparisons ignore case, while the returned relative spelling does not.
+String? relativePathWithin(String root, String path, {bool? windows}) {
+  final isWindows = windows ?? Platform.isWindows;
+  String canonical(String value) => normalized(
+    Uri.file(
+      value,
+      windows: isWindows,
+    ).normalizePath().toFilePath(windows: isWindows),
+  ).replaceFirst(RegExp(r'/+$'), '');
+  final base = canonical(root);
+  final absolute = canonical(path);
+  final comparisonBase = isWindows ? base.toLowerCase() : base;
+  final comparisonPath = isWindows ? absolute.toLowerCase() : absolute;
+  if (comparisonPath == comparisonBase) return '.';
+  if (!comparisonPath.startsWith('$comparisonBase/')) return null;
   return absolute.substring(base.length + 1);
 }
 
@@ -586,10 +606,12 @@ bool _exportsPresentation(
   }
   final resolved = normalized(source.absolute.uri.resolve(uri).toFilePath());
   for (final candidate in members.values) {
-    final prefix =
-        '${normalized(Directory('${root.path}/${candidate.path}/lib').absolute.path)}/';
-    if (resolved.startsWith(prefix)) {
-      return (candidate, resolved.substring(prefix.length));
+    final relative = relativePathWithin(
+      Directory('${root.path}/${candidate.path}/lib').absolute.path,
+      resolved,
+    );
+    if (relative != null && relative != '.') {
+      return (candidate, relative);
     }
   }
   return null;
@@ -1083,11 +1105,48 @@ final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
   void visitBlock(Block node) {
     for (final statement in node.statements) {
       if (pending == null) break;
-      // Synchronous code may throw too. Capture its incoming state rather than
-      // borrowing a guard reached later in the try body.
-      thrown = _join(thrown, pending);
       statement.accept(this);
     }
+  }
+
+  void _mayThrow() => thrown = _join(thrown, pending);
+
+  @override
+  void visitMethodInvocation(MethodInvocation node) {
+    super.visitMethodInvocation(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitFunctionExpressionInvocation(FunctionExpressionInvocation node) {
+    super.visitFunctionExpressionInvocation(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitInstanceCreationExpression(InstanceCreationExpression node) {
+    super.visitInstanceCreationExpression(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitPropertyAccess(PropertyAccess node) {
+    if (_isMounted(node)) return;
+    super.visitPropertyAccess(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitPrefixedIdentifier(PrefixedIdentifier node) {
+    if (_isMounted(node)) return;
+    super.visitPrefixedIdentifier(node);
+    _mayThrow();
+  }
+
+  @override
+  void visitIndexExpression(IndexExpression node) {
+    super.visitIndexExpression(node);
+    _mayThrow();
   }
 
   @override
@@ -1105,6 +1164,7 @@ final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
     } else {
       // Matching a boolean against a pattern is not a truthiness test.
       final evaluated = _run(node.expression, pending);
+      node.caseClause!.accept(evaluated);
       _mergeExits(evaluated);
       yes = no = evaluated.pending;
     }
@@ -1263,6 +1323,7 @@ final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
     if (writesState && pending == true) {
       unsafeAssignments.add(node);
     }
+    _mayThrow();
   }
 }
 
