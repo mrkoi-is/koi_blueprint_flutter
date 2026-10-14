@@ -51,6 +51,9 @@ class KoiApiBootstrapOptions {
 
   /// 在接入真实令牌刷新实现之前保持关闭。
   final bool enableProactiveTokenRefresh;
+
+  /// 401 会话处理的精确端点白名单。相对路径使用请求的 base URL，
+  /// 绝对 HTTP(S) URL 同时限定 origin；不按子串或查询参数匹配。
   final List<String> tokenRefreshWhiteList;
 
   KoiAppEnvironment get appEnvironment =>

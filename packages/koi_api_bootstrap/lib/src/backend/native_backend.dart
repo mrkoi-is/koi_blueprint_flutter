@@ -181,8 +181,7 @@ final class _SessionAwareAuthErrorInterceptor extends Interceptor {
     DioException err,
     ErrorInterceptorHandler handler,
   ) async {
-    if (!_isCurrentRuntime() ||
-        _tokenRefreshWhiteList.any(err.requestOptions.path.contains)) {
+    if (!_isCurrentRuntime() || _isWhitelisted(err.requestOptions)) {
       handler.next(err);
       return;
     }
@@ -231,6 +230,31 @@ final class _SessionAwareAuthErrorInterceptor extends Interceptor {
     }
 
     handler.next(err);
+  }
+
+  bool _isWhitelisted(RequestOptions request) {
+    final endpoint = request.uri.normalizePath();
+    return _tokenRefreshWhiteList.any((entry) {
+      final uri = Uri.tryParse(entry);
+      if (entry.isEmpty ||
+          entry.trim() != entry ||
+          uri == null ||
+          uri.userInfo.isNotEmpty ||
+          uri.hasQuery ||
+          uri.hasFragment) {
+        return false;
+      }
+      // Use Dio's base/path composition, including a configured path prefix.
+      final allowed = RequestOptions(
+        baseUrl: request.baseUrl,
+        path: entry,
+      ).uri.normalizePath();
+      if ((allowed.scheme != 'http' && allowed.scheme != 'https') ||
+          allowed.host.isEmpty) {
+        return false;
+      }
+      return endpoint.origin == allowed.origin && endpoint.path == allowed.path;
+    });
   }
 
   String? _readBearerToken(Map<String, dynamic> headers) {

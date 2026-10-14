@@ -11,6 +11,60 @@ import 'package:koi_network/koi_network.dart';
 void main() {
   tearDown(disposeKoiApi);
 
+  test(
+    '401 whitelist matches normalized endpoint and origin, not substrings',
+    () async {
+      final primary = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      final secondary = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
+      for (final server in [primary, secondary]) {
+        addTearDown(() => server.close(force: true));
+        server.listen((request) async {
+          request.response
+            ..statusCode = HttpStatus.unauthorized
+            ..headers.contentType = ContentType.json
+            ..write(jsonEncode({'code': 401, 'msg': 'expired'}));
+          await request.response.close();
+        });
+      }
+      final primaryUrl = 'http://${primary.address.host}:${primary.port}/';
+      final bindings = KoiApiBindings();
+      final runtime = await bootstrapKoiApi(
+        KoiApiBootstrapOptions(
+          baseUrl: primaryUrl,
+          environment: 'test',
+          additionalBackends: [
+            KoiBackendDefinition(
+              key: 'secondary',
+              purpose: 'Shared session',
+              baseUrl: 'http://${secondary.address.host}:${secondary.port}/',
+            ),
+          ],
+          tokenRefreshWhiteList: ['${primaryUrl}public', 'auth/login'],
+        ),
+        bindings: bindings,
+      );
+      for (final scenario in [
+        ('main', 'auth/login-history', false),
+        ('main', 'public?next=/private', true),
+        ('main', 'auth/./login', true),
+        ('main', 'protected?next=auth/login', false),
+        ('secondary', 'public', false),
+      ]) {
+        await bindings.tokenSession.saveToken('current-token');
+        final client = buildKoiApiClient(runtime, scenario.$1, (dio) => dio);
+        await expectLater(
+          client.get<void>(scenario.$2),
+          throwsA(isA<DioException>()),
+        );
+        expect(
+          bindings.tokenSession.getToken(),
+          scenario.$3 ? 'current-token' : isNull,
+          reason: '${scenario.$1}: ${scenario.$2}',
+        );
+      }
+    },
+  );
+
   test('failed GET and POST requests are sent once on every backend', () async {
     final runtime = await bootstrapKoiApi(
       const KoiApiBootstrapOptions(
