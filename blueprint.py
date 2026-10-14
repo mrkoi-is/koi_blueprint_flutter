@@ -61,9 +61,29 @@ class SDK:
         # on the selected SDK, even when PATH points at a different installation.
         os.environ['PATH'] = str(self.flutter.parent) + os.pathsep + os.environ.get('PATH', '')
         expected = pinned_flutter_version(root)
-        actual = json.loads(run([self.flutter, '--version', '--machine'], root, capture=True))['frameworkVersion']
+        actual = self._framework_version(root)
         if actual != expected:
             raise BlueprintError(f'Flutter {expected} required, found {actual}')
+
+    def _framework_version(self, root):
+        for attempt in range(2):
+            output = run([self.flutter, '--version', '--machine'], root, capture=True)
+            try:
+                version = json.loads(output)
+            except json.JSONDecodeError as error:
+                # A cold Windows SDK may print pub bootstrap logs before its
+                # machine JSON. Retry once after initialization, without
+                # relaxing JSON parsing or retrying a failed SDK command.
+                if attempt == 0:
+                    continue
+                preview = repr(output[:240])
+                raise BlueprintError(
+                    'Flutter --version --machine returned invalid JSON after one retry; '
+                    f'stdout starts with {preview}'
+                ) from error
+            if not isinstance(version, dict) or not isinstance(version.get('frameworkVersion'), str):
+                raise BlueprintError('Flutter --version --machine JSON is missing a string frameworkVersion')
+            return version['frameworkVersion']
 
 
 def source_root():
@@ -508,7 +528,10 @@ def create(args):
             template_name: f'{name}_app',
             pascal(template_name): pascal(name) + 'App',
             'Starter App' if template == 'minimal' else 'Koi Workbench': brand_display_name or pascal(name),
-            'Executable blueprint reference, also used by the generator': f'{brand_display_name or pascal(name)} Flutter application',
+            # A JSON string is also a quoted YAML scalar; preserve punctuation
+            # in the generated pubspec description instead of YAML syntax.
+            'Executable blueprint reference, also used by the generator': json.dumps(
+                f'{brand_display_name or pascal(name)} Flutter application', ensure_ascii=False),
         }
         if template == 'workbench':
             replacements['Koi Workspace'] = brand_display_name or pascal(name)

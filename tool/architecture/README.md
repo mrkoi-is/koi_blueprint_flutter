@@ -22,6 +22,17 @@
 | ARCH013 | `shell/coordinators/` 不导入路径中含 `/presentation/` 的 URI、解析结果或 workspace 内重导出闭包。壳层页面组合（如 `app_shell.dart`）仍可引用 feature 页面。 |
 | ARCH014 | `@riverpod` / `@Riverpod` Notifier 异步方法（除 `build` 外）在 `await` 之后写入 `state` 前必须检查 `ref.mounted`。 |
 
+ARCH014 按局部执行顺序检查直接 `state` / `this.state` 赋值，包含右侧表达式中的
+`await`；每次新的挂起都会使之前的 mounted 检查失效。有效守卫支持
+`if (ref.mounted) { ... }`、`if (!ref.mounted) return`、括号、`!`、`&&` 和 `||`，
+并分别跟踪条件分支以及 `try/catch/finally` 的正常、返回和异常路径。
+单纯读取 `ref.mounted` 或在未执行的闭包里检查不能保护外层赋值。
+
+此规则不是完整控制流或符号解析：不进入闭包/局部函数体，不跟踪辅助函数和布尔
+别名；循环与 switch 保守合并，循环挂起后建议在写入所在循环体及循环后分别检查。
+if/switch 的 pattern/when、break/continue 和穷尽性不用于证明 guard；复杂控制流请写
+显式局部守卫，或用精确例外并配套生命周期行为测试。
+
 生成的 `.g.dart`/`.freezed.dart` 由生成与 analyze 检查，结构检查扫描成员的手写
 `lib`。语法错误以 ARCH000 失败。测试包含每条规则的正例、反例及合法例外；运行
 `dart run tool/tests/architecture_test.dart`。

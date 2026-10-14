@@ -367,7 +367,7 @@ class BlueprintTest(unittest.TestCase):
         source = self.root / 'blueprint-source'
         write(source / 'pubspec.yaml', 'name: source_blueprint\nversion: 0.1.0\ndescription: Old blueprint\nrepository: https://old.invalid/repo\nhomepage: https://old.invalid\nissue_tracker: https://old.invalid/issues\n\nenvironment:\n  sdk: ^3.13.0\nworkspace:\n  - examples/starter_app\n  - packages/koi_core\n\ndev_dependencies:\n  analyzer: 14.4.0\n')
         write(source / 'analysis_options.yaml', 'analyzer:\n  exclude:\n    - "**/*.g.dart"\n')
-        write(source / 'examples/starter_app/pubspec.yaml', 'name: starter_app\nresolution: workspace\ndev_dependencies:\n  build_runner: 2.16.1\n')
+        write(source / 'examples/starter_app/pubspec.yaml', 'name: starter_app\ndescription: Executable blueprint reference, also used by the generator\nresolution: workspace\ndev_dependencies:\n  build_runner: 2.16.1\n')
         write(source / 'examples/starter_app/lib/main.dart', 'class StarterApp {}\n// starter_app\n')
         write(source / 'examples/starter_app/test/main_test.dart', '// starter_app test\n')
         write(source / 'packages/koi_core/pubspec.yaml', 'name: koi_core\nresolution: workspace\n')
@@ -397,9 +397,37 @@ class BlueprintTest(unittest.TestCase):
         if command[1:2] == ['create']:
             write(Path(command[-1]) / 'lib/main.dart', 'temporary flutter skeleton')
             write(Path(command[-1]) / 'web/runner_identity.txt', command[command.index('--project-name') + 1])
+            write(Path(command[-1]) / 'web/manifest.json', json.dumps({'name': 'original', 'short_name': 'original'}))
+            write(Path(command[-1]) / 'web/index.html', '<html><head><title>original</title></head></html>\n')
         if command[1:3] == ['pub', 'get']:
             write(cwd / '.dart_tool/package_config.json', json.dumps({'rootUri': cwd.as_uri()}))
         return ''
+
+    def test_create_serializes_display_name_in_generated_pubspec(self):
+        source = self.create_fixture()
+        for input_kind in ('cli', 'config'):
+            for index, display_name in enumerate(('Koi: Pocket', '锦鲤: "Pocket" # 工作台')):
+                with self.subTest(input_kind=input_kind, display_name=display_name):
+                    name = f'display_{input_kind}_{index}'
+                    target = self.root / name
+                    arguments = ['create', name, '--org', 'org.example', '--platforms', 'web', '--output', str(target)]
+                    if input_kind == 'cli':
+                        arguments.extend(['--display-name', display_name])
+                    else:
+                        config = self.root / f'{name}.json'
+                        write(config, json.dumps({'schema': 1, 'brand': {'displayName': display_name}}))
+                        arguments.extend(['--config', str(config)])
+                    with patch.object(blueprint, 'ROOT', source):
+                        self.assertEqual(blueprint.main(arguments), 0)
+                    app = target / 'apps' / f'{name}_app'
+                    pubspec = (app / 'pubspec.yaml').read_text(encoding='utf-8')
+                    description = re.search(r'^description: (.*)$', pubspec, re.M).group(1)
+                    # JSON string syntax is a YAML subset, so parse the actual
+                    # emitted scalar without adding a Python YAML dependency.
+                    self.assertEqual(json.loads(description), f'{display_name} Flutter application')
+                    manifest = json.loads((app / 'web/manifest.json').read_text(encoding='utf-8'))
+                    self.assertEqual(manifest['name'], display_name)
+                    self.assertEqual(manifest['short_name'], display_name)
 
     def test_create_clears_blueprint_identity_and_refreshes_config_after_move(self):
         source = self.create_fixture()
@@ -424,6 +452,7 @@ class BlueprintTest(unittest.TestCase):
         self.assertTrue((target / '.blueprint/reference/examples/starter_app/lib/main.dart').is_file())
         self.assertIn('../.blueprint/reference/examples/', (target / 'docs/examples.md').read_text(encoding='utf-8'))
         self.assertEqual(json.loads((target / 'blueprint.json').read_text(encoding='utf-8'))['platforms'], ['web'])
+        self.assertEqual(json.loads((target / 'apps/my_workspace_app/web/manifest.json').read_text(encoding='utf-8'))['name'], 'My Workspace')
         self.assertFalse((target / 'docs/validation').exists())
         self.assertFalse((target / 'docs/research').exists())
         self.assertNotIn('SOURCE_BLUEPRINT_RELEASE_HISTORY', (target / 'CHANGELOG.md').read_text(encoding='utf-8'))

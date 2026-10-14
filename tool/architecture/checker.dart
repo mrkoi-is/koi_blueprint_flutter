@@ -741,17 +741,10 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
       }
       final inspector = _AsyncStateAssignmentVisitor();
       method.body.accept(inspector);
-      final awaitOffset = inspector.firstAwaitOffset;
-      if (awaitOffset == null) continue;
-      final postAwaitAssignments = inspector.stateAssignments
-          .where((assignment) => assignment.offset > awaitOffset)
-          .toList();
-      if (postAwaitAssignments.isEmpty) continue;
-      final mountedOffset = inspector.lastMountedOffset;
-      if (mountedOffset == null || mountedOffset < awaitOffset) {
+      if (inspector.unsafeAssignments.isNotEmpty) {
         report(
           'ARCH014',
-          postAwaitAssignments.first,
+          inspector.unsafeAssignments.first,
           '$className.${method.name.lexeme}',
           'Check ref.mounted after await before assigning notifier state',
         );
@@ -1007,48 +1000,288 @@ final class _SourceVisitor extends RecursiveAstVisitor<void> {
 }
 
 final class _AsyncStateAssignmentVisitor extends RecursiveAstVisitor<void> {
-  int? firstAwaitOffset;
-  int? lastMountedOffset;
-  final List<AssignmentExpression> stateAssignments = [];
+  _AsyncStateAssignmentVisitor({
+    this.pending = false,
+    Set<AssignmentExpression>? unsafeAssignments,
+  }) : unsafeAssignments = unsafeAssignments ?? {};
+
+  // null = unreachable; true = a reachable path has suspended without a guard.
+  // Normal, return and exception paths stay separate until a finally block.
+  bool? pending;
+  bool? returned;
+  bool? thrown;
+  final Set<AssignmentExpression> unsafeAssignments;
+
+  static bool? _join(bool? first, bool? second) => first == null
+      ? second
+      : second == null
+      ? first
+      : first || second;
+
+  _AsyncStateAssignmentVisitor _run(AstNode? node, bool? entry) {
+    final branch = _AsyncStateAssignmentVisitor(
+      pending: entry,
+      unsafeAssignments: unsafeAssignments,
+    );
+    if (entry != null) node?.accept(branch);
+    return branch;
+  }
+
+  void _mergeExits(_AsyncStateAssignmentVisitor branch) {
+    returned = _join(returned, branch.returned);
+    thrown = _join(thrown, branch.thrown);
+  }
+
+  bool _isRef(Expression expression) =>
+      expression is SimpleIdentifier && expression.name == 'ref' ||
+      expression is PropertyAccess &&
+          expression.target is ThisExpression &&
+          expression.propertyName.name == 'ref';
+
+  bool _isMounted(Expression expression) =>
+      expression is PrefixedIdentifier &&
+          expression.prefix.name == 'ref' &&
+          expression.identifier.name == 'mounted' ||
+      expression is PropertyAccess &&
+          expression.target != null &&
+          _isRef(expression.target!) &&
+          expression.propertyName.name == 'mounted';
+
+  // Facts belong to the evaluated branch, never to a mere read of ref.mounted.
+  (bool?, bool?) _condition(Expression condition, bool? entry) {
+    if (entry == null) return (null, null);
+    if (condition is ParenthesizedExpression) {
+      return _condition(condition.expression, entry);
+    }
+    if (_isMounted(condition)) return (false, entry);
+    if (condition is BooleanLiteral) {
+      return condition.value ? (entry, null) : (null, entry);
+    }
+    if (condition is PrefixExpression && condition.operator.lexeme == '!') {
+      final (yes, no) = _condition(condition.operand, entry);
+      return (no, yes);
+    }
+    if (condition is BinaryExpression) {
+      final operator = condition.operator.lexeme;
+      if (operator == '&&' || operator == '||') {
+        final (leftYes, leftNo) = _condition(condition.leftOperand, entry);
+        final (rightYes, rightNo) = _condition(
+          condition.rightOperand,
+          operator == '&&' ? leftYes : leftNo,
+        );
+        return operator == '&&'
+            ? (rightYes, _join(leftNo, rightNo))
+            : (_join(leftYes, rightYes), rightNo);
+      }
+    }
+    final evaluated = _run(condition, entry);
+    _mergeExits(evaluated);
+    return (evaluated.pending, evaluated.pending);
+  }
 
   @override
-  void visitFunctionExpression(FunctionExpression node) {
-    if (node.body.isAsynchronous) return;
-    super.visitFunctionExpression(node);
+  void visitBlock(Block node) {
+    for (final statement in node.statements) {
+      if (pending == null) break;
+      // Synchronous code may throw too. Capture its incoming state rather than
+      // borrowing a guard reached later in the try body.
+      thrown = _join(thrown, pending);
+      statement.accept(this);
+    }
+  }
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {}
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {}
+
+  @override
+  void visitIfStatement(IfStatement node) {
+    final bool? yes;
+    final bool? no;
+    if (node.caseClause == null) {
+      (yes, no) = _condition(node.expression, pending);
+    } else {
+      // Matching a boolean against a pattern is not a truthiness test.
+      final evaluated = _run(node.expression, pending);
+      _mergeExits(evaluated);
+      yes = no = evaluated.pending;
+    }
+    final thenBranch = _run(node.thenStatement, yes);
+    final elseBranch = _run(node.elseStatement, no);
+    _mergeExits(thenBranch);
+    _mergeExits(elseBranch);
+    pending = _join(thenBranch.pending, elseBranch.pending);
+  }
+
+  @override
+  void visitConditionalExpression(ConditionalExpression node) {
+    final (yes, no) = _condition(node.condition, pending);
+    final thenBranch = _run(node.thenExpression, yes);
+    final elseBranch = _run(node.elseExpression, no);
+    _mergeExits(thenBranch);
+    _mergeExits(elseBranch);
+    pending = _join(thenBranch.pending, elseBranch.pending);
+  }
+
+  @override
+  void visitSwitchStatement(SwitchStatement node) {
+    node.expression.accept(this);
+    final entry = pending;
+    // Keep the unmatched path conservatively, including pattern switches.
+    var normal = entry;
+    for (final member in node.members) {
+      final branch = _run(member, entry);
+      _mergeExits(branch);
+      normal = _join(normal, branch.pending);
+    }
+    pending = normal;
+  }
+
+  @override
+  void visitSwitchExpression(SwitchExpression node) {
+    node.expression.accept(this);
+    final entry = pending;
+    var normal = entry;
+    for (final arm in node.cases) {
+      final branch = _run(arm, entry);
+      _mergeExits(branch);
+      normal = _join(normal, branch.pending);
+    }
+    pending = normal;
+  }
+
+  @override
+  void visitBinaryExpression(BinaryExpression node) {
+    if ({'&&', '||'}.contains(node.operator.lexeme)) {
+      final (yes, no) = _condition(node, pending);
+      pending = _join(yes, no);
+    } else {
+      super.visitBinaryExpression(node);
+    }
+  }
+
+  @override
+  void visitReturnStatement(ReturnStatement node) {
+    node.expression?.accept(this);
+    returned = _join(returned, pending);
+    pending = null;
+  }
+
+  @override
+  void visitThrowExpression(ThrowExpression node) {
+    node.expression.accept(this);
+    thrown = _join(thrown, pending);
+    pending = null;
+  }
+
+  @override
+  void visitRethrowExpression(RethrowExpression node) {
+    thrown = _join(thrown, pending);
+    pending = null;
+  }
+
+  @override
+  void visitTryStatement(TryStatement node) {
+    final body = _run(node.body, pending);
+    var normal = body.pending;
+    var returns = body.returned;
+    var errors = node.catchClauses.any((clause) => clause.exceptionType == null)
+        ? null
+        : body.thrown;
+    for (final clause in node.catchClauses) {
+      final handler = _run(clause.body, body.thrown);
+      normal = _join(normal, handler.pending);
+      returns = _join(returns, handler.returned);
+      errors = _join(errors, handler.thrown);
+    }
+    final finallyBlock = node.finallyBlock;
+    if (finallyBlock != null) {
+      final afterNormal = _run(finallyBlock, normal);
+      final afterReturn = _run(finallyBlock, returns);
+      final afterError = _run(finallyBlock, errors);
+      normal = afterNormal.pending;
+      returns = _join(afterReturn.pending, afterNormal.returned);
+      errors = _join(afterError.pending, afterNormal.thrown);
+      returns = _join(
+        returns,
+        _join(afterReturn.returned, afterError.returned),
+      );
+      errors = _join(errors, _join(afterReturn.thrown, afterError.thrown));
+    }
+    pending = normal;
+    returned = _join(returned, returns);
+    thrown = _join(thrown, errors);
   }
 
   @override
   void visitAwaitExpression(AwaitExpression node) {
-    firstAwaitOffset ??= node.offset;
-    super.visitAwaitExpression(node);
+    node.expression.accept(this);
+    if (pending != null) {
+      pending = true;
+      thrown = true;
+    }
+  }
+
+  // Loops are conservative: a suspension in any iteration invalidates facts
+  // at the next iteration and after the loop. Guards inside the body still work.
+  void _loop(AstNode node, void Function() visitChildren) {
+    final awaits = _AwaitFinder();
+    node.accept(awaits);
+    final entry = pending;
+    if (entry != null && awaits.found) pending = true;
+    visitChildren();
+    pending = awaits.found && entry != null ? true : _join(entry, pending);
   }
 
   @override
-  void visitPrefixedIdentifier(PrefixedIdentifier node) {
-    if (node.prefix.name == 'ref' && node.identifier.name == 'mounted') {
-      lastMountedOffset = node.offset;
-    }
-    super.visitPrefixedIdentifier(node);
+  void visitForStatement(ForStatement node) {
+    _loop(node, () => super.visitForStatement(node));
   }
 
   @override
-  void visitPropertyAccess(PropertyAccess node) {
-    final target = node.target;
-    if (target is SimpleIdentifier &&
-        target.name == 'ref' &&
-        node.propertyName.name == 'mounted') {
-      lastMountedOffset = node.offset;
-    }
-    super.visitPropertyAccess(node);
+  void visitWhileStatement(WhileStatement node) {
+    _loop(node, () => super.visitWhileStatement(node));
+  }
+
+  @override
+  void visitDoStatement(DoStatement node) {
+    _loop(node, () => super.visitDoStatement(node));
   }
 
   @override
   void visitAssignmentExpression(AssignmentExpression node) {
+    node.leftHandSide.accept(this);
+    node.rightHandSide.accept(this);
     final lhs = node.leftHandSide;
-    if (lhs is SimpleIdentifier && lhs.name == 'state') {
-      stateAssignments.add(node);
+    final writesState =
+        lhs is SimpleIdentifier && lhs.name == 'state' ||
+        lhs is PropertyAccess &&
+            lhs.target is ThisExpression &&
+            lhs.propertyName.name == 'state';
+    if (writesState && pending == true) {
+      unsafeAssignments.add(node);
     }
-    super.visitAssignmentExpression(node);
+  }
+}
+
+final class _AwaitFinder extends RecursiveAstVisitor<void> {
+  bool found = false;
+
+  @override
+  void visitFunctionExpression(FunctionExpression node) {}
+
+  @override
+  void visitFunctionDeclaration(FunctionDeclaration node) {}
+
+  @override
+  void visitAwaitExpression(AwaitExpression node) => found = true;
+
+  @override
+  void visitForStatement(ForStatement node) {
+    if (node.awaitKeyword != null) found = true;
+    super.visitForStatement(node);
   }
 }
 

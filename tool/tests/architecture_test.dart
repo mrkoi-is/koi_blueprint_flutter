@@ -66,6 +66,19 @@ void ruleCase(
   });
 }
 
+void mountedCase(String description, String body, {required bool rejected}) {
+  ruleCase('ARCH014', description, '''
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+@riverpod
+class Tasks extends _\$Tasks {
+  int build() => 0;
+  Future<void> refresh() async {
+    $body
+  }
+}
+''', rejected: rejected);
+}
+
 void main() {
   test('Dart CLI exit codes and JSON contract', () {
     final fixture = Fixture();
@@ -1002,5 +1015,211 @@ class Tasks extends _\$Tasks {
   }
 }
 ''', rejected: false);
+  mountedCase(
+    'reject a state assignment whose right hand side suspends',
+    'state = await Future.value(1);',
+    rejected: true,
+  );
+  mountedCase(
+    'reject RHS await even inside a previously mounted branch',
+    'if (ref.mounted) state = await Future.value(1);',
+    rejected: true,
+  );
+  mountedCase(
+    'reject mounted check after the state write',
+    'await Future.value(1); state = 1; if (!ref.mounted) return;',
+    rejected: true,
+  );
+  mountedCase('reject a guard invalidated by a second suspension', '''
+await Future.value(1);
+if (!ref.mounted) return;
+await Future.value(2);
+state = 2;
+''', rejected: true);
+  mountedCase('allow a fresh guard after each suspension', '''
+await Future.value(1);
+if (!ref.mounted) return;
+state = 1;
+await Future.value(2);
+if (!ref.mounted) return;
+state = 2;
+''', rejected: false);
+  for (final declaration in [
+    'final guard = () => ref.mounted;',
+    'final guard = () { if (!ref.mounted) return; };',
+    'final guard = () async { if (!ref.mounted) return; };',
+    'bool guard() => ref.mounted;',
+    'final mounted = ref.mounted;',
+  ]) {
+    mountedCase(
+      'reject a read or uninvoked closure as a mounted guard: $declaration',
+      'await Future.value(1); $declaration state = 1;',
+      rejected: true,
+    );
+  }
+  mountedCase(
+    'closure declarations do not introduce a suspension in the outer method',
+    'final work = () async { await Future.value(1); }; state = 1;',
+    rejected: false,
+  );
+  mountedCase(
+    'allow a write only on the mounted branch',
+    'await Future.value(1); if (ref.mounted) { state = 1; }',
+    rejected: false,
+  );
+  mountedCase(
+    'allow compound early exit for mounted and operation identity',
+    'await Future.value(1); if (!ref.mounted || stale) return; state = 1;',
+    rejected: false,
+  );
+  mountedCase(
+    'allow a compound positive guard',
+    'await Future.value(1); if (ref.mounted && !stale) state = 1;',
+    rejected: false,
+  );
+  mountedCase(
+    'reject a positive OR guard that can succeed without mounted',
+    'await Future.value(1); if (ref.mounted || override) state = 1;',
+    rejected: true,
+  );
+  mountedCase(
+    'reject a negative AND early exit that can retain an unmounted path',
+    'await Future.value(1); if (!ref.mounted && stale) return; state = 1;',
+    rejected: true,
+  );
+  mountedCase(
+    'reject a guard on only one unrelated branch',
+    'await Future.value(1); if (enabled) { if (!ref.mounted) return; } state = 1;',
+    rejected: true,
+  );
+  mountedCase(
+    'allow the else branch of an unmounted return',
+    'await Future.value(1); if (!ref.mounted) return; else state = 1;',
+    rejected: false,
+  );
+  mountedCase(
+    'allow a parenthesized guard and explicit this receiver',
+    'await Future.value(1); if (!(this.ref.mounted)) return; this.state = 1;',
+    rejected: false,
+  );
+  mountedCase(
+    'reject suspension during a compound condition after its mounted check',
+    'await Future.value(1); if (ref.mounted && await ready()) state = 1;',
+    rejected: true,
+  );
+  mountedCase(
+    'allow mounted checked after suspension within a compound condition',
+    'if (await ready() && ref.mounted) state = 1;',
+    rejected: false,
+  );
+  mountedCase(
+    'allow guarded conditional expression writes',
+    'await Future.value(1); ref.mounted ? state = 1 : null;',
+    rejected: false,
+  );
+  mountedCase('allow mounted checks in both try and catch', '''
+try {
+  await Future.value(1);
+  if (!ref.mounted) return;
+  state = 1;
+} catch (error) {
+  if (ref.mounted) state = 0;
+}
+''', rejected: false);
+  mountedCase(
+    'reject a catch write guarded only on the successful try path',
+    '''
+try {
+  await Future.value(1);
+  if (!ref.mounted) return;
+  state = 1;
+} catch (error) {
+  state = 0;
+}
+''',
+    rejected: true,
+  );
+  mountedCase(
+    'allow a mounted guard in finally',
+    'try { await Future.value(1); } finally { if (ref.mounted) state = 1; }',
+    rejected: false,
+  );
+  mountedCase('reject finally reached by the unmounted early return', '''
+try {
+  await Future.value(1);
+  if (!ref.mounted) return;
+} finally {
+  state = 0;
+}
+''', rejected: true);
+  mountedCase('allow a guard after try catch joins', '''
+try { await Future.value(1); } catch (error) { log(error); }
+if (!ref.mounted) return;
+state = 1;
+''', rejected: false);
+  mountedCase('preserve a successful guard through synchronous finally', '''
+try {
+  await Future.value(1);
+  if (!ref.mounted) return;
+} finally { cleanup(); }
+state = 1;
+''', rejected: false);
+  mountedCase('invalidate a try guard when finally suspends', '''
+try {
+  await Future.value(1);
+  if (!ref.mounted) return;
+} finally { await cleanup(); }
+state = 1;
+''', rejected: true);
+  mountedCase(
+    'reject a mounted pattern matching the false value',
+    'await Future.value(1); if (ref.mounted case false) state = 1;',
+    rejected: true,
+  );
+  mountedCase('reject a guard belonging to another switch branch', '''
+await Future.value(1);
+switch (choice) {
+  case 1:
+    if (!ref.mounted) return;
+    break;
+  default:
+    state = 1;
+}
+''', rejected: true);
+  mountedCase(
+    'allow an explicit guard in the switch branch that writes state',
+    '''
+await Future.value(1);
+switch (choice) {
+  case 1:
+    if (!ref.mounted) return;
+    state = 1;
+    break;
+  default:
+    break;
+}
+''',
+    rejected: false,
+  );
+  mountedCase(
+    'reject a loop write after an unguarded suspension',
+    'while (ready) { await next(); state = 1; }',
+    rejected: true,
+  );
+  mountedCase(
+    'allow an explicit guard following a suspension inside a loop',
+    'while (ready) { await next(); if (!ref.mounted) return; state = 1; }',
+    rejected: false,
+  );
+  mountedCase(
+    'reject async for writes without a per-iteration guard',
+    'await for (final item in items) { state = item; }',
+    rejected: true,
+  );
+  mountedCase(
+    'allow an explicit guard in an async for loop',
+    'await for (final item in items) { if (!ref.mounted) return; state = item; }',
+    rejected: false,
+  );
   stdout.writeln('$_passed architecture tests passed.');
 }
