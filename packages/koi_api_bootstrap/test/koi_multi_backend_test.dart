@@ -26,7 +26,7 @@ void main() {
           await request.response.close();
         });
       }
-      final primaryUrl = 'http://${primary.address.host}:${primary.port}/';
+      final primaryUrl = 'http://${primary.address.host}:${primary.port}/api/';
       final bindings = KoiApiBindings();
       final runtime = await bootstrapKoiApi(
         KoiApiBootstrapOptions(
@@ -36,7 +36,8 @@ void main() {
             KoiBackendDefinition(
               key: 'secondary',
               purpose: 'Shared session',
-              baseUrl: 'http://${secondary.address.host}:${secondary.port}/',
+              baseUrl:
+                  'http://${secondary.address.host}:${secondary.port}/api/',
             ),
           ],
           tokenRefreshWhiteList: ['${primaryUrl}public', 'auth/login'],

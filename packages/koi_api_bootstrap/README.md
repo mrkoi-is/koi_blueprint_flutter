@@ -27,6 +27,8 @@ const options = KoiApiBootstrapOptions(
 
 所有后端关闭自动重试，失败的 GET 和 POST 都只发送一次。需要重试的业务须先定义幂等和去重契约，再由相应拥有者实现策略。
 
+401 会话白名单按规范化 URI 的 origin 和完整路径匹配。相对条目使用该后端的 Dio base URL/path 拼接规则，绝对 HTTP(S) 条目只允许对应 origin；查询参数或相似路径不会扩大白名单范围。真实 token refresh 仍未实现。
+
 环境显式接受 `dev/development`、`test/testing`、`staging`、`prod/production`，不从构建模式推断；未知环境拒绝启动。所有 URL 必须为不含凭据、query、fragment 的绝对 HTTP(S) 地址，staging/production 要求 HTTPS 并强制证书验证。production 拒绝 `enableLogging` 和 `enableInternalLogging`，释放时复位全局 debug 开关。非法替换配置不会破坏活动 Runtime；并发 bootstrap 会被拒绝。
 
 ## Native 生成 Client 装配
