@@ -20,7 +20,7 @@ description: 从 Koi 蓝图创建独立 Flutter workspace 并验证名称、平�
 ## 核心规则
 - workspace 成员只以根 pubspec 为准，成员使用 `resolution: workspace`。
 - `blueprint.json` schema 2 记录来源链、配置摘要、能力版本和受管文件基线；根 pubspec 仍是成员单一来源。递归生成与无 Git 导出也保留内容身份。
-- 下游升级只运行 `upgrade-report --app ... --source ...` 做三方只读比较；不自动覆盖业务代码或伪造旧工程基线。
+- 下游先运行 `upgrade-report --app ... --source ...` 做三方只读比较。新的 upgrade plan/apply/rollback 仍处于验收中，无法安全处理的 App、依赖、删除和引用树变化会阻断；不自动覆盖业务代码或伪造旧工程基线。详见升级指南。
 - 使用匹配 `.fvmrc` 的 SDK；生成器兼容组合整体维护。
 - 不将原作者本机路径、其他私有仓库或登录凭证作为新项目的依赖。
 

@@ -121,7 +121,7 @@ python3 blueprint.py upgrade-report --app apps/field_notes_app --source ../koi_b
 
 报告把生成时基线、当前本地文件、当前上游来源分为 upstreamChanges/localChanges/conflicts/alreadyApplied/unchanged；`alreadyApplied` 表示本地文件已与当前上游内容一致。报告还列出新能力和人工迁移说明；只输出 JSON，不写项目、不自动合并、不升级依赖。schema 1 或缺少基线的旧工程可读取，但只得到人工迁移说明，不能直接 capability add。现有项目先人工接入 schema 2 装配和基线，再验证；不要通过改一个 schema 数字伪造迁移完成。下游已有业务改动仍由项目维护者逐项审阅迁移。
 
-逐项处理方式见 [下游工程只读升级指南](upgrade-guide.md)。
+逐项处理方式及受限的升级事务入口见 [下游工程升级指南](upgrade-guide.md)。
 
 ## 新增业务功能
 

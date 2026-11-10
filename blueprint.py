@@ -20,7 +20,7 @@ TEMPLATES = {'minimal': 'starter_app', 'workbench': 'workbench_app'}
 INHERITED_DOCUMENTS = ('docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
 
 REQUIRED_PACKAGES = ('koi_core', 'koi_ui')
-IGNORED = shutil.ignore_patterns('.dart_tool', 'build', 'coverage', '.fvm', '__pycache__', '*.g.dart', '*.freezed.dart', '*.pyc', '.flutter-plugins*', '.git', 'Pods', 'ephemeral', '.symlinks', '.swiftpm', '.DS_Store')
+_IGNORED_PATTERNS = shutil.ignore_patterns('.dart_tool', 'build', 'coverage', '.fvm', '__pycache__', '*.g.dart', '*.freezed.dart', '*.pyc', '.flutter-plugins*', '.git', 'Pods', 'ephemeral', '.symlinks', '.swiftpm', '.DS_Store')
 RESERVED = set('abstract as assert async augment await base break case catch class const continue covariant default deferred do dynamic else enum export extends extension external factory false final finally for Function get hide if implements import in interface is late library mixin native new null of on operator part required rethrow return sealed set show static super switch sync this throw true try type typedef var void when while with yield dart flutter test con prn aux nul'.split())
 FEATURE_DEPENDENCIES = {
     'presentation': (('flutter',), ('flutter_test',)),
@@ -33,6 +33,14 @@ FEATURE_DEPENDENCIES = {
 
 class BlueprintError(Exception):
     pass
+
+
+def IGNORED(directory, names):
+    ignored = _IGNORED_PATTERNS(directory, names)
+    path = Path(directory)
+    if path.name == 'golden' and path.parent.name == 'test':
+        ignored |= {'failures'} & set(names)
+    return ignored
 
 
 def run(command, cwd, capture=False):
@@ -779,7 +787,7 @@ def check(args):
     elif phase in ('format-check', 'format'):
         flags = ['--output=none', '--set-exit-if-changed'] if phase == 'format-check' else []
         targets = [str(path.relative_to(root)) for path in (root / 'tool').rglob('*.dart') if '.dart_tool' not in path.parts]
-        targets += [str(member.relative_to(root) / sub) for member in workspace for sub in ('lib', 'test', 'integration_test') if (member / sub).exists()]
+        targets += [str(member.relative_to(root) / sub) for member in workspace for sub in ('lib', 'test', 'integration_test', 'test_driver') if (member / sub).exists()]
         run([sdk.dart, 'format', *flags, *targets], root)
     elif phase == 'analyze':
         run([sdk.dart, 'analyze', '--fatal-infos'], root)
@@ -801,6 +809,17 @@ def check(args):
         run([sdk.dart, 'run', 'tool/check_architecture.dart', '--root', root], root)
     elif phase == 'coverage':
         coverage(root, sdk, workspace, args.coverage_min)
+
+
+def test(args):
+    from tool.blueprint_test import run_tests
+    root = Path(args.workspace).resolve()
+    sdk = SDK(root)
+    result = run_tests(root, sdk, members(root, sdk), args)
+    print(json.dumps({'status': result['status'], 'executed': result['executed'],
+                      'resultPath': result['resultPath']}, ensure_ascii=False))
+    if result['status'] != 'passed':
+        raise BlueprintError(f"Targeted tests: {result['status']}; see {result['resultPath']}")
 
 
 def validate(args):
@@ -878,6 +897,26 @@ def upgrade_report(args):
         print(json.dumps(report(workspace_for(app), checked_root(args.source)), ensure_ascii=False, indent=2))
     finally:
         sys.dont_write_bytecode = previous
+
+
+def upgrade(args):
+    from tool.blueprint_upgrade import plan, apply, rollback
+    root = workspace_for(checked_root(args.app))
+    if args.action == 'plan':
+        destination = Path(args.output).expanduser().resolve()
+        if destination.is_relative_to(root):
+            raise BlueprintError('Upgrade plan output must be outside the target workspace')
+        resolutions = json.loads(Path(args.resolutions).read_text(encoding='utf-8')) if args.resolutions else None
+        result = plan(root, checked_root(args.source), resolutions=resolutions)
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        with destination.open('x', encoding='utf-8') as output:
+            output.write(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
+        print(json.dumps({'planPath': str(destination), 'conflicts': result.get('conflicts', [])}, ensure_ascii=False))
+    elif args.action == 'apply':
+        result = apply(root, json.loads(Path(args.plan).read_text(encoding='utf-8')))
+        print(json.dumps(result, ensure_ascii=False))
+    else:
+        print(json.dumps(rollback(root, args.transaction), ensure_ascii=False))
 
 
 def capability(args):
@@ -1096,6 +1135,13 @@ def main(argv=None):
     module_parser.add_argument('--workspace', required=True, help='Destination workspace root')
     module_parser.add_argument('--dry-run', action='store_true', help='Show the plan without writing files or resolving dependencies')
     validate_parser = commands.add_parser('validate', help='Run the complete local quality gate', description='Strict lockfile, source-only templates, generation, format, architecture, AI assets, analysis, tests, active Chrome tests and 80% coverage. Source API Web smoke also requires Node. Platform builds are separate.')
+    test_parser = commands.add_parser('test', help='Run explicit test files with replayable evidence; not the full gate', description='No pub get or codegen. Requires a prepared workspace. Emits fresh JSONL, stderr and result.json under build/test-runs. Pass only proves the selected files/name filter; validate remains required.')
+    test_parser.add_argument('--workspace', default=str(ROOT))
+    test_parser.add_argument('--member', required=True, help='Active member path relative to workspace')
+    test_parser.add_argument('--path', action='append', required=True, help='Explicit test/*_test.dart file relative to member; repeat for multiple files')
+    test_parser.add_argument('--name', help='Runner test-name regular expression; narrows the claimed scope')
+    test_parser.add_argument('--platform', choices=('vm', 'chrome'), default='vm')
+    test_parser.add_argument('--timeout', type=float, default=120, help='Wall-clock execution deadline in seconds (0 < value <= 3600)')
     check_parser = commands.add_parser('check', help='Run one quality phase', description='bootstrap resolves dependencies; generate and generate-check both rebuild untracked Dart parts (reproducibility, not a read-only drift check). format rewrites; format-check is read-only. browser runs active test/browser tests. templates checks source template assets. Other phases: architecture, ai, analyze, test, coverage.')
     check_parser.add_argument('phase', choices=['bootstrap', 'generate', 'generate-check', 'format', 'format-check', 'analyze', 'test', 'browser', 'coverage', 'architecture', 'ai', 'templates'], help='Quality phase to run; see descriptions above')
     for item in (validate_parser, check_parser):
@@ -1111,6 +1157,19 @@ def main(argv=None):
     report_parser = commands.add_parser('upgrade-report', help='Read-only three-way upgrade report; no project writes')
     report_parser.add_argument('--app', required=True)
     report_parser.add_argument('--source', required=True)
+    upgrade_parser = commands.add_parser('upgrade', help='Plan, apply or roll back a managed project upgrade')
+    upgrade_actions = upgrade_parser.add_subparsers(dest='action', required=True)
+    upgrade_plan = upgrade_actions.add_parser('plan', help='Write an auditable plan without modifying the project')
+    upgrade_plan.add_argument('--app', required=True)
+    upgrade_plan.add_argument('--source', required=True)
+    upgrade_plan.add_argument('--output', required=True)
+    upgrade_plan.add_argument('--resolutions')
+    upgrade_apply = upgrade_actions.add_parser('apply', help='Apply a verified conflict-free plan')
+    upgrade_apply.add_argument('--app', required=True)
+    upgrade_apply.add_argument('--plan', required=True)
+    upgrade_rollback = upgrade_actions.add_parser('rollback', help='Roll back an owned upgrade transaction')
+    upgrade_rollback.add_argument('--app', required=True)
+    upgrade_rollback.add_argument('--transaction', required=True)
     capability_parser = commands.add_parser('capability', help='Inspect or install tested optional capability recipes')
     capability_actions = capability_parser.add_subparsers(dest='action', required=True)
     capability_list = capability_actions.add_parser('list')
@@ -1133,7 +1192,19 @@ def main(argv=None):
     # Read-only commands must also leave copied Python tooling byte-for-byte intact.
     sys.dont_write_bytecode = previous_bytecode or args.command == 'upgrade-report' or bool(getattr(args, 'dry_run', False))
     try:
-        (launch if args.command == 'run' else globals()[args.command.replace('-', '_')])(args)
+        action = launch if args.command == 'run' else globals()[args.command.replace('-', '_')]
+        locked = (args.command in ('test', 'validate') or
+                  (args.command == 'upgrade' and args.action in ('apply', 'rollback')) or
+                  (args.command == 'capability' and args.action == 'add' and not args.dry_run) or
+                  (args.command == 'check' and args.phase in ('test', 'browser', 'coverage')))
+        if locked:
+            from tool.workspace_lock import workspace_lock
+            lock_root = (workspace_for(checked_root(args.app)) if args.command in ('upgrade', 'capability')
+                         else Path(args.workspace).resolve())
+            with workspace_lock(lock_root):
+                action(args)
+        else:
+            action(args)
         return 0
     except (BlueprintError, OSError, ValueError) as error:
         print(f'blueprint: {error}', file=sys.stderr)

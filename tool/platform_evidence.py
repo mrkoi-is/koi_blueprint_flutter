@@ -28,6 +28,9 @@ def source_manifest(root: Path) -> dict:
             if not path.is_file() or path.is_symlink():
                 continue
             relative = path.relative_to(root)
+            # Flutter Golden diagnostics are output, not the reviewed baseline.
+            if '/test/golden/failures/' in '/' + relative.as_posix():
+                continue
             if (any(part in IGNORED for part in relative.parts)
                     or any(relative.parts[-len(parts):] == parts for parts in GENERATED_ENVIRONMENT_INPUTS)
                     or path.name.endswith(('.g.dart', '.freezed.dart', '.pyc'))
