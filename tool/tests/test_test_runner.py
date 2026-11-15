@@ -1,12 +1,12 @@
 import json
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import os
 import subprocess
 import sys
 import tempfile
 import unittest
 
-from tool.blueprint_test import execute, select_targets, summarize
+from tool.blueprint_test import execute, protocol_path, select_targets, summarize
 
 
 class TestEvidenceTest(unittest.TestCase):
@@ -36,6 +36,11 @@ class TestEvidenceTest(unittest.TestCase):
         self.assertEqual((result['status'], result['executed']), ('passed', 1))
         self.assertTrue(result['evidenceComplete'])
         self.assertTrue(result['scopeComplete'])
+
+    def test_windows_relative_paths_serialize_with_posix_separators(self):
+        self.assertEqual(protocol_path(PureWindowsPath(r'apps\demo_app')), 'apps/demo_app')
+        self.assertEqual(protocol_path(PureWindowsPath(r'test\browser\sample_test.dart')),
+                         'test/browser/sample_test.dart')
 
     def test_zero_exit_cannot_override_failure(self):
         self.events[-2]['result'] = 'failure'

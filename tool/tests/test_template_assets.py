@@ -11,6 +11,20 @@ from tool.platform_evidence import source_manifest
 
 
 class RealTemplateAssetsTest(unittest.TestCase):
+    def test_macos_versioned_goldens_are_inherited_with_exact_bytes(self):
+        source = Path(__file__).resolve().parents[2] / 'packages/koi_ui/test/golden'
+        names = ('empty_narrow_large.png', 'error_dark.png', 'error_light.png')
+        with tempfile.TemporaryDirectory(prefix='koi-golden-inherit-') as temporary:
+            destination = Path(temporary) / 'golden'
+            blueprint.copy(source, destination)
+            for family in ('macos-arm64', 'macos-26-arm64'):
+                for name in names:
+                    relative = Path('baselines') / family / name
+                    self.assertTrue((source / relative).is_file())
+                    self.assertEqual((source / relative).read_bytes(),
+                                     (destination / relative).read_bytes())
+            self.assertFalse((destination / 'failures').exists())
+
     def test_golden_baselines_inherit_but_failure_artifacts_do_not(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

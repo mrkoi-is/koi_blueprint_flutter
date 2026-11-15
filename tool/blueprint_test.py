@@ -16,6 +16,11 @@ import uuid
 from tool.platform_evidence import source_manifest
 
 
+def protocol_path(path: Path) -> str:
+    """Serialize a relative path independently of the executing host OS."""
+    return path.as_posix()
+
+
 def summarize(log: Path, exit_code: int | None, targets: list[Path], cwd: Path,
               *, timed_out=False) -> dict:
     """Interpret test reporter 0.1.1. A success summary alone is insufficient."""
@@ -188,8 +193,8 @@ def run_tests(root: Path, sdk, workspace: list[Path], args) -> dict:
         argv += ['--platform', 'chrome']
     if args.name:
         argv += ['--name', args.name]
-    argv += [str(path.relative_to(member)) for path in targets]
-    relative_targets = [str(path.relative_to(member)) for path in targets]
+    relative_targets = [protocol_path(path.relative_to(member)) for path in targets]
+    argv += relative_targets
     diagnostics = []
     before = after = None
     process = {'exitCode': None, 'timedOut': False, 'interrupted': False,
@@ -213,10 +218,12 @@ def run_tests(root: Path, sdk, workspace: list[Path], args) -> dict:
                 destination = output / 'golden' / path.relative_to(member / 'test/golden/failures')
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copy2(path, destination)
-                golden_artifacts.append(str(destination.relative_to(output)))
+                golden_artifacts.append(protocol_path(destination.relative_to(output)))
         phase = 'summarize'
         result = summarize(output / 'events.jsonl', process['exitCode'], targets, member,
                            timed_out=process['timedOut'])
+        result['missingTargets'] = [protocol_path(Path(path).relative_to(member))
+                                    for path in result['missingTargets']]
         phase = 'source_after'
         after = source_manifest(root)
         if before['source_sha256'] != after['source_sha256']:
@@ -267,7 +274,7 @@ def run_tests(root: Path, sdk, workspace: list[Path], args) -> dict:
         result['status'] = 'error'
         result['evidenceComplete'] = False
     result.update({'schemaVersion': 1, 'runId': run_id, 'attempt': 1,
-                   'scope': 'explicit_files', 'member': str(member.relative_to(root)),
+                   'scope': 'explicit_files', 'member': protocol_path(member.relative_to(root)),
                    'requestedTargets': args.path, 'resolvedTargets': relative_targets,
                    'requiredTargets': relative_targets, 'nameFilter': args.name,
                    'selectionReason': 'explicit user selection; no downstream inference',
@@ -279,7 +286,7 @@ def run_tests(root: Path, sdk, workspace: list[Path], args) -> dict:
                                    'hostArch': platform.machine(), 'target': args.platform, 'mode': 'flutter_test'},
                    'process': process, 'deadlineSeconds': args.timeout,
                    'replay': {'argv': argv, 'cwd': str(member),
-                              'member': str(member.relative_to(root)), 'paths': relative_targets,
+                              'member': protocol_path(member.relative_to(root)), 'paths': relative_targets,
                               'platform': args.platform, 'nameFilter': args.name},
                    'artifacts': artifacts, 'diagnostics': diagnostics,
                    'resultPath': str(output / 'result.json'),

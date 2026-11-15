@@ -30,7 +30,7 @@ class UpgradeTest(unittest.TestCase):
                     'platforms': ['web'], 'source': {'sourceSha256': 'a' * 64},
                     'managedFiles': {'blueprint.py': {'sha256': digest(old),
                         'sourceSha256': digest(old), 'source': 'blueprint.py'}}, 'capabilities': {}}
-        (self.root / 'blueprint.json').write_text(json.dumps(metadata))
+        (self.root / 'blueprint.json').write_text(json.dumps(metadata), encoding='utf-8')
 
     def test_plan_is_readonly_and_apply_rollback_restores_bytes(self):
         before = {str(p.relative_to(self.root)): p.read_bytes() for p in self.root.rglob('*') if p.is_file()}
@@ -54,7 +54,7 @@ class UpgradeTest(unittest.TestCase):
         self.assertTrue(plan['applicable'])
         upgrade.apply(self.root, plan)
         self.assertEqual((self.root / 'blueprint.py').read_bytes(), b'my cli')
-        metadata = json.loads((self.root / 'blueprint.json').read_text())
+        metadata = json.loads((self.root / 'blueprint.json').read_text(encoding='utf-8'))
         self.assertEqual(metadata['managedFiles']['blueprint.py']['sha256'], digest(b'new cli'))
 
     def test_dirty_source_identity_is_not_reported_clean(self):
@@ -68,7 +68,7 @@ class UpgradeTest(unittest.TestCase):
         self.assertTrue(result['sourceIdentity']['dirty'])
         self.assertIsNotNone(result['sourceIdentity']['commit'])
         upgrade.apply(self.root, result)
-        metadata = json.loads((self.root / 'blueprint.json').read_text())
+        metadata = json.loads((self.root / 'blueprint.json').read_text(encoding='utf-8'))
         self.assertTrue(metadata['source']['dirty'])
 
     def test_stale_or_tampered_plan_rejected(self):
@@ -105,7 +105,8 @@ class UpgradeTest(unittest.TestCase):
 
     def test_untracked_identical_guidance_requires_review(self):
         source = self.source / 'AGENTS.md'
-        source.write_text('# Demo — Agent 入口\n')
+        source.write_bytes('# Demo — Agent 入口\n'.encode('utf-8'))
+        self.assertEqual(source.read_bytes(), b'# Demo \xe2\x80\x94 Agent \xe5\x85\xa5\xe5\x8f\xa3\n')
         (self.root / 'AGENTS.md').write_bytes(source.read_bytes())
         result = upgrade.plan(self.root, self.source)
         self.assertTrue(any(item['path'] == 'AGENTS.md' and item['reason'] == 'no_baseline'
@@ -128,17 +129,17 @@ class UpgradeTest(unittest.TestCase):
     def test_dependency_resolution_is_isolated_and_rejects_escaping_paths(self):
         import blueprint
         from types import SimpleNamespace
-        (self.root / 'pubspec.yaml').write_text('name: demo\n')
-        (self.root / 'pubspec.lock').write_text('before\n')
-        (self.root / '.fvmrc').write_text('{"flutter":"3.47.2"}')
+        (self.root / 'pubspec.yaml').write_bytes(b'name: demo\n')
+        (self.root / 'pubspec.lock').write_bytes(b'before\n')
+        (self.root / '.fvmrc').write_bytes(b'{"flutter":"3.47.2"}')
         pub = self.root / 'packages/demo/pubspec.yaml'
         pub.parent.mkdir(parents=True)
-        pub.write_text('name: demo_package\n')
+        pub.write_bytes(b'name: demo_package\n')
         def run(argv, cwd, **kwargs):
             self.assertEqual(argv[1:], ['pub', 'get'])
             self.assertNotEqual(Path(cwd).resolve(), self.root.resolve())
-            self.assertEqual((Path(cwd) / 'packages/demo/pubspec.yaml').read_text(), 'name: updated\n')
-            (Path(cwd) / 'pubspec.lock').write_text('after\n')
+            self.assertEqual((Path(cwd) / 'packages/demo/pubspec.yaml').read_bytes(), b'name: updated\n')
+            (Path(cwd) / 'pubspec.lock').write_bytes(b'after\n')
             return SimpleNamespace(returncode=0, stderr='')
         with patch.object(blueprint, 'SDK', return_value=SimpleNamespace(flutter=Path('/sdk/flutter'))), \
              patch.object(blueprint, 'pinned_flutter_version', return_value='3.47.2'), \
@@ -149,8 +150,8 @@ class UpgradeTest(unittest.TestCase):
             self.assertIn('-before', diff)
             self.assertEqual(resolver['command'], ['flutter', 'pub', 'get'])
             self.assertEqual(inputs['pubspec.lock'], digest(b'before\n'))
-            self.assertEqual((self.root / 'pubspec.lock').read_text(), 'before\n')
-            pub.write_text('name: demo_package\ndependencies:\n  other:\n    path: /tmp/outside\n')
+            self.assertEqual((self.root / 'pubspec.lock').read_bytes(), b'before\n')
+            pub.write_bytes(b'name: demo_package\ndependencies:\n  other:\n    path: /tmp/outside\n')
             with self.assertRaisesRegex(ValueError, 'External local path'):
                 upgrade._resolve_dependencies(self.root.resolve(), {}, blueprint)
 
@@ -161,10 +162,10 @@ class UpgradeTest(unittest.TestCase):
         package.write_bytes(old)
         (self.root / '.blueprint/baseline' / digest(old)).write_bytes(old)
         metadata_path = self.root / 'blueprint.json'
-        metadata = json.loads(metadata_path.read_text())
+        metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
         metadata['managedFiles']['packages/koi_ui/lib/widget.dart'] = {
             'sha256': digest(old), 'sourceSha256': digest(old), 'source': 'packages/koi_ui/lib/widget.dart'}
-        metadata_path.write_text(json.dumps(metadata))
+        metadata_path.write_text(json.dumps(metadata), encoding='utf-8')
         package_source = self.source / 'packages/koi_ui/lib/widget.dart'
         package_source.parent.mkdir(parents=True)
         package_source.write_bytes(b'new widget')
@@ -173,20 +174,20 @@ class UpgradeTest(unittest.TestCase):
         font.write_bytes(b'font-bytes')
         test = self.source / 'examples/starter_app/test/new_test.dart'
         test.parent.mkdir(parents=True)
-        test.write_text('import "package:starter_app/main.dart"; StarterApp();')
+        test.write_bytes(b'import "package:starter_app/main.dart"; StarterApp();')
         result = upgrade.plan(self.root, self.source)
         self.assertTrue(result['applicable'], result['conflicts'])
         upgrade.apply(self.root, result)
         self.assertEqual(package.read_bytes(), b'new widget')
         self.assertEqual((self.root / 'packages/koi_ui/test/golden/fonts/sample.ttf').read_bytes(), b'font-bytes')
-        rendered = (self.root / 'apps/demo_app/test/new_test.dart').read_text()
+        rendered = (self.root / 'apps/demo_app/test/new_test.dart').read_text(encoding='utf-8')
         self.assertIn('package:demo_app/main.dart', rendered)
         self.assertIn('DemoApp()', rendered)
 
     def test_new_app_lib_is_rendered_but_never_overwrites_unmanaged_file(self):
         origin = self.source / 'examples/starter_app/lib/feature/new_file.dart'
         origin.parent.mkdir(parents=True)
-        origin.write_text('import "package:starter_app/main.dart"; StarterApp();')
+        origin.write_bytes(b'import "package:starter_app/main.dart"; StarterApp();')
         path = self.root / 'apps/demo_app/lib/feature/new_file.dart'
         def formatter(root, metadata, old, new, blueprint):
             return old, new + b' // formatted', {'sdk': 'fixture'}
@@ -194,8 +195,8 @@ class UpgradeTest(unittest.TestCase):
             result = upgrade.plan(self.root, self.source)
             self.assertTrue(result['applicable'], result['conflicts'])
             upgrade.apply(self.root, result)
-            self.assertEqual(path.read_text(), 'import "package:demo_app/main.dart"; DemoApp(); // formatted')
-            self.assertEqual(json.loads((self.root / 'blueprint.json').read_text())['managedFiles']
+            self.assertEqual(path.read_text(encoding='utf-8'), 'import "package:demo_app/main.dart"; DemoApp(); // formatted')
+            self.assertEqual(json.loads((self.root / 'blueprint.json').read_text(encoding='utf-8'))['managedFiles']
                              ['apps/demo_app/lib/feature/new_file.dart']['source'],
                              'examples/starter_app/lib/feature/new_file.dart')
 
@@ -229,9 +230,9 @@ class UpgradeTest(unittest.TestCase):
         upstream.parent.mkdir(parents=True)
         upstream.write_bytes(newer)
         metadata_path = self.root / 'blueprint.json'
-        metadata = json.loads(metadata_path.read_text())
+        metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
         metadata['managedFiles'][relative] = {'sha256': digest(generated), 'sourceSha256': digest(old), 'source': origin}
-        metadata_path.write_text(json.dumps(metadata))
+        metadata_path.write_text(json.dumps(metadata), encoding='utf-8')
         fake_formatter = lambda root, meta, old, new, blueprint: (old, new, {'sdk': 'fixture'})
         with patch.object(upgrade, '_format_app_pair', side_effect=fake_formatter):
             # Reference replacement remains an independent explicit review.
@@ -255,10 +256,10 @@ class UpgradeTest(unittest.TestCase):
         (self.root / relative).write_bytes(old)
         (self.root / '.blueprint/baseline' / digest(old)).write_bytes(old)
         metadata_path = self.root / 'blueprint.json'
-        metadata = json.loads(metadata_path.read_text())
+        metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
         metadata['managedFiles'][relative] = {'sha256': digest(old), 'sourceSha256': digest(old),
                                                'source': 'examples/starter_app/lib/main.dart'}
-        metadata_path.write_text(json.dumps(metadata))
+        metadata_path.write_text(json.dumps(metadata), encoding='utf-8')
         origin = self.source / 'examples/starter_app/lib/main.dart'
         origin.parent.mkdir(parents=True)
         origin.write_bytes(b'new app')
@@ -287,7 +288,7 @@ class UpgradeTest(unittest.TestCase):
         reviewed = upgrade.plan(self.root, self.source, resolution)
         self.assertTrue(reviewed['applicable'], reviewed['conflicts'])
         upgrade.apply(self.root, reviewed)
-        metadata = json.loads((self.root / 'blueprint.json').read_text())
+        metadata = json.loads((self.root / 'blueprint.json').read_text(encoding='utf-8'))
         self.assertEqual(metadata['referenceFiles'][relative], digest(b'new reference'))
         self.assertEqual((self.root / '.blueprint/baseline' / digest(b'new reference')).read_bytes(), b'new reference')
         origin.write_bytes(b'newer reference')

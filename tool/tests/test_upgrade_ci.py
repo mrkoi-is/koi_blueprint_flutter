@@ -1,9 +1,12 @@
 import hashlib
+import json
 from pathlib import Path
+import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
-from tool.upgrade_ci import reviewed_references
+from tool.upgrade_ci import BASELINE_COMMITS, main, reviewed_references
 
 
 def sha(data):
@@ -50,6 +53,27 @@ class UpgradeCiReviewTest(unittest.TestCase):
             self.skipTest('Symlinks unavailable')
         with self.assertRaisesRegex(ValueError, 'Symlink'):
             reviewed_references([self.conflict], self.old, self.project, self.target)
+
+    def test_archive_uses_immutable_baseline_commit_not_local_tag(self):
+        expected = {
+            'v0.2.0-rc.1': 'b880f35311ca59a7e8c21782d98ed8b4cc1e36f1',
+            '5ec56a9': '5ec56a9774b68a9425f23882f620d479b03acf10',
+        }
+        self.assertEqual(BASELINE_COMMITS, expected)
+        for label, commit in expected.items():
+            output = self.root / ('out-' + label)
+            argv = ['upgrade_ci.py', '--source', str(self.target), '--output', str(output),
+                    '--baseline', label, '--template', 'minimal', '--device', 'linux']
+            calls = []
+            def capture(command, cwd, log):
+                calls.append(command)
+                raise RuntimeError('stop after archive request')
+            with self.subTest(label=label), patch.object(sys, 'argv', argv), patch('tool.upgrade_ci.run', side_effect=capture):
+                self.assertEqual(main(), 2)
+            self.assertEqual(calls[0][-1], commit)
+            summary = json.loads((output / 'summary.json').read_text())
+            self.assertEqual((summary['baseline'], summary['baselineCommit']), (label, commit))
+            self.assertFalse(summary['passed'])
 
 
 if __name__ == '__main__':

@@ -5,10 +5,18 @@ and a 320 logical-pixel empty state at 200% text size. Fixed DPR 1, height 480,
 no animation, test font KoiGoldenSans, Material locale en-US with Koi's existing
 Chinese fallback labels. The font is a reproducible test-only Noto Sans SC subset.
 
-Canonical baseline: Flutter 3.47.2, macOS arm64, flutter_tester renderer.
-Initially generated on macOS 27.0.1; other macOS versions/remote CI have not yet
-been measured. Other OS/CPU targets explicitly skip, not claim equivalence.
-Pixel equality is exact; no tolerance or automatic baseline regeneration.
+Reviewed baselines use Flutter 3.47.2, macOS arm64 and flutter_tester:
+
+- `baselines/macos-arm64` is the original macOS 27.0.1 baseline.
+- `baselines/macos-26-arm64` records the actual macOS 26.7.2 CI render after
+  explicit approval. Four independent CI runs produced matching image hashes.
+
+The test selects the baseline using the actual `sw_vers -productVersion` major
+version. Other macOS arm64 versions fail explicitly until reviewed; non-macOS
+and non-arm64 hosts skip and are not verified. Other minor releases within a
+supported major still must match pixel-for-pixel. There is no tolerance or
+automatic baseline regeneration. CI outcome for the new baseline remains pending
+until a new run actually executes it.
 
 From packages/koi_ui using the workspace SDK:
 

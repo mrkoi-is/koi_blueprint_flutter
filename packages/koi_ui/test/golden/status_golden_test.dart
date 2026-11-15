@@ -10,10 +10,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:koi_ui/theme/koi_material_theme.dart';
 
+import 'golden_environment.dart';
+
 void main() {
   final supported = Platform.isMacOS && Abi.current() == Abi.macosArm64;
+  late String baselineDirectory;
   setUpAll(() async {
     if (!supported) return;
+    final version = await Process.run('/usr/bin/sw_vers', ['-productVersion']);
+    if (version.exitCode != 0 || version.stdout is! String) {
+      throw StateError('Cannot determine macOS version for Golden tests');
+    }
+    baselineDirectory = goldenBaselineForMacVersion(version.stdout as String);
     final bytes = await File('test/golden/fonts/KoiGoldenSans.ttf')
         .readAsBytes();
     await (FontLoader(
@@ -80,7 +88,7 @@ void main() {
         expect(tester.takeException(), isNull);
         await expectLater(
           find.byKey(const ValueKey('golden-status')),
-          matchesGoldenFile('baselines/macos-arm64/${scenario.name}.png'),
+          matchesGoldenFile('$baselineDirectory/${scenario.name}.png'),
         );
       },
       // Other hosts are NOT_RUN; they cannot validate this baseline.

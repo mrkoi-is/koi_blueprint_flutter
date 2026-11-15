@@ -5,7 +5,7 @@ import argparse
 import hashlib
 import json
 import shutil
-from pathlib import Path, PurePosixPath
+from pathlib import Path, PurePosixPath, PureWindowsPath
 import subprocess
 import sys
 import uuid
@@ -34,6 +34,23 @@ WORKBENCH_IDS = {
     'test/ai_persistence_faults_test.dart': {'W2', 'W3', 'W4', 'W6'},
     'test/browser/ai_persistence_faults_browser_test.dart': {'W2', 'W3', 'W4', 'W6'},
 }
+
+
+def protocol_relative(value: str) -> str:
+    """Read schema 1 relative paths, including legacy Windows separators.
+
+    Backslashes from older Windows producers are accepted, but drive-qualified,
+    absolute, non-normalized and traversal paths never identify valid evidence.
+    """
+    if not isinstance(value, str) or not value or '\0' in value:
+        raise ValueError('invalid relative evidence path')
+    windows = PureWindowsPath(value)
+    normalized = value.replace('\\', '/')
+    path = PurePosixPath(normalized)
+    if (windows.drive or windows.root or path.is_absolute() or normalized in ('', '.')
+            or '..' in path.parts or str(path) != normalized):
+        raise ValueError('invalid relative evidence path')
+    return normalized
 
 
 def verify_case_ids(events: Path, target: str) -> None:
@@ -80,7 +97,8 @@ def inspect_result(root: Path, summary: dict, code: int, previous: set[str],
             or result.get('evidenceComplete') is not True or result.get('scopeComplete') is not True
             or result.get('executed') != count or summary.get('executed') != count
             or result.get('skipped') != [] or result.get('missingTargets') != []
-            or result.get('member') != member or result.get('requiredTargets') != [target]
+            or protocol_relative(result.get('member')) != member
+            or [protocol_relative(p) for p in result.get('requiredTargets', [])] != [target]
             or result.get('nameFilter') is not None or result.get('environment', {}).get('target') != platform):
         raise ValueError('failed, incomplete, skipped or wrong-scope result')
     artifacts = result.get('artifacts', {})
@@ -93,7 +111,7 @@ def inspect_result(root: Path, summary: dict, code: int, previous: set[str],
         if hashlib.sha256(artifact.read_bytes()).hexdigest() != info.get('sha256'):
             raise ValueError(f'artifact hash mismatch: {name}')
     verify_case_ids(path.parent / 'events.jsonl', target)
-    return {'runId': result['runId'], 'result': str(path.relative_to(root)),
+    return {'runId': result['runId'], 'result': path.relative_to(root).as_posix(),
             'member': member, 'target': target, 'platform': platform, 'executed': count,
             'resultSha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
@@ -137,7 +155,7 @@ def run_suite(root: Path, suite: str, member: str | None = None) -> tuple[Path, 
             returned = Path(summaries[0]['resultPath']).resolve()
             if (returned.name == 'result.json' and returned.parent.parent == (root / 'build/test-runs').resolve()
                     and returned.parent.name not in previous and returned.is_file()):
-                item['result'] = str(returned.relative_to(root))
+                item['result'] = returned.relative_to(root).as_posix()
                 item['runId'] = returned.parent.name
                 item['resultSha256'] = hashlib.sha256(returned.read_bytes()).hexdigest()
             item.update(inspect_result(root, summaries[0], process.returncode, previous,
@@ -159,27 +177,30 @@ def verify_index(root: Path, index_path: Path) -> dict:
     if index.get('suite') not in SUITES or type(index.get('passed')) is not bool:
         raise ValueError('invalid suite index')
     entries = index.get('runs', [])
-    specs = suite_specs(index['suite'], index.get('member'))
+    indexed_member = index.get('member')
+    specs = suite_specs(index['suite'], protocol_relative(indexed_member) if indexed_member is not None else None)
     if len(entries) != len(specs):
         raise ValueError('incorrect suite size')
     replay, outcomes = [], []
     for item, (platform, member, target, count) in zip(entries, specs):
-        if (item.get('platform'), item.get('member'), item.get('target')) != (platform, member, target):
+        if (item.get('platform'), protocol_relative(item.get('member')),
+                protocol_relative(item.get('target'))) != (platform, member, target):
             raise ValueError('index scope mismatch')
-        path = (root / item['result']).resolve()
+        path = (root / protocol_relative(item['result'])).resolve()
         if not path.is_relative_to(root / 'build/test-runs') or path.name != 'result.json':
             raise ValueError('invalid result path')
         data = path.read_bytes()
         if hashlib.sha256(data).hexdigest() != item.get('resultSha256'):
             raise ValueError('result hash mismatch')
         result = json.loads(data)
-        if result.get('runId') != item.get('runId') or result.get('member') != member:
+        if (result.get('runId') != item.get('runId')
+                or protocol_relative(result.get('member')) != member):
             raise ValueError('result identity mismatch')
         artifacts = result.get('artifacts', {})
         if not {'events.jsonl', 'stderr.log', 'source.json'} <= artifacts.keys():
             raise ValueError('missing mandatory artifacts')
         for name, info in artifacts.items():
-            artifact = (path.parent / name).resolve()
+            artifact = (path.parent / protocol_relative(name)).resolve()
             if not artifact.is_relative_to(path.parent) or not artifact.is_file():
                 raise ValueError('missing or invalid extracted artifact')
             if hashlib.sha256(artifact.read_bytes()).hexdigest() != info.get('sha256'):
@@ -188,7 +209,8 @@ def verify_index(root: Path, index_path: Path) -> dict:
             if (result.get('status') != 'passed' or result.get('evidenceComplete') is not True
                     or result.get('scopeComplete') is not True or result.get('executed') != count
                     or result.get('skipped') != [] or result.get('missingTargets') != []
-                    or result.get('requiredTargets') != [target] or result.get('nameFilter') is not None
+                    or [protocol_relative(p) for p in result.get('requiredTargets', [])] != [target]
+                    or result.get('nameFilter') is not None
                     or result.get('environment', {}).get('target') != platform):
                 raise ValueError('passed result scope mismatch')
             verify_case_ids(path.parent / 'events.jsonl', target)

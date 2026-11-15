@@ -5,7 +5,8 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from tool.ai_test_ci import inspect_result, stage_evidence, suite_specs, verify_case_ids, verify_index
+from tool.ai_test_ci import (inspect_result, protocol_relative, stage_evidence, suite_specs,
+                             verify_case_ids, verify_index)
 
 
 class EvidenceCheckTest(unittest.TestCase):
@@ -62,6 +63,67 @@ class EvidenceCheckTest(unittest.TestCase):
         self.result['requiredTargets'] = ['test/other_test.dart']
         with self.assertRaises(ValueError):
             self.check()
+
+    def test_legacy_windows_result_is_normalized_without_weakening_scope(self):
+        self.result['member'] = r'packages\koi_ui'
+        self.result['requiredTargets'] = [r'test\golden\status_golden_test.dart']
+        entry = self.check()
+        self.assertEqual(entry['member'], 'packages/koi_ui')
+        self.assertEqual(entry['target'], 'test/golden/status_golden_test.dart')
+        self.assertEqual(entry['result'], 'build/test-runs/new-run/result.json')
+        for member in (r'packages\..\koi_ui', r'C:\packages\koi_ui',
+                       r'\packages\koi_ui', 'packages//koi_ui'):
+            with self.subTest(member=member):
+                self.result['member'] = member
+                with self.assertRaises(ValueError):
+                    self.check()
+
+    def test_legacy_windows_evidence_replays_after_relocation(self):
+        self.result['member'] = r'packages\koi_ui'
+        self.result['requiredTargets'] = [r'test\golden\status_golden_test.dart']
+        image = self.run / 'golden' / 'actual.png'
+        image.parent.mkdir()
+        image.write_bytes(b'image')
+        self.result['artifacts'][r'golden\actual.png'] = {
+            'path': r'C:\old-machine\build\test-runs\new-run\golden\actual.png',
+            'sha256': hashlib.sha256(image.read_bytes()).hexdigest()}
+        self.path.write_text(json.dumps(self.result), encoding='utf-8')
+        extracted = Path(self.enterContext(tempfile.TemporaryDirectory())).resolve()
+        shutil.copytree(self.run, extracted / 'build/test-runs/new-run')
+        entry = {'runId': 'new-run', 'result': r'build\test-runs\new-run\result.json',
+                 'resultSha256': hashlib.sha256(self.path.read_bytes()).hexdigest(),
+                 'member': r'packages\koi_ui', 'target': r'test\golden\status_golden_test.dart',
+                 'platform': 'vm', 'passed': True}
+        index = extracted / 'index.json'
+        index.write_text(json.dumps({'suite': 'golden', 'passed': True, 'runs': [entry]}), encoding='utf-8')
+        verified = verify_index(extracted, index)
+        self.assertTrue(verified['integrityVerified'])
+        self.assertTrue(verified['suitePassed'])
+        self.assertEqual(verified['replayFromCheckout'][0][3:7],
+                         ['--member', 'packages/koi_ui', '--path', 'test/golden/status_golden_test.dart'])
+        (extracted / 'build/test-runs/new-run/golden/actual.png').write_bytes(b'tampered')
+        with self.assertRaisesRegex(ValueError, 'hash mismatch'):
+            verify_index(extracted, index)
+        entry['result'] = r'build\test-runs\..\outside\result.json'
+        index.write_text(json.dumps({'suite': 'golden', 'passed': True, 'runs': [entry]}), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'invalid relative evidence path'):
+            verify_index(extracted, index)
+        (extracted / 'build/test-runs/new-run/golden/actual.png').write_bytes(b'image')
+        self.result['artifacts'][r'..\outside.png'] = {'path': 'unused', 'sha256': '0' * 64}
+        relocated_result = extracted / 'build/test-runs/new-run/result.json'
+        relocated_result.write_text(json.dumps(self.result), encoding='utf-8')
+        entry['result'] = r'build\test-runs\new-run\result.json'
+        entry['resultSha256'] = hashlib.sha256(relocated_result.read_bytes()).hexdigest()
+        index.write_text(json.dumps({'suite': 'golden', 'passed': True, 'runs': [entry]}), encoding='utf-8')
+        with self.assertRaisesRegex(ValueError, 'invalid relative evidence path'):
+            verify_index(extracted, index)
+
+    def test_legacy_path_normalization_rejects_drive_and_traversal(self):
+        self.assertEqual(protocol_relative(r'test\browser\flow_test.dart'), 'test/browser/flow_test.dart')
+        for value in ('', '.', '../outside', 'a/../b', r'..\outside', r'C:\outside',
+                      r'C:relative', r'\\server\share\file', '/absolute', 'a//b', 'a/./b'):
+            with self.subTest(value=value), self.assertRaises(ValueError):
+                protocol_relative(value)
 
     def test_extracted_evidence_is_portable_and_detects_tampering(self):
         entry = self.check()

@@ -8,6 +8,13 @@ from pathlib import Path, PurePosixPath
 import subprocess
 import sys
 
+# Release candidate tag was local-only and is not necessarily present in a
+# remote clone. Resolve every supported label to its reviewed immutable commit.
+BASELINE_COMMITS = {
+    'v0.2.0-rc.1': 'b880f35311ca59a7e8c21782d98ed8b4cc1e36f1',
+    '5ec56a9': '5ec56a9774b68a9425f23882f620d479b03acf10',
+}
+
 
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -57,7 +64,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--baseline', choices=('v0.2.0-rc.1', '5ec56a9'), required=True)
+    parser.add_argument('--baseline', choices=tuple(BASELINE_COMMITS), required=True)
     parser.add_argument('--template', choices=('minimal', 'workbench'), required=True)
     parser.add_argument('--device', choices=('linux', 'macos'), required=True)
     args = parser.parse_args()
@@ -67,11 +74,13 @@ def main() -> int:
     output.mkdir(parents=True, exist_ok=False)
     old, project = output / 'old-source', output / 'project'
     old.mkdir()
-    summary = {'baseline': args.baseline, 'template': args.template, 'device': args.device,
+    baseline_commit = BASELINE_COMMITS[args.baseline]
+    summary = {'baseline': args.baseline, 'baselineCommit': baseline_commit,
+               'template': args.template, 'device': args.device,
                'passed': False, 'steps': []}
     try:
         archive = output / 'baseline.tar'
-        run(['git', 'archive', '--format=tar', '--output', str(archive), args.baseline], source, output / 'archive.log')
+        run(['git', 'archive', '--format=tar', '--output', str(archive), baseline_commit], source, output / 'archive.log')
         run(['tar', '-xf', str(archive), '-C', str(old)], source, output / 'extract.log')
         archive.unlink()
         platforms = 'web,' + args.device
