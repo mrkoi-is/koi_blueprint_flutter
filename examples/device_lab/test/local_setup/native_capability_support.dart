@@ -9,21 +9,35 @@ import 'package:koi_core/koi_core.dart';
 
 Future<void> waitForCapability(
   WidgetTester tester,
-  bool Function() ready,
-) async {
-  for (var i = 0; i < 100 && !ready(); i++) {
+  bool Function() ready, {
+  Duration timeout = const Duration(seconds: 15),
+  String Function()? describe,
+}) async {
+  final elapsed = Stopwatch()..start();
+  var pumps = 0;
+  while (!ready() && elapsed.elapsed < timeout) {
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 20)),
     );
     await tester.pump(const Duration(milliseconds: 16));
+    pumps++;
   }
-  expect(ready(), true, reason: 'Capability IO or stream must settle');
+  expect(
+    ready(),
+    true,
+    reason:
+        'Capability IO or stream must settle; '
+        'elapsed=${elapsed.elapsed}, pumps=$pumps, '
+        'state=${describe?.call() ?? 'unspecified'}',
+  );
 }
 
 Future<T> completeCapability<T>(
   WidgetTester tester,
-  Future<T> Function() action,
-) async {
+  Future<T> Function() action, {
+  Duration timeout = const Duration(seconds: 15),
+  String Function()? describe,
+}) async {
   var completed = false;
   T? value;
   Object? failure;
@@ -39,7 +53,14 @@ Future<T> completeCapability<T>(
       completed = true;
     },
   );
-  await waitForCapability(tester, () => completed);
+  await waitForCapability(
+    tester,
+    () => completed,
+    timeout: timeout,
+    describe: () =>
+        'completed=$completed, failure=$failure, '
+        '${describe?.call() ?? 'no additional state'}',
+  );
   if (failure != null) Error.throwWithStackTrace(failure!, trace!);
   return value as T;
 }
