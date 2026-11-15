@@ -50,6 +50,16 @@ class EvidenceCheckTest(unittest.TestCase):
             self.check({'new-run'})
         with self.assertRaises(ValueError):
             self.check(code=1)
+        with self.assertRaises(ValueError):
+            self.check(code=False)
+
+    def test_single_case_count_cannot_be_a_boolean(self):
+        self.result['executed'] = True
+        self.summary['executed'] = True
+        self.path.write_text(json.dumps(self.result), encoding='utf-8')
+        with self.assertRaises(ValueError):
+            inspect_result(self.root, self.summary, 0, set(), 'vm', 'packages/koi_ui',
+                           'test/golden/status_golden_test.dart', 1)
 
     def test_rejects_missing_and_tampered_artifacts(self):
         (self.run / 'source.json').unlink()
@@ -93,7 +103,7 @@ class EvidenceCheckTest(unittest.TestCase):
         entry = {'runId': 'new-run', 'result': r'build\test-runs\new-run\result.json',
                  'resultSha256': hashlib.sha256(self.path.read_bytes()).hexdigest(),
                  'member': r'packages\koi_ui', 'target': r'test\golden\status_golden_test.dart',
-                 'platform': 'vm', 'passed': True}
+                 'platform': 'vm', 'passed': True, 'exitCode': 0}
         index = extracted / 'index.json'
         index.write_text(json.dumps({'suite': 'golden', 'passed': True, 'runs': [entry]}), encoding='utf-8')
         verified = verify_index(extracted, index)
@@ -138,6 +148,23 @@ class EvidenceCheckTest(unittest.TestCase):
         (extracted / 'build/test-runs/new-run/events.jsonl').write_text('tampered')
         with self.assertRaisesRegex(ValueError, 'hash mismatch'):
             verify_index(extracted, index)
+
+    def test_passed_index_requires_integer_zero_cli_exit(self):
+        entry = self.check()
+        entry['passed'] = True
+        index = self.root / 'index.json'
+        for value in (None, 1, -1, False, True, '0'):
+            with self.subTest(exitCode=value):
+                altered = dict(entry)
+                if value is None:
+                    altered.pop('exitCode')
+                else:
+                    altered['exitCode'] = value
+                index.write_text(json.dumps({'suite': 'golden', 'passed': True, 'runs': [altered]}), encoding='utf-8')
+                with self.assertRaisesRegex(ValueError, 'passed result scope mismatch'):
+                    verify_index(self.root, index)
+        index.write_text(json.dumps({'suite': 'golden', 'passed': True, 'runs': [entry]}), encoding='utf-8')
+        self.assertTrue(verify_index(self.root, index)['suitePassed'])
 
     def test_failed_golden_evidence_retains_outcome_and_verifies_images(self):
         self.result['status'] = 'failed'

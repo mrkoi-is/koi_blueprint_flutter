@@ -92,10 +92,11 @@ def inspect_result(root: Path, summary: dict, code: int, previous: set[str],
     result = json.loads(path.read_text(encoding='utf-8'))
     if result.get('runId') != path.parent.name:
         raise ValueError('runId does not match result directory')
-    if (code != 0 or summary.get('status') != 'passed'
+    if (type(code) is not int or code != 0 or summary.get('status') != 'passed'
             or result.get('schemaVersion') != 1 or result.get('status') != 'passed'
             or result.get('evidenceComplete') is not True or result.get('scopeComplete') is not True
-            or result.get('executed') != count or summary.get('executed') != count
+            or type(result.get('executed')) is not int or result.get('executed') != count
+            or type(summary.get('executed')) is not int or summary.get('executed') != count
             or result.get('skipped') != [] or result.get('missingTargets') != []
             or protocol_relative(result.get('member')) != member
             or [protocol_relative(p) for p in result.get('requiredTargets', [])] != [target]
@@ -111,7 +112,7 @@ def inspect_result(root: Path, summary: dict, code: int, previous: set[str],
         if hashlib.sha256(artifact.read_bytes()).hexdigest() != info.get('sha256'):
             raise ValueError(f'artifact hash mismatch: {name}')
     verify_case_ids(path.parent / 'events.jsonl', target)
-    return {'runId': result['runId'], 'result': path.relative_to(root).as_posix(),
+    return {'runId': result['runId'], 'result': path.relative_to(root).as_posix(), 'exitCode': code,
             'member': member, 'target': target, 'platform': platform, 'executed': count,
             'resultSha256': hashlib.sha256(path.read_bytes()).hexdigest()}
 
@@ -206,8 +207,10 @@ def verify_index(root: Path, index_path: Path) -> dict:
             if hashlib.sha256(artifact.read_bytes()).hexdigest() != info.get('sha256'):
                 raise ValueError('extracted artifact hash mismatch')
         if item.get('passed'):
-            if (result.get('status') != 'passed' or result.get('evidenceComplete') is not True
-                    or result.get('scopeComplete') is not True or result.get('executed') != count
+            if (type(item.get('exitCode')) is not int or item['exitCode'] != 0
+                    or result.get('status') != 'passed' or result.get('evidenceComplete') is not True
+                    or result.get('scopeComplete') is not True or type(result.get('executed')) is not int
+                    or result.get('executed') != count
                     or result.get('skipped') != [] or result.get('missingTargets') != []
                     or [protocol_relative(p) for p in result.get('requiredTargets', [])] != [target]
                     or result.get('nameFilter') is not None
