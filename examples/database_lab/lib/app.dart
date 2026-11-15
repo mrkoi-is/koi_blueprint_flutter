@@ -1,3 +1,4 @@
+import 'package:database_lab/l10n/app_locale_policy.dart';
 import 'package:database_lab/features/library/presentation/providers/library_providers.dart';
 import 'package:riverpod_annotation/experimental/scope.dart';
 import 'package:database_lab/l10n/generated/app_localizations.dart';
@@ -14,8 +15,12 @@ class DatabaseLabApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => MaterialApp(
     title: 'Database Lab',
-    supportedLocales: AppLocalizations.supportedLocales,
-    localizationsDelegates: AppLocalizations.localizationsDelegates,
+    supportedLocales: appLocalePolicy.supportedLocales,
+    localeListResolutionCallback: appLocalePolicy.resolve,
+    localizationsDelegates: [
+      KoiUiLocalizations.delegate,
+      ...AppLocalizations.localizationsDelegates,
+    ],
     locale: locale,
     theme: AppTheme.light,
     darkTheme: AppTheme.dark,

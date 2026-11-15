@@ -5,7 +5,7 @@
   "settingsNoResults": "沒有符合的設定",
   "settingsLanguageGroup": "語言",
   "settingsLanguage": "顯示語言",
-  "settingsLanguageDescription": "立即套用。跟隨系統使用裝置語言；不支援的語言回退為簡體中文。",
+  "settingsLanguageDescription": "立即套用。跟隨系統使用裝置語言；不支援的語言回退為{fallbackLanguage}。",
   "settingsAppearanceGroup": "外觀",
   "settingsTheme": "明暗模式",
   "settingsThemeDescription": "跟隨系統會使用裝置目前的明暗設定。",

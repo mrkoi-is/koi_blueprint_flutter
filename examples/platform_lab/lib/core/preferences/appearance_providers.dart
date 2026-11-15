@@ -1,3 +1,4 @@
+import 'package:platform_lab/l10n/app_locale_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:koi_ui/koi_ui.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -61,15 +62,7 @@ class AppAppearance extends _$AppAppearance {
       _values = await ref.read(uiPreferencesStoreProvider).read();
       _loadFailed = false;
       return AppAppearanceState(
-        locale: switch (_values['locale']) {
-          'en' => const Locale('en'),
-          'zh' => const Locale('zh'),
-          'zh-Hant' => const Locale.fromSubtags(
-            languageCode: 'zh',
-            scriptCode: 'Hant',
-          ),
-          _ => null,
-        },
+        locale: appLocalePolicy.fromTag(_values['locale']),
         accent:
             KoiAccent.values
                 .where((v) => v.name == _values['accent'])
@@ -92,10 +85,11 @@ class AppAppearance extends _$AppAppearance {
   void apply({required Locale? locale, required KoiAccent accent}) {
     final current = state.value;
     if (current == null) return;
+    final supported = appLocalePolicy.fromTag(locale?.toLanguageTag());
     _update(
       current.copyWith(
-        locale: locale,
-        clearLocale: locale == null,
+        locale: supported,
+        clearLocale: supported == null,
         accent: accent,
       ),
     );
@@ -104,7 +98,10 @@ class AppAppearance extends _$AppAppearance {
   void setLocale(Locale? locale) {
     final current = state.value;
     if (current != null) {
-      _update(current.copyWith(locale: locale, clearLocale: locale == null));
+      final supported = appLocalePolicy.fromTag(locale?.toLanguageTag());
+      _update(
+        current.copyWith(locale: supported, clearLocale: supported == null),
+      );
     }
   }
 

@@ -1,3 +1,4 @@
+import 'package:platform_lab/l10n/app_locale_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_ui/koi_ui.dart';
@@ -21,6 +22,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
+    final languageDescription = l.settingsLanguageDescription(
+      appLocalePolicy.label(appLocalePolicy.fallbackLocale),
+    );
     final state = ref.watch(appAppearanceProvider);
     final notifier = ref.read(appAppearanceProvider.notifier);
     final value = state.value;
@@ -28,28 +32,19 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
       (
         l.settingsLanguageGroup,
         [
-          if (_matches(l.settingsLanguage, l.settingsLanguageDescription))
+          if (_matches(l.settingsLanguage, languageDescription))
             _choice<String>(
               title: l.settingsLanguage,
-              description: l.settingsLanguageDescription,
+              description: languageDescription,
               selected: value?.locale?.toLanguageTag() ?? 'system',
               choices: {
                 'system': l.settingsSystem,
-                'zh': '简体中文',
-                'zh-Hant': '繁體中文',
-                'en': 'English',
+                for (final locale in appLocalePolicy.supportedLocales)
+                  locale.toLanguageTag(): appLocalePolicy.label(locale),
               },
               onChanged: value == null
                   ? null
-                  : (id) => notifier.setLocale(switch (id) {
-                      'zh' => const Locale('zh'),
-                      'zh-Hant' => const Locale.fromSubtags(
-                        languageCode: 'zh',
-                        scriptCode: 'Hant',
-                      ),
-                      'en' => const Locale('en'),
-                      _ => null,
-                    }),
+                  : (id) => notifier.setLocale(appLocalePolicy.fromTag(id)),
             ),
         ],
       ),

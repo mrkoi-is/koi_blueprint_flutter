@@ -17,7 +17,7 @@ MIN_PYTHON = (3, 11)
 PLATFORMS = ('web', 'android', 'ios', 'macos', 'windows', 'linux')
 TEMPLATES = {'minimal': 'starter_app', 'workbench': 'workbench_app'}
 # Only current guidance is inherited. New documents require an explicit decision.
-INHERITED_DOCUMENTS = ('docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
+INHERITED_DOCUMENTS = ('docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/localization.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
 
 REQUIRED_PACKAGES = ('koi_core', 'koi_ui')
 IGNORED = shutil.ignore_patterns('.dart_tool', 'build', 'coverage', '.fvm', '__pycache__', '*.g.dart', '*.freezed.dart', '*.pyc', '.flutter-plugins*', '.git', 'Pods', 'ephemeral', '.symlinks', '.swiftpm', '.DS_Store')
@@ -148,6 +148,12 @@ def replace_tree(root, replacements):
 def members(root, sdk):
     data = json.loads(run([sdk.dart, 'pub', 'workspace', 'list', '--json'], root, capture=True))
     return [Path(item['path']) for item in data['packages'] if Path(item['path']).resolve() != root.resolve()]
+
+
+def check_localizations(root, sdk, workspace):
+    localized = [member for member in workspace if (member / 'l10n.yaml').is_file()]
+    if localized:
+        run([sdk.dart, 'run', 'tool/check_l10n.dart', *localized], root)
 
 
 def add_members(manifest, paths):
@@ -598,7 +604,9 @@ def create(args):
             run([sys.executable, 'tool/check_ai_assets.py', '--root', stage], stage)
         run([sdk.flutter, 'pub', 'get'], stage)
         # The complete app is generated before the destination becomes visible.
-        for member in members(stage, sdk):
+        workspace = members(stage, sdk)
+        check_localizations(stage, sdk, workspace)
+        for member in workspace:
             if (member / 'l10n.yaml').is_file():
                 run([sdk.flutter, 'gen-l10n'], member)
             if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
@@ -771,11 +779,14 @@ def check(args):
         return
     workspace = members(root, sdk)
     if phase in ('generate', 'generate-check'):
+        check_localizations(root, sdk, workspace)
         for member in workspace:
             if (member / 'l10n.yaml').is_file():
                 run([sdk.flutter, 'gen-l10n'], member)
             if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
                 run([sdk.dart, 'run', 'build_runner', 'build'], member)
+    elif phase == 'l10n':
+        check_localizations(root, sdk, workspace)
     elif phase in ('format-check', 'format'):
         flags = ['--output=none', '--set-exit-if-changed'] if phase == 'format-check' else []
         targets = [str(path.relative_to(root)) for path in (root / 'tool').rglob('*.dart') if '.dart_tool' not in path.parts]
@@ -927,7 +938,9 @@ def capability(args):
             target.write_bytes(content)
         staged_app = stage / app.relative_to(root)
         run([sdk.flutter, 'pub', 'get'], stage)
-        for member in members(stage, sdk):
+        workspace = members(stage, sdk)
+        check_localizations(stage, sdk, workspace)
+        for member in workspace:
             if (member / 'l10n.yaml').is_file():
                 run([sdk.flutter, 'gen-l10n'], member)
             if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
@@ -957,6 +970,7 @@ def capability(args):
             transaction.before[relative] = path.read_bytes() if path.is_file() else None
         def refresh():
             run([sdk.flutter, 'pub', 'get', '--enforce-lockfile'], root)
+            check_localizations(root, sdk, [app])
             if (app / 'l10n.yaml').is_file():
                 run([sdk.flutter, 'gen-l10n'], app)
             run([sdk.dart, 'run', 'build_runner', 'build'], app)
@@ -1096,8 +1110,8 @@ def main(argv=None):
     module_parser.add_argument('--workspace', required=True, help='Destination workspace root')
     module_parser.add_argument('--dry-run', action='store_true', help='Show the plan without writing files or resolving dependencies')
     validate_parser = commands.add_parser('validate', help='Run the complete local quality gate', description='Strict lockfile, source-only templates, generation, format, architecture, AI assets, analysis, tests, active Chrome tests and 80% coverage. Source API Web smoke also requires Node. Platform builds are separate.')
-    check_parser = commands.add_parser('check', help='Run one quality phase', description='bootstrap resolves dependencies; generate and generate-check both rebuild untracked Dart parts (reproducibility, not a read-only drift check). format rewrites; format-check is read-only. browser runs active test/browser tests. templates checks source template assets. Other phases: architecture, ai, analyze, test, coverage.')
-    check_parser.add_argument('phase', choices=['bootstrap', 'generate', 'generate-check', 'format', 'format-check', 'analyze', 'test', 'browser', 'coverage', 'architecture', 'ai', 'templates'], help='Quality phase to run; see descriptions above')
+    check_parser = commands.add_parser('check', help='Run one quality phase', description='bootstrap resolves dependencies; l10n checks ARB completeness and declared placeholder metadata without writing files. generate and generate-check run l10n first and rebuild untracked Dart parts (reproducibility, not a read-only drift check). format rewrites; format-check is read-only. browser runs active test/browser tests. templates checks source template assets. Other phases: architecture, ai, analyze, test, coverage.')
+    check_parser.add_argument('phase', choices=['bootstrap', 'l10n', 'generate', 'generate-check', 'format', 'format-check', 'analyze', 'test', 'browser', 'coverage', 'architecture', 'ai', 'templates'], help='Quality phase to run; see descriptions above')
     for item in (validate_parser, check_parser):
         item.add_argument('--workspace', default=str(ROOT), help='Workspace root (default: directory containing blueprint.py)')
         item.add_argument('--coverage-min', type=float, default=80, help='Minimum handwritten line coverage percentage (default: 80)')

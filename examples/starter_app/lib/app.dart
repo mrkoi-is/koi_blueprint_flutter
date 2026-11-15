@@ -1,3 +1,4 @@
+import 'package:starter_app/l10n/app_locale_policy.dart';
 import 'package:koi_core/koi_core.dart';
 import 'package:starter_app/core/capabilities/app_capabilities.dart';
 
@@ -83,12 +84,12 @@ class _StarterAppState extends ConsumerState<StarterApp>
         ),
         themeMode: appearance?.themeMode ?? ThemeMode.system,
         locale: appearance?.locale,
-        supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: appLocalePolicy.supportedLocales,
         localizationsDelegates: [
           KoiUiLocalizations.delegate,
           ...AppLocalizations.localizationsDelegates,
         ],
-        localeListResolutionCallback: resolveKoiLocale,
+        localeListResolutionCallback: appLocalePolicy.resolve,
         routerConfig: _router,
         builder: (context, child) => Column(
           children: [

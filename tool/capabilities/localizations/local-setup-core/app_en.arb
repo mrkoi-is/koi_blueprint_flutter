@@ -8,9 +8,11 @@
   "@localSetupSetup": {
     "placeholders": {
       "value0": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number identifying the current local setup request."
   },
   "localSetupNext": "Next",
   "localSetupNoDirectoryWebUsesTheBrowser": "No directory; Web uses the browser file picker",
@@ -24,9 +26,11 @@
   "@localSetupDraftProtectedPendingIntents": {
     "placeholders": {
       "value0": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of pending setup intents deferred to protect the current draft."
   },
   "localSetupText": "Text",
   "localSetupSave": "Save",

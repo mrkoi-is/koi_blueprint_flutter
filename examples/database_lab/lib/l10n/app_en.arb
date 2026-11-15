@@ -26,32 +26,40 @@
   "@databaseOperationFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "A database command failed. error contains the technical diagnostic text."
   },
   "databaseReadFailed": "Could not load: {error}",
   "@databaseReadFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Reading the database failed. error contains the technical diagnostic text."
   },
   "databaseSaveFailed": "Save failed: {error}. Your changes are retained; retry when ready.",
   "@databaseSaveFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Saving a database draft failed. error contains the technical diagnostic text."
   },
   "databaseOpenFailed": "Could not restore data: {error}",
   "@databaseOpenFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "The database could not be opened. error contains the technical diagnostic text."
   }
 }

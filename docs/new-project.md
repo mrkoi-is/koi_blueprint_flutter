@@ -47,7 +47,7 @@ python3 blueprint.py create field_notes --output ../field_notes --config bluepri
 python3 blueprint.py create field_notes --output ../field_notes --config blueprint.local.json
 ```
 
-`images` 自动安装其 `network` 依赖。依赖按目录中的顺序解析，来源只取蓝图内置受测配方；`capability list` 的 status 字段与生成项目/目标平台验证日志一起判断完成度。`locales` 省略时使用默认三种语言；目前显式指定时也要求完整的 en/zh/zh_Hant 组合，尚不支持通过删项裁剪翻译。
+`images` 自动安装其 `network` 依赖。依赖按目录中的顺序解析，来源只取蓝图内置受测配方；`capability list` 的 status 字段与生成项目/目标平台验证日志一起判断完成度。`locales` 省略时使用默认三种语言；目前显式指定时也要求完整的 en/zh/zh_Hant 组合，尚不支持通过删项裁剪翻译。 App 内的语言选择、偏好恢复和匹配统一消费 `lib/l10n/app_locale_policy.dart`；文案维护与检查见 [国际化契约](architecture/localization.md)。
 
 显示名称同步 App 文案、Android label、Apple bundle/window/menu、Windows/Linux window 和 Web manifest/title，保留包名、bundle identifier 与可执行文件身份。需要图标时，在 brand 中加入 `iconForeground`（相对于配置文件的 PNG 或自包含 SVG 路径）和 `iconBackground`（例如 `#315C80`）；生成器自动加入 branding 能力，需要 ImageMagick 7.1–7.x。首次创建可替换 SDK 默认 runner 图标；已有工程的未受管图标默认拒绝覆盖。资源与图标的输入/输出摘要、限制见 [资源与打包](engineering/assets-and-packaging.md)。
 

@@ -9,17 +9,21 @@
   "@moduleCapabilitiesOperations": {
     "placeholders": {
       "operations": {
-        "type": "String"
+        "type": "String",
+        "example": "read, write"
       }
-    }
+    },
+    "description": "List of operations supported by the selected module; operations is already formatted text."
   },
   "moduleCapabilitiesClosed": "Closed instances: {count}",
   "@moduleCapabilitiesClosed": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of module sessions that have been closed."
   },
   "moduleCapabilitiesWords": "Word engine",
   "moduleCapabilitiesCharacters": "Character engine",
@@ -30,11 +34,14 @@
   "@moduleCapabilitiesResult": {
     "placeholders": {
       "engine": {
-        "type": "String"
+        "type": "String",
+        "example": "local"
       },
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Analysis result: engine is the engine name and count is the result count."
   }
 }

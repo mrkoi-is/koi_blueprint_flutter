@@ -8,26 +8,32 @@
   "@networkStartupFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Network initialization failed. error contains the technical diagnostic text."
   },
   "networkSearchLabel": "Search (300 ms debounce)",
   "networkReachability": "Connectivity: {status}. Each request reports its own result.",
   "@networkReachability": {
     "placeholders": {
       "status": {
-        "type": "String"
+        "type": "String",
+        "example": "ready"
       }
-    }
+    },
+    "description": "Network reachability result; status is a diagnostic status value."
   },
   "networkReachabilityState": "{state, select, reachable{Reachable} unreachable{Unreachable} other{Unknown}}",
   "@networkReachabilityState": {
     "placeholders": {
       "state": {
-        "type": "String"
+        "type": "String",
+        "example": "ready"
       }
-    }
+    },
+    "description": "Network reachability state; state is a diagnostic state value."
   },
   "networkEnterQuery": "Enter a keyword to query the test service",
   "networkSearching": "Searching…",
@@ -37,9 +43,11 @@
   "@networkErrorDetails": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Technical diagnostic details for a failed network request."
   },
   "networkRefresh": "Refresh",
   "networkLoadMore": "Load more",
@@ -48,31 +56,39 @@
   "@networkTransferPhase": {
     "placeholders": {
       "phase": {
-        "type": "String"
+        "type": "String",
+        "example": "ready"
       }
-    }
+    },
+    "description": "Current transfer phase; phase is a diagnostic phase identifier."
   },
   "networkTransferProgress": "Transfer: {phase} · {received} / {total} bytes",
   "@networkTransferProgress": {
     "placeholders": {
       "phase": {
-        "type": "String"
+        "type": "String",
+        "example": "ready"
       },
       "received": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       },
       "total": {
-        "type": "String"
+        "type": "String",
+        "example": "4096"
       }
-    }
+    },
+    "description": "Transfer progress: phase identifier, received byte count, and total bytes or an unknown-total label."
   },
   "networkTransferError": "Transfer error: {error}",
   "@networkTransferError": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Transfer failed. error contains the technical diagnostic text."
   },
   "networkDownloadRetry": "Download / retry",
   "networkCancel": "Cancel",

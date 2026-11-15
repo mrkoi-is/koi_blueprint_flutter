@@ -30,6 +30,7 @@ description: 按 Koi Riverpod 3 契约实现页面、异步状态、派生计算
 - 新增展示内容或改变布局/控件交互前，先在本 feature 和 packages/koi_ui/lib 检索任务名词。修复已有事件接线或 provider 实例参数时先定位对应回调，不要求遍历 UI 组件目录。已经有的面板、属性行、工具栏和探查函数直接调用。
 - 同级内容侧栏/详情复用 koi_ui 的 KoiPanel；宿主持有跨抽屉/内联切换的滚动恢复范围，不把稳定 router 等同于局部滚动自动保持。
 - 工作区三视图共用会话，resize 不重建文本/媒体控制器；参照 [UI 与自适应](../../../docs/architecture/ui-and-adaptive.md) 和 Workbench。
+- 语言状态消费 App 的 `appLocalePolicy`，不在 provider/选择器重复硬编码支持语言；`null` 持续跟随系统，切换语言保留 router/session。文案与参数检查见 [国际化契约](../../../docs/architecture/localization.md)。
 
 消费 scoped provider 时，为 Widget、路由和辅助函数补 `@Dependencies`，依赖链声明 `dependencies`。Riverpod lint 3.1.9 的 15 条已全部启用；不使用 lint ignore 绕过。生成注解与消费元数据的边界见状态管理规范。
 

@@ -13,6 +13,7 @@
 | 模型默认 | Freezed + json_serializable；兼容既有序列化格式时可保留有测试的手写实现 |
 | 按需能力 | 认证、koi_network、Swagger、数据库、原生平台服务 |
 | UI 默认 | koi_ui + Material 3；语义 token、density 和自适应规范见 [UI 契约](ui-and-adaptive.md) |
+| 国际化 | ARB + gen-l10n；App 拥有语言策略与偏好，共享组件独立翻译；见 [国际化契约](localization.md) |
 
 版本以 `.fvmrc`、各 pubspec 和根锁文件为事实来源。SDK 升级同时更新 CI 和生成器兼容组合，不用 dependency_overrides 掩盖生成器冲突。
 

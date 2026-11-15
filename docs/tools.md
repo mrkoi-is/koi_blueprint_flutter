@@ -15,7 +15,8 @@
 | `python3 blueprint.py run --app PATH --device ID` | 使用固定 SDK 启动活动成员；先用 `devices` 获取 ID |
 | `python3 blueprint.py devices` | 列出设备 |
 | `python3 blueprint.py doctor --purpose run` | SDK、profile 打包工具与版本、已装能力依赖、App 动态库实际加载、Web 资产摘要；`--purpose validate` 另检查活动测试需要的 Chrome/Node |
-| `python3 blueprint.py validate` | 严格锁文件、源仓模板资产、生成、格式、架构、AI、分析、测试、浏览器与覆盖率；目标构建另做 |
+| `python3 blueprint.py check l10n` | 只读检查活动成员 ARB 的键、空译文、重复键、locale 与占位符元数据；完整 ICU 另由生成器验证 |
+| `python3 blueprint.py validate` | 严格锁文件、源仓模板资产、国际化源检查与生成、格式、架构、AI、分析、测试、浏览器与覆盖率；目标构建另做 |
 | `python3 blueprint.py build --app PATH --platforms web,macos` | 为选定平台创建默认 `<platform>-release` profile 构建清单；要求已生成 runner 和匹配工具链 |
 | `python3 blueprint.py build --app PATH --profile NAME` | 读取生成元数据中的 buildProfiles；与 platforms 互斥；Apple 目标先准备原生依赖再冻结身份，记录源码、lock、profile、实际架构与产物摘要 |
 | `python3 blueprint.py package --app PATH --profile NAME` | 只打包输入仍匹配的成功构建；支持 Web zip、Android apk、iOS app、macOS dmg、Windows exe、Linux deb/AppImage；不安装或发布 |

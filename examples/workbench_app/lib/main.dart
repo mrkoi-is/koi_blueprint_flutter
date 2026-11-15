@@ -3,6 +3,7 @@ import 'package:workbench_app/core/diagnostics/app_diagnostics.dart';
 import 'package:workbench_app/core/preferences/ui_preferences_store.dart';
 import 'package:workbench_app/core/capabilities/installed_capabilities.dart';
 import 'package:workbench_app/l10n/app_strings.dart';
+import 'package:workbench_app/l10n/app_locale_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:media_kit/media_kit.dart';
 import 'package:koi_ui/koi_ui.dart';
@@ -80,12 +81,12 @@ class _WorkbenchLauncherState extends State<WorkbenchLauncher> {
         return WorkbenchApp(bootstrap: bootstrap);
       }
       return MaterialApp(
-        supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: appLocalePolicy.supportedLocales,
         localizationsDelegates: [
           KoiUiLocalizations.delegate,
           ...AppLocalizations.localizationsDelegates,
         ],
-        localeListResolutionCallback: resolveKoiLocale,
+        localeListResolutionCallback: appLocalePolicy.resolve,
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         home: Builder(

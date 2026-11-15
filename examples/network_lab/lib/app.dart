@@ -1,3 +1,5 @@
+import 'package:network_lab/l10n/app_locale_policy.dart';
+
 import 'dart:async';
 import 'dart:ui' show AppExitResponse;
 
@@ -47,8 +49,12 @@ class _NetworkLabAppState extends State<NetworkLabApp> {
       onGenerateTitle: (context) =>
           AppLocalizations.of(context)!.networkLabTitle,
       locale: widget.locale,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: AppLocalizations.supportedLocales,
+      localizationsDelegates: [
+        KoiUiLocalizations.delegate,
+        ...AppLocalizations.localizationsDelegates,
+      ],
+      supportedLocales: appLocalePolicy.supportedLocales,
+      localeListResolutionCallback: appLocalePolicy.resolve,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: widget.bootstrap.router,

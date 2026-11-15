@@ -20,6 +20,8 @@
 
 分项检查使用 `python3 blueprint.py check <phase>`；可选 phase 见 `check --help`。`generate-check` 与 `generate` 都重建未入库的 Dart part，验证可重复生成，不是只读差异检查。工具说明见 [工具清单](tools.md)。新增或调整依赖后先执行 `check bootstrap`，再生成和检查。
 
+国际化源检查由 `check l10n` 提供，并在生成前执行：拒绝缺失/多余键、空译文、重复 JSON 键及无效占位符元数据。源检查不依赖旧报告，ICU 语法由 `gen-l10n` 验证；语言切换和布局要求见 [国际化契约](architecture/localization.md)。
+
 目标平台构建使用 `python3 blueprint.py build --app <path> --platforms <platforms>`。不同平台需要匹配主机与 SDK；验证矩阵分别记录生成、依赖、分析、测试、构建与实际运行。不得把 Web 构建成功折算成六端成功。
 
 ## 测试环境

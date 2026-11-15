@@ -1,3 +1,4 @@
+import 'package:platform_lab/l10n/app_locale_policy.dart';
 import 'package:platform_lab/features/settings/presentation/settings_page.dart';
 import 'package:platform_lab/features/settings/presentation/providers/settings_providers.dart';
 import 'package:platform_lab/l10n/generated/app_localizations.dart';
@@ -90,8 +91,8 @@ class _PlatformLabState extends ConsumerState<PlatformLab>
         ),
         themeMode: appearance?.themeMode ?? ThemeMode.system,
         locale: appearance?.locale,
-        localeListResolutionCallback: resolveKoiLocale,
-        supportedLocales: AppLocalizations.supportedLocales,
+        localeListResolutionCallback: appLocalePolicy.resolve,
+        supportedLocales: appLocalePolicy.supportedLocales,
         localizationsDelegates: [
           KoiUiLocalizations.delegate,
           ...AppLocalizations.localizationsDelegates,
