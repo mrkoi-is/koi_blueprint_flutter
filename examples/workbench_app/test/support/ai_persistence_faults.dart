@@ -60,15 +60,26 @@ final class FaultRepository implements WorkspaceRepository {
   }
 }
 
-Future<void> _until(WidgetTester tester, bool Function() condition) async {
-  for (var i = 0; i < 200; i++) {
+Future<void> _until(
+  WidgetTester tester,
+  bool Function() condition, {
+  String Function()? describe,
+}) async {
+  final elapsed = Stopwatch()..start();
+  while (elapsed.elapsed < const Duration(seconds: 15)) {
     if (condition()) return;
-    await tester.pump(const Duration(milliseconds: 1));
+    // Do not advance the fake clock: doing so may trigger the autosave timer
+    // and make a missing explicit save appear to have succeeded.
+    await tester.pump();
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 5)),
     );
   }
-  fail('Timed out waiting for persistence operation');
+  if (condition()) return;
+  fail(
+    'Timed out waiting for persistence operation after ${elapsed.elapsed}: '
+    '${describe?.call() ?? 'no state supplied'}',
+  );
 }
 
 Future<void> _save(WidgetTester tester) async {
@@ -148,7 +159,8 @@ Future<void> _disposeOwner(WidgetTester tester, WorkbenchBootstrap app) async {
       closed = true;
     },
   );
-  for (var i = 0; i < 300 && !closed; i++) {
+  final elapsed = Stopwatch()..start();
+  while (!closed && elapsed.elapsed < const Duration(seconds: 15)) {
     await tester.pump();
     await tester.runAsync(
       () => Future<void>.delayed(const Duration(milliseconds: 10)),
@@ -235,6 +247,7 @@ void registerPersistenceFaultTests() {
   ) async {
     final f = await _mount(tester);
     var reopened = false;
+    Object? primaryFailure;
     try {
       f.storage.repository.gate = Completer<void>();
       f.storage.repository.entered = Completer<void>();
@@ -251,17 +264,41 @@ void registerPersistenceFaultTests() {
       expect(f.app.session.state.snapshot.documents.single.dirty, isTrue);
       final disk = await tester.runAsync(f.storage.actual.repository.load);
       expect(disk!.documents.single.text, '首版');
+      final attemptsBeforeSave = f.storage.repository.attempts;
       await _save(tester);
       await _until(
         tester,
-        () => !f.app.session.state.snapshot.documents.single.dirty,
+        () {
+          final state = f.app.session.state;
+          if (state.error != null) fail('Second save failed: ${state.error}');
+          return f.storage.repository.attempts > attemptsBeforeSave &&
+              !state.snapshot.documents.single.dirty;
+        },
+        describe: () {
+          final state = f.app.session.state;
+          final document = state.snapshot.documents.single;
+          return 'attempts=${f.storage.repository.attempts}, '
+              'saving=${state.saving}, error=${state.error}, '
+              'revision=${document.revision}, '
+              'savedRevision=${document.savedRevision}';
+        },
       );
       reopened = true;
       await _reopenAndExpect(tester, f.sandbox, f.app, '保存期间的新版');
+    } catch (error) {
+      primaryFailure = error;
+      rethrow;
     } finally {
       final gate = f.storage.repository.gate;
       if (gate != null && !gate.isCompleted) gate.complete();
-      if (!reopened) await _cleanup(tester, f.sandbox, f.app);
+      if (!reopened) {
+        try {
+          await _cleanup(tester, f.sandbox, f.app);
+        } catch (error, stack) {
+          if (primaryFailure == null) rethrow;
+          debugPrint('W3 cleanup also failed: $error\n$stack');
+        }
+      }
     }
   });
 

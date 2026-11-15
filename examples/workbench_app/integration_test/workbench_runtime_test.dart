@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart' show debugPrintSynchronously;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -166,18 +167,23 @@ void main() {
       final videoEvidence = <Map<String, Object?>>[];
       evidence['videos'] = videoEvidence;
       for (final name in ['landscape.mp4', 'portrait.mp4']) {
-        debugPrint('KOI_RUNTIME_STAGE video $name');
+        _runtimeStage('video $name begin');
         final asset = session.state.snapshot.assets.singleWhere(
           (value) => value.name == name,
         );
         final videoRecord = <String, Object?>{'name': name};
         videoEvidence.add(videoRecord);
+        _runtimeStage('video $name update preferences begin');
         session.updatePreferences(
           session.state.snapshot.preferences.copyWith(
             selectedAssetId: asset.id,
           ),
         );
+        _runtimeStage('video $name update preferences done');
+        _runtimeStage('video $name select call begin');
         final selecting = bootstrap.preview.select(asset);
+        _runtimeStage('video $name select call returned');
+        _runtimeStage('video $name wait thumbnail begin');
         await _pumpUntil(
           tester,
           () =>
@@ -188,7 +194,10 @@ void main() {
               bootstrap.preview.error != null,
           label: '$name first frame and thumbnail',
         );
+        _runtimeStage('video $name wait thumbnail done');
+        _runtimeStage('video $name await select begin');
         await selecting;
+        _runtimeStage('video $name await select done');
         videoRecord['first_frame_probe'] = probeVideoFrame();
         videoRecord['preview_error'] = bootstrap.preview.error;
         expect(
@@ -199,9 +208,11 @@ void main() {
         final player = bootstrap.preview.playback!;
         expect(player.playing, isFalse);
         expect(player.duration.inMilliseconds, greaterThan(1500));
+        _runtimeStage('video $name screenshot begin');
         final screenshot = await player.screenshot().timeout(
           const Duration(seconds: 10),
         );
+        _runtimeStage('video $name screenshot done');
         expect(screenshot, isNotNull);
         expect(screenshot, isNotEmpty);
         final screenshotCodec = await ui.instantiateImageCodec(screenshot!);
@@ -228,6 +239,7 @@ void main() {
         });
         screenshotFrame.image.dispose();
         screenshotCodec.dispose();
+        _runtimeStage('video $name playback controls begin');
         await bootstrap.preview.setVisible(true);
         await bootstrap.preview.setVolume(
           0,
@@ -279,11 +291,14 @@ void main() {
           greaterThan(16),
           reason: '$name persisted thumbnail must preserve real frame pixels',
         );
+        _runtimeStage('video $name playback controls done');
         final lease = storage.leases.last;
         session.updatePreferences(
           session.state.snapshot.preferences.copyWith(selectedAssetId: null),
         );
+        _runtimeStage('video $name release begin');
         await bootstrap.preview.select(null);
+        _runtimeStage('video $name release select done');
         await _pumpUntil(
           tester,
           () => bootstrap.preview.playback == null,
@@ -291,6 +306,7 @@ void main() {
         );
         expect(lease.releaseCount, 1);
         await sandbox.verifyReleasedUri(lease.uri);
+        _runtimeStage('video $name release done');
         videoRecord.addAll({
           'first_frame': true,
           'play_pause_seek_volume': true,
@@ -338,9 +354,13 @@ void main() {
       expect(tester.takeException(), isNull);
       debugPrint('KOI_RUNTIME_EVIDENCE ${jsonEncode(evidence)}');
     } finally {
+      _runtimeStage('cleanup unmount begin');
       await tester.pumpWidget(const SizedBox.shrink());
+      _runtimeStage('cleanup owner begin');
       await owned?.disposeAsync();
+      _runtimeStage('cleanup sandbox begin');
       await sandbox.dispose();
+      _runtimeStage('cleanup done');
     }
   }, timeout: const Timeout(Duration(minutes: 4)));
 }
@@ -361,14 +381,25 @@ Future<void> _pumpUntil(
   required String label,
 }) async {
   final elapsed = Stopwatch()..start();
+  var lastLogged = const Duration(seconds: -2);
   while (!condition()) {
     if (elapsed.elapsed > const Duration(seconds: 30)) {
       fail('Timeout waiting for $label');
     }
+    final shouldLog =
+        elapsed.elapsed - lastLogged >= const Duration(seconds: 2);
+    if (shouldLog) {
+      lastLogged = elapsed.elapsed;
+      _runtimeStage('$label pump begin');
+    }
     await tester.pump(const Duration(milliseconds: 50));
+    if (shouldLog) _runtimeStage('$label pump done');
   }
   await tester.pump();
 }
+
+void _runtimeStage(String stage) =>
+    debugPrintSynchronously('KOI_RUNTIME_STAGE $stage');
 
 bool _hasSourceBytes(ImageProvider<Object> provider, int byteLength) {
   if (provider is ResizeImage) {

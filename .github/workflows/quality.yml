@@ -362,6 +362,7 @@ jobs:
           retention-days: 7
 
       - name: Build native platforms and web
+        id: generated-build
         run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" build --app "${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app" --platforms "${{ matrix.platforms }}"
 
       - name: Verify Workbench persistence across processes
@@ -423,10 +424,13 @@ jobs:
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          python "$GITHUB_WORKSPACE/tool/native_runtime_watchdog.py" \
+            --timeout 600 --grace 10 --log native-runtime.log --report native-runtime-supervisor.json \
+            --events native-runtime-tests.json --target integration_test/workbench_runtime_test.dart -- \
+            xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart
 
       - name: Run real Chrome media and IndexedDB smoke
-        if: matrix.template == 'workbench' && runner.os == 'Linux'
+        if: ${{ !cancelled() && steps.generated-build.outcome == 'success' && matrix.template == 'workbench' && runner.os == 'Linux' }}
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         shell: bash
         run: |
@@ -482,6 +486,7 @@ jobs:
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/integration_response_data.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-supervisor.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-system.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-tests.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/runtime-crashes
