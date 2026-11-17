@@ -88,15 +88,22 @@ void main() {
         store.record(AppLogLevel.info, 'live update');
         expect(await lines.moveNext(), isTrue);
         expect(lines.current, 'data: ${store.revision}');
-        await lines.cancel();
         final oldAddress = lan.address!;
-        await lan.stop();
+        await lan.stop().timeout(const Duration(seconds: 5));
+        await lines.cancel().timeout(const Duration(seconds: 5));
         expect(lan.running, isFalse);
         expect(lan.credential, isNull);
-        await expectLater(
-          client.getUrl(Uri.parse('$oldAddress/records')),
-          throwsA(isA<SocketException>()),
-        );
+        await expectLater(() async {
+          final probe = HttpClient();
+          try {
+            final request = await probe.getUrl(
+              Uri.parse('$oldAddress/records'),
+            );
+            await request.close();
+          } finally {
+            probe.close(force: true);
+          }
+        }(), throwsA(isA<SocketException>()));
         await lan.start(address: '127.0.0.1');
         expect(lan.credential, isNot(firstCredential));
         await lan.stop();

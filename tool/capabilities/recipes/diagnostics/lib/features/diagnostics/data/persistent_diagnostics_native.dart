@@ -112,11 +112,32 @@ final class _RotatingLog {
     if (pending.isEmpty) {
       return;
     }
-    final lines = pending.map((event) => jsonEncode(event.toJson())).join('\n');
-    final data = utf8.encode('$lines\n');
-    if (data.length > capacity) {
+    final lines = pending
+        .map((event) => utf8.encode('${jsonEncode(event.toJson())}\n'))
+        .toList();
+    if (lines.fold<int>(0, (size, line) => size + line.length) > capacity) {
       throw StateError('Diagnostic batch exceeds capacity');
     }
+    // A slow disk may coalesce a whole ring into one batch. Keep rotation
+    // independent of write scheduling; only a single large event may exceed 1 MiB.
+    final chunk = BytesBuilder(copy: false);
+    var chunkLastId = lastId;
+    Future<void> flush() async {
+      if (chunk.isEmpty) return;
+      await _appendChunk(chunk.takeBytes(), chunkLastId);
+    }
+
+    for (var i = 0; i < pending.length; i++) {
+      if (chunk.isNotEmpty && chunk.length + lines[i].length > segmentLimit) {
+        await flush();
+      }
+      chunk.add(lines[i]);
+      chunkLastId = pending[i].id;
+    }
+    await flush();
+  }
+
+  Future<void> _appendChunk(List<int> data, int chunkLastId) async {
     var target = current;
     if (target == null ||
         (await target.length()) + data.length > segmentLimit) {
@@ -133,7 +154,7 @@ final class _RotatingLog {
     } finally {
       await handle.close();
     }
-    lastId = pending.last.id;
+    lastId = chunkLastId;
     final files = await _files();
     var total = 0;
     for (final file in files) {
