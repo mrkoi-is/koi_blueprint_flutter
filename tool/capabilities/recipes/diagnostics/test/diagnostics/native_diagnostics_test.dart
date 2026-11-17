@@ -21,23 +21,26 @@ void main() {
           '$i 鲤 ${'x' * 400000}',
           source: 'native',
         );
-        await Future<void>.delayed(const Duration(milliseconds: 1));
       }
       await store.close();
       final segments = await dir
           .list()
           .where((entry) => entry.path.endsWith('.ndjson'))
           .toList();
+      expect(store.persistenceError, isNull);
       expect(segments.length, greaterThan(1));
       var bytes = 0;
       for (final file in segments.cast<File>()) {
-        bytes += await file.length();
+        final length = await file.length();
+        expect(length, lessThanOrEqualTo(1024 * 1024));
+        bytes += length;
       }
       expect(bytes, lessThanOrEqualTo(20 * 1024 * 1024));
       store = await openDiagnosticStore(directory: dir);
       final page = store.query(const DiagnosticQuery(source: 'native'));
       expect(page.items, isNotEmpty);
       expect(page.items.first.message, contains('鲤'));
+      expect(page.items.first.message, startsWith('64 '));
       final snapshot = store.exportSnapshot();
       store.record(AppLogLevel.error, 'later');
       final export = await snapshot.fold<List<int>>([], (a, b) => a..addAll(b));

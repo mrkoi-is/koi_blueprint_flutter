@@ -1,6 +1,6 @@
 # diagnostics v2 验证记录
 
-日期：2026-11-15，America/Los_Angeles。代码实现、Android release 补验与设备收尾均已完成。
+日期：2026-11-15，America/Los_Angeles。本文件保留当次临时工程的设备验收历史；不代替新候选提交的完整门禁与设备执行。Android RC 的候选与 CI 归档见 [版本记录](releases/v0.3.0-android-rc.1.md)。
 
 ## 实现与本地验证
 
@@ -52,6 +52,6 @@
 
 ## 本地证据
 
-`build/diagnostics-validation/` 为本地忽略目录，包含最终 APK、构建清单、`result.json`、三份完整门禁日志、原生锁屏样本/结果、设备导出、资源释放及设置还原记录、浏览器布局检查、设备和 LAN 截图。`release-probe-source/` 保存临时探针源代码与验证脚本。访问凭证不写入此文档。
+当次工作区的 `build/diagnostics-validation/` 是临时产物目录。发布收尾从仍存在的临时副本恢复了可核对的 APK、构建清单、门禁与锁屏原始日志，随 Android RC 的历史验收归档发布。原 APK 的 SHA-256 已重新核对一致。实际保留文件及校验和以 Release 附件索引为准，不声称所有早期截图仍可恢复。访问凭证不随归档发布。
 
 使用方式见 [诊断能力](diagnostics.md)。

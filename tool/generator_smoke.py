@@ -74,6 +74,18 @@ def main() -> None:
 
     temporary = tempfile.mkdtemp(prefix="koi-generator-smoke-")
     try:
+        no_browser = Path(temporary) / "explicit capabilities disabled"
+        no_browser_config = Path(temporary) / "no-browser.json"
+        no_browser_config.write_text(json.dumps({'schema': 1, 'capabilities': []}))
+        run(source / "blueprint.py", "create", "no_browser",
+            "--output", str(no_browser), "--org", "io.blueprint.smoke",
+            "--template", "minimal", "--platforms", "web",
+            "--config", str(no_browser_config), cwd=source)
+        if json.loads((no_browser / "blueprint.json").read_text())['capabilities']:
+            raise AssertionError("Explicit empty capabilities installed a runtime capability")
+        run(no_browser / "blueprint.py", "check", "browser", "--workspace", str(no_browser),
+            cwd=no_browser, without_chrome=True)
+
         output = Path(temporary) / "renamed workspace 中文"
         run(
             source / "blueprint.py", "create", "renamed_project",
@@ -142,8 +154,9 @@ def main() -> None:
         (package / 'lib/feature_host.dart').write_text("export 'src/features/package_catalog/package_catalog.dart';\n")
         run(generated, "check", "bootstrap", "--workspace", str(output), cwd=output)
         run(generated, "check", "generate-check", "--workspace", str(output), cwd=output)
-        run(generated, "validate", "--workspace", str(output), cwd=output, without_chrome=True)
-        print("Generator smoke passed: both templates, four recursive combinations, three features, module and module API feature.")
+        # Default diagnostics installs active browser tests; validate with the real Chrome.
+        run(generated, "validate", "--workspace", str(output), cwd=output)
+        print("Generator smoke passed: both templates, four recursive combinations, three features, module, module API feature and explicit no-browser capabilities.")
 
     except BaseException:
         print(f"Failed generator workspace retained at {temporary}", file=sys.stderr)

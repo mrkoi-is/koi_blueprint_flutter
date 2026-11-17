@@ -14,6 +14,15 @@
 - 新增 `python3 blueprint.py check l10n`，检查 ARB 翻译键完整性、空译文、重复 JSON 键、locale 与占位符元数据，并接入生成、创建项目和能力安装流程；完整 ICU 语法继续由 Flutter `gen-l10n` 验证。
 - 补充参数化文案的翻译说明、语言切换与旧偏好恢复回归，以及英／简／繁在 320px 窄屏和 200% 字号下的交互测试；使用约定见 [国际化契约](docs/architecture/localization.md)。
 
+## 0.3.0-android-rc.1
+
+- 新建 minimal/workbench 项目默认安装 diagnostics v2，使用 Talker 统一采集日志与已接入客户端的网络请求。
+- 增加 release 隐藏诊断入口、20 MiB 持久历史、脱敏、流式请求状态/耗时、查询与 NDJSON 导出。
+- 增加带会话凭证的 LAN 实时查看器及 Android 前台保活；修复超长日志布局，保留 Web 的只读本地诊断。
+- 修复慢速磁盘突发写入的分段轮转，修复 SSE 首帧期间可能漏失实时更新的竞态，覆盖活跃连接的关闭与端口释放。
+- 生成器烟测为默认诊断使用真实 Chrome，并单独验证显式空 capabilities 的无浏览器路径；Windows 浏览器 SDK 兼容补丁覆盖两种模板。
+- 发布范围为 Android RC；APK 使用测试签名，不代表正式商店签名或六端实机认证。设备验收与发布索引见 [Android RC 记录](docs/releases/v0.3.0-android-rc.1.md)。
+
 ## 0.2.0-rc.1 — 2026-10-04
 
 本版本为 Web/macOS 验收范围的本地候选版。其他平台、浏览器与人工理解反馈分别记录，不能由候选 tag 推导为六端稳定版。验收范围见 [候选版本记录](docs/releases/v0.2.0-rc.1.md)。
