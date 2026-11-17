@@ -1,6 +1,6 @@
 # 国际化修复与发布验收记录
 
-日期：2026-11-17（America/Los_Angeles）。范围为 minimal / workbench 蓝图及默认诊断能力，语言为英文、简体中文、繁体中文，目标为 Android、iOS、macOS、Windows、Linux、Web。证据对应本轮工作树，不代表已发布提交。三项代码缺口已修复，六端完整国际化验收尚未完成。
+日期：2026-11-17（America/Los_Angeles）。范围为 minimal / workbench 蓝图及默认诊断能力，语言为英文、简体中文、繁体中文，目标为 Android、iOS、macOS、Windows、Linux、Web。证据对应国际化修复阶段的工作树（源码指纹 `5e8ec4853b4c23e36d2aa1fcf4f145685862affafa7c79dd6ac17f8867f0ea09`），先于已发布分支的整合，不代表合并后的候选提交已重新执行全部设备测试。最终候选的门禁与 CI 结果另见 [版本记录](releases/v0.3.0-rc.1.md)。三项代码缺口已修复，六端完整国际化验收尚未完成。
 
 ## 本轮修复
 
@@ -17,7 +17,7 @@
 | Dart 定向回归 | PASS，7 项 | 通知参数、LAN 实际 HTTP 响应与语言匹配；最终通道接线已由完整门禁复验 |
 | Chrome 定向回归 | PASS，3 项 | 三语网页 DOM、实际导出失败处理及 320px 布局 |
 | 原生包译文查询 | PASS，12 项 | 两模板 × iOS/macOS × 三语；Foundation 显式语言匹配与包内字符串读取 |
-| 最终源码完整门禁 | PASS，覆盖率 83.20%（10502/12623） | 生成、格式、分析、架构、模板继承、成员测试、Chrome、覆盖率与 API Web 冒烟；Python 为 40 + 237 项，其中 1 项跳过 |
+| 修复阶段源码完整门禁 | PASS，覆盖率 83.20%（10502/12623） | 生成、格式、分析、架构、模板继承、成员测试、Chrome、覆盖率与 API Web 冒烟；Python 为 40 + 237 项，其中 1 项跳过 |
 | 原生引擎界面回归 | PASS，6 个 fixture / 18 个语言检查 | 两模板 × macOS、Android 真机、iOS 模拟器；切换语言、router/session 保留与恢复系统模式；workbench 使用真实临时文件重开偏好 |
 | Android 真实通知 | PASS，3 种语言 | 使用真实 NotificationManager 读取渠道名、已发布通知标题与正文；初始渠道重要性 2 保持不变 |
 | 构建后能力重入 | PASS，两模板 | 最终工程构建后再次规划安装 diagnostics，变更文件为空 |
@@ -28,7 +28,7 @@
 
 每行均涵盖两种模板。Windows/Linux 目录已生成，不据此推断目标主机构建成功。iOS 构建不签名，macOS 使用本地临时签名，不代表分发签名或公证完成。
 
-| 平台 | 最终工程生成 | 本机 release 构建 | 完整三语系统/UI 实测 |
+| 平台 | 修复阶段工程生成 | 修复阶段本机 release 构建 | 完整三语系统/UI 实测 |
 | --- | --- | --- | --- |
 | Android | PASS | PASS | PARTIAL：Android 13 真机，两模板三语界面及真实诊断通知通过 |
 | iOS | PASS | PASS（无签名） | PARTIAL：iOS 26.5 模拟器，两模板三语界面通过；真机未执行 |

@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path, PurePosixPath
 import subprocess
 import sys
@@ -60,6 +61,60 @@ def run(argv: list[str], cwd: Path, log: Path) -> None:
         raise RuntimeError(f'Command failed ({process.returncode}); see {log}')
 
 
+def project_snapshot(root: Path) -> dict[str, str]:
+    """Hash project data and receipts, excluding only disposable tool caches."""
+    ignored = {'.git', '.dart_tool', '.fvm', 'build', 'coverage', 'Pods',
+               'ephemeral', '.symlinks', '.gradle', '__pycache__'}
+    files = {}
+    for directory, folders, names in os.walk(root, followlinks=False):
+        for name in list(folders):
+            path = Path(directory) / name
+            if name in ignored:
+                folders.remove(name)
+            elif path.is_symlink():
+                files[path.relative_to(root).as_posix()] = 'link:' + os.readlink(path)
+                folders.remove(name)
+        for name in names:
+            path = Path(directory) / name
+            if name.endswith('.pyc'):
+                continue
+            files[path.relative_to(root).as_posix()] = (
+                'link:' + os.readlink(path) if path.is_symlink() else digest(path.read_bytes()))
+    return files
+
+
+def verify_manual_migration(preview: dict, old: Path, project: Path,
+                            source: Path, plan: Path, log: Path) -> dict:
+    """Verify the reviewed v0.3 dependency boundary, never accept arbitrary failures."""
+    expected = {
+        ('pubspec.yaml', 'unsupported_managed_change'),
+        ('apps/upgrade_ci_app/pubspec.yaml', 'dependency_resolution_required'),
+        ('packages/koi_core/pubspec.yaml', 'dependency_resolution_required'),
+    }
+    conflicts = preview['conflicts']
+    blocking = [c for c in conflicts if c.get('reason') != 'unmanaged_reference']
+    if (preview.get('applicable') is not False or len(blocking) != len(expected)
+            or {(c.get('path'), c.get('reason')) for c in blocking} != expected
+            or any(c.get('detail') != 'unsupported upstream pubspec changes'
+                   for c in blocking if c['reason'] == 'dependency_resolution_required')):
+        raise ValueError('Unexpected migration boundary; review the complete plan')
+    reviewed_references([c for c in conflicts if c.get('reason') == 'unmanaged_reference'],
+                        old, project, source)
+    before = project_snapshot(project)
+    command = [sys.executable, str(source / 'blueprint.py'), 'upgrade', 'apply',
+               '--app', str(project / 'apps/upgrade_ci_app'), '--plan', str(plan)]
+    result = subprocess.run(command, cwd=source, stdout=subprocess.PIPE,
+                            stderr=subprocess.STDOUT, text=True, encoding='utf-8', errors='replace')
+    log.write_text('$ ' + ' '.join(command) + '\n' + result.stdout, encoding='utf-8')
+    after = project_snapshot(project)
+    if (result.returncode != 2 or 'Unresolved upgrade conflicts prevent applying the plan' not in result.stdout
+            or before != after):
+        raise ValueError('Blocked upgrade must reject apply and preserve the project')
+    return {'status': 'manual_migration_required', 'upgradeApplied': False,
+            'blockingConflicts': blocking, 'projectUnchanged': True,
+            'projectSha256': digest(json.dumps(before, sort_keys=True).encode())}
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, required=True)
@@ -67,6 +122,8 @@ def main() -> int:
     parser.add_argument('--baseline', choices=tuple(BASELINE_COMMITS), required=True)
     parser.add_argument('--template', choices=('minimal', 'workbench'), required=True)
     parser.add_argument('--device', choices=('linux', 'macos'), required=True)
+    parser.add_argument('--expect-manual-migration', action='store_true',
+                        help='Verify v0.3 dependency conflicts and refusal without project changes; do not apply an upgrade')
     args = parser.parse_args()
     source, output = args.source.resolve(), args.output.resolve()
     if output == source or output.is_relative_to(source) or source.is_relative_to(output):
@@ -91,6 +148,11 @@ def main() -> int:
         base = [sys.executable, str(source / 'blueprint.py'), 'upgrade', 'plan', '--app', str(app), '--source', str(source)]
         run(base + ['--output', str(initial)], source, output / 'initial-plan.log')
         preview = json.loads(initial.read_text(encoding='utf-8'))
+        if args.expect_manual_migration:
+            summary.update(verify_manual_migration(preview, old, project, source, initial,
+                                                   output / 'rejected-apply.log'))
+            summary['passed'] = True
+            return finish(output, summary)
         approved = reviewed_references(preview['conflicts'], old, project, source)
         decisions.write_text(json.dumps(approved, indent=2, sort_keys=True) + '\n', encoding='utf-8')
         run(base + ['--output', str(final), '--resolutions', str(decisions)], source, output / 'final-plan.log')
@@ -114,6 +176,10 @@ def main() -> int:
         summary['passed'] = True
     except (OSError, ValueError, KeyError, RuntimeError) as error:
         summary['error'] = str(error)
+    return finish(output, summary)
+
+
+def finish(output: Path, summary: dict) -> int:
     (output / 'summary.json').write_text(json.dumps(summary, indent=2) + '\n', encoding='utf-8')
     print(json.dumps({'passed': summary['passed'], 'summary': str(output / 'summary.json')}))
     return 0 if summary['passed'] else 2

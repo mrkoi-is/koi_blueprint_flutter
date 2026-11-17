@@ -10,6 +10,8 @@ python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app apps/my_app -
 
 计划输出必须位于目标 workspace 外；apply 会重新计算计划，拒绝过期计划与未解决冲突。对指导/工具文件，计划可通过 `--resolutions <json文件>` 接收按路径映射的 `choice`（`keep-local` 或 `merged`）与审核后 `currentSha256`。旧引用文件没有基线时，人工比较后可用 `take-upstream` 并同时提供 `currentSha256` 和 `targetSha256`。每次更改受审文件后必须重新规划。事务备份位于蓝图数据目录的 upgrades 子目录；回滚会先检查文件是否被后续编辑，不会覆盖冲突。
 
+`v0.3.0-rc.1` 整合了新的依赖版本，从两个历史 CI 基线直接升级时会报告 root/App/koi_core 的依赖冲突，需要人工审阅迁移。该版本的 `Migration boundary` CI 只验证明确冲突、拒绝应用及工程/来源记录不变，不表示自动升级和升级后运行成功。不要删除冲突或修改基线摘要绕过检查；具体范围见 [候选版本记录](https://github.com/mrkoi-is/koi_blueprint_flutter/blob/v0.3.0-rc.1/docs/releases/v0.3.0-rc.1.md)。
+
 原有只读报告继续可用：
 
 `upgrade-report` 只比较文件和来源，不修改工程，也不执行依赖解析。先确认目标蓝图源码、提交与工作区 dirty 状态，再在现有工程中运行：

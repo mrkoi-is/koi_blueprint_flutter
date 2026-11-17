@@ -185,10 +185,10 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
-  upgrade-baseline:
+  migration-boundary:
     needs: workspace-kind
     if: needs.workspace-kind.outputs.kind == 'source'
-    name: Upgrade / ${{ matrix.baseline }} / ${{ matrix.template }} / ${{ matrix.os }}
+    name: Migration boundary / ${{ matrix.baseline }} / ${{ matrix.template }} / ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
@@ -212,11 +212,11 @@ jobs:
       - name: Install Linux build dependencies
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y xvfb clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev mpv libepoxy-dev
-      - name: Rebuild and upgrade the old project
+      - name: Verify old project requires manual migration without writes
         shell: bash
         run: |
           if [ "${{ runner.os }}" = Linux ]; then device=linux; else device=macos; fi
-          python tool/upgrade_ci.py --source . --output "${{ runner.temp }}/koi-upgrade-ci" --baseline "${{ matrix.baseline }}" --template "${{ matrix.template }}" --device "$device"
+          python tool/upgrade_ci.py --source . --output "${{ runner.temp }}/koi-upgrade-ci" --baseline "${{ matrix.baseline }}" --template "${{ matrix.template }}" --device "$device" --expect-manual-migration
       - name: Preserve upgrade evidence
         if: always()
         uses: actions/upload-artifact@v4
@@ -368,6 +368,7 @@ jobs:
           retention-days: 7
 
       - name: Build native platforms and web
+        id: generated-build
         run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" build --app "${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app" --platforms "${{ matrix.platforms }}"
 
       - name: Verify Workbench persistence across processes
@@ -429,10 +430,13 @@ jobs:
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          python "$GITHUB_WORKSPACE/tool/native_runtime_watchdog.py" \
+            --timeout 600 --grace 10 --log native-runtime.log --report native-runtime-supervisor.json \
+            --events native-runtime-tests.json --target integration_test/workbench_runtime_test.dart -- \
+            xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart
 
       - name: Run real Chrome media and IndexedDB smoke
-        if: matrix.template == 'workbench' && runner.os == 'Linux'
+        if: ${{ !cancelled() && steps.generated-build.outcome == 'success' && matrix.template == 'workbench' && runner.os == 'Linux' }}
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         shell: bash
         run: |
@@ -488,6 +492,7 @@ jobs:
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/integration_response_data.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-supervisor.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-system.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-tests.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/runtime-crashes

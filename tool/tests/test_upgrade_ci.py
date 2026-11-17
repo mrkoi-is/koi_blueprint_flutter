@@ -4,9 +4,11 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from types import SimpleNamespace
 from unittest.mock import patch
 
-from tool.upgrade_ci import BASELINE_COMMITS, main, reviewed_references
+from tool.upgrade_ci import (BASELINE_COMMITS, main, project_snapshot,
+                             reviewed_references, verify_manual_migration)
 
 
 def sha(data):
@@ -74,6 +76,59 @@ class UpgradeCiReviewTest(unittest.TestCase):
             summary = json.loads((output / 'summary.json').read_text())
             self.assertEqual((summary['baseline'], summary['baselineCommit']), (label, commit))
             self.assertFalse(summary['passed'])
+
+    def migration_preview(self):
+        return {'applicable': False, 'conflicts': [
+            {'path': 'pubspec.yaml', 'reason': 'unsupported_managed_change'},
+            *({'path': path, 'reason': 'dependency_resolution_required',
+               'detail': 'unsupported upstream pubspec changes'}
+              for path in ('apps/upgrade_ci_app/pubspec.yaml', 'packages/koi_core/pubspec.yaml')),
+            self.conflict,
+        ]}
+
+    def verify_migration(self, preview=None):
+        return verify_manual_migration(preview or self.migration_preview(), self.old,
+            self.project, self.target, self.root / 'plan.json', self.root / 'rejected-apply.log')
+
+    def test_manual_migration_requires_explicit_refusal_and_preserves_receipts(self):
+        receipt = self.project / '.blueprint/baseline/receipt'
+        receipt.parent.mkdir(parents=True)
+        receipt.write_bytes(b'trusted baseline')
+        before = project_snapshot(self.project)
+        refusal = SimpleNamespace(returncode=2, stdout='Unresolved upgrade conflicts prevent applying the plan')
+        with patch('tool.upgrade_ci.subprocess.run', return_value=refusal) as execute:
+            result = self.verify_migration()
+        self.assertEqual(execute.call_args.args[0][-2:], ['--plan', str(self.root / 'plan.json')])
+        self.assertEqual(result['status'], 'manual_migration_required')
+        self.assertFalse(result['upgradeApplied'])
+        self.assertTrue(result['projectUnchanged'])
+        self.assertEqual(before, project_snapshot(self.project))
+        self.assertIn('.blueprint/baseline/receipt', before)
+
+    def test_manual_migration_rejects_unexpected_conflicts_or_success(self):
+        for change in ('applicable', 'extra', 'missing', 'resolver'):
+            preview = self.migration_preview()
+            if change == 'applicable':
+                preview['applicable'] = True
+            elif change == 'extra':
+                preview['conflicts'].append({'path': 'lib/data.dart', 'reason': 'unsupported_managed_change'})
+            elif change == 'missing':
+                preview['conflicts'].pop(0)
+            else:
+                preview['conflicts'][1]['detail'] = 'resolver unavailable'
+            with self.subTest(change=change), self.assertRaisesRegex(ValueError, 'Unexpected migration boundary'):
+                self.verify_migration(preview)
+        for result in (SimpleNamespace(returncode=0, stdout='ok'),
+                       SimpleNamespace(returncode=2, stdout='SDK missing')):
+            with self.subTest(result=result), patch('tool.upgrade_ci.subprocess.run', return_value=result), self.assertRaisesRegex(ValueError, 'must reject apply'):
+                self.verify_migration()
+
+    def test_manual_migration_rejects_project_mutation_even_when_apply_fails(self):
+        def mutate(*args, **kwargs):
+            (self.project / 'user-data.json').write_text('changed')
+            return SimpleNamespace(returncode=2, stdout='Unresolved upgrade conflicts prevent applying the plan')
+        with patch('tool.upgrade_ci.subprocess.run', side_effect=mutate), self.assertRaisesRegex(ValueError, 'preserve the project'):
+            self.verify_migration()
 
 
 if __name__ == '__main__':
