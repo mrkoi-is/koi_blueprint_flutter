@@ -112,7 +112,7 @@ jobs:
         run: python tool/platform_evidence.py --output "${{ runner.temp }}/koi-platform-evidence/source.json"
 
       - name: Correct pinned Flutter Windows CanvasKit URL handling
-        if: matrix.template == 'workbench' && runner.os == 'Windows'
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           @'

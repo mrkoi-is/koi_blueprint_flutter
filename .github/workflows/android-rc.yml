@@ -46,12 +46,16 @@ jobs:
           cache: true
       - name: Install native test libraries
         run: sudo apt-get update && sudo apt-get install -y libmpv-dev mpv libepoxy-dev
-      - name: Run complete source gate
+      - name: Validate source workspace
         shell: bash
         run: |
           set -o pipefail
           mkdir -p build/android-rc/source
           python blueprint.py validate 2>&1 | tee build/android-rc/source/validate.log
+      - name: Run generator smoke
+        shell: bash
+        run: |
+          set -o pipefail
           python tool/generator_smoke.py 2>&1 | tee build/android-rc/source/generator-smoke.log
       - uses: actions/upload-artifact@v4
         if: always()
