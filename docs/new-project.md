@@ -133,3 +133,7 @@ python3 blueprint.py module reporting --workspace .
 ```
 
 presentation 生成无数据源页面，api 生成仓库驱动的分页/搜索骨架，local 生成本地数据与业务状态。脚手架后仍需完成业务字段、宿主导航、依赖 override 和场景测试；示例替身不代表真实后端。新增共享包按 [add-shared-package](../.agents/skills/add-shared-package/SKILL.md) 完成目录、pubspec、workspace 登记和测试。
+
+## Talker 标准诊断
+
+见 [诊断能力](diagnostics.md)；新项目默认安装 diagnostics v2，设备与 LAN 共用持久化记录，release 连点版本号进入。Android LAN 后台服务与真机验收单独记录。

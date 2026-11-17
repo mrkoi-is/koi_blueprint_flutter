@@ -1,3 +1,5 @@
+import 'package:koi_core/koi_core.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -10,9 +12,19 @@ import 'package:starter_app/l10n/generated/app_localizations.dart';
 import 'package:starter_app/l10n/app_locale_policy.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  AppDiagnostics.instance.install();
-  runApp(ProviderScope(child: const StarterLauncher()));
+  runZonedGuarded(
+    () {
+      WidgetsFlutterBinding.ensureInitialized();
+      AppDiagnostics.instance.install();
+      runApp(ProviderScope(child: const StarterLauncher()));
+    },
+    (error, stack) => AppDiagnostics.instance.record(error, stack, 'zone'),
+    zoneSpecification: ZoneSpecification(
+      print: (self, parent, zone, line) {
+        AppLogger.info(line);
+      },
+    ),
+  );
 }
 
 class StarterLauncher extends StatefulWidget {

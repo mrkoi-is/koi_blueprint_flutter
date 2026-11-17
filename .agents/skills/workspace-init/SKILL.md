@@ -7,7 +7,7 @@ description: 从 Koi 蓝图创建独立 Flutter workspace 并验证名称、平�
 创建能独立运行和继续开发的新 workspace，保留蓝图架构和 AI 入口。
 
 ## 决策
-先确定项目名、目标目录、组织标识、平台与 minimal/workbench 模板，再按实际需求选择版本化 JSON 中的语言、能力、品牌和构建 profile。所有新项目默认接入 koi_ui；minimal 保持最小业务，workbench 加入本地资料/媒体/任务样例。未选择的能力不继承其运行依赖。新项目默认不包含认证演示。平台生成与平台构建是两项验收。
+先确定项目名、目标目录、组织标识、平台与 minimal/workbench 模板，再按实际需求选择版本化 JSON 中的语言、能力、品牌和构建 profile。所有新项目默认接入 koi_ui；minimal 保持最小业务，workbench 加入本地资料/媒体/任务样例。创建配置未写 capabilities 时默认安装 diagnostics v2；显式 [] 关闭，显式列表代表完整选择。未选择的能力不继承其运行依赖。新项目默认不包含认证演示。平台生成与平台构建是两项验收。
 
 ## 流程
 1. 阅读 [初始化契约](references/initialization-contract.md)，核对输入和目标目录。

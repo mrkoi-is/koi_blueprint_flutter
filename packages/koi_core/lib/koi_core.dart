@@ -1,3 +1,4 @@
+export 'package:koi_core/diagnostics/diagnostic_recorder.dart';
 export 'package:koi_core/error/app_failure.dart';
 export 'package:koi_core/build_info.dart';
 export 'package:koi_core/diagnostics/diagnostic_store.dart';

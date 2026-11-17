@@ -3,11 +3,11 @@
   "capabilities": [
     {
       "id": "diagnostics",
-      "version": 1,
+      "version": 2,
       "directions": [
         2
       ],
-      "title": "错误诊断",
+      "title": "日志与网络诊断",
       "dependencies": [],
       "platforms": [
         "web",
@@ -22,7 +22,7 @@
         "workbench"
       ],
       "recipe": "tool/capabilities/recipes/diagnostics",
-      "status": "implemented_pending_validation",
+      "status": "tested_source_generated_android_web",
       "pubspecDependencies": {
         "path_provider": "^2.1.5",
         "web": "1.1.1"
@@ -39,7 +39,10 @@
       "disposer": {
         "import": "features/diagnostics/data/persistent_diagnostics.dart",
         "function": "disposePersistentDiagnostics"
-      }
+      },
+      "packages": [
+        "koi_diagnostics"
+      ]
     },
     {
       "id": "network",

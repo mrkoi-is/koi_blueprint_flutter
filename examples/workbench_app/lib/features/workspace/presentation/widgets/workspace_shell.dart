@@ -1,3 +1,5 @@
+import 'package:workbench_app/core/diagnostics/diagnostic_version.dart';
+import 'package:flutter/foundation.dart';
 import 'package:workbench_app/core/preferences/appearance_providers.dart';
 import 'package:workbench_app/core/commands/workbench_commands.dart';
 import 'package:workbench_app/core/capabilities/app_capabilities.dart';
@@ -7,7 +9,6 @@ import 'package:workbench_app/l10n/app_strings.dart';
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -160,17 +161,32 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
                   icon: Icons.info_outline,
                   onSelected: () {
                     const info = BuildInfo.current;
-                    showAboutDialog(
+                    showDialog<void>(
                       context: context,
-                      applicationName: context.l10n.appTitle,
-                      applicationVersion: '${info.version}+${info.build}',
-                      children: [
-                        SelectableText(
-                          '${context.l10n.aboutSource}: ${info.source}\n'
-                          '${context.l10n.aboutChannel}: ${info.channel}\n'
-                          '${context.l10n.aboutPlatform}: ${info.platform} / ${info.architecture}',
-                        ),
-                      ],
+                      builder: (dialogContext) => AboutDialog(
+                        applicationName: context.l10n.appTitle,
+
+                        children: [
+                          DiagnosticVersion(
+                            version: '${info.version}+${info.build}',
+                            onUnlocked:
+                                appCapabilities.any(
+                                  (c) => c.id == 'diagnostics',
+                                )
+                                ? () {
+                                    Navigator.pop(dialogContext);
+                                    const CapabilityRoute(id: 'diagnostics')
+                                        .push<void>(context);
+                                  }
+                                : null,
+                          ),
+                          SelectableText(
+                            '${context.l10n.aboutSource}: ${info.source}\n'
+                            '${context.l10n.aboutChannel}: ${info.channel}\n'
+                            '${context.l10n.aboutPlatform}: ${info.platform} / ${info.architecture}',
+                          ),
+                        ],
+                      ),
                     );
                   },
                 ),
@@ -217,7 +233,9 @@ class _WorkspaceShellState extends ConsumerState<WorkspaceShell> {
                     ),
                   ),
                 ),
-                for (final capability in appCapabilities)
+                for (final capability in appCapabilities.where(
+                  (c) => !kReleaseMode || c.id != 'diagnostics',
+                ))
                   KoiMenuItem(
                     label: capability.titleFor(context),
                     onSelected: () =>

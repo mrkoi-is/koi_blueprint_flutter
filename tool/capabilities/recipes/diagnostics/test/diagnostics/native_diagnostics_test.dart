@@ -18,7 +18,7 @@ void main() {
       for (var i = 0; i < 65; i++) {
         store.record(
           AppLogLevel.info,
-          '$i 鲤 ${'x' * 110000}',
+          '$i 鲤 ${'x' * 400000}',
           source: 'native',
         );
         await Future<void>.delayed(const Duration(milliseconds: 1));
@@ -33,7 +33,7 @@ void main() {
       for (final file in segments.cast<File>()) {
         bytes += await file.length();
       }
-      expect(bytes, lessThanOrEqualTo(6 * 1024 * 1024));
+      expect(bytes, lessThanOrEqualTo(20 * 1024 * 1024));
       store = await openDiagnosticStore(directory: dir);
       final page = store.query(const DiagnosticQuery(source: 'native'));
       expect(page.items, isNotEmpty);

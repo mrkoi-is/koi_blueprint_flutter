@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:koi_core/koi_core.dart';
 import 'package:path_provider/path_provider.dart';
 
-/// The log is a separate, rebuildable six MiB ring of complete NDJSON files.
+/// The log is a separate, rebuildable twenty MiB ring of complete NDJSON files.
 /// A failed append leaves an observable in-memory fallback; it never logs itself.
 Future<BoundedDiagnosticStore> openDiagnosticStore({
   Directory? directory,
@@ -43,7 +43,7 @@ Future<BoundedDiagnosticStore> openDiagnosticStore({
 final class _RotatingLog {
   _RotatingLog(this.directory);
   final Directory directory;
-  static const capacity = 6 * 1024 * 1024;
+  static const capacity = 20 * 1024 * 1024;
   static const segmentLimit = 1024 * 1024;
   int lastId = 0;
   int nextSegment = 1;

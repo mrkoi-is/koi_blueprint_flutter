@@ -56,12 +56,12 @@ def plan_native_changes(app, selected_caps, config=None):
         output[relative] = value
 
     android = app / 'android/app/src/main'
-    if android.is_dir() and selected & {'system-media', 'home-widget', 'network', 'lan'}:
+    if android.is_dir() and selected & {'system-media', 'home-widget', 'network', 'lan', 'diagnostics'}:
         manifest_path = android / 'AndroidManifest.xml'
         manifest = manifest_path.read_text()
         if manifest.count('</application>') != 1 or manifest.count('</manifest>') != 1:
             raise ValueError('Unsupported Android manifest structure')
-        if selected & {'network', 'lan', 'system-media'}:
+        if selected & {'network', 'lan', 'system-media', 'diagnostics'}:
             anchors = re.findall(r'<application\b[^>]*>', manifest)
             if len(anchors) != 1:
                 raise ValueError('Unsupported Android application element')
@@ -72,6 +72,13 @@ def plan_native_changes(app, selected_caps, config=None):
                     raise ValueError('Existing Android cleartext configuration requires explicit merge')
                 if 'android:usesCleartextTraffic=' not in anchors[0]:
                     manifest = _once(manifest, anchors[0], anchors[0][:-1] + ' android:usesCleartextTraffic="true">')
+        if 'diagnostics' in selected:
+            anchors = re.findall(r'<application\b[^>]*>', manifest)
+            permissions = '\n'.join(f'<uses-permission android:name="android.permission.{name}" />' for name in
+                ['FOREGROUND_SERVICE', 'FOREGROUND_SERVICE_CONNECTED_DEVICE', 'WAKE_LOCK', 'CHANGE_WIFI_STATE', 'POST_NOTIFICATIONS', 'REQUEST_IGNORE_BATTERY_OPTIMIZATIONS'])
+            manifest = _managed(manifest, 'diagnostics permissions', permissions, anchors[0])
+            service = '<service android:name="com.pravera.flutter_foreground_task.service.ForegroundService" android:exported="false" android:foregroundServiceType="connectedDevice" android:stopWithTask="true" />'
+            manifest = _managed(manifest, 'diagnostics service', service, '</application>')
         if 'system-media' in selected:
             if 'com.ryanheise.audioservice.AudioService' in manifest and '<!-- Koi system media begin -->' not in manifest:
                 raise ValueError('Unmanaged AudioService manifest configuration')
@@ -117,9 +124,11 @@ def plan_native_changes(app, selected_caps, config=None):
         output[manifest_path.relative_to(app).as_posix()] = manifest.encode()
 
     ios = app / 'ios'
-    if ios.is_dir() and selected & {'system-media', 'home-widget', 'lan'}:
+    if ios.is_dir() and selected & {'system-media', 'home-widget', 'lan', 'diagnostics'}:
         info_path = ios / 'Runner/Info.plist'
         info = plistlib.loads(info_path.read_bytes())
+        if 'diagnostics' in selected:
+            info.setdefault('NSLocalNetworkUsageDescription', 'View application diagnostics from a browser on your local network.')
         if 'lan' in selected and config.get('lan', {}).get('allowLocalHttp', False):
             ats = info.setdefault('NSAppTransportSecurity', {})
             if not isinstance(ats, dict):
@@ -189,14 +198,19 @@ def plan_native_changes(app, selected_caps, config=None):
         else:
             delegate = _once(delegate, '  override func applicationSupportsSecureRestorableState', reopen + '\n  override func applicationSupportsSecureRestorableState')
         output['macos/Runner/AppDelegate.swift'] = delegate.encode()
-    if macos.is_dir() and selected & {'network', 'lan', 'system-media'}:
+    if macos.is_dir() and 'diagnostics' in selected:
+        info_path = macos / 'Info.plist'
+        info = plistlib.loads(info_path.read_bytes())
+        info.setdefault('NSLocalNetworkUsageDescription', 'View application diagnostics from a browser on your local network.')
+        output['macos/Runner/Info.plist'] = plistlib.dumps(info, sort_keys=False)
+    if macos.is_dir() and selected & {'network', 'lan', 'system-media', 'diagnostics'}:
         for name in ['DebugProfile.entitlements', 'Release.entitlements']:
             path = macos / name
             if not path.is_file() or path.is_symlink():
                 raise ValueError(f'Missing or unsafe macOS entitlement anchor: {name}')
             entitlements = plistlib.loads(path.read_bytes())
             required = ['com.apple.security.network.client']
-            if 'lan' in selected:
+            if selected & {'lan', 'diagnostics'}:
                 required.append('com.apple.security.network.server')
             if 'system-media' in selected:
                 required.append('com.apple.security.files.user-selected.read-only')

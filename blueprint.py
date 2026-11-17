@@ -17,7 +17,7 @@ MIN_PYTHON = (3, 11)
 PLATFORMS = ('web', 'android', 'ios', 'macos', 'windows', 'linux')
 TEMPLATES = {'minimal': 'starter_app', 'workbench': 'workbench_app'}
 # Only current guidance is inherited. New documents require an explicit decision.
-INHERITED_DOCUMENTS = ('docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/localization.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
+INHERITED_DOCUMENTS = ('docs/diagnostics.md', 'docs/agent-skill-rule-discovery.md', 'docs/ai-quickstart.md', 'docs/architecture/ARCHITECTURE.md', 'docs/architecture/MONOREPO_ARCHITECTURE.md', 'docs/architecture/PROJECT_STRUCTURE.md', 'docs/architecture/governance.md', 'docs/architecture/local-first-desktop.md', 'docs/architecture/modules.md', 'docs/architecture/references.md', 'docs/architecture/state-management.md', 'docs/architecture/localization.md', 'docs/architecture/ui-and-adaptive.md', 'docs/engineering/assets-and-packaging.md', 'docs/examples.md', 'docs/how-other-ai-use-this-project.md', 'docs/new-project.md', 'docs/platform-acceptance.md', 'docs/test_strategy.md', 'docs/tools.md', 'docs/upgrade-guide.md')
 
 REQUIRED_PACKAGES = ('koi_core', 'koi_ui')
 IGNORED = shutil.ignore_patterns('.dart_tool', 'build', 'coverage', '.fvm', '__pycache__', '*.g.dart', '*.freezed.dart', '*.pyc', '.flutter-plugins*', '.git', 'Pods', 'ephemeral', '.symlinks', '.swiftpm', '.DS_Store')
@@ -475,6 +475,8 @@ def create(args):
         raise BlueprintError(f'Workspace name {name} conflicts with the required support package')
     from tool.blueprint_config import read_config, choose
     config = read_config(getattr(args, 'config', None))
+    if 'capabilities' not in config:
+        config = {**config, 'capabilities': ['diagnostics']}
     template = choose(getattr(args, 'template', None), config, 'template', 'minimal')
     if template not in TEMPLATES:
         raise BlueprintError('Template must be minimal or workbench')
@@ -584,7 +586,7 @@ def create(args):
             from tool.blueprint_capabilities import install_plan, FileTransaction
             plan = install_plan(stage, app, requested_capabilities, ROOT,
                                 config=config.get('capabilityOptions'), brand=config.get('brand'),
-                                brand_root=Path(args.config).resolve().parent if args.config else None, fresh=True)
+                                brand_root=Path(args.config).resolve().parent if getattr(args, 'config', None) else None, fresh=True)
             FileTransaction(stage, plan['changes']).commit()
         display_name = brand_display_name or ' '.join(part.capitalize() for part in name.split('_'))
         if display_name:

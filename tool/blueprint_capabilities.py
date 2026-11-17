@@ -217,7 +217,7 @@ def registry_content(package, ordered, entries):
     if any(entries[key].get('page', {}).get('titleKey') for key in ordered):
         lines.append(f"import 'package:{package}/l10n/generated/app_localizations.dart';")
     pages, starts, closers = [], [], []
-    for key in ordered:
+    for key in sorted(ordered, key=lambda key: key != 'diagnostics'):
         entry, alias = entries[key], key.replace('-', '_')
         if page := entry.get('page'):
             lines.append(f"import 'package:{package}/{page['import']}' as {alias};")

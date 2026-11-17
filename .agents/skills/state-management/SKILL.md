@@ -36,3 +36,5 @@ description: 按 Koi Riverpod 3 契约实现页面、异步状态、派生计算
 
 ## 验证
 参照 [Feature Lab](../../../docs/examples.md) 和认证 provider 测试。未测取消与释放时，不宣称生命周期安全。
+
+诊断 runtime 由宿主拥有，页面/provider 仅借用；日志与网络统一通过 recorder 进入同一 DiagnosticStore，禁止另建 Talker history。见 [诊断能力](../../../docs/diagnostics.md)。

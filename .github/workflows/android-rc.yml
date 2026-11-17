@@ -1,0 +1,114 @@
+name: Android RC
+
+on:
+  push:
+    branches: ['codex/android-diagnostics-rc*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-rc-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Install native test libraries
+        run: sudo apt-get update && sudo apt-get install -y libmpv-dev mpv libepoxy-dev
+      - name: Run complete source gate
+        shell: bash
+        run: |
+          set -o pipefail
+          mkdir -p build/android-rc/source
+          python blueprint.py validate 2>&1 | tee build/android-rc/source/validate.log
+          python tool/generator_smoke.py 2>&1 | tee build/android-rc/source/generator-smoke.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-rc-source
+          path: build/android-rc/source/
+          retention-days: 30
+          if-no-files-found: error
+
+  android:
+    strategy:
+      fail-fast: false
+      matrix:
+        template: [minimal, workbench]
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Install native test libraries
+        run: sudo apt-get update && sudo apt-get install -y libmpv-dev mpv libepoxy-dev
+      - name: Create, validate and build Android candidate
+        shell: bash
+        env:
+          RC_TEMPLATE: ${{ matrix.template }}
+        run: |
+          set -o pipefail
+          rc_workspace="$RUNNER_TEMP/koi-android-rc-$RC_TEMPLATE"
+          rc_evidence="$GITHUB_WORKSPACE/build/android-rc/$RC_TEMPLATE"
+          mkdir -p "$rc_evidence"
+          python blueprint.py create android_rc --output "$rc_workspace" --org "dev.koi.rc.$RC_TEMPLATE" --template "$RC_TEMPLATE" --platforms android 2>&1 | tee "$rc_evidence/create.log"
+          if [ "$RC_TEMPLATE" = minimal ]; then
+            python blueprint.py capability add network --app "$rc_workspace/apps/android_rc_app" 2>&1 | tee "$rc_evidence/network.log"
+          fi
+          RC_WORKSPACE="$rc_workspace" python - <<'PYVERSION'
+          from pathlib import Path
+          import os, re
+          path=Path(os.environ['RC_WORKSPACE'])/'apps/android_rc_app/pubspec.yaml'
+          value,count=re.subn(r'^version:.*$', 'version: 0.3.0-android-rc.1+1', path.read_text(), count=1, flags=re.MULTILINE)
+          assert count==1
+          path.write_text(value)
+          PYVERSION
+          python blueprint.py validate --workspace "$rc_workspace" 2>&1 | tee "$rc_evidence/validate.log"
+          python blueprint.py build --app "$rc_workspace/apps/android_rc_app" --platforms android 2>&1 | tee "$rc_evidence/build.log"
+          cp "$rc_workspace/apps/android_rc_app/build/app/outputs/flutter-apk/app-release.apk" "$rc_evidence/android-rc-$RC_TEMPLATE-debug-signed.apk"
+          cp "$rc_workspace/apps/android_rc_app/build/blueprint/android-release.json" "$rc_evidence/build-manifest.json"
+          cp "$rc_workspace/blueprint.json" "$rc_evidence/workspace-manifest.json"
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib, json, os, subprocess
+          directory=Path(os.environ['GITHUB_WORKSPACE'])/'build/android-rc'/os.environ['RC_TEMPLATE']
+          apk=next(directory.glob('*.apk'))
+          sdk=Path(os.environ.get('ANDROID_HOME',os.environ.get('ANDROID_SDK_ROOT','')))
+          signer=sorted((sdk/'build-tools').glob('*/apksigner'))[-1]
+          result=subprocess.run([str(signer),'verify','--print-certs',str(apk)],capture_output=True,text=True,check=True)
+          (directory/'signing-certificate.txt').write_text(result.stdout)
+          assert 'Android Debug' in result.stdout, 'RC expects the explicitly documented test certificate'
+          metadata={'commit':os.environ['GITHUB_SHA'],'template':os.environ['RC_TEMPLATE'],'sha256':hashlib.sha256(apk.read_bytes()).hexdigest(),'signing':'Android Debug; internal RC only','deviceRuntime':'NOT_RUN_ON_CI'}
+          (directory/'artifact.json').write_text(json.dumps(metadata,indent=2)+'\n')
+          PY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: android-rc-${{ matrix.template }}
+          path: build/android-rc/${{ matrix.template }}/
+          retention-days: 30
+          if-no-files-found: error
