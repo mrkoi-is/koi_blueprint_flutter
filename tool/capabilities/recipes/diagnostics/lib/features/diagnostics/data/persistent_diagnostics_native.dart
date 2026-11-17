@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:koi_core/koi_core.dart';
 import 'package:path_provider/path_provider.dart';
