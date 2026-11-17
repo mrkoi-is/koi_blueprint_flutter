@@ -174,10 +174,8 @@ final class DiagnosticLan extends ChangeNotifier with WidgetsBindingObserver {
         case '/events':
           response.bufferOutput = false;
           response.headers.contentType = ContentType('text', 'event-stream');
-          response.write('data: ${store().revision}\n\n');
-          await response.flush();
           var dirty = false;
-          var sending = false;
+          var sending = true;
           Future<void> publish() async {
             if (!dirty || sending) return;
             dirty = false;
@@ -205,6 +203,15 @@ final class DiagnosticLan extends ChangeNotifier with WidgetsBindingObserver {
             const Duration(milliseconds: 250),
             (_) => unawaited(publish()),
           );
+          // Subscribe before the first flush: a client can observe that frame
+          // and trigger a change before the flush Future completes on Windows.
+          try {
+            response.write('data: ${store().revision}\n\n');
+            await response.flush();
+          } finally {
+            sending = false;
+          }
+          await publish();
           await response.done;
           _timers.remove(response)?.cancel();
           await _streams.remove(response)?.cancel();

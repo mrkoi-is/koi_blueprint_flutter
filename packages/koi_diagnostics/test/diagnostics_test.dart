@@ -52,41 +52,49 @@ void main() {
       final store = BoundedDiagnosticStore();
       final lan = DiagnosticLan(() => store);
       final client = HttpClient();
+      Future<T> within<T>(String operation, Future<T> future) => future.timeout(
+        const Duration(seconds: 5),
+        onTimeout: () => throw TimeoutException('LAN test: $operation'),
+      );
+      Future<String> read(HttpClientResponse response) =>
+          within('read finite response', utf8.decodeStream(response));
       Future<HttpClientResponse> get(String path, {bool auth = true}) async {
-        final request = await client.getUrl(Uri.parse('${lan.address}$path'));
+        final request = await within(
+          'connect $path',
+          client.getUrl(Uri.parse('${lan.address}$path')),
+        );
         if (auth) {
           request.headers.set('Authorization', 'Bearer ${lan.credential}');
         }
-        return request.close();
+        return within('response headers $path', request.close());
       }
 
       try {
-        await lan.start(address: '127.0.0.1');
+        await within('start listener', lan.start(address: '127.0.0.1'));
         expect(lan.running, isTrue);
         final firstCredential = lan.credential;
         final root = await get('/', auth: false);
-        expect(await utf8.decodeStream(root), contains('EventSource'));
+        expect(await read(root), contains('EventSource'));
         final denied = await get('/records', auth: false);
         expect(denied.statusCode, 401);
-        await denied.drain<void>();
+        await within('drain denied response', denied.drain<void>());
         store.record(AppLogLevel.info, '<script>text</script>');
-        final page =
-            jsonDecode(await utf8.decodeStream(await get('/records'))) as Map;
+        final page = jsonDecode(await read(await get('/records'))) as Map;
         expect(
           (page['items'] as List).single['message'],
           '<script>text</script>',
         );
-        final export = await utf8.decodeStream(await get('/export'));
+        final export = await read(await get('/export'));
         expect(export, contains('message'));
         final stream = await get('/events');
         final lines = StreamIterator(
           stream.transform(utf8.decoder).transform(const LineSplitter()),
         );
-        expect(await lines.moveNext(), isTrue);
+        expect(await within('initial SSE frame', lines.moveNext()), isTrue);
         expect(lines.current, startsWith('data:'));
-        expect(await lines.moveNext(), isTrue); // SSE separator.
+        expect(await within('SSE separator', lines.moveNext()), isTrue);
         store.record(AppLogLevel.info, 'live update');
-        expect(await lines.moveNext(), isTrue);
+        expect(await within('live SSE revision', lines.moveNext()), isTrue);
         expect(lines.current, 'data: ${store.revision}');
         final oldAddress = lan.address!;
         await lan.stop().timeout(const Duration(seconds: 5));
@@ -104,16 +112,17 @@ void main() {
             probe.close(force: true);
           }
         }(), throwsA(isA<SocketException>()));
-        await lan.start(address: '127.0.0.1');
+        await within('restart listener', lan.start(address: '127.0.0.1'));
         expect(lan.credential, isNot(firstCredential));
-        await lan.stop();
-        await lan.start(address: 'invalid host!');
+        await within('stop restarted listener', lan.stop());
+        // Fail binding locally, without platform-specific DNS/NetBIOS retries.
+        await within('reject nonlocal bind', lan.start(address: '192.0.2.1'));
         expect(lan.error, isNotNull);
         expect(lan.running, isFalse);
       } finally {
         client.close(force: true);
-        await lan.close();
-        await store.close();
+        await within('close listener', lan.close());
+        await within('close store', store.close());
       }
     },
   );

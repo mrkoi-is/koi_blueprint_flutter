@@ -13,6 +13,24 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  windows-lan:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Install locked workspace dependencies
+        run: flutter pub get --enforce-lockfile
+      - name: Generate core models
+        working-directory: packages/koi_core
+        run: dart run build_runner build
+      - name: Verify native LAN protocol on Windows
+        run: flutter test --no-pub packages/koi_diagnostics/test/diagnostics_test.dart --reporter expanded
+
   source:
     runs-on: ubuntu-latest
     timeout-minutes: 90
