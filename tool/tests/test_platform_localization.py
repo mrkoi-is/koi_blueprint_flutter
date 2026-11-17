@@ -51,7 +51,7 @@ class AppleLocalizationTest(unittest.TestCase):
             (runner / 'Info.plist').write_bytes(plistlib.dumps({'custom': 'keep', 'CFBundleLocalizations': ['fr']}))
             project = self.app / platform / 'Runner.xcodeproj/project.pbxproj'
             project.parent.mkdir()
-            project.write_text(PROJECT)
+            project.write_bytes(PROJECT.encode())
 
     def apply(self, changes):
         for relative, data in changes.items():
@@ -84,6 +84,24 @@ class AppleLocalizationTest(unittest.TestCase):
                 resource = f'{locale}.lproj/InfoPlist.strings'
                 self.assertIn(resource, project)
                 self.assertIn(text, changes[f'{platform}/Runner/{resource}'].decode())
+        self.apply(changes)
+        self.assertEqual(plan_apple_localizations(self.app, diagnostics=True), changes)
+
+    def test_windows_crlf_projects_keep_newlines_and_match_lf_resource_semantics(self):
+        expected = plan_apple_localizations(self.app, diagnostics=True)
+        projects = [f'{platform}/Runner.xcodeproj/project.pbxproj' for platform in ('ios', 'macos')]
+        for relative in projects:
+            (self.app / relative).write_bytes(PROJECT.replace('\n', '\r\n').encode())
+        # Creation first declares languages, then the default capability links
+        # resources. Both passes must accept Windows output and stay idempotent.
+        base = plan_apple_localizations(self.app)
+        self.apply(base)
+        self.assertEqual(plan_apple_localizations(self.app), base)
+        changes = plan_apple_localizations(self.app, diagnostics=True)
+        for relative in projects:
+            self.assertIn(b'\r\n', changes[relative])
+            self.assertNotIn(b'\n', changes[relative].replace(b'\r\n', b''))
+            self.assertEqual(changes[relative].replace(b'\r\n', b'\n'), expected[relative])
         self.apply(changes)
         self.assertEqual(plan_apple_localizations(self.app, diagnostics=True), changes)
 

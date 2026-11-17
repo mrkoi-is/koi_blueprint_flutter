@@ -116,6 +116,10 @@ def plan_apple_localizations(app, *, diagnostics=False, base_changes=None):
         info['CFBundleLocalizations'] = list(dict.fromkeys([*locales, *APPLE_LOCALES]))
         project_path = f'{platform}/Runner.xcodeproj/project.pbxproj'
         project = read(project_path).decode('utf-8')
+        # Flutter emits CRLF projects on Windows. Parse a normalized view and
+        # preserve the project's original newline convention when serializing.
+        newline = '\r\n' if '\r\n' in project else '\n'
+        project = project.replace('\r\n', '\n')
         regions = list(re.finditer(r'knownRegions = \(\n(.*?)\n\s*\);', project, re.S))
         if len(regions) != 1:
             raise ValueError('Missing Apple knownRegions localization anchor')
@@ -137,5 +141,5 @@ def plan_apple_localizations(app, *, diagnostics=False, base_changes=None):
                         raise ValueError(f'Localized native resource has user changes: {relative}')
                 output[relative] = content
         output[plist_path] = plistlib.dumps(info, sort_keys=False)
-        output[project_path] = project.encode('utf-8')
+        output[project_path] = project.replace('\n', newline).encode('utf-8')
     return output
