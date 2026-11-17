@@ -17,6 +17,46 @@ final class AppDiagnostics {
   static final instance = AppDiagnostics();
   BoundedDiagnosticStore store;
   bool _installed = false;
+  DiagnosticRecorder? recorder;
+  Object? _recorderOwner;
+  VoidCallback registerRecorder(DiagnosticRecorder next) {
+    final owner = Object();
+    _recorderOwner = owner;
+    recorder = next;
+    return () {
+      if (!identical(_recorderOwner, owner)) return;
+      _recorderOwner = null;
+      recorder = null;
+    };
+  }
+
+  void write(
+    AppLogLevel level,
+    String message, {
+    String source = 'app',
+    Object? error,
+    StackTrace? stackTrace,
+    Map<String, Object?>? network,
+  }) {
+    final target = recorder ?? store.record;
+    target(
+      level,
+      message,
+      source: source,
+      error: error,
+      stackTrace: stackTrace,
+      network: network,
+    );
+  }
+
+  DebugPrintCallback? _previousDebugPrint;
+  late final DebugPrintCallback _debugPrint = _handleDebugPrint;
+  void _handleDebugPrint(String? message, {int? wrapWidth}) {
+    if (message != null) {
+      write(AppLogLevel.debug, message, source: 'debugPrint');
+    }
+  }
+
   DiagnosticsExporter? _exporter;
   Object? _exporterOwner;
 
@@ -66,7 +106,7 @@ final class AppDiagnostics {
     StackTrace? stackTrace,
   }) {
     if (error == null) {
-      store.record(level, message);
+      write(level, message);
     } else {
       record(
         error,
@@ -87,6 +127,8 @@ final class AppDiagnostics {
     FlutterError.onError = _flutter;
     PlatformDispatcher.instance.onError = _platform;
     AppLogger.sink = _sink;
+    _previousDebugPrint = debugPrint;
+    debugPrint = _debugPrint;
   }
 
   void record(
@@ -101,7 +143,7 @@ final class AppDiagnostics {
       _seen.clear();
       _clearSeen = null;
     });
-    store.record(
+    write(
       level,
       message ?? '$error',
       source: source,
@@ -112,18 +154,7 @@ final class AppDiagnostics {
 
   Future<void> replaceStore(BoundedDiagnosticStore next) async {
     final old = store;
-    for (final event
-        in old.query(const DiagnosticQuery(), limit: 1000).items.reversed) {
-      next.record(
-        event.level,
-        event.message,
-        source: event.source,
-        error: event.error,
-        stackTrace: event.stack == null
-            ? null
-            : StackTrace.fromString(event.stack!),
-      );
-    }
+    next.importEvents(old.snapshot);
     store = next;
     await old.close();
   }
@@ -138,6 +169,10 @@ final class AppDiagnostics {
       }
       if (identical(AppLogger.sink, _sink)) AppLogger.sink = _previousSink;
     }
+    if (identical(debugPrint, _debugPrint)) {
+      debugPrint = _previousDebugPrint ?? debugPrintThrottled;
+    }
+    recorder = null;
     _installed = false;
     _exporterOwner = null;
     _exporter = null;

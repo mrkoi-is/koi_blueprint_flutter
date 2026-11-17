@@ -1,3 +1,4 @@
+import 'package:__APP_PACKAGE__/core/diagnostics/installed_diagnostics.dart';
 import 'package:koi_core/koi_core.dart';
 import 'package:__APP_PACKAGE__/core/diagnostics/app_diagnostics.dart';
 import 'package:__APP_PACKAGE__/features/diagnostics/data/persistent_diagnostics_native.dart'
@@ -24,7 +25,13 @@ Future<void> _initialize(
   Future<BoundedDiagnosticStore> Function()? openStore,
   DiagnosticsExporter? exporter,
 ) async {
-  final store = await (openStore ?? platform.openDiagnosticStore)();
+  installTalkerDiagnostics();
+  late final BoundedDiagnosticStore store;
+  try {
+    store = await (openStore ?? platform.openDiagnosticStore)();
+  } catch (error) {
+    store = BoundedDiagnosticStore()..persistenceError = error;
+  }
   await AppDiagnostics.instance.replaceStore(store);
   _removeExporter = AppDiagnostics.instance.registerExporter(
     exporter ?? platform.exportDiagnostics,
@@ -48,6 +55,7 @@ Future<void> disposePersistentDiagnostics() async {
   }
   if (!_initialized) return;
   _initialized = false;
+  await uninstallTalkerDiagnostics();
   _removeExporter?.call();
   _removeExporter = null;
   await AppDiagnostics.instance.replaceStore(BoundedDiagnosticStore());

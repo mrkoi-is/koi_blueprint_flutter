@@ -24,6 +24,35 @@
 
 目标平台构建使用 `python3 blueprint.py build --app <path> --platforms <platforms>`。不同平台需要匹配主机与 SDK；验证矩阵分别记录生成、依赖、分析、测试、构建与实际运行。不得把 Web 构建成功折算成六端成功。
 
+## AI 快速闭环与定向证据
+
+先在准备好的 workspace 中使用显式目标，不运行 pub get 或 codegen：
+
+```sh
+python3 blueprint.py test --member packages/koi_ui --path test/koi_ui_test.dart
+python3 blueprint.py test --member <成员路径> --path test/<用例>_test.dart --name '<名称正则>' --timeout 120
+```
+
+`--path` 可以重复，但首版只接受活动成员 test 下实际存在的 `_test.dart` 文件，不推断受影响依赖。`--platform chrome` 运行真实 Chrome 测试。`--name` 缩小声明范围；定向通过不代表成员、消费方或完整门禁通过。共享包修改仍须运行完整 `validate`；本轮没有覆盖率去重、缓存或自动范围选择。
+
+每次运行在 `build/test-runs/<runId>/` 保存独立的 `events.jsonl`、`stderr.log`、源码指纹和 `result.json`，后者包含命令数组/cwd、源码前后摘要、环境、执行范围、退出码、耗时和清理结果。产物不入库、不作为模板输入。退出 0 只表示本次显式范围 passed；其余结果退出非零。`result.json` 不是所有命令 stdout 都是 JSON 的承诺，SDK 准备查询仍输出诊断行。
+
+Workbench 的 W1–W6 覆盖真实存储的 UI 保存重开、失败重试、保存期间新编辑、关闭取消、不同工作区隔离和单写者占用；Native 使用临时目录，Chrome 使用独立 IndexedDB。Web Widget 测试使用受支持的 compact 外观，避免测试服务器缺失 InkSparkle shader，不模拟系统平台。Native 跨进程探针分两次启动写入与读取；集成测试通过准备关闭和释放宿主验证存储，不声称触发了操作系统退出事件。真实退出 binding 另由 Widget 测试验证。
+
+同一 workspace 的 `test`、`check test/browser/coverage` 和 `validate` 使用操作系统文件锁互斥；锁忙时立即报 `workspace_busy`，不同 workspace 可并行。直接运行 `flutter test` 不受该锁保护，不要与这些命令在同一 workspace 混跑。停止进程后内核释放锁，锁文件本身保留并不代表运行中。Golden 诊断在锁内收集到本次运行目录，不清理旧诊断。
+
+passed 需要完整且兼容的 runner 事件、正常退出、必需文件各有实际执行用例且无跳过，源码在执行期间不变。零实际用例记 not_run；缺失目标、截断/不兼容日志、摘要代替事件记 inconclusive；断言失败记 failed，编译/启动失败记 error，超时记 timeout。重放使用记录的 argv/cwd；要获得新证据，重新运行同一 blueprint test 命令。首版一次运行只有一次 attempt，无自动重试；不得覆盖旧失败或把重试成功改写为首次通过。
+
+运行时探索先读取实际 tools/list 与 Widget 树，操作后断言业务状态，最后转为无 Agent 可运行的测试。官方 Dart MCP 可以配合独立 driver 入口；driver 扩展只能在该入口启用，生产 main 不导入它。测试宿主须保留自己的 binding/退出契约，不能复制 UI Lab 入口到已有自定义 binding 的宿主。探索与 runner 证据分开保存；MCP 的 isError:false 不替代测试门禁。
+
+本轮真实样例是 UI Lab 的重命名：确认后读回去空白名称，切换页面后保持，空名称留在对话框，取消不提交。具体操作与已知 SDK 截图差异见样例 README；VM 与 Chrome 共享同一行为回归，Chrome 包装位于活动成员的 test/browser，因此由现有 browser 门禁执行。
+
+## Golden 试点
+
+`koi_ui/test/golden` 使用 Flutter 原生 matcher，首轮包含明/暗错误态和 320 宽、200% 字号中文空态。只使用随测试分发的固定中文字体子集，DPR 为 1；不依赖主机中文字体。基线环境限定 macOS arm64 + 项目固定 Flutter，其他主机明确 skip/NOT_RUN，不能报告跨平台像素一致。显式指定该文件给定向 CLI 时，全部跳过不会得到 passed。已有完整门禁及各平台测试保持原流程，首次远端 CI 结果仍须单独检查。
+
+更新仅通过显式 `flutter test --update-goldens test/golden/status_golden_test.dart`，随后查看差异并普通重跑；定向 CLI 不暴露自动更新基线开关。不降低阈值、不因失败自动更新图片。首次中文字体基线与诊断能力验证后，再决定是否引入 Alchemist；首轮不新增 Golden 框架依赖。
+
 ## 测试环境
 
 ProviderScope/ProviderContainer overrides 注入替身；auto-dispose provider 在观察期间保留 listen，结束时 dispose。文件测试用临时目录，服务/引擎/时钟经构造器注入。单测不使用用户素材库或生产后端。

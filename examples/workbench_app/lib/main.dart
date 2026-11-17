@@ -1,3 +1,7 @@
+import 'package:koi_core/koi_core.dart';
+
+import 'dart:async';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workbench_app/core/diagnostics/app_diagnostics.dart';
 import 'package:workbench_app/core/preferences/ui_preferences_store.dart';
@@ -13,9 +17,19 @@ import 'package:workbench_app/core/window/workbench_exit_binding.dart';
 import 'package:workbench_app/features/workspace/domain/workspace_ports.dart';
 
 Future<void> main() async {
-  WorkbenchWidgetsFlutterBinding();
-  AppDiagnostics.instance.install();
-  runApp(ProviderScope(child: const WorkbenchLauncher()));
+  runZonedGuarded(
+    () {
+      WorkbenchWidgetsFlutterBinding();
+      AppDiagnostics.instance.install();
+      runApp(ProviderScope(child: const WorkbenchLauncher()));
+    },
+    (error, stack) => AppDiagnostics.instance.record(error, stack, 'zone'),
+    zoneSpecification: ZoneSpecification(
+      print: (self, parent, zone, line) {
+        AppLogger.info(line);
+      },
+    ),
+  );
 }
 
 /// Both decoder initialization and storage failures are handled by the launcher.

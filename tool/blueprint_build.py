@@ -14,7 +14,7 @@ import zipfile
 import tempfile
 
 from tool.blueprint_config import digest, validate_profile
-from tool.blueprint_provenance import read_metadata, source_identity
+from tool.blueprint_provenance import read_metadata, source_identity, write_metadata
 from tool.platform_evidence import source_manifest
 
 
@@ -170,6 +170,31 @@ def manifest_path(app, profile_name):
     return Path(app) / 'build/blueprint' / f'{profile_name}.json'
 
 
+def _record_prepared_native_files(root, before, after):
+    """Accept only SDK preparation changes whose inputs still matched ownership."""
+    metadata = read_metadata(root)
+    if not metadata:
+        return
+    updated = False
+    for relative, expected in metadata.get('nativeFiles', {}).items():
+        current = after['files'].get(relative)
+        if before['files'].get(relative) != expected or not current or current == expected:
+            continue
+        metadata['nativeFiles'][relative] = current
+        baseline = metadata.get('managedFiles', {}).get(relative)
+        if baseline and baseline.get('sha256') == expected and baseline.get('source') is None:
+            content = (root / relative).read_bytes()
+            blob = root / '.blueprint/baseline' / current
+            blob.parent.mkdir(parents=True, exist_ok=True)
+            if blob.exists() and blob.read_bytes() != content:
+                raise ValueError('Native preparation baseline content mismatch')
+            blob.write_bytes(content)
+            baseline['sha256'] = current
+        updated = True
+    if updated:
+        write_metadata(root, metadata)
+
+
 def build_target(app, root, sdk, profile_name, profile, run):
     app, root = Path(app), Path(root)
     profile = validate_profile(profile)
@@ -253,6 +278,7 @@ def build_target(app, root, sdk, profile_name, profile, run):
                 raise ValueError('Non-native source changed during native dependency preparation')
             if hash_file(root / 'pubspec.lock') != manifest['lockSha256']:
                 raise ValueError('Lockfile changed during native dependency preparation')
+            _record_prepared_native_files(root, before, after)
             identity = source_identity(root)
             manifest['source'] = identity
         manifest['preparation'].update(status='PASS', sourceAfter=identity, lockAfterSha256=manifest['lockSha256'])

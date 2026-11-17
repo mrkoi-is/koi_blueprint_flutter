@@ -1,0 +1,18 @@
+name: koi_diagnostics
+description: Talker diagnostics bridge and authenticated LAN viewer for Koi.
+version: 0.1.0
+publish_to: none
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+  flutter: '>=3.47.0'
+dependencies:
+  flutter:
+    sdk: flutter
+  koi_core: any
+  talker: 5.2.0
+  flutter_foreground_task: 11.0.3
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  web: ^1.1.1

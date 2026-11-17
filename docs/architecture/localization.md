@@ -15,6 +15,14 @@
 
 minimal 默认使用内存偏好，设置页面及其存储按需安装；workbench 使用 Native JSON / Web localStorage。切换语言只重建展示，保持 router、工作区会话和编辑状态的拥有者稳定。管理端认证演示仍是固定中文宿主，不代表新模板的完整国际化接入。
 
+## 原生资源与诊断网页
+
+创建器通过 `tool/platform_localization.py` 为 iOS/macOS 同步 `CFBundleLocalizations` 和 Xcode `knownRegions`，使用系统语言标签 `en`、`zh-Hans`、`zh-Hant`。安装默认诊断能力时，三语 `InfoPlist.strings` 通过 Runner 的资源构建阶段打包，翻译局域网权限说明；系统提示使用 OS 为 App 选择的语言，不由 Dart 页面语言直接改写。已有翻译或工程接线有冲突时保留用户文件并报告需合并，不静默覆盖。
+
+诊断共享文案位于 `koi_diagnostics` 的 `DiagnosticStrings`，设备页面、Android 前台服务通知和 LAN 网页共用词表。LAN 启动时使用当前页面语言，停止后重启可应用新语言；网页标题、`lang` 和导出错误均与所选译文一致。Android 宿主的 `koi/diagnostics` 通道更新已有通知渠道名称，保留渠道 ID、重要性和用户设置；升级诊断包时须同时采用能力配方的 MainActivity 接线。原始日志、协议字段和 HTTP 状态码保留诊断原文。
+
+ARB 门禁只覆盖 ARB 源；原生打包资源、诊断共享词表和网页脚本由 Python、Dart 与 Chrome 行为回归分别验证。目标 OS 的系统弹窗、通知和语言偏好仍需真实运行验收，详见 [平台验收](../platform-acceptance.md)。
+
 ## 新增与翻译文案
 
 1. 在模板 ARB 中增加语义明确的 key，并提供 `@key.description`，说明出现位置、动作含义和易混淆词。

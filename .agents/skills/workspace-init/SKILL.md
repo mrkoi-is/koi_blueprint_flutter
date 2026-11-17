@@ -7,7 +7,7 @@ description: 从 Koi 蓝图创建独立 Flutter workspace 并验证名称、平�
 创建能独立运行和继续开发的新 workspace，保留蓝图架构和 AI 入口。
 
 ## 决策
-先确定项目名、目标目录、组织标识、平台与 minimal/workbench 模板，再按实际需求选择版本化 JSON 中的语言、能力、品牌和构建 profile。所有新项目默认接入 koi_ui；minimal 保持最小业务，workbench 加入本地资料/媒体/任务样例。未选择的能力不继承其运行依赖。新项目默认不包含认证演示。平台生成与平台构建是两项验收。
+先确定项目名、目标目录、组织标识、平台与 minimal/workbench 模板，再按实际需求选择版本化 JSON 中的语言、能力、品牌和构建 profile。所有新项目默认接入 koi_ui；minimal 保持最小业务，workbench 加入本地资料/媒体/任务样例。创建配置未写 capabilities 时默认安装 diagnostics v2；显式 [] 关闭，显式列表代表完整选择。未选择的能力不继承其运行依赖。新项目默认不包含认证演示。平台生成与平台构建是两项验收。
 
 ## 流程
 1. 阅读 [初始化契约](references/initialization-contract.md)，核对输入和目标目录。
@@ -20,7 +20,7 @@ description: 从 Koi 蓝图创建独立 Flutter workspace 并验证名称、平�
 ## 核心规则
 - workspace 成员只以根 pubspec 为准，成员使用 `resolution: workspace`。
 - `blueprint.json` schema 2 记录来源链、配置摘要、能力版本和受管文件基线；根 pubspec 仍是成员单一来源。递归生成与无 Git 导出也保留内容身份。
-- 下游升级只运行 `upgrade-report --app ... --source ...` 做三方只读比较；不自动覆盖业务代码或伪造旧工程基线。
+- 下游先运行 `upgrade-report --app ... --source ...` 做三方只读比较。新的 upgrade plan/apply/rollback 仍处于验收中，无法安全处理的 App、依赖、删除和引用树变化会阻断；不自动覆盖业务代码或伪造旧工程基线。详见升级指南。
 - 使用匹配 `.fvmrc` 的 SDK；生成器兼容组合整体维护。
 - 不将原作者本机路径、其他私有仓库或登录凭证作为新项目的依赖。
 

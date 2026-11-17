@@ -48,7 +48,7 @@ void main() {
     expect(find.text('needle-gamma'), findsOneWidget);
     store.record(AppLogLevel.error, 'late-record', source: 'engine');
     await tester.pump();
-    expect(find.text('late-record'), findsNothing);
+    expect(find.text('late-record'), findsOneWidget);
     await tester.tap(find.text('Refresh new records'));
     await tester.pump();
     expect(find.text('late-record'), findsOneWidget);
@@ -100,8 +100,8 @@ void main() {
     expect(find.text('page-101'), findsOneWidget);
     await tester.drag(find.byType(ListView), const Offset(0, -10000));
     await tester.pump();
-    expect(find.text('Load older records'), findsOneWidget);
-    await tester.tap(find.text('Load older records'));
+    expect(find.text('Load more'), findsOneWidget);
+    await tester.tap(find.text('Load more'));
     await tester.pump();
     expect(find.text('page-1'), findsOneWidget);
     expect(tester.takeException(), isNull);

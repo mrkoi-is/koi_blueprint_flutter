@@ -55,3 +55,7 @@ Web：使用匹配浏览器版本的ChromeDriver或SafariDriver，按照workbenc
 6. 保存失败时退出应取消，保留可编辑内容；强杀恢复单独登记，不承诺退出前异步保存。
 
 证据保存OS/设备/浏览器版本、源码摘要、生成参数、命令日志、产物SHA256及运行结果；未执行写NOT_RUN，失败记录原始错误。VoiceOver/TalkBack/Narrator和真实文件对话框单列，fixture不折算为人工流程通过。
+
+## Talker 标准诊断
+
+见 [诊断能力](diagnostics.md)；新项目默认安装 diagnostics v2，设备与 LAN 共用持久化记录，release 连点版本号进入。Android LAN 后台服务与真机验收单独记录。

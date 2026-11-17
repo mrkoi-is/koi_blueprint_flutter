@@ -1,4 +1,5 @@
 import json
+import hashlib
 from pathlib import Path
 import struct
 import tempfile
@@ -133,6 +134,30 @@ class BuildManifestTests(unittest.TestCase):
         self.assertEqual(manifest['preparation']['status'], 'PASS')
         self.assertNotEqual(manifest['source']['sourceSha256'], source_identity(self.root)['sourceSha256'])
 
+    def test_sdk_preparation_refreshes_owned_native_receipts_without_adopting_user_edits(self):
+        native, calls, runner = self.native_fixture()
+        project = native / 'Runner.xcodeproj/project.pbxproj'
+        relative = project.relative_to(self.root).as_posix()
+        original = hashlib.sha256(project.read_bytes()).hexdigest()
+        metadata = {'schema': 2, 'nativeFiles': {relative: original},
+                    'managedFiles': {relative: {'sha256': original, 'source': None}}}
+        path = self.root / 'blueprint.json'
+        path.write_text(json.dumps(metadata))
+        with patch('tool.blueprint_build.sys.platform', 'darwin'):
+            result = build_target(self.app, self.root, self.sdk, 'mac', {'platform': 'macos'}, runner)
+        receipt = json.loads(path.read_text())
+        current = hashlib.sha256(project.read_bytes()).hexdigest()
+        self.assertEqual(receipt['nativeFiles'][relative], current)
+        self.assertEqual(receipt['managedFiles'][relative]['sha256'], current)
+        self.assertEqual((self.root / '.blueprint/baseline' / current).read_bytes(), project.read_bytes())
+        self.assertEqual(result['source'], source_identity(self.root))
+        # A file edited before preparation remains a local change, even if the
+        # SDK then rewrites it. Its ownership receipt must not be silently reset.
+        path.write_text(json.dumps(metadata))
+        project.write_text('user edit before SDK preparation')
+        with patch('tool.blueprint_build.sys.platform', 'darwin'):
+            build_target(self.app, self.root, self.sdk, 'mac', {'platform': 'macos'}, runner)
+        self.assertEqual(json.loads(path.read_text()), metadata)
     def test_native_preparation_failure_and_unrelated_edits_never_start_build(self):
         native, calls, runner = self.native_fixture()
         def unrelated_edit(command, cwd):

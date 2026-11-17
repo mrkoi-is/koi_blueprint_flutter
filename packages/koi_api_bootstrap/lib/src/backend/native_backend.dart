@@ -1,3 +1,4 @@
+import 'package:koi_api_bootstrap/src/backend/diagnostic_interceptor.dart';
 import 'package:koi_api_bootstrap/src/koi_api_bindings.dart';
 import 'package:koi_api_bootstrap/src/koi_api_bootstrap_options.dart';
 import 'package:koi_api_bootstrap/src/koi_api_log.dart';
@@ -49,6 +50,18 @@ Future<KoiApiRuntime> bootstrapKoiApiBackend(
 
   try {
     await KoiNetworkInitializer.initializeWithConfig(config);
+    for (final dio in [
+      KoiNetworkServiceManager.instance.mainDio,
+      KoiNetworkServiceManager.instance.tokenDio,
+    ]) {
+      final errorHandler = dio.interceptors.indexWhere(
+        (i) => i is KoiErrorHandlingInterceptor,
+      );
+      dio.interceptors.insert(
+        errorHandler < 0 ? dio.interceptors.length : errorHandler + 1,
+        DiagnosticInterceptor(),
+      );
+    }
     KoiNetworkServiceManager.instance.mainDio.interceptors.insert(
       0,
       _SessionAwareAuthErrorInterceptor(

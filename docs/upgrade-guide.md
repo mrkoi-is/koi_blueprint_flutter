@@ -1,4 +1,16 @@
-# 下游工程只读升级指南
+# 下游工程升级指南
+
+安全升级入口正在发布验收中，可规划受管工具、共享包、App 文件及本轮支持的依赖变更。无法重现基线的 App 变更、未知依赖变更、删除和未经审核的旧引用会阻断；不能把部分更新当作完整版本升级。在独立副本试用，使用新蓝图源码中的 CLI：
+
+```sh
+python3 /path/to/new-blueprint/blueprint.py upgrade plan --app apps/my_app --source /path/to/new-blueprint --output /tmp/koi-upgrade-plan.json
+python3 /path/to/new-blueprint/blueprint.py upgrade apply --app apps/my_app --plan /tmp/koi-upgrade-plan.json
+python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app apps/my_app --transaction <transaction-id>
+```
+
+计划输出必须位于目标 workspace 外；apply 会重新计算计划，拒绝过期计划与未解决冲突。对指导/工具文件，计划可通过 `--resolutions <json文件>` 接收按路径映射的 `choice`（`keep-local` 或 `merged`）与审核后 `currentSha256`。旧引用文件没有基线时，人工比较后可用 `take-upstream` 并同时提供 `currentSha256` 和 `targetSha256`。每次更改受审文件后必须重新规划。事务备份位于蓝图数据目录的 upgrades 子目录；回滚会先检查文件是否被后续编辑，不会覆盖冲突。
+
+原有只读报告继续可用：
 
 `upgrade-report` 只比较文件和来源，不修改工程，也不执行依赖解析。先确认目标蓝图源码、提交与工作区 dirty 状态，再在现有工程中运行：
 

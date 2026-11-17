@@ -21,8 +21,11 @@
 | `python3 blueprint.py build --app PATH --profile NAME` | 读取生成元数据中的 buildProfiles；与 platforms 互斥；Apple 目标先准备原生依赖再冻结身份，记录源码、lock、profile、实际架构与产物摘要 |
 | `python3 blueprint.py package --app PATH --profile NAME` | 只打包输入仍匹配的成功构建；支持 Web zip、Android apk、iOS app、macOS dmg、Windows exe、Linux deb/AppImage；不安装或发布 |
 | `python3 blueprint.py upgrade-report --app PATH --source SOURCE` | 只读比较基线/本地/上游，输出 JSON 与人工迁移说明；不写项目、不合并、不解析依赖 |
+| `python3 /path/to/new-blueprint/blueprint.py upgrade plan --app PATH --source SOURCE --output PLAN` | 在项目外保存受管升级计划；无法安全处理的引用、依赖、删除和 App 文件会阻断，详见升级指南 |
+| `python3 /path/to/new-blueprint/blueprint.py upgrade apply --app PATH --plan PLAN` | 仅应用无阻断且输入未变化的计划，记录可回滚事务 |
+| `python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app PATH --transaction ID` | 在文件仍属于该事务时回退，不覆盖后续编辑 |
 
-每条子命令的参数含义以 `--help` 为准。升级命令是 `upgrade-report`，没有 upgrade/apply 子命令。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
+每条子命令的参数含义以 `--help` 为准。新升级入口目前处于发布验收中，不保证旧项目可以自动升级；必须检查计划中全部阻断。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
 
 Feature 的源码布局、导入和 dry-run 使用同一解析结果，双布局会明确拒绝；测试统一放 test/features。API/local 的注入声明来自 composition 入口，独立 module 的外部消费仍经过模块根入口。
 
@@ -57,6 +60,16 @@ doctor 的 JSON 区分工具 AVAILABLE、能力依赖 MATCH、库 LOADABLE、Web
 | [scripts/check_coverage.sh](../scripts/check_coverage.sh) | `check coverage` 兼容包装，可传 `--coverage-min` |
 | [scripts/create_feature.py](../scripts/create_feature.py) | 旧入口 `PATH NAME` 默认 api；支持显式 `--kind local`，`--presentation-only` 等价 presentation；两种类型参数不可混用 |
 | [tool/flutterw](../tool/flutterw)、[tool/dartw](../tool/dartw)、[tool/melos](../tool/melos) | SDK/命令兼容包装；日常优先使用 blueprint，避免多个入口的 SDK 选择差异 |
+
+## 定向测试
+
+`python3 blueprint.py test --member <活动成员路径> --path test/<用例>_test.dart` 在已准备的 workspace 中直接运行测试，不调用生成或依赖解析。支持重复 `--path`、`--name`、`--platform vm|chrome` 和墙钟 `--timeout`；帮助见 `test --help`。
+
+证据保存在 `build/test-runs/<runId>/result.json` 及原始事件/日志中，包含源码指纹与重放 argv/cwd。只声明显式选中范围的结果，不能代替 `check test`、`check browser` 或 `validate`。空跑、必需跳过和不完整日志不能成功；详细判定见 [测试策略](test_strategy.md)。实现为 [tool/blueprint_test.py](../tool/blueprint_test.py)，使用 Python 标准库，随生成项目继承。
+
+同一 workspace 的定向测试、测试/浏览器/覆盖率阶段和完整验证互斥；并发请求会报 `workspace_busy`。直接运行 Flutter 不参与锁，必须由使用者避免混跑。CI 定向检查与重复性测量的入口和证据位置以脚本 `--help` 为准；它们不替代完整门禁。
+
+Workbench 定向集合使用 `python3 tool/ai_test_ci.py --workspace . --suite workbench`；生成项目添加 `--member apps/<app>`。重复运行使用 `python3 tool/workbench_stability.py --workspace . --cache-note '<缓存状态>'`。已准备原生平台 runner 的生成项目可用 `python3 tool/workbench_restart_probe.py --workspace <生成项目> --member apps/<app> --device macos` 分两个进程验证持久化（设备按实际平台指定）。每项结果只证明其声明的范围。
 
 ## 维护与集成工具
 

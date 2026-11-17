@@ -6,6 +6,7 @@ import 'package:__APP_PACKAGE__/core/diagnostics/app_diagnostics.dart';
 import 'package:__APP_PACKAGE__/features/diagnostics/data/persistent_diagnostics.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
   test(
     'concurrent install shares IO and its disposer preserves a newer exporter',
     () async {
@@ -48,19 +49,19 @@ void main() {
   );
 
   test(
-    'failed initialization leaves no port and a later retry can install it',
+    'storage failure degrades to memory and reinstallation can recover',
     () async {
       addTearDown(disposePersistentDiagnostics);
-      await expectLater(
-        initializePersistentDiagnostics(
-          openStore: () async => throw StateError('open failed'),
-        ),
-        throwsA(isA<StateError>()),
+      await initializePersistentDiagnostics(
+        openStore: () async => throw StateError('open failed'),
+        exporter: (_) async => 'memory.json',
       );
-      await expectLater(
-        AppDiagnostics.instance.exportSnapshot(const Stream.empty()),
-        throwsA(isA<UnsupportedError>()),
+      expect(AppDiagnostics.instance.store.persistenceError, isA<StateError>());
+      expect(
+        await AppDiagnostics.instance.exportSnapshot(const Stream.empty()),
+        'memory.json',
       );
+      await disposePersistentDiagnostics();
       await initializePersistentDiagnostics(
         openStore: () async => BoundedDiagnosticStore(),
         exporter: (_) async => 'retry.json',
