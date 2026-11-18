@@ -127,6 +127,66 @@ def _dependency_snapshot(root):
     return files
 
 
+def _check_dependency_paths(stage, relative, text, blueprint):
+    """Accept explicit block dependencies only; never guess YAML aliases/maps."""
+    # The generator already uses this constrained block-mapping grammar. A
+    # quoted/complex top-level key could otherwise conceal a dependency section.
+    seen_heading = False
+    for line in text.splitlines():
+        if not line.strip() or line.lstrip().startswith('#'):
+            continue
+        if line.startswith((' ', '\t')):
+            if not seen_heading:
+                raise ValueError(f'Ambiguous dependency YAML: {relative}')
+            continue
+        if not re.match(r'^[A-Za-z_][A-Za-z0-9_-]*:', line):
+            raise ValueError(f'Ambiguous dependency YAML: {relative}')
+        seen_heading = True
+    for section in ('dependencies', 'dev_dependencies', 'dependency_overrides'):
+        try:
+            entries = blueprint.dependency_entries(text, section)
+        except blueprint.BlueprintError as error:
+            raise ValueError(f'Ambiguous dependency YAML: {relative}: {error}') from error
+        for entry in entries.values():
+            lines = entry.splitlines()
+            value = lines[0].split(':', 1)[1].strip().split('#', 1)[0].strip()
+            nested = [line for line in lines[1:] if line.strip() and not line.lstrip().startswith('#')]
+            if value:
+                if value.startswith(('{', '[', '*', '&', '!', '|', '>')) or nested:
+                    raise ValueError(f'Ambiguous dependency YAML: {relative}')
+                continue
+            fields = {}
+            last_field = None
+            for line in nested:
+                match = re.fullmatch(r'    ([a-z][a-z0-9_]*):[ \t]*(.*)', line)
+                if match:
+                    key, value = match.groups()
+                    if key in fields or key not in ('path', 'sdk', 'git', 'hosted', 'version'):
+                        raise ValueError(f'Ambiguous dependency YAML: {relative}')
+                    fields[key] = value
+                    last_field = key
+                elif not line.startswith('      ') or last_field not in ('git', 'hosted'):
+                    raise ValueError(f'Ambiguous dependency YAML: {relative}')
+            if 'path' not in fields:
+                continue
+            value = fields['path'].split(' #', 1)[0].strip()
+            if value.startswith('"'):
+                try:
+                    value = json.loads(value)
+                except ValueError as error:
+                    raise ValueError(f'Ambiguous local path dependency: {relative}') from error
+            elif value.startswith("'") and len(value) >= 2 and value[-1] == "'":
+                value = value[1:-1]
+            if not re.fullmatch(r'[A-Za-z0-9_./\\-]+', value):
+                raise ValueError(f'Ambiguous local path dependency: {relative}')
+            dep = Path(value.replace('\\', '/'))
+            if dep.is_absolute() or PureWindowsPath(value).anchor:
+                raise ValueError(f'External local path dependency: {relative}')
+            candidate = (stage / relative).parent / dep
+            if not candidate.resolve().is_relative_to(stage.resolve()):
+                raise ValueError(f'External local path dependency: {relative}')
+
+
 def _resolve_dependencies(root, updates, blueprint):
     """Resolve dependencies in an isolated workspace; return reviewed lock delta."""
     snapshot = _dependency_snapshot(root)
@@ -145,19 +205,7 @@ def _resolve_dependencies(root, updates, blueprint):
         for relative, original in snapshot.items():
             if not relative.endswith(('pubspec.yaml', 'pubspec_overrides.yaml')) or original is None:
                 continue
-            text = updates.get(relative, original).decode('utf-8')
-            for match in re.finditer(r'^ {4,}path:\s*(.*?)\s*$', text, re.M):
-                value = match.group(1).strip()
-                if value.startswith(("'", '"')) and len(value) >= 2 and value[-1] == value[0]:
-                    value = value[1:-1]
-                if not re.fullmatch(r'[A-Za-z0-9_./\\-]+', value):
-                    raise ValueError(f'Ambiguous local path dependency: {relative}')
-                dep = Path(value)
-                if dep.is_absolute() or PureWindowsPath(value).is_absolute():
-                    raise ValueError(f'External local path dependency: {relative}')
-                candidate = (stage / relative).parent / dep
-                if not candidate.resolve().is_relative_to(stage.resolve()):
-                    raise ValueError(f'External local path dependency: {relative}')
+            _check_dependency_paths(stage, relative, updates.get(relative, original).decode('utf-8'), blueprint)
         try:
             result = subprocess.run([str(sdk.flutter), 'pub', 'get'], cwd=stage,
                                     capture_output=True, text=True, encoding='utf-8', errors='replace', timeout=180)
@@ -385,8 +433,11 @@ def plan(root, source, resolutions=None):
             used_resolutions.add(path)
             retained.append({'path': path, 'reason': choice['choice'], 'sha256': _hash(current)})
         elif current != new:
-            operations.append({'path': path, 'before': _hash(current), 'after': _hash(new),
-                               'content': base64.b64encode(new).decode()})
+            operation = {'path': path, 'before': _hash(current), 'after': _hash(new),
+                         'content': base64.b64encode(new).decode()}
+            if current is None:
+                operation['newFileMode'] = safe_file(source, origin).stat().st_mode & 0o777
+            operations.append(operation)
         sha = _hash(new)
         baseline_blobs['.blueprint/baseline/' + sha] = new
         new_metadata['managedFiles'][path] = {'sha256': sha, 'source': origin, 'sourceSha256': _hash(raw)}
@@ -421,8 +472,11 @@ def plan(root, source, resolutions=None):
                 continue
             used_resolutions.add(path)
         if current != target:
-            operations.append({'path': path, 'before': _hash(current), 'after': target_sha,
-                               'content': base64.b64encode(target).decode()})
+            operation = {'path': path, 'before': _hash(current), 'after': target_sha,
+                         'content': base64.b64encode(target).decode()}
+            if current is None:
+                operation['newFileMode'] = safe_file(source, entry['source']).stat().st_mode & 0o777
+            operations.append(operation)
         reference_baselines[path] = target_sha
         baseline_blobs['.blueprint/baseline/' + target_sha] = target
     dependency_evidence = None
@@ -507,6 +561,8 @@ def apply(root, upgrade_plan):
     journal = {'schemaVersion': 1, 'transaction': transaction, 'state': 'prepared', 'files': []}
     for index, op in enumerate(operations):
         before = _read(root, op['path'])
+        if _hash(before) != op['before']:
+            raise ValueError(f"Concurrent modification during backup: {op['path']}")
         if before is not None:
             atomic_write(directory / str(index), before)
         journal['files'].append({'path': op['path'], 'before': op['before'],
@@ -522,7 +578,10 @@ def apply(root, upgrade_plan):
         if _hash(payload) != op['after']:
             raise ValueError(f"Invalid payload; rollback transaction {transaction}")
         path.parent.mkdir(parents=True, exist_ok=True)
-        atomic_write(path, payload)
+        if 'newFileMode' in op:
+            atomic_write(path, payload, new_file_mode=op['newFileMode'])
+        else:
+            atomic_write(path, payload)
     journal['state'] = 'applied'
     _write_journal(journal_path, journal)
     return {'transaction': transaction, 'state': 'applied', 'files': len(operations)}
@@ -557,7 +616,10 @@ def rollback(root, transaction):
         if item['backup'] is None:
             path.unlink()
         else:
-            atomic_write(path, _read(directory, item['backup']))
+            backup = _read(directory, item['backup'])
+            if _hash(backup) != item['before']:
+                raise ValueError(f"Backup corrupt: {item['path']}")
+            atomic_write(path, backup)
     journal['state'] = 'rolled_back'
     _write_journal(journal_path, journal)
     return {'transaction': transaction, 'state': 'rolled_back'}

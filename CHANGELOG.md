@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.3.1
+
+源码补丁版，合入 `54716bd` 的升级事务与诊断资源清理修复。完整范围见 [补丁记录](docs/releases/v0.3.1.md)，发布后的固定提交、CI、产物及日期见 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.1)。
+
+- 升级计划不生成受审工程的 Python 缓存，输出位置必须位于目标 workspace 与源蓝图之外；在调用 pub 前拒绝不明确的依赖 YAML 与越界本地路径。
+- 新增工具继承上游执行权限，已有文件保留本地权限；备份和回退恢复前再次校验内容，拒绝并发修改或损坏备份。可选能力包的源码变更仍需人工迁移。
+- LAN 重复停止共享同一清理任务，停止期间禁止重启，订阅取消使用稳定快照；Android 前台服务停止失败后保留所有权，允许后续清理重试。
+- macOS CI 媒体能力摘要使用 runner 自带的 grep；同步 README、升级指南、工具说明与默认诊断能力说明。
+
+
 ## 0.3.0 — 2026-11-17
 
 源码正式版，将已发布的诊断、国际化、测试与升级工具整合至 main。完整范围、迁移边界和未执行场景见 [版本记录](docs/releases/v0.3.0.md)，最终提交、CI 与产物摘要见 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.0)。
@@ -14,7 +24,7 @@
 
 ## 0.3.0-rc.1 — 2026-11-17
 
-源码预发布，整合已发布的测试工具与诊断修复。已验证范围和未执行项见 [候选版本记录](docs/releases/v0.3.0-rc.1.md)，不代表六端完整国际化验收。
+已发布的源码预发布，整合测试工具与诊断修复。发布提交 `046850e` 的 CI 为 19 项成功、1 项不适用跳过，两模板六端共 12 个构建组合通过。已验证范围和未执行项见 [版本记录](docs/releases/v0.3.0-rc.1.md) 与 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.0-rc.1)，不代表六端完整国际化 UI 验收。
 
 - 合入主分支 analyzer 14.5.0、build_runner 2.16.2 与 CI checkout 更新。旧项目因依赖差异需人工审阅迁移；CI 明确验证拒绝应用且工程保持不变，不将其记为自动升级通过。
 - 修复 macOS 监督进程在清理僵尸进程组时丢失超时报告的问题；只有确认进程组不存在活成员时才接受清理完成。
@@ -22,7 +32,7 @@
 - 修复 Windows 宿主创建六端工程时 Apple 本地化解析不接受 CRLF 换行的问题；保留工程原有换行格式，并覆盖两阶段安装与重入。
 - 原生语言资源校验兼容 CocoaPods/Xcode 的工程重排；构建准备阶段仅对仍匹配基线的原生文件同步 SDK 迁移后的记录，避免后续能力安装误报冲突，不吸收构建前的用户修改。
 - 诊断 Android 通知、LAN 网页标题和导出失败提示支持三语；通知渠道改名保留原渠道及用户设置；网页 `lang` 使用实际译文的 BCP 47 标签，兼容旧下划线标签及中文脚本／地区偏好。新增原生资源生成、通知调用和 Chrome 网页行为回归。
-- 补充两种模板的四平台构建、macOS/Android/iOS 模拟器三语引擎测试及 Android 真机通知验证；Windows/Linux、Safari 和系统权限弹窗的未执行项见 [国际化验收记录](docs/localization-validation.md)。
+- 保留合并前国际化修复阶段的两模板四平台构建、macOS/Android/iOS 模拟器三语引擎测试及 Android 真机通知证据。发布提交的六端构建结果单独记录；Windows/Linux 国际化 UI、Safari 和系统权限弹窗仍待验收，见 [国际化验收记录](docs/localization-validation.md)。
 - 修复已有工程的平台 CI：在各自作业内准备依赖并重新生成 Dart 代码，避免干净检出缺少 Riverpod、路由与模型生成文件。
 - 修复调试会话监控或状态写入失败后的进程回收，隔离命令进程组并保留已观察进程的身份校验，避免遗留子进程或误杀无关进程。
 - 修复 Dio 流式响应的诊断状态与耗时：根据正文流完成、错误或取消结束记录，保留原始字节、异常及暂停／恢复行为；补充对应回归测试。

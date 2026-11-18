@@ -47,7 +47,7 @@ python3 blueprint.py upgrade-report --app apps/studio_app --source /path/to/new-
 
 从 [样例地图](examples.md) 选择最小宿主、三类 Feature、认证或模块会话样例。完整源码只在受测样例维护，Skill 不复制第二份实现。
 
-API、本地 IO、认证、持久化都是按需能力。不要从认证样例推导出新项目必须有账号、网络或数据库。
+业务 API、本地业务 IO、认证和业务持久化按需加入；未指定 capabilities 的新项目默认安装 diagnostics v2 及其日志持久化。不要从认证样例推导出新项目必须有账号、业务网络客户端或数据库。
 
 ## 规则优先级
 

@@ -2,6 +2,8 @@
 
 新建 minimal/workbench 项目未提供 capabilities 字段时默认安装；显式 `capabilities: []` 关闭，非空列表代表完整选择。旧工程不追溯安装默认项，使用 capability add 或升级报告审阅变更。v1 → v2 保留原 ID 和旧日志读取，不能通过改 receipt 版本跳过迁移。
 
+LAN 停止期间保持 busy，阻止重启；重复停止共享同一清理任务。Android 前台服务停止失败时保留所有权，后续停止或宿主关闭可再次尝试释放。
+
 App 启动即持续采集 AppLogger、print/debugPrint、Flutter/Dart 主 isolate 异常、Riverpod 失败及已接入客户端的网络请求。release 在“关于”连续点击版本号七次打开诊断，间隔超过三秒重置。日志和网络请求页支持查询、详情和 NDJSON 导出。原生插件的系统 logcat、其他 isolate 和未接入的第三方网络 SDK 不属于自动采集范围。
 
 Talker 5.2.0 是统一采集入口；自身 history 和重复 console output 关闭。唯一 DiagnosticStore 由 AppDiagnostics 拥有，设备 UI、LAN UI、持久化均借用该存储。网络适配器仅生成安全快照，不保留 Dio/流对象；network/images 的 Transport 和 koi_api_bootstrap 的 Dio 各接一次。外部客户端可通过 koi_core 的 Diagnostics.startNetwork 接入，完成时调用 response/finish。

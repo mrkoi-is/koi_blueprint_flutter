@@ -58,7 +58,7 @@ def safe_file(root, relative):
     return candidate
 
 
-def atomic_write(path, data):
+def atomic_write(path, data, *, new_file_mode=None):
     fd, name = tempfile.mkstemp(prefix='.blueprint-write-', dir=path.parent)
     try:
         with os.fdopen(fd, 'wb') as stream:
@@ -67,6 +67,8 @@ def atomic_write(path, data):
             os.fsync(stream.fileno())
         if path.exists():
             os.chmod(name, path.stat().st_mode)
+        elif new_file_mode is not None:
+            os.chmod(name, new_file_mode)
         os.replace(name, path)
     finally:
         if os.path.exists(name):

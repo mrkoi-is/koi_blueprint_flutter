@@ -928,10 +928,11 @@ def upgrade(args):
     root = workspace_for(checked_root(args.app))
     if args.action == 'plan':
         destination = Path(args.output).expanduser().resolve()
-        if destination.is_relative_to(root):
-            raise BlueprintError('Upgrade plan output must be outside the target workspace')
+        source = checked_root(args.source)
+        if destination.is_relative_to(root) or destination.is_relative_to(source):
+            raise BlueprintError('Upgrade plan output must be outside the target and source workspaces')
         resolutions = json.loads(Path(args.resolutions).read_text(encoding='utf-8')) if args.resolutions else None
-        result = plan(root, checked_root(args.source), resolutions=resolutions)
+        result = plan(root, source, resolutions=resolutions)
         destination.parent.mkdir(parents=True, exist_ok=True)
         with destination.open('x', encoding='utf-8') as output:
             output.write(json.dumps(result, ensure_ascii=False, indent=2) + '\n')
@@ -1217,7 +1218,9 @@ def main(argv=None):
     args = parser.parse_args(argv)
     previous_bytecode = sys.dont_write_bytecode
     # Read-only commands must also leave copied Python tooling byte-for-byte intact.
-    sys.dont_write_bytecode = previous_bytecode or args.command == 'upgrade-report' or bool(getattr(args, 'dry_run', False))
+    sys.dont_write_bytecode = (previous_bytecode or args.command == 'upgrade-report' or
+                              (args.command == 'upgrade' and args.action == 'plan') or
+                              bool(getattr(args, 'dry_run', False)))
     try:
         action = launch if args.command == 'run' else globals()[args.command.replace('-', '_')]
         locked = (args.command in ('test', 'validate') or

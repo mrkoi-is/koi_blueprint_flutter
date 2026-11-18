@@ -1,6 +1,10 @@
 import hashlib
 import json
+import os
 from pathlib import Path
+import shutil
+import stat
+import sys
 import tempfile
 import subprocess
 import unittest
@@ -42,6 +46,86 @@ class UpgradeTest(unittest.TestCase):
         self.assertEqual(upgrade.rollback(self.root, result['transaction'])['state'], 'rolled_back')
         for name, content in before.items():
             self.assertEqual((self.root / name).read_bytes(), content)
+
+    def test_plan_cli_does_not_create_bytecode_in_reviewed_workspace(self):
+        repository = Path(__file__).resolve().parents[2]
+        shutil.copy2(repository / 'blueprint.py', self.root / 'blueprint.py')
+        shutil.copytree(repository / 'tool', self.root / 'tool',
+                        ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+        old = (self.root / 'blueprint.py').read_bytes()
+        metadata_path = self.root / 'blueprint.json'
+        metadata = json.loads(metadata_path.read_text())
+        metadata['managedFiles']['blueprint.py'].update(
+            sha256=digest(old), sourceSha256=digest(old))
+        metadata_path.write_text(json.dumps(metadata))
+        (self.root / '.blueprint/baseline' / digest(old)).write_bytes(old)
+        (self.root / '.fvmrc').write_text('{"flutter":"3.47.2"}')
+        (self.root / 'pubspec.yaml').write_text('name: demo\nworkspace:\n  - apps/demo_app\n')
+        app = self.root / 'apps/demo_app'
+        app.mkdir(parents=True)
+        (app / 'pubspec.yaml').write_text('name: demo_app\nresolution: workspace\n')
+        snapshot = lambda: {p.relative_to(self.root).as_posix(): p.read_bytes()
+                            for p in self.root.rglob('*') if p.is_file()}
+        before = snapshot()
+        environment = dict(os.environ)
+        environment.pop('PYTHONDONTWRITEBYTECODE', None)
+        environment.pop('PYTHONPYCACHEPREFIX', None)
+        result = subprocess.run([sys.executable, str(self.root / 'blueprint.py'),
+                                 'upgrade', 'plan', '--app', str(app),
+                                 '--source', str(self.source), '--output', str(self.source.parent / 'plan.json')],
+                                cwd=self.root, env=environment, capture_output=True, text=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(set(snapshot()) - set(before), set(), 'Planning created files in the project')
+        self.assertEqual(snapshot(), before)
+        source_before = {p.relative_to(self.source).as_posix(): p.read_bytes()
+                         for p in self.source.rglob('*') if p.is_file()}
+        for output in (self.root / 'plan.json', self.source / 'tool/plan.json'):
+            result = subprocess.run([sys.executable, str(self.root / 'blueprint.py'),
+                                     'upgrade', 'plan', '--app', str(app),
+                                     '--source', str(self.source), '--output', str(output)],
+                                    cwd=self.root, env=environment, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 2, result.stdout)
+            self.assertIn('outside the target and source workspaces', result.stderr)
+            self.assertFalse(output.exists())
+            self.assertEqual(snapshot(), before)
+            self.assertEqual({p.relative_to(self.source).as_posix(): p.read_bytes()
+                              for p in self.source.rglob('*') if p.is_file()}, source_before)
+
+    @unittest.skipIf(os.name == 'nt', 'POSIX executable permissions')
+    def test_new_tool_keeps_executable_mode_and_can_run_after_upgrade(self):
+        script = self.source / 'tool/new-command'
+        script.parent.mkdir()
+        script.write_text('#!/bin/sh\nprintf "upgraded tool\\n"\n')
+        script.chmod(0o755)
+        result = upgrade.apply(self.root, upgrade.plan(self.root, self.source))
+        target = self.root / 'tool/new-command'
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o755)
+        process = subprocess.run([str(target)], capture_output=True, text=True, check=True)
+        self.assertEqual(process.stdout, 'upgraded tool\n')
+        upgrade.rollback(self.root, result['transaction'])
+        self.assertFalse(target.exists())
+
+    @unittest.skipIf(os.name == 'nt', 'POSIX executable permissions')
+    def test_existing_tool_keeps_user_permissions(self):
+        target = self.root / 'blueprint.py'
+        target.chmod(0o750)
+        (self.source / 'blueprint.py').chmod(0o644)
+        result = upgrade.apply(self.root, upgrade.plan(self.root, self.source))
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o750)
+        upgrade.rollback(self.root, result['transaction'])
+        self.assertEqual(stat.S_IMODE(target.stat().st_mode), 0o750)
+
+    def test_backup_capture_rejects_concurrent_edit_before_journal(self):
+        plan = upgrade.plan(self.root, self.source)
+        original = upgrade._journal
+        def changed(root, transaction):
+            (self.root / 'blueprint.py').write_bytes(b'user edit during backup')
+            return original(root, transaction)
+        with patch.object(upgrade, '_journal', side_effect=changed):
+            with self.assertRaisesRegex(ValueError, 'Concurrent modification'):
+                upgrade.apply(self.root, plan)
+        self.assertEqual((self.root / 'blueprint.py').read_bytes(), b'user edit during backup')
+        self.assertEqual(list((self.root / '.blueprint/upgrades').glob('*/journal.json')), [])
 
     def test_custom_conflict_and_reviewed_resolution(self):
         (self.root / 'blueprint.py').write_bytes(b'my cli')
@@ -87,6 +171,25 @@ class UpgradeTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'Rollback conflict'):
             upgrade.rollback(self.root, result['transaction'])
         self.assertEqual((self.root / 'blueprint.py').read_bytes(), b'later edit')
+
+    def test_rollback_rechecks_backup_before_restoring(self):
+        result = upgrade.apply(self.root, upgrade.plan(self.root, self.source))
+        directory = self.root / '.blueprint/upgrades' / result['transaction']
+        journal = json.loads((directory / 'journal.json').read_text())
+        entry = next(item for item in journal['files'] if item['path'] == 'blueprint.py')
+        backup = directory / entry['backup']
+        original = upgrade._write_journal
+        def change_backup(path, value):
+            original(path, value)
+            if value['state'] == 'rollback_incomplete':
+                backup.write_bytes(b'backup changed after preflight')
+        with patch.object(upgrade, '_write_journal', side_effect=change_backup):
+            with self.assertRaisesRegex(ValueError, 'Backup corrupt'):
+                upgrade.rollback(self.root, result['transaction'])
+        self.assertEqual((self.root / 'blueprint.py').read_bytes(), b'new cli')
+        backup.write_bytes(b'old cli')
+        upgrade.rollback(self.root, result['transaction'])
+        self.assertEqual((self.root / 'blueprint.py').read_bytes(), b'old cli')
 
     def test_interrupted_apply_is_recoverable(self):
         original = upgrade.atomic_write
@@ -154,6 +257,46 @@ class UpgradeTest(unittest.TestCase):
             pub.write_bytes(b'name: demo_package\ndependencies:\n  other:\n    path: /tmp/outside\n')
             with self.assertRaisesRegex(ValueError, 'External local path'):
                 upgrade._resolve_dependencies(self.root.resolve(), {}, blueprint)
+
+    def test_dependency_resolution_rejects_ambiguous_yaml_before_running_pub(self):
+        import blueprint
+        from types import SimpleNamespace
+        (self.root / 'pubspec.lock').write_bytes(b'before\n')
+        (self.root / '.fvmrc').write_bytes(b'{"flutter":"3.47.2"}')
+        variants = [
+            'dependencies:\n  other: {path: /tmp/outside}\n',
+            'dependencies: {other: {path: /tmp/outside}}\n',
+            '"dependencies":\n  other:\n    path: /tmp/outside\n',
+            'dependencies:\n  other:\n    "path": /tmp/outside\n',
+            'external: &outside {path: /tmp/outside}\ndependencies:\n  other: *outside\n',
+            'dependencies:\n  other:\n    path: >-\n      /tmp/outside\n',
+            'dependency_overrides:\n  other: {path: /tmp/outside}\n',
+            'dependencies:\n  other:\n    path: ..\\outside\n',
+            'dependencies:\n  other:\n    path: "packages/foo\\u002f..\\u002f..\\u002f.."\n',
+        ]
+        for value in variants:
+            with self.subTest(value=value):
+                (self.root / 'pubspec.yaml').write_text('name: demo\n' + value)
+                with patch.object(blueprint, 'SDK', return_value=SimpleNamespace(flutter=Path('/sdk/flutter'))), \
+                     patch.object(upgrade.subprocess, 'run') as command:
+                    with self.assertRaisesRegex(ValueError, 'Ambiguous|External|block mapping'):
+                        upgrade._resolve_dependencies(self.root.resolve(), {}, blueprint)
+                    command.assert_not_called()
+
+    def test_dependency_path_checks_allow_internal_blocks_and_reject_indented_root(self):
+        import blueprint
+        stage = self.root / 'isolated'
+        stage.mkdir()
+        text = ('name: demo\ndependencies:\n  flutter:\n    sdk: flutter\n'
+                '  local:\n    path: "../shared" # sibling within workspace\n'
+                '  hosted_package:\n    hosted:\n      name: hosted_package\n'
+                '      url: https://example.invalid\n    version: ^1.0.0\n'
+                '  git_package:\n    git:\n      url: https://example.invalid/repo.git\n'
+                '      path: packages/part\ndev_dependencies:\n  test: ^1.0.0\n')
+        upgrade._check_dependency_paths(stage, 'packages/demo/pubspec.yaml', text, blueprint)
+        with self.assertRaisesRegex(ValueError, 'Ambiguous dependency YAML'):
+            upgrade._check_dependency_paths(stage, 'pubspec.yaml',
+                ' name: demo\n dependencies:\n   other: {path: /tmp/outside}\n', blueprint)
 
     def test_package_baseline_and_new_rendered_app_test(self):
         old = b'old widget'
@@ -271,6 +414,29 @@ class UpgradeTest(unittest.TestCase):
         self.assertEqual(reasons.count('unsupported_managed_change'), 1)
         self.assertEqual(reasons.count('unmanaged_reference'), 1)
         self.assertFalse(result['applicable'])
+
+    def test_changed_optional_package_requires_manual_migration(self):
+        relative = 'packages/koi_diagnostics/lib/koi_diagnostics.dart'
+        old, new = b'old diagnostics', b'new diagnostics'
+        local, upstream = self.root / relative, self.source / relative
+        local.parent.mkdir(parents=True)
+        upstream.parent.mkdir(parents=True)
+        local.write_bytes(old)
+        upstream.write_bytes(new)
+        (self.root / '.blueprint/baseline' / digest(old)).write_bytes(old)
+        metadata_path = self.root / 'blueprint.json'
+        metadata = json.loads(metadata_path.read_text())
+        metadata['managedFiles'][relative] = {
+            'sha256': digest(old), 'sourceSha256': digest(old), 'source': relative}
+        metadata_path.write_text(json.dumps(metadata))
+        plan = upgrade.plan(self.root, self.source)
+        self.assertFalse(plan['applicable'])
+        self.assertTrue(any(c['path'] == relative and c['reason'] == 'unsupported_managed_change'
+                            for c in plan['conflicts']))
+        with self.assertRaisesRegex(ValueError, 'Unresolved upgrade conflicts'):
+            upgrade.apply(self.root, plan)
+        self.assertEqual(local.read_bytes(), old)
+        self.assertFalse((self.root / '.blueprint/upgrades').exists())
 
     def test_reference_review_records_real_new_baseline(self):
         origin = self.source / 'examples/starter_app/README.md'
