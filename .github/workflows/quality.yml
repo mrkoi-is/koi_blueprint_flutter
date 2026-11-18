@@ -398,7 +398,7 @@ jobs:
         run: |
           set -o pipefail
           swift tool/macos_media_preflight.swift | tee "$RUNNER_TEMP/macos-media-capability.txt" >> "$GITHUB_OUTPUT"
-          if ! rg -q '^available=true$' "$RUNNER_TEMP/macos-media-capability.txt"; then
+          if ! grep -q '^available=true$' "$RUNNER_TEMP/macos-media-capability.txt"; then
             echo 'macOS native media runtime: NOT_RUN. This host cannot create the OpenGL context required by media_kit_video; use a graphics-capable Mac. Native builds and generated-workspace checks still run.' | tee -a "$GITHUB_STEP_SUMMARY"
           fi
 

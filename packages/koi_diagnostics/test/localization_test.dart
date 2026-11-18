@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,6 +12,114 @@ import 'package:koi_diagnostics/src/diagnostic_lan_native.dart' as native;
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
   HttpOverrides.global = null;
+
+  test(
+    'failed foreground stop retains ownership so cleanup can be retried',
+    () async {
+      const channel = MethodChannel('flutter_foreground_task/methods');
+      const hostChannel = MethodChannel('koi/diagnostics');
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      var serviceRunning = false;
+      var stopCalls = 0;
+      messenger.setMockMethodCallHandler(hostChannel, (_) async => null);
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        switch (call.method) {
+          case 'isRunningService':
+            return serviceRunning;
+          case 'requestNotificationPermission':
+            return NotificationPermission.granted.index;
+          case 'isIgnoringBatteryOptimizations':
+            return true;
+          case 'startService':
+            serviceRunning = true;
+          case 'stopService':
+            if (++stopCalls == 1) throw PlatformException(code: 'stop_failed');
+            serviceRunning = false;
+        }
+        return null;
+      });
+      final store = BoundedDiagnosticStore();
+      final lan = native.DiagnosticLan(() => store, isAndroid: true);
+      try {
+        await lan.start(address: '127.0.0.1');
+        await lan.stop();
+        expect(lan.error, isNotNull);
+        expect(serviceRunning, isTrue);
+        await lan.stop();
+        expect(stopCalls, 2);
+        expect(serviceRunning, isFalse);
+      } finally {
+        await lan.close();
+        await store.close();
+        messenger.setMockMethodCallHandler(channel, null);
+        messenger.setMockMethodCallHandler(hostChannel, null);
+      }
+    },
+  );
+
+  test(
+    'concurrent stops share cleanup and prevent restart until it finishes',
+    () async {
+      const channel = MethodChannel('flutter_foreground_task/methods');
+      const hostChannel = MethodChannel('koi/diagnostics');
+      final messenger =
+          TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger;
+      final stopping = Completer<void>();
+      final releaseStop = Completer<void>();
+      var serviceRunning = false;
+      var stopCalls = 0;
+      messenger.setMockMethodCallHandler(hostChannel, (_) async => null);
+      messenger.setMockMethodCallHandler(channel, (call) async {
+        switch (call.method) {
+          case 'isRunningService':
+            return serviceRunning;
+          case 'requestNotificationPermission':
+            return NotificationPermission.granted.index;
+          case 'isIgnoringBatteryOptimizations':
+            return true;
+          case 'startService':
+            serviceRunning = true;
+          case 'stopService':
+            stopCalls++;
+            if (!stopping.isCompleted) stopping.complete();
+            await releaseStop.future;
+            serviceRunning = false;
+        }
+        return null;
+      });
+      final store = BoundedDiagnosticStore();
+      final lan = native.DiagnosticLan(() => store, isAndroid: true);
+      Future<void>? firstStop;
+      try {
+        await lan.start(address: '127.0.0.1');
+        expect(lan.running, isTrue);
+        firstStop = lan.stop();
+        await stopping.future.timeout(const Duration(seconds: 5));
+        expect(lan.busy, isTrue);
+        final secondStop = lan.stop();
+        await lan
+            .start(address: '127.0.0.1')
+            .timeout(const Duration(seconds: 5));
+        expect(lan.running, isFalse);
+        expect(stopCalls, 1);
+        releaseStop.complete();
+        await Future.wait([firstStop, secondStop])
+            .timeout(const Duration(seconds: 5));
+        expect(lan.busy, isFalse);
+        expect(serviceRunning, isFalse);
+        await lan.start(address: '127.0.0.1');
+        expect(lan.running, isTrue);
+      } finally {
+        if (!releaseStop.isCompleted) releaseStop.complete();
+        await firstStop;
+        await lan.close();
+        await store.close();
+        messenger.setMockMethodCallHandler(channel, null);
+        messenger.setMockMethodCallHandler(hostChannel, null);
+      }
+    },
+  );
 
   for (final (language, tag, title, notice, body, failure) in [
     (

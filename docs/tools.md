@@ -21,15 +21,15 @@
 | `python3 blueprint.py build --app PATH --profile NAME` | 读取生成元数据中的 buildProfiles；与 platforms 互斥；Apple 目标先准备原生依赖再冻结身份，记录源码、lock、profile、实际架构与产物摘要 |
 | `python3 blueprint.py package --app PATH --profile NAME` | 只打包输入仍匹配的成功构建；支持 Web zip、Android apk、iOS app、macOS dmg、Windows exe、Linux deb/AppImage；不安装或发布 |
 | `python3 blueprint.py upgrade-report --app PATH --source SOURCE` | 只读比较基线/本地/上游，输出 JSON 与人工迁移说明；不写项目、不合并、不解析依赖 |
-| `python3 /path/to/new-blueprint/blueprint.py upgrade plan --app PATH --source SOURCE --output PLAN` | 在项目外保存受管升级计划；无法安全处理的引用、依赖、删除和 App 文件会阻断，详见升级指南 |
+| `python3 /path/to/new-blueprint/blueprint.py upgrade plan --app PATH --source SOURCE --output PLAN` | 在目标 workspace 和源蓝图目录之外保存受管升级计划；无法安全处理的引用、依赖、删除和 App 文件会阻断，详见升级指南 |
 | `python3 /path/to/new-blueprint/blueprint.py upgrade apply --app PATH --plan PLAN` | 仅应用无阻断且输入未变化的计划，记录可回滚事务 |
 | `python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app PATH --transaction ID` | 在文件仍属于该事务时回退，不覆盖后续编辑 |
 
-每条子命令的参数含义以 `--help` 为准。新升级入口目前处于发布验收中，不保证旧项目可以自动升级；必须检查计划中全部阻断。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
+每条子命令的参数含义以 `--help` 为准。升级入口只应用当前支持且无阻断的变更，旧项目的依赖版本和可选能力包变更需按计划人工审阅，见 [升级指南](upgrade-guide.md)。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
 
 Feature 的源码布局、导入和 dry-run 使用同一解析结果，双布局会明确拒绝；测试统一放 test/features。API/local 的注入声明来自 composition 入口，独立 module 的外部消费仍经过模块根入口。
 
-dry-run 与 upgrade-report 不写项目文件，也不创建 Python 字节码缓存；Feature dry-run 在 SDK 发现之前返回。兼容的 create_feature.py 入口遵循同一合同。
+dry-run、upgrade-report 与 upgrade plan 不写受审工程，也不创建 Python 字节码缓存；upgrade plan 只向工程外的指定位置输出计划。Feature dry-run 在 SDK 发现之前返回。兼容的 create_feature.py 入口遵循同一合同。
 
 指导资产采用 blueprint.py 的显式复制计划；研究、迁移评分和历史运行记录保留在源仓 docs/research、docs/validation，不下发。README/CHANGELOG 按新项目生成，参照源码仅放 .blueprint/reference。来源登记复用 schema 2 managedFiles；升级报告用 untrackedGuidance 标识旧指导文件的 NO_BASELINE 缺口，参照 [升级指南](upgrade-guide.md)。
 

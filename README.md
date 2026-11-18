@@ -2,7 +2,11 @@
 
 面向新项目和 AI 协作的 Flutter Monorepo 蓝图：用可运行样例、任务技能、脚手架与质量门禁，让实现遵循同一套架构。
 
-默认技术路线为 Dart Workspace + Melos、Riverpod 3、类型化 go_router、Freezed/json_serializable。所有新项目默认使用 koi_ui 的统一主题；minimal 保持最小业务，workbench 是文本资料、图片/视频素材与任务的可选模板。默认包含本地化、错误接线与来源信息；诊断持久化、网络、数据库、图片、平台集成及独立业务模块按需求加入。
+默认技术路线为 Dart Workspace + Melos、Riverpod 3、类型化 go_router、Freezed/json_serializable。所有新项目默认使用 koi_ui 的统一主题；minimal 保持最小业务，workbench 是文本资料、图片/视频素材与任务的可选模板。默认包含英／简／繁本地化、错误接线、来源信息和 diagnostics v2 持久化诊断；网络、数据库、图片、平台集成及独立业务模块按需求加入。创建配置省略 `capabilities` 时安装默认诊断，显式 `[]` 关闭默认能力，非空列表代表完整选择，详见 [诊断能力](docs/diagnostics.md)。
+
+## 版本与验收
+
+当前源码预发布为 [v0.3.0-rc.1](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.0-rc.1)，正式版为 [v0.2.0](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.2.0)。预发布提交已通过完整门禁及两模板六端构建；完整国际化 UI、系统语言和部分真机场景仍待验收。固定提交、CI、覆盖率及未执行范围见 [版本记录](docs/releases/v0.3.0-rc.1.md)，语言配置见 [国际化契约](docs/architecture/localization.md)。
 
 ## 创建项目
 
@@ -89,7 +93,9 @@ Feature 按职责选择 domain/data/application/presentation；data 与 applicat
 
 SDK 选择顺序是 `FLUTTER_BIN` → 项目 `.fvm/flutter_sdk` → PATH 中的 Flutter；Python 入口从所选 Flutter SDK 同目录定位 Dart，使用同一 SDK 运行生成与测试。锁文件使用 pub.dev，严格锁文件检查应使用同一包源。
 
-`python3 blueprint.py validate` 是统一入口。源仓库完整验证需要 Chrome 和 Node；生成项目只在活动成员存在浏览器测试时要求 Chrome，只在存在 API Web 冒烟入口时要求 Node。默认 minimal 两者都不要求；workbench 要求 Chrome。`doctor --purpose validate` 会提前检查这些条件。源仓库 validate 还检查两个模板的真实继承资产；完整递归验收另运行 `python3 tool/generator_smoke.py`。质量要求包括 AI 资产/引用、架构边界、代码生成、只读格式、fatal-infos 分析、成员测试和 **80% 手写代码覆盖率**。生成的 Dart part 文件不入库。目标平台使用 `build` 单独验证；测试与本地构建不能替代真实业务后端或设备验收。
+`python3 blueprint.py validate` 是统一入口。源仓库完整验证需要 Chrome 和 Node；生成项目只在活动成员存在浏览器测试时要求 Chrome，只在存在 API Web 冒烟入口时要求 Node。默认 minimal/workbench 均包含诊断浏览器测试，因此要求 Chrome；默认两模板不要求 Node。minimal 显式配置 `capabilities: []` 且未新增浏览器测试时不要求 Chrome。`doctor --purpose validate` 会提前检查这些条件。
+
+源仓库 validate 还检查两个模板的真实继承资产；完整递归验收另运行 `python3 tool/generator_smoke.py`。质量要求包括 AI 资产/引用、架构边界、代码生成、只读格式、fatal-infos 分析、成员测试和 **80% 手写代码覆盖率**。生成的 Dart part 文件不入库。目标平台使用 `build` 单独验证；测试与本地构建不能替代真实业务后端或设备验收。
 
 已有 `make validate` 与 shell 入口保留为兼容包装。完整命令见 [工具清单](docs/tools.md) 和 [Melos 使用](MELOS_USAGE.md)。详见 [测试策略](docs/test_strategy.md) 与 [平台验收](docs/platform-acceptance.md)。仓库中的配置和测试描述验收要求，当前是否通过以本次执行结果为准。本地运行结果与平台缺口记录在 `docs/validation/`，这些记录不随新项目下发，也不作为干净检出的必需指导文件。
 

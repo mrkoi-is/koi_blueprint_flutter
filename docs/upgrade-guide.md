@@ -1,6 +1,6 @@
 # 下游工程升级指南
 
-安全升级入口正在发布验收中，可规划受管工具、共享包、App 文件及本轮支持的依赖变更。无法重现基线的 App 变更、未知依赖变更、删除和未经审核的旧引用会阻断；不能把部分更新当作完整版本升级。在独立副本试用，使用新蓝图源码中的 CLI：
+受管升级入口提供计划、事务应用与回退，可处理能够从基线重现的工具、共享包、App 文件及受支持的依赖变更。无法重现基线的 App 变更、未知依赖变更、删除和未经审核的旧引用会阻断；不能把部分更新当作完整版本升级。在独立副本试用，使用新蓝图源码中的 CLI：
 
 ```sh
 python3 /path/to/new-blueprint/blueprint.py upgrade plan --app apps/my_app --source /path/to/new-blueprint --output /tmp/koi-upgrade-plan.json
@@ -8,9 +8,13 @@ python3 /path/to/new-blueprint/blueprint.py upgrade apply --app apps/my_app --pl
 python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app apps/my_app --transaction <transaction-id>
 ```
 
-计划输出必须位于目标 workspace 外；apply 会重新计算计划，拒绝过期计划与未解决冲突。对指导/工具文件，计划可通过 `--resolutions <json文件>` 接收按路径映射的 `choice`（`keep-local` 或 `merged`）与审核后 `currentSha256`。旧引用文件没有基线时，人工比较后可用 `take-upstream` 并同时提供 `currentSha256` 和 `targetSha256`。每次更改受审文件后必须重新规划。事务备份位于蓝图数据目录的 upgrades 子目录；回滚会先检查文件是否被后续编辑，不会覆盖冲突。
+计划输出必须位于目标 workspace 和源蓝图目录之外；计划命令不在受审工程生成 Python 缓存。apply 会重新计算计划，拒绝过期计划与未解决冲突。对指导/工具文件，计划可通过 `--resolutions <json文件>` 接收按路径映射的 `choice`（`keep-local` 或 `merged`）与审核后 `currentSha256`。旧引用文件没有基线时，人工比较后可用 `take-upstream` 并同时提供 `currentSha256` 和 `targetSha256`。每次更改受审文件后必须重新规划。
 
-`v0.3.0-rc.1` 整合了新的依赖版本，从两个历史 CI 基线直接升级时会报告 root/App/koi_core 的依赖冲突，需要人工审阅迁移。该版本的 `Migration boundary` CI 只验证明确冲突、拒绝应用及工程/来源记录不变，不表示自动升级和升级后运行成功。不要删除冲突或修改基线摘要绕过检查；具体范围见 [候选版本记录](https://github.com/mrkoi-is/koi_blueprint_flutter/blob/v0.3.0-rc.1/docs/releases/v0.3.0-rc.1.md)。
+事务备份位于蓝图数据目录的 upgrades 子目录；备份时再次核对文件，回退在预检和每次恢复前校验备份摘要，后续用户修改会阻断覆盖。新工具继承上游的普通文件权限，已有文件保留本地权限；新增可执行入口不会因原子写入丢失执行位。中断后的事务须先回退，不能继续叠加应用。
+
+依赖解析只接受可明确检查的块状 YAML：顶层字段和依赖名称使用普通键，本地 `path` 必须留在隔离 workspace 内。行内依赖映射、别名、复杂或带引号的依赖键等不明确形式要求先人工规范化；不会调用 pub 去尝试这些输入。受支持的依赖变更仍限定于已识别的插入，不自动迁移任意依赖版本。可选能力包的源码变更（例如 `koi_diagnostics`）也会报告 `unsupported_managed_change`，需人工审阅迁移。
+
+`v0.3.0-rc.1` 整合了新的依赖版本，从两个历史 CI 基线直接升级时会报告 root/App/koi_core 的依赖冲突，需要人工审阅迁移。该版本的 `Migration boundary` CI 只验证明确冲突、拒绝应用及工程/来源记录不变，不表示自动升级和升级后运行成功。不要删除冲突或修改基线摘要绕过检查；最终验证范围见 [预发布说明](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.0-rc.1)。
 
 原有只读报告继续可用：
 
