@@ -25,7 +25,7 @@
 | `python3 /path/to/new-blueprint/blueprint.py upgrade apply --app PATH --plan PLAN` | 仅应用无阻断且输入未变化的计划，记录可回滚事务 |
 | `python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app PATH --transaction ID` | 在文件仍属于该事务时回退，不覆盖后续编辑 |
 
-每条子命令的参数含义以 `--help` 为准。新升级入口目前处于发布验收中，不保证旧项目可以自动升级；必须检查计划中全部阻断。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
+每条子命令的参数含义以 `--help` 为准。受管升级须检查计划中全部阻断；跨版本依赖冲突可能要求人工迁移，详见 [升级指南](upgrade-guide.md)。`run` 当前只接受 app/device，需编译常量时从 App 目录直接使用固定 SDK wrapper，见 [创建项目](new-project.md)。
 
 Feature 的源码布局、导入和 dry-run 使用同一解析结果，双布局会明确拒绝；测试统一放 test/features。API/local 的注入声明来自 composition 入口，独立 module 的外部消费仍经过模块根入口。
 

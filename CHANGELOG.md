@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.3.0 — 2026-11-17
+
+源码正式版，将已发布的诊断、国际化、测试与升级工具整合至 main。完整范围、迁移边界和未执行场景见 [版本记录](docs/releases/v0.3.0.md)，最终提交、CI 与产物摘要见 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.0)。
+
+- 默认 diagnostics v2：Talker 日志与网络记录、设备内查看、持久化与导出、临时授权的局域网查看；包含 Android release 后台诊断接线及已发布的 SSE、轮转和流式响应修复。
+- 整合 ARB 驱动的英／简／繁语言策略、Apple 本地化资源、Android 通知渠道与 LAN 网页翻译，保留 Windows CRLF 兼容修复。
+- 整合定向测试、Golden、持久化验收与受管升级事务；历史工程的依赖冲突仍需人工迁移。
+- 同步 README、创建指南及初始化契约中的默认诊断、显式能力选择和 Chrome 前置条件；补齐候选发布证据，区分历史设备验收与最终提交构建。
+- 本版发布从合并后的 main 提交构建并归档；验证应用不代表正式签名的业务 APK，六端完整国际化 UI 验收仍未完成。
+
 ## 0.3.0-rc.1 — 2026-11-17
 
 源码预发布，整合已发布的测试工具与诊断修复。已验证范围和未执行项见 [候选版本记录](docs/releases/v0.3.0-rc.1.md)，不代表六端完整国际化验收。
