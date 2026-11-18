@@ -26,6 +26,8 @@ dependencies:
   media_kit_video: 2.0.1
   media_kit_libs_video: 1.0.7
 dev_dependencies:
+  flutter_driver:
+    sdk: flutter
   flutter_test:
     sdk: flutter
   integration_test:

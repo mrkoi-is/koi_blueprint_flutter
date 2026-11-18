@@ -7,9 +7,54 @@ import unittest
 
 import blueprint
 from tool.check_template_assets import check
+from tool.platform_evidence import source_manifest
 
 
 class RealTemplateAssetsTest(unittest.TestCase):
+    def test_macos_versioned_goldens_are_inherited_with_exact_bytes(self):
+        source = Path(__file__).resolve().parents[2] / 'packages/koi_ui/test/golden'
+        names = ('empty_narrow_large.png', 'error_dark.png', 'error_light.png')
+        with tempfile.TemporaryDirectory(prefix='koi-golden-inherit-') as temporary:
+            destination = Path(temporary) / 'golden'
+            blueprint.copy(source, destination)
+            for family in ('macos-arm64', 'macos-26-arm64'):
+                for name in names:
+                    relative = Path('baselines') / family / name
+                    self.assertTrue((source / relative).is_file())
+                    self.assertEqual((source / relative).read_bytes(),
+                                     (destination / relative).read_bytes())
+            self.assertFalse((destination / 'failures').exists())
+
+    def test_golden_baselines_inherit_but_failure_artifacts_do_not(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / 'source'
+            for relative in ('test/golden/baselines/example.png',
+                             'test/golden/fonts/font.ttf',
+                             'test/golden/failures/actual.png',
+                             'test/fixtures/failures/legitimate.json'):
+                path = source / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(b'fixture')
+            blueprint.copy(source, root / 'copy')
+            self.assertTrue((root / 'copy/test/golden/baselines/example.png').is_file())
+            self.assertTrue((root / 'copy/test/golden/fonts/font.ttf').is_file())
+            self.assertFalse((root / 'copy/test/golden/failures').exists())
+            self.assertTrue((root / 'copy/test/fixtures/failures/legitimate.json').is_file())
+
+    def test_golden_diagnostics_do_not_change_source_but_baselines_do(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            before = source_manifest(root)['source_sha256']
+            diagnostics = root / 'packages/ui/test/golden/failures/actual.png'
+            diagnostics.parent.mkdir(parents=True)
+            diagnostics.write_bytes(b'output')
+            self.assertEqual(source_manifest(root)['source_sha256'], before)
+            baseline = root / 'packages/ui/test/golden/baselines/state.png'
+            baseline.parent.mkdir()
+            baseline.write_bytes(b'baseline')
+            self.assertNotEqual(source_manifest(root)['source_sha256'], before)
+
     def test_copy_plan_drives_guidance_baselines_in_recursive_generation(self):
         source = Path(__file__).resolve().parents[2]
         with tempfile.TemporaryDirectory(prefix='koi-copy-plan-') as temporary:
@@ -50,6 +95,8 @@ class RealTemplateAssetsTest(unittest.TestCase):
             with tempfile.TemporaryDirectory(prefix='koi-real-assets-regression-') as temporary:
                 clone = Path(temporary)
                 blueprint.inherit_workspace_assets(clone, 'probe')
+                self.assertTrue((clone / 'tool/blueprint_test.py').is_file())
+                self.assertTrue((clone / 'tool/workspace_lock.py').is_file())
                 blueprint.copy(source / 'packages', clone / 'packages')
                 (clone / 'pubspec.yaml').write_bytes((source / 'pubspec.yaml').read_bytes())
                 research = clone / 'docs/research/source-only.md'

@@ -1,16 +1,55 @@
 {
   "@@locale": "en",
   "retry": "Retry",
+  "@retry": {
+    "description": "Action to retry the failed operation; does not discard the current draft."
+  },
   "loading": "Preparing workspace…",
+  "@loading": {
+    "description": "Default loading message while a workspace is being prepared."
+  },
   "openMenu": "Open menu",
+  "@openMenu": {
+    "description": "Accessibility label for the trigger that opens a contextual menu."
+  },
   "openPanel": "Open panel",
+  "@openPanel": {
+    "description": "Accessibility label for opening a panel."
+  },
   "closePanel": "Close panel",
+  "@closePanel": {
+    "description": "Accessibility label for closing a panel without deleting its contents."
+  },
   "clearSearch": "Clear search",
+  "@clearSearch": {
+    "description": "Accessibility label for clearing the current search query."
+  },
   "back": "Back",
+  "@back": {
+    "description": "Navigate to the previous location in navigation history."
+  },
   "forward": "Forward",
+  "@forward": {
+    "description": "Navigate to the next location in navigation history."
+  },
   "toggleSidebar": "Toggle sidebar",
+  "@toggleSidebar": {
+    "description": "Show or hide the navigation sidebar."
+  },
   "toggleDetail": "Toggle details",
+  "@toggleDetail": {
+    "description": "Show or hide the details panel for the current selection."
+  },
   "resizeSidebar": "Resize sidebar",
+  "@resizeSidebar": {
+    "description": "Accessibility label for the draggable sidebar divider."
+  },
   "resizeDetail": "Resize details",
-  "resizePanel": "Resize panel"
+  "@resizeDetail": {
+    "description": "Accessibility label for the draggable details-panel divider."
+  },
+  "resizePanel": "Resize panel",
+  "@resizePanel": {
+    "description": "Accessibility label for a draggable panel divider."
+  }
 }

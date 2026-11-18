@@ -12,6 +12,7 @@ final class DiagnosticEvent {
     required this.message,
     this.error,
     this.stack,
+    this.network,
   });
   final int id;
   final DateTime time;
@@ -20,6 +21,7 @@ final class DiagnosticEvent {
   final String message;
   final String? error;
   final String? stack;
+  final Map<String, Object?>? network;
   Map<String, Object?> toJson() => {
     'id': id,
     'time': time.toUtc().toIso8601String(),
@@ -28,6 +30,7 @@ final class DiagnosticEvent {
     'message': message,
     'error': error,
     'stack': stack,
+    if (network != null) 'network': network,
   };
   factory DiagnosticEvent.fromJson(Map<String, Object?> json) =>
       DiagnosticEvent(
@@ -38,18 +41,21 @@ final class DiagnosticEvent {
         message: json['message'] as String,
         error: json['error'] as String?,
         stack: json['stack'] as String?,
+        network: (json['network'] as Map?)?.cast<String, Object?>(),
       );
 }
 
 final class DiagnosticQuery {
-  const DiagnosticQuery({this.level, this.source, this.text = ''});
+  const DiagnosticQuery({this.level, this.source, this.text = '', this.kind});
   final AppLogLevel? level;
   final String? source;
   final String text;
+  final String? kind;
   bool matches(DiagnosticEvent event) =>
+      (kind == null || (kind == 'network') == (event.network != null)) &&
       (level == null || level == event.level) &&
       (source == null || source == event.source) &&
-      '${event.message}\n${event.error ?? ''}\n${event.stack ?? ''}'
+      '${event.message}\n${event.error ?? ''}\n${event.stack ?? ''}\n${event.network ?? ''}'
           .toLowerCase()
           .contains(text.toLowerCase());
 }
@@ -78,7 +84,7 @@ typedef DiagnosticPersistence = Future<void> Function(
 /// Bounded diagnostics; persistence failure is observable and never logged recursively.
 final class BoundedDiagnosticStore implements DiagnosticStore {
   BoundedDiagnosticStore({
-    this.maxBytes = 6 * 1024 * 1024,
+    this.maxBytes = 20 * 1024 * 1024,
     this.persist,
     DateTime Function()? clock,
   }) : _clock = clock ?? DateTime.now {
@@ -122,23 +128,45 @@ final class BoundedDiagnosticStore implements DiagnosticStore {
     String source = 'app',
     Object? error,
     StackTrace? stackTrace,
+    Map<String, Object?>? network,
+    DateTime? time,
   }) {
     if (_closed) {
       return;
     }
     final event = DiagnosticEvent(
       id: ++_revision,
-      time: _clock().toUtc(),
+      time: (time ?? _clock()).toUtc(),
       level: level,
       source: source,
       message: redactDiagnostic(message),
       error: error == null ? null : redactDiagnostic('$error'),
       stack: stackTrace == null ? null : redactDiagnostic('$stackTrace'),
+      network: network == null ? null : Map.unmodifiable(network),
     );
     _append(event);
     _changes.add(++_notification);
     _schedulePersistence();
   }
+
+  /// Imports boot records without changing their timestamps or network identity.
+  void importEvents(Iterable<DiagnosticEvent> events) {
+    for (final event in events) {
+      record(
+        event.level,
+        event.message,
+        source: event.source,
+        error: event.error,
+        stackTrace: event.stack == null
+            ? null
+            : StackTrace.fromString(event.stack!),
+        network: event.network,
+        time: event.time,
+      );
+    }
+  }
+
+  List<DiagnosticEvent> get snapshot => List.unmodifiable(_events);
 
   void _append(DiagnosticEvent event) {
     final size = utf8.encode(jsonEncode(event.toJson())).length + 1;
@@ -257,7 +285,7 @@ String redactDiagnostic(String value) => value
     )
     .replaceAllMapped(
       RegExp(
-        r'''((?:access_token|refresh_token|password|api_key|secret)["\']?\s*[=:]\s*["\']?)[^\s"\'&,;]+''',
+        r'''((?:access_token|refresh_token|token|password|api_key|secret)["\']?\s*[=:]\s*["\']?)[^\s"\'&,;]+''',
         caseSensitive: false,
       ),
       (m) => '${m[1]}[redacted]',

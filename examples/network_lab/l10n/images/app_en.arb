@@ -12,23 +12,29 @@
   "@imagesReadError": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Reading an image failed. error contains the technical diagnostic text."
   },
   "imagesLayout": "Layout {width} dp · DPR {dpr} · Decode limit {pixels} px",
   "@imagesLayout": {
     "placeholders": {
       "width": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       },
       "dpr": {
-        "type": "String"
+        "type": "String",
+        "example": "2.0"
       },
       "pixels": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Image layout diagnostics: logical width, device pixel ratio, and requested physical pixel width."
   },
   "imagesRetry": "Retry",
   "imagesCacheHit": "Cache hit; available offline",
@@ -38,20 +44,25 @@
   "@imagesDecodeFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Image decoding failed. error contains the technical diagnostic text."
   },
   "imagesDecodedSize": "Decoded {width} × {height} px",
   "@imagesDecodedSize": {
     "placeholders": {
       "width": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       },
       "height": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Decoded image dimensions, width by height, in physical pixels."
   },
   "imagesPreview": "Image preview"
 }

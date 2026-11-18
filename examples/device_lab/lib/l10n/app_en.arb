@@ -15,9 +15,11 @@
   "@devicesIncomingEventsAwaitDraftResolution": {
     "placeholders": {
       "value0": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Count of incoming device events held while the user resolves an unsaved draft."
   },
   "devicesIncomingLinks": "Incoming links",
   "devicesOpenLink": "Open link",
@@ -41,9 +43,11 @@
   "@devicesFirstSetup": {
     "placeholders": {
       "value0": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of the first-time device setup request."
   },
   "devicesLanguage": "Language",
   "devicesNext": "Next",
@@ -60,9 +64,11 @@
   "@localSetupSetup": {
     "placeholders": {
       "value0": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number identifying the current local setup request."
   },
   "localSetupNext": "Next",
   "localSetupNoDirectoryWebUsesTheBrowser": "No directory; Web uses the browser file picker",
@@ -76,9 +82,11 @@
   "@localSetupDraftProtectedPendingIntents": {
     "placeholders": {
       "value0": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of pending setup intents deferred to protect the current draft."
   },
   "localSetupText": "Text",
   "localSetupSave": "Save",
@@ -92,9 +100,11 @@
   "@devicesOpenFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "The device session could not be opened. error contains the technical diagnostic text."
   },
   "devicesConnectionDisconnected": "Disconnected",
   "devicesConnectionConnecting": "Connecting",

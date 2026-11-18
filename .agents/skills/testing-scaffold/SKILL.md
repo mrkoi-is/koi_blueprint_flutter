@@ -14,7 +14,7 @@ description: 为 Koi Feature、共享包和模块补行为测试，覆盖依赖�
 2. 用构造器/provider overrides 注入仓库、时钟、平台、文件根目录等替身。
 3. 测首次 loading、空数据、失败、刷新/重试；异步状态增加逆序返回和 dispose 场景。
 4. module 增加重复 id/路由、切换释放、旧结果拒绝与宿主共享服务仍存活测试。
-5. 运行受影响测试，再运行完整门禁和 80% 手写代码覆盖率检查。
+5. 已准备环境可用 `python3 blueprint.py test --member <成员路径> --path test/<用例>_test.dart` 定向诊断，保存 result.json 和原始事件；再运行完整门禁和 80% 手写代码覆盖率检查。
 
 ## 核心规则
 - auto-dispose provider 在观测期间保持 listen 订阅，测试结束销毁 container。
@@ -25,6 +25,11 @@ description: 为 Koi Feature、共享包和模块补行为测试，覆盖依赖�
 - 原生退出回归挂载真实 App 并通过宿主 binding 分发：覆盖阻塞/失败、晚到异步与取消监听器、重复请求；全部监听器允许后先卸载消费树再释放 router/provider。不能仅以直接调用 observer 或 bootstrap 证明退出顺序。
 - UI 增强覆盖长中文/200%字号、焦点、Escape 恢复、resize 保留；媒体替身只证明拥有者行为，真实播放、截图与 Web 存储另做平台测试。
 - 生成物排除覆盖率；手写可执行代码缺失于报告不能被当成已覆盖。
+- 国际化先跑 `check l10n` 与生成，再测设备语言变化、用户覆盖/恢复跟随系统、繁简脚本匹配、窄屏大字体和 router/session 身份保留；见 [国际化契约](../../../docs/architecture/localization.md)。
+- 定向结果只证明显式文件/name 范围；共享包消费方不能据此判为通过。空跑、必需跳过、截断日志和 MCP 成功摘要都不能代替完整测试证据。
+- 同一 workspace 的蓝图测试命令互斥；不要同时直接运行不受锁保护的 Flutter 测试。失败时保留本次 runId 的日志和 Golden 差异，不用旧产物替代。
+- 真实 App 探索先发现 MCP 能力与当前 Widget 树，唯一定位后操作并读回业务状态；保存动作/截图，固化为无 Agent 可运行的回归，从干净状态重放。driver 扩展只放独立入口并保留宿主 binding 契约。
+- Golden 只在其声明的主机/SDK/字体环境比较；更新基线须显式执行并查看差异，不能由自动修复顺手刷新。其他主机的 skip 属于未执行。
 
 ## 验证
 对目标平台另跑 build/运行检查。记录通过、失败、未执行；不能把源码检查当成真实设备或外部服务验收。

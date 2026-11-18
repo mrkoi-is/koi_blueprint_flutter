@@ -12,7 +12,7 @@ python3 blueprint.py create studio --output ../studio --org com.example --templa
 
 非空目标、符号链接目标和名称冲突会被拒绝。创建在独立临时目录装配、解析依赖和生成源码，成功后才交付目标目录；不覆盖已有项目。`create --dry-run` 检查输入和展示配置，不运行 SDK、依赖解析或完整配方安装验证。
 
-`--template minimal|workbench` 默认 minimal。活动成员从 App、`koi_core`、`koi_ui` 开始。两种模板默认具备主题、en/zh/zh_Hant 本地化、错误接线和来源信息；minimal 不默认引入认证、网络、文件、媒体或数据库插件。workbench 提供文本资料、图片/视频素材、待办、导入任务与会话存储。其他能力按需安装，保留原有 App 的装配与 router。
+`--template minimal|workbench` 默认 minimal。基础活动成员为 App、`koi_core`、`koi_ui`，默认 diagnostics v2 另加入 `koi_diagnostics` 及其持久化、平台依赖。两种模板默认具备主题、en/zh/zh_Hant 本地化、错误接线和来源信息；认证、业务网络客户端、媒体和数据库能力按需加入。workbench 提供文本资料、图片/视频素材、待办、导入任务与会话存储。增装能力保留原有 App 的装配与 router。
 
 工作台使用 SDK 生成 runner，再合并平台配置。macOS 加入用户选择文件的只读权限并保留其他 entitlement；未知结构报错。当前沿用 Flutter 3.47.2 的 Android 24、iOS 15、macOS 12 下限。Linux 工作台需要 `libmpv-dev mpv libepoxy-dev` 及 Flutter GTK 构建依赖。
 
@@ -47,7 +47,7 @@ python3 blueprint.py create field_notes --output ../field_notes --config bluepri
 python3 blueprint.py create field_notes --output ../field_notes --config blueprint.local.json
 ```
 
-`images` 自动安装其 `network` 依赖。依赖按目录中的顺序解析，来源只取蓝图内置受测配方；`capability list` 的 status 字段与生成项目/目标平台验证日志一起判断完成度。`locales` 省略时使用默认三种语言；目前显式指定时也要求完整的 en/zh/zh_Hant 组合，尚不支持通过删项裁剪翻译。
+`capabilities` 省略时默认安装 diagnostics v2；显式 `[]` 关闭默认能力，非空列表代表完整选择，不会额外补入 diagnostics。`images` 自动安装其 `network` 依赖。依赖按目录中的顺序解析，来源只取蓝图内置受测配方；`capability list` 的 status 字段与生成项目/目标平台验证日志一起判断完成度。`locales` 省略时使用默认三种语言；目前显式指定时也要求完整的 en/zh/zh_Hant 组合，尚不支持通过删项裁剪翻译。App 内的语言选择、偏好恢复和匹配统一消费 `lib/l10n/app_locale_policy.dart`；文案维护与检查见 [国际化契约](architecture/localization.md)。
 
 显示名称同步 App 文案、Android label、Apple bundle/window/menu、Windows/Linux window 和 Web manifest/title，保留包名、bundle identifier 与可执行文件身份。需要图标时，在 brand 中加入 `iconForeground`（相对于配置文件的 PNG 或自包含 SVG 路径）和 `iconBackground`（例如 `#315C80`）；生成器自动加入 branding 能力，需要 ImageMagick 7.1–7.x。首次创建可替换 SDK 默认 runner 图标；已有工程的未受管图标默认拒绝覆盖。资源与图标的输入/输出摘要、限制见 [资源与打包](engineering/assets-and-packaging.md)。
 
@@ -83,7 +83,7 @@ cd ../..
 
 该地址只是本机受控服务示例；运行 App 前先启动自己的测试服务，设备端换为实际可达地址。HTTP smoke 脚本自行启动/终止临时端口 fixture；network 单独安装运行 5 个真实场景（含地址输入→连接→搜索），加入 images 后增加图像场景。普通 validate 的成员测试跳过需要该服务的 HTTP 组，因此还要单独执行这条 smoke 命令。图片来源页可以单独输入 URL。网络与图片页面、状态和导航标题使用宿主英/简/繁 ARB，切换语言保留页面会话与布局。
 
-Chrome 运行要求生成 Web runner；macOS 将 device 改为 macos，手机使用 devices 返回的 ID。validate 只在活动成员存在浏览器测试时要求 Chrome，只在存在 API Web 冒烟入口时要求 Node。默认 minimal 不要求这两项；workbench 和安装了浏览器测试的能力要求 Chrome。
+Chrome 运行要求生成 Web runner；macOS 将 device 改为 macos，手机使用 devices 返回的 ID。validate 只在活动成员存在浏览器测试时要求 Chrome，只在存在 API Web 冒烟入口时要求 Node。默认 minimal/workbench 均包含诊断浏览器测试，因此要求 Chrome；默认两模板不要求 Node。minimal 显式配置 `capabilities: []` 且未新增浏览器测试时不要求 Chrome，workbench 自身的浏览器测试仍要求 Chrome。
 
 ## 构建和打包
 
@@ -121,7 +121,7 @@ python3 blueprint.py upgrade-report --app apps/field_notes_app --source ../koi_b
 
 报告把生成时基线、当前本地文件、当前上游来源分为 upstreamChanges/localChanges/conflicts/alreadyApplied/unchanged；`alreadyApplied` 表示本地文件已与当前上游内容一致。报告还列出新能力和人工迁移说明；只输出 JSON，不写项目、不自动合并、不升级依赖。schema 1 或缺少基线的旧工程可读取，但只得到人工迁移说明，不能直接 capability add。现有项目先人工接入 schema 2 装配和基线，再验证；不要通过改一个 schema 数字伪造迁移完成。下游已有业务改动仍由项目维护者逐项审阅迁移。
 
-逐项处理方式见 [下游工程只读升级指南](upgrade-guide.md)。
+逐项处理方式及受限的升级事务入口见 [下游工程升级指南](upgrade-guide.md)。
 
 ## 新增业务功能
 
@@ -133,3 +133,7 @@ python3 blueprint.py module reporting --workspace .
 ```
 
 presentation 生成无数据源页面，api 生成仓库驱动的分页/搜索骨架，local 生成本地数据与业务状态。脚手架后仍需完成业务字段、宿主导航、依赖 override 和场景测试；示例替身不代表真实后端。新增共享包按 [add-shared-package](../.agents/skills/add-shared-package/SKILL.md) 完成目录、pubspec、workspace 登记和测试。
+
+## Talker 标准诊断
+
+见 [诊断能力](diagnostics.md)；新项目默认安装 diagnostics v2，设备与 LAN 共用持久化记录，release 连点版本号进入。Android LAN 后台服务与真机验收单独记录。

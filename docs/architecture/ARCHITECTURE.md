@@ -13,6 +13,7 @@
 | 模型默认 | Freezed + json_serializable；兼容既有序列化格式时可保留有测试的手写实现 |
 | 按需能力 | 认证、koi_network、Swagger、数据库、原生平台服务 |
 | UI 默认 | koi_ui + Material 3；语义 token、density 和自适应规范见 [UI 契约](ui-and-adaptive.md) |
+| 国际化 | ARB + gen-l10n；App 拥有语言策略与偏好，共享组件独立翻译；见 [国际化契约](localization.md) |
 
 版本以 `.fvmrc`、各 pubspec 和根锁文件为事实来源。SDK 升级同时更新 CI 和生成器兼容组合，不用 dependency_overrides 掩盖生成器冲突。
 
@@ -75,3 +76,5 @@ API/local Feature 的 `<feature>.dart` 是业务入口，导出模型、端口�
 ## 维护契约
 
 架构改动同步相关 Skill、样例、脚手架与测试。文档写清默认选择和条件例外；验证记录写明实际执行命令及平台。设计参考和个人项目经验见 [参考依据](references.md)。分阶段收口口径、目录和产品例外见 [治理方案](governance.md)。下游使用不依赖这些原始仓库。
+
+诊断采集、唯一存储与 LAN 生命周期见 [诊断能力](../diagnostics.md)。

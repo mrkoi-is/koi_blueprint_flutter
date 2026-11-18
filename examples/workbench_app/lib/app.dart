@@ -1,3 +1,4 @@
+import 'package:workbench_app/l10n/app_locale_policy.dart';
 import 'package:koi_core/koi_core.dart';
 import 'package:workbench_app/core/capabilities/app_capabilities.dart';
 import 'package:workbench_app/core/commands/workbench_commands.dart';
@@ -193,12 +194,12 @@ class _ThemedWorkbench extends ConsumerWidget {
               WorkspaceThemeMode.light => ThemeMode.light,
               WorkspaceThemeMode.dark => ThemeMode.dark,
             },
-        supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: appLocalePolicy.supportedLocales,
         localizationsDelegates: [
           KoiUiLocalizations.delegate,
           ...AppLocalizations.localizationsDelegates,
         ],
-        localeListResolutionCallback: resolveKoiLocale,
+        localeListResolutionCallback: appLocalePolicy.resolve,
         locale: appearance?.locale,
         routerConfig: bootstrap.router,
         builder: (context, child) => ListenableBuilder(

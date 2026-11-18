@@ -1,3 +1,5 @@
+import 'package:koi_core/koi_core.dart';
+
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -7,11 +9,22 @@ import 'package:starter_app/app.dart';
 import 'package:starter_app/core/capabilities/installed_capabilities.dart';
 import 'package:starter_app/core/diagnostics/app_diagnostics.dart';
 import 'package:starter_app/l10n/generated/app_localizations.dart';
+import 'package:starter_app/l10n/app_locale_policy.dart';
 
 void main() {
-  WidgetsFlutterBinding.ensureInitialized();
-  AppDiagnostics.instance.install();
-  runApp(ProviderScope(child: const StarterLauncher()));
+  runZonedGuarded(
+    () {
+      WidgetsFlutterBinding.ensureInitialized();
+      AppDiagnostics.instance.install();
+      runApp(ProviderScope(child: const StarterLauncher()));
+    },
+    (error, stack) => AppDiagnostics.instance.record(error, stack, 'zone'),
+    zoneSpecification: ZoneSpecification(
+      print: (self, parent, zone, line) {
+        AppLogger.info(line);
+      },
+    ),
+  );
 }
 
 class StarterLauncher extends StatefulWidget {
@@ -55,12 +68,12 @@ class _StarterLauncherState extends State<StarterLauncher> {
       return MaterialApp(
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
-        supportedLocales: AppLocalizations.supportedLocales,
+        supportedLocales: appLocalePolicy.supportedLocales,
         localizationsDelegates: [
           KoiUiLocalizations.delegate,
           ...AppLocalizations.localizationsDelegates,
         ],
-        localeListResolutionCallback: resolveKoiLocale,
+        localeListResolutionCallback: appLocalePolicy.resolve,
         home: Builder(
           builder: (context) {
             final strings = AppLocalizations.of(context)!;

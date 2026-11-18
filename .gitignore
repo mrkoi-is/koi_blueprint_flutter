@@ -11,6 +11,7 @@
 **/.flutter-plugins-dependencies
 **/.pub/
 **/coverage/
+**/test/golden/failures/
 melos_*.iml
 
 # Codegen outputs are not versioned; regenerate via `melos run generate`
@@ -20,6 +21,7 @@ melos_*.iml
 # Python validation tooling
 __pycache__/
 *.pyc
+.blueprint/upgrades/
 
 # Flutter localization output (regenerate from ARB)
 **/lib/l10n/generated/

@@ -1,3 +1,4 @@
+import 'package:platform_lab/l10n/app_locale_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -27,7 +28,8 @@ class _Host extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final preferences = ref.watch(appAppearanceProvider).value;
     return MaterialApp(
-      locale: preferences?.locale ?? const Locale('en'),
+      locale: preferences?.locale,
+      localeListResolutionCallback: appLocalePolicy.resolve,
       localizationsDelegates: [
         KoiUiLocalizations.delegate,
         ...AppLocalizations.localizationsDelegates,
@@ -45,6 +47,47 @@ class _Host extends ConsumerWidget {
 }
 
 void main() {
+  for (final locale in appLocalePolicy.supportedLocales) {
+    testWidgets('language selector fits 320px and 200% text in $locale', (
+      tester,
+    ) async {
+      tester.view.physicalSize = const Size(320, 780);
+      tester.view.devicePixelRatio = 1;
+      tester.platformDispatcher.textScaleFactorTestValue = 2;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+      final store = MemoryUiPreferencesStore();
+      await store.write({'locale': locale.toLanguageTag()});
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [uiPreferencesStoreProvider.overrideWithValue(store)],
+          child: const _Host(),
+        ),
+      );
+      await tester.pumpAndSettle();
+      final l10n = lookupAppLocalizations(locale);
+      expect(find.text(l10n.settingsLanguage), findsOneWidget);
+      expect(
+        find.text(
+          l10n.settingsLanguageDescription(
+            appLocalePolicy.label(appLocalePolicy.fallbackLocale),
+          ),
+        ),
+        findsOneWidget,
+      );
+      await tester.ensureVisible(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+      await tester.tap(find.byType(DropdownButton<String>));
+      await tester.pumpAndSettle();
+      for (final available in appLocalePolicy.supportedLocales) {
+        expect(find.text(appLocalePolicy.label(available)), findsWidgets);
+      }
+      expect(tester.takeException(), isNull);
+      await tester.pumpWidget(const SizedBox.shrink());
+    });
+  }
+
   testWidgets('search, immediate host theme, persistence failure and retry', (
     tester,
   ) async {

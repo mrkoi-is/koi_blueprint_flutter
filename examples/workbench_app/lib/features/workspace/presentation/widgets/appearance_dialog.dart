@@ -1,3 +1,4 @@
+import 'package:workbench_app/l10n/app_locale_policy.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:koi_ui/koi_ui.dart';
@@ -29,9 +30,11 @@ Future<void> showAppearanceDialog(BuildContext context, WidgetRef ref) async {
                   value: 'system',
                   child: Text(context.l10n.systemLanguage),
                 ),
-                const DropdownMenuItem(value: 'zh', child: Text('简体中文')),
-                const DropdownMenuItem(value: 'zh-Hant', child: Text('繁體中文')),
-                const DropdownMenuItem(value: 'en', child: Text('English')),
+                for (final locale in appLocalePolicy.supportedLocales)
+                  DropdownMenuItem(
+                    value: locale.toLanguageTag(),
+                    child: Text(appLocalePolicy.label(locale)),
+                  ),
               ],
               onChanged: (value) => setState(() => locale = value ?? 'system'),
             ),
@@ -75,16 +78,5 @@ Future<void> showAppearanceDialog(BuildContext context, WidgetRef ref) async {
   );
   if (apply != true || !context.mounted) return;
   final notifier = ref.read(workbenchAppearanceProvider.notifier);
-  notifier.apply(
-    locale: switch (locale) {
-      'en' => const Locale('en'),
-      'zh' => const Locale('zh'),
-      'zh-Hant' => const Locale.fromSubtags(
-        languageCode: 'zh',
-        scriptCode: 'Hant',
-      ),
-      _ => null,
-    },
-    accent: accent,
-  );
+  notifier.apply(locale: appLocalePolicy.fromTag(locale), accent: accent);
 }

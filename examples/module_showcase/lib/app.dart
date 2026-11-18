@@ -1,3 +1,4 @@
+import 'package:module_showcase/l10n/app_locale_policy.dart';
 import 'package:showcase_alpha/showcase_alpha.dart' show alphaMessage;
 import 'package:showcase_beta/showcase_beta.dart' show betaMessage;
 import 'package:riverpod_annotation/experimental/scope.dart';
@@ -31,8 +32,12 @@ class _ModuleShowcaseAppState extends State<ModuleShowcaseApp> {
   Widget build(BuildContext context) => UncontrolledProviderScope(
     container: widget.bootstrap.container,
     child: MaterialApp.router(
-      supportedLocales: AppLocalizations.supportedLocales,
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: appLocalePolicy.supportedLocales,
+      localeListResolutionCallback: appLocalePolicy.resolve,
+      localizationsDelegates: [
+        KoiUiLocalizations.delegate,
+        ...AppLocalizations.localizationsDelegates,
+      ],
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       routerConfig: widget.bootstrap.router,

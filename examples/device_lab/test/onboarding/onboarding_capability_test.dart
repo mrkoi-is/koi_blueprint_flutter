@@ -45,7 +45,13 @@ void main() {
         'native persisted 正文',
       );
       expect(
-        await completeCapability(tester, CapabilityLifecycle.instance.prepare),
+        await completeCapability(
+          tester,
+          CapabilityLifecycle.instance.prepare,
+          describe: () =>
+              'dirty=${session.dirty}, error=${session.error}, '
+              'storageRequests=${fixture.requests}',
+        ),
         true,
       );
       expect(

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:database_lab/l10n/generated/app_localizations.dart';
+import 'package:database_lab/l10n/app_locale_policy.dart';
 
 import 'dart:ui' show AppExitResponse;
 
@@ -14,8 +15,12 @@ void main() {
     ProviderScope(
       child: MaterialApp(
         title: 'Database Lab',
-        supportedLocales: AppLocalizations.supportedLocales,
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: appLocalePolicy.supportedLocales,
+        localeListResolutionCallback: appLocalePolicy.resolve,
+        localizationsDelegates: [
+          KoiUiLocalizations.delegate,
+          ...AppLocalizations.localizationsDelegates,
+        ],
         theme: AppTheme.light,
         darkTheme: AppTheme.dark,
         home: const _StandaloneOwner(),

@@ -365,6 +365,11 @@ class BlueprintTest(unittest.TestCase):
 
     def create_fixture(self):
         source = self.root / 'blueprint-source'
+        # New projects install diagnostics by default. Keep the real recipe and
+        # support package in the source fixture so recursion exercises that path.
+        real_source = Path(__file__).resolve().parents[2]
+        blueprint.copy(real_source / 'tool/capabilities', source / 'tool/capabilities')
+        blueprint.copy(real_source / 'packages/koi_diagnostics', source / 'packages/koi_diagnostics')
         write(source / 'pubspec.yaml', 'name: source_blueprint\nversion: 0.1.0\ndescription: Old blueprint\nrepository: https://old.invalid/repo\nhomepage: https://old.invalid\nissue_tracker: https://old.invalid/issues\n\nenvironment:\n  sdk: ^3.13.0\nworkspace:\n  - examples/starter_app\n  - packages/koi_core\n\ndev_dependencies:\n  analyzer: 14.4.0\n')
         write(source / 'analysis_options.yaml', 'analyzer:\n  exclude:\n    - "**/*.g.dart"\n')
         write(source / 'examples/starter_app/pubspec.yaml', 'name: starter_app\ndescription: Executable blueprint reference, also used by the generator\nresolution: workspace\ndev_dependencies:\n  build_runner: 2.16.1\n')
@@ -444,6 +449,8 @@ class BlueprintTest(unittest.TestCase):
         self.assertNotIn('Old blueprint', spec)
         self.assertIn('  - apps/my_workspace_app', spec)
         self.assertIn('  - packages/koi_ui', spec)
+        self.assertIn('  - packages/koi_diagnostics', spec)
+        self.assertEqual(json.loads((target / 'blueprint.json').read_text())['capabilities']['diagnostics']['version'], 2)
         self.assertNotIn('  - examples/starter_app', spec)
         self.assertIn('analyzer: 14.4.0', spec)
         config = json.loads((target / '.dart_tool/package_config.json').read_text(encoding='utf-8'))

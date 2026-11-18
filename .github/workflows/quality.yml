@@ -12,7 +12,22 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  workspace-kind:
+    runs-on: ubuntu-latest
+    outputs:
+      kind: ${{ steps.workspace.outputs.kind }}
+      member: ${{ steps.workspace.outputs.member }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - id: workspace
+        run: python tool/ai_test_workspace.py --workspace . --github-output "$GITHUB_OUTPUT"
+
   python-compatibility:
+    needs: workspace-kind
+    if: needs.workspace-kind.outputs.kind == 'source'
     name: Python ${{ matrix.python-version }} generator tests
     runs-on: ubuntu-latest
     strategy:
@@ -27,6 +42,7 @@ jobs:
       - run: python -m unittest discover -s tool/tests -p 'test_*.py'
 
   quality:
+    needs: workspace-kind
     runs-on: ubuntu-latest
     timeout-minutes: 90
 
@@ -52,10 +68,173 @@ jobs:
       - name: Validate workspace
         run: python blueprint.py validate
 
+      - name: Verify AI App test evidence
+        if: needs.workspace-kind.outputs.kind == 'source'
+        run: python tool/ai_test_ci.py --workspace . --suite app
+
+      - name: Verify Workbench persistence evidence
+        if: needs.workspace-kind.outputs.kind != 'minimal'
+        run: python tool/ai_test_ci.py --workspace . --suite workbench
+
+      - name: Stage AI App test evidence
+        if: always()
+        run: python tool/ai_test_ci.py --workspace . --stage "${{ runner.temp }}/ai-app-evidence"
+
+      - name: Preserve AI App test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-app-quality-${{ runner.os }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ai-app-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Compile and test renamed feature and module outputs
+        if: needs.workspace-kind.outputs.kind == 'source'
         run: python tool/generator_smoke.py
 
+  golden:
+    needs: workspace-kind
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - run: python blueprint.py check bootstrap
+      - name: Verify Golden evidence
+        run: python tool/ai_test_ci.py --workspace . --suite golden
+      - name: Stage Golden evidence
+        if: always()
+        run: python tool/ai_test_ci.py --workspace . --stage "${{ runner.temp }}/ai-golden-evidence"
+      - name: Preserve Golden evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-golden-${{ needs.workspace-kind.outputs.kind }}-${{ runner.os }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ai-golden-evidence/
+          if-no-files-found: warn
+          retention-days: 7
+
+  downstream-platform:
+    needs: workspace-kind
+    if: needs.workspace-kind.outputs.kind != 'source'
+    name: Existing project / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Select configured platforms
+        id: platforms
+        shell: bash
+        run: python tool/ai_test_workspace.py --workspace . --host "${{ runner.os }}" --github-output "$GITHUB_OUTPUT"
+      - name: Verify Windows workspace lock behavior
+        if: runner.os == 'Windows'
+        run: python -m unittest tool.tests.test_workspace_lock tool.tests.test_workspace_process_lock
+      - uses: actions/setup-java@v4
+        if: runner.os == 'Linux' && steps.platforms.outputs.platforms != ''
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux' && steps.platforms.outputs.platforms != ''
+        run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev mpv libepoxy-dev
+      - uses: subosito/flutter-action@v2
+        if: steps.platforms.outputs.platforms != ''
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Prepare this project's dependencies
+        if: steps.platforms.outputs.platforms != ''
+        run: python blueprint.py check bootstrap
+      - name: Generate this project's Dart code
+        if: steps.platforms.outputs.platforms != ''
+        run: python blueprint.py check generate
+      - name: Build this project's configured platforms
+        if: steps.platforms.outputs.platforms != ''
+        run: python blueprint.py build --app "${{ needs.workspace-kind.outputs.member }}" --platforms "${{ steps.platforms.outputs.platforms }}"
+      - name: Verify Workbench persistence across processes
+        if: needs.workspace-kind.outputs.kind == 'workbench' && ((runner.os == 'Linux' && contains(steps.platforms.outputs.platforms, 'linux')) || (runner.os == 'macOS' && contains(steps.platforms.outputs.platforms, 'macos')) || (runner.os == 'Windows' && contains(steps.platforms.outputs.platforms, 'windows')))
+        shell: bash
+        run: |
+          case "${{ runner.os }}" in
+            Linux) xvfb-run -a python tool/workbench_restart_probe.py --workspace . --member "${{ needs.workspace-kind.outputs.member }}" --device linux ;;
+            macOS) python tool/workbench_restart_probe.py --workspace . --member "${{ needs.workspace-kind.outputs.member }}" --device macos ;;
+            Windows) python tool/workbench_restart_probe.py --workspace . --member "${{ needs.workspace-kind.outputs.member }}" --device windows ;;
+          esac
+      - name: Preserve restart evidence
+        if: always() && needs.workspace-kind.outputs.kind == 'workbench'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-restart-downstream-${{ runner.os }}-${{ github.run_attempt }}
+          path: build/ai-testing/workbench-restart/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  migration-boundary:
+    needs: workspace-kind
+    if: needs.workspace-kind.outputs.kind == 'source'
+    name: Migration boundary / ${{ matrix.baseline }} / ${{ matrix.template }} / ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        baseline: ['v0.2.0-rc.1', '5ec56a9']
+        template: [minimal, workbench]
+        os: [ubuntu-latest, macos-26]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 3.47.2
+          channel: stable
+          cache: true
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y xvfb clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev mpv libepoxy-dev
+      - name: Verify old project requires manual migration without writes
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = Linux ]; then device=linux; else device=macos; fi
+          python tool/upgrade_ci.py --source . --output "${{ runner.temp }}/koi-upgrade-ci" --baseline "${{ matrix.baseline }}" --template "${{ matrix.template }}" --device "$device" --expect-manual-migration
+      - name: Preserve upgrade evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: upgrade-${{ matrix.baseline }}-${{ matrix.template }}-${{ runner.os }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/koi-upgrade-ci/*.json
+            ${{ runner.temp }}/koi-upgrade-ci/*.log
+            ${{ runner.temp }}/koi-upgrade-ci/project/build/ai-test-ci/
+            ${{ runner.temp }}/koi-upgrade-ci/project/build/test-runs/
+            ${{ runner.temp }}/koi-upgrade-ci/project/build/ai-testing/workbench-restart/
+            ${{ runner.temp }}/koi-upgrade-ci/project/packages/koi_ui/test/golden/failures/
+          if-no-files-found: warn
+          retention-days: 7
+
   generated-project:
+    needs: workspace-kind
+    if: needs.workspace-kind.outputs.kind == 'source'
     name: Fresh project / ${{ matrix.template }} / ${{ matrix.platforms }}
     strategy:
       fail-fast: false
@@ -64,7 +243,7 @@ jobs:
           - os: ubuntu-latest
             platforms: web,android,linux
             template: minimal
-          - os: macos-latest
+          - os: macos-26
             platforms: ios,macos
             template: minimal
           - os: windows-latest
@@ -80,7 +259,7 @@ jobs:
             platforms: windows
             template: workbench
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
+    timeout-minutes: 90
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -89,6 +268,10 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+
+      - name: Verify Windows workspace lock behavior
+        if: runner.os == 'Windows'
+        run: python -m unittest tool.tests.test_workspace_lock tool.tests.test_workspace_process_lock
 
       - name: Install Java for Android
         if: runner.os == 'Linux'
@@ -112,7 +295,7 @@ jobs:
         run: python tool/platform_evidence.py --output "${{ runner.temp }}/koi-platform-evidence/source.json"
 
       - name: Correct pinned Flutter Windows CanvasKit URL handling
-        if: matrix.template == 'workbench' && runner.os == 'Windows'
+        if: runner.os == 'Windows'
         shell: pwsh
         run: |
           @'
@@ -144,13 +327,70 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Generate a new six-platform project
+        id: generated-create
         run: python blueprint.py create ci_blueprint --output "${{ runner.temp }}/koi-blueprint-generated" --org com.example --template "${{ matrix.template }}"
 
       - name: Validate the generated project
         run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" validate --workspace "${{ runner.temp }}/koi-blueprint-generated"
 
+      - name: Verify generated Golden test evidence
+        if: always() && steps.generated-create.outcome == 'success' && matrix.template == 'minimal' && runner.os == 'macOS'
+        run: python tool/ai_test_ci.py --workspace "${{ runner.temp }}/koi-blueprint-generated" --suite golden
+
+      - name: Stage generated Golden evidence
+        if: always() && matrix.template == 'minimal' && runner.os == 'macOS'
+        run: python tool/ai_test_ci.py --workspace "${{ runner.temp }}/koi-blueprint-generated" --stage "${{ runner.temp }}/ai-golden-evidence"
+
+      - name: Preserve generated Golden evidence
+        if: always() && matrix.template == 'minimal' && runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-golden-generated-${{ runner.os }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ai-golden-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Verify generated Workbench persistence evidence
+        if: always() && steps.generated-create.outcome == 'success' && matrix.template == 'workbench'
+        run: python tool/ai_test_ci.py --workspace "${{ runner.temp }}/koi-blueprint-generated" --suite workbench --member apps/ci_blueprint_app
+
+      - name: Stage generated Workbench persistence evidence
+        if: always() && matrix.template == 'workbench'
+        run: python tool/ai_test_ci.py --workspace "${{ runner.temp }}/koi-blueprint-generated" --stage "${{ runner.temp }}/ai-workbench-evidence"
+
+      - name: Preserve generated Workbench persistence evidence
+        if: always() && matrix.template == 'workbench'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-workbench-generated-${{ runner.os }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/ai-workbench-evidence/
+          if-no-files-found: ignore
+          retention-days: 7
+
       - name: Build native platforms and web
+        id: generated-build
         run: python "${{ runner.temp }}/koi-blueprint-generated/blueprint.py" build --app "${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app" --platforms "${{ matrix.platforms }}"
+
+      - name: Verify Workbench persistence across processes
+        if: always() && steps.generated-create.outcome == 'success' && matrix.template == 'workbench'
+        shell: pwsh
+        run: |
+          $device = switch ($env:RUNNER_OS) { 'macOS' { 'macos' } 'Windows' { 'windows' } 'Linux' { 'linux' } default { throw 'Unsupported runner' } }
+          if ($env:RUNNER_OS -eq 'Linux') {
+            & xvfb-run -a python tool/workbench_restart_probe.py --workspace "${{ runner.temp }}/koi-blueprint-generated" --member apps/ci_blueprint_app --device $device
+          } else {
+            & python tool/workbench_restart_probe.py --workspace "${{ runner.temp }}/koi-blueprint-generated" --member apps/ci_blueprint_app --device $device
+          }
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
+      - name: Preserve Workbench process restart evidence
+        if: always() && matrix.template == 'workbench'
+        uses: actions/upload-artifact@v4
+        with:
+          name: workbench-restart-${{ runner.os }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/koi-blueprint-generated/build/ai-testing/workbench-restart/
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Check macOS native video rendering capability
         id: macos-media
@@ -190,10 +430,13 @@ jobs:
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         run: |
           set -o pipefail
-          xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart 2>&1 | tee native-runtime.log
+          python "$GITHUB_WORKSPACE/tool/native_runtime_watchdog.py" \
+            --timeout 600 --grace 10 --log native-runtime.log --report native-runtime-supervisor.json \
+            --events native-runtime-tests.json --target integration_test/workbench_runtime_test.dart -- \
+            xvfb-run -a flutter test --no-pub --reporter expanded --file-reporter json:native-runtime-tests.json -d linux integration_test/workbench_runtime_test.dart
 
       - name: Run real Chrome media and IndexedDB smoke
-        if: matrix.template == 'workbench' && runner.os == 'Linux'
+        if: ${{ !cancelled() && steps.generated-build.outcome == 'success' && matrix.template == 'workbench' && runner.os == 'Linux' }}
         working-directory: ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app
         shell: bash
         run: |
@@ -244,22 +487,24 @@ jobs:
         if: always() && matrix.template == 'workbench'
         uses: actions/upload-artifact@v4
         with:
-          name: workbench-runtime-${{ runner.os }}
+          name: workbench-runtime-${{ runner.os }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/integration_response_data.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/chromedriver.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime.log
+            ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-supervisor.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-system.log
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/native-runtime-tests.json
             ${{ runner.temp }}/koi-blueprint-generated/apps/ci_blueprint_app/build/runtime-crashes
             ${{ runner.temp }}/macos-media-capability.txt
           if-no-files-found: ignore
+          retention-days: 7
 
       - name: Preserve platform provenance and build artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: platform-${{ matrix.template }}-${{ runner.os }}
+          name: platform-${{ matrix.template }}-${{ runner.os }}-${{ github.run_attempt }}
           path: |
             ${{ runner.temp }}/koi-platform-evidence/source.json
             ${{ runner.temp }}/koi-blueprint-generated/blueprint.json

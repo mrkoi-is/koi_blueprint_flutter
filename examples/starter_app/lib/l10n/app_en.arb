@@ -23,15 +23,36 @@
   "settingsNoResults": "No matching settings",
   "settingsLanguageGroup": "Language",
   "settingsLanguage": "Display language",
-  "settingsLanguageDescription": "Changes apply immediately. Follow system uses your device language; unsupported languages use Simplified Chinese.",
+  "@settingsLanguage": {
+    "description": "Label for the application display-language selector."
+  },
+  "settingsLanguageDescription": "Changes apply immediately. Follow system uses your device language; unsupported languages use {fallbackLanguage}.",
+  "@settingsLanguageDescription": {
+    "description": "Explain immediate language changes and the App-configured fallback; fallbackLanguage is its native language name.",
+    "placeholders": {
+      "fallbackLanguage": {
+        "type": "String",
+        "example": "简体中文"
+      }
+    }
+  },
   "settingsAppearanceGroup": "Appearance",
   "settingsTheme": "Color mode",
   "settingsThemeDescription": "Follow system adapts to your device appearance.",
   "settingsDensity": "Interface density",
+  "@settingsDensity": {
+    "description": "Label for the spacing and control-density selector, not display resolution."
+  },
   "settingsDensityDescription": "Automatic uses comfortable spacing for touch or pen and compact spacing for a mouse. Manual choices always take priority.",
   "settingsAccent": "Accent color",
+  "@settingsAccent": {
+    "description": "Label for the interface highlight color, not a status color."
+  },
   "settingsAccentDescription": "Changes highlights and selection while preserving status colors.",
   "settingsSystem": "Follow system",
+  "@settingsSystem": {
+    "description": "Use the device preference instead of a saved application override."
+  },
   "settingsLight": "Light",
   "settingsDark": "Dark",
   "settingsComfortable": "Comfortable",
@@ -41,9 +62,15 @@
   "settingsViolet": "Violet",
   "settingsReset": "Restore defaults",
   "settingsResetDescription": "Restore language, color mode, density and accent. Your documents and other settings remain intact.",
+  "@settingsResetDescription": {
+    "description": "Explain the scope of resetting appearance preferences; documents and unrelated settings are preserved."
+  },
   "settingsCancel": "Cancel",
   "settingsRetry": "Retry",
   "settingsSaveError": "Settings could not be saved. Retry to persist your choices.",
+  "@settingsSaveError": {
+    "description": "Preferences changed on screen but could not be saved; the user can retry."
+  },
   "platformCapabilities": "Platform capabilities",
   "platformDesktopWindow": "Desktop window",
   "platformWindowUnavailable": "Desktop window unavailable",
@@ -89,11 +116,16 @@
   "@platformCompleted": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Count of completed items in the native home-widget snapshot."
   },
   "settingsDensityAutomatic": "Automatic (current input)",
+  "@settingsDensityAutomatic": {
+    "description": "Automatically choose spacing based on the current input device."
+  },
   "platformEngineTitle": "Playback engine",
   "platformEnginePolicy": "Selection is explicit. If the requested engine fails, the current engine remains active; no automatic replacement is made.",
   "platformEngineReady": "Available: engine initialization succeeded",

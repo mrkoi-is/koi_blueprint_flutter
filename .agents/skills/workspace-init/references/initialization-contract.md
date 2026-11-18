@@ -2,9 +2,9 @@
 
 输入为项目名、非冲突目标目录，以及组织标识、平台、模板；可选版本化 JSON 还声明语言、能力、品牌和构建 profile。先使用 dry-run 核对操作；实际创建遵循同一输入。参数与配置同一字段冲突、目录冲突、非法名称或未知平台应在写入前失败。
 
-输出包含独立 workspace、选定模板 App、koi_core/koi_ui、选定平台、工具链配置、AI 入口与测试。根 pubspec 决定成员；blueprint.json schema 2 记录来源链、配置摘要、能力版本和受管文件基线。默认 minimal 不含认证、网络、文件、媒体和存储插件；可选能力仅按配置安装，workbench 的平台能力需独立验收。安装能力前展示完整变更，用户改动或原生接线冲突不得被覆盖。
+输出包含独立 workspace、选定模板 App、koi_core/koi_ui、选定平台、工具链配置、AI 入口与测试。根 pubspec 决定成员；blueprint.json schema 2 记录来源链、配置摘要、能力版本和受管文件基线。省略 capabilities 时默认安装 diagnostics v2、koi_diagnostics 及其持久化和平台依赖；显式 [] 关闭默认能力，非空列表代表完整选择。minimal 的认证、业务网络、媒体和数据库能力按需安装，workbench 的平台能力需独立验收。安装能力前展示完整变更，用户改动或原生接线冲突不得被覆盖。
 
-首次启动使用 blueprint.py doctor/devices/run，沿用同一 SDK 选择规则；源仓库本地 FVM SDK 不复制到下游，须安装或显式指定。
+首次启动使用 blueprint.py doctor/devices/run，沿用同一 SDK 选择规则；源仓库本地 FVM SDK 不复制到下游，须安装或显式指定。默认两模板的 validate 因包含诊断浏览器测试而要求 Chrome；minimal 显式关闭默认能力且无其他活动浏览器测试时不要求 Chrome。Node 只在存在 API Web 冒烟入口时要求。
 
 验收：新目标能独立解析依赖，imports/平台标识/品牌使用新名称，未选能力不进入运行依赖，AI 入口不存在指向作者目录的依赖；生成/格式/分析/测试/覆盖率通过，选定平台在对应主机完成构建并记录源码、SDK、锁文件及产物摘要。安装包与实际设备运行另验；没有执行的阶段不得记为通过。
 

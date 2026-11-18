@@ -18,6 +18,9 @@
   "saveShortcut": "Save workspace (⌘/Ctrl+S)",
   "importFiles": "Import files",
   "retry": "Retry",
+  "@retry": {
+    "description": "Action to retry the failed operation; does not discard the current draft."
+  },
   "restoring": "Restoring workspace…",
   "initializing": "Initializing local workspace…",
   "workspaceInUse": "Workspace is already open",
@@ -33,7 +36,13 @@
   "apply": "Apply",
   "keyboardShortcuts": "Keyboard shortcuts",
   "back": "Back",
+  "@back": {
+    "description": "Navigate to the previous location in navigation history."
+  },
   "forward": "Forward",
+  "@forward": {
+    "description": "Navigate to the next location in navigation history."
+  },
   "quit": "Quit workspace",
   "unsaved": "Unsaved",
   "saved": "Saved",
@@ -121,100 +130,125 @@
   "@characterCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of characters in the current document; use the locale plural rules."
   },
   "revision": "Revision {number}",
   "@revision": {
     "placeholders": {
       "number": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Revision number of the current document, not the application version."
   },
   "byteCount": "{count, plural, =1{1 byte} other{{count} bytes}}",
   "@byteCount": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Content size in bytes; use the locale plural rules."
   },
   "incompleteTodos": "{count, plural, =1{1 incomplete to-do} other{{count} incomplete to-dos}}",
   "@incompleteTodos": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of to-do items that have not been completed."
   },
   "activeJobs": "{count, plural, =1{1 active I/O job} other{{count} active I/O jobs}}",
   "@activeJobs": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of active background input/output jobs."
   },
   "deleteTodoConfirm": "Delete “{name}”? This cannot be undone.",
   "@deleteTodoConfirm": {
     "placeholders": {
       "name": {
-        "type": "String"
+        "type": "String",
+        "example": "Project notes"
       }
-    }
+    },
+    "description": "Destructive confirmation naming the to-do item that will be deleted; name is user content."
   },
   "renameTodoNamed": "Rename to-do: {name}",
   "@renameTodoNamed": {
     "placeholders": {
       "name": {
-        "type": "String"
+        "type": "String",
+        "example": "Project notes"
       }
-    }
+    },
+    "description": "Accessibility label for renaming a to-do item; name is user content."
   },
   "deleteTodoNamed": "Delete to-do: {name}",
   "@deleteTodoNamed": {
     "placeholders": {
       "name": {
-        "type": "String"
+        "type": "String",
+        "example": "Project notes"
       }
-    }
+    },
+    "description": "Accessibility label for deleting a to-do item; name is user content."
   },
   "retryThumbnailNamed": "Retry reading thumbnail: {name}",
   "@retryThumbnailNamed": {
     "placeholders": {
       "name": {
-        "type": "String"
+        "type": "String",
+        "example": "Project notes"
       }
-    }
+    },
+    "description": "Accessibility label for retrying thumbnail generation; name is the media filename."
   },
   "imageDecodeFailed": "Image decoding failed: {error}",
   "@imageDecodeFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Image decoding failed. error contains the technical diagnostic text."
   },
   "imageReadFailed": "Image reading failed: {error}",
   "@imageReadFailed": {
     "placeholders": {
       "error": {
-        "type": "String"
+        "type": "String",
+        "example": "Connection refused"
       }
-    }
+    },
+    "description": "Reading image bytes failed. error contains the technical diagnostic text."
   },
   "playbackTime": "Played {position} of {duration}",
   "@playbackTime": {
     "placeholders": {
       "position": {
-        "type": "String"
+        "type": "String",
+        "example": "01:20"
       },
       "duration": {
-        "type": "String"
+        "type": "String",
+        "example": "03:45"
       }
-    }
+    },
+    "description": "Playback position and duration; both values are already formatted media times, not clock times."
   },
   "diagTitle": "Diagnostics",
   "diagSearch": "Search logs",
@@ -238,52 +272,81 @@
   "@directoryIndexProgress": {
     "placeholders": {
       "visited": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       },
       "reused": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       },
       "failures": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Directory indexing progress: visited entries, reused entries, and failed entries."
   },
   "bulkDocumentsTitle": "Document selection",
   "bulkFilter": "Filter documents",
   "bulkSelected": "{count} selected",
-  "bulkClear": "Clear selection",
-  "bulkDelete": "Delete selected",
-  "bulkDeleteConfirm": "Delete {count} documents?",
-  "bulkReorder": "Drag to reorder; Alt+Up/Down with keyboard",
   "@bulkSelected": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Number of items currently selected for a bulk operation."
   },
+  "bulkClear": "Clear selection",
+  "bulkDelete": "Delete selected",
+  "bulkDeleteConfirm": "Delete {count} documents?",
   "@bulkDeleteConfirm": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Confirmation before deleting the selected items; count is the selected item count."
   },
+  "bulkReorder": "Drag to reorder; Alt+Up/Down with keyboard",
   "diagSource": "Source",
   "settingsTitle": "Settings",
   "settingsSearch": "Search settings",
   "settingsNoResults": "No matching settings",
   "settingsLanguageGroup": "Language",
   "settingsLanguage": "Display language",
-  "settingsLanguageDescription": "Changes apply immediately. Follow system uses your device language; unsupported languages use Simplified Chinese.",
+  "@settingsLanguage": {
+    "description": "Label for the application display-language selector."
+  },
+  "settingsLanguageDescription": "Changes apply immediately. Follow system uses your device language; unsupported languages use {fallbackLanguage}.",
+  "@settingsLanguageDescription": {
+    "description": "Explain immediate language changes and the App-configured fallback; fallbackLanguage is its native language name.",
+    "placeholders": {
+      "fallbackLanguage": {
+        "type": "String",
+        "example": "简体中文"
+      }
+    }
+  },
   "settingsAppearanceGroup": "Appearance",
   "settingsTheme": "Color mode",
   "settingsThemeDescription": "Follow system adapts to your device appearance.",
   "settingsDensity": "Interface density",
+  "@settingsDensity": {
+    "description": "Label for the spacing and control-density selector, not display resolution."
+  },
   "settingsDensityDescription": "Automatic uses comfortable spacing for touch or pen and compact spacing for a mouse. Manual choices always take priority.",
   "settingsAccent": "Accent color",
+  "@settingsAccent": {
+    "description": "Label for the interface highlight color, not a status color."
+  },
   "settingsAccentDescription": "Changes highlights and selection while preserving status colors.",
   "settingsSystem": "Follow system",
+  "@settingsSystem": {
+    "description": "Use the device preference instead of a saved application override."
+  },
   "settingsLight": "Light",
   "settingsDark": "Dark",
   "settingsComfortable": "Comfortable",
@@ -293,9 +356,15 @@
   "settingsViolet": "Violet",
   "settingsReset": "Restore defaults",
   "settingsResetDescription": "Restore language, color mode, density and accent. Your documents and other settings remain intact.",
+  "@settingsResetDescription": {
+    "description": "Explain the scope of resetting appearance preferences; documents and unrelated settings are preserved."
+  },
   "settingsCancel": "Cancel",
   "settingsRetry": "Retry",
   "settingsSaveError": "Settings could not be saved. Retry to persist your choices.",
+  "@settingsSaveError": {
+    "description": "Preferences changed on screen but could not be saved; the user can retry."
+  },
   "historyTitle": "Task history",
   "historySearch": "Search name or task ID",
   "historyClear": "Clear history",
@@ -305,9 +374,11 @@
   "@historyAttempt": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Attempt number of a background job in the job history."
   },
   "platformCapabilities": "Platform capabilities",
   "platformDesktopWindow": "Desktop window",
@@ -354,11 +425,16 @@
   "@platformCompleted": {
     "placeholders": {
       "count": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
+    },
+    "description": "Count of completed items in the native home-widget snapshot."
   },
   "settingsDensityAutomatic": "Automatic (current input)",
+  "@settingsDensityAutomatic": {
+    "description": "Automatically choose spacing based on the current input device."
+  },
   "platformEngineTitle": "Playback engine",
   "platformEnginePolicy": "Selection is explicit. If the requested engine fails, the current engine remains active; no automatic replacement is made.",
   "platformEngineReady": "Available: engine initialization succeeded",
@@ -366,12 +442,14 @@
   "documentSegmentPrevious": "Previous segment",
   "documentSegmentNext": "Next segment",
   "documentSegmentPosition": "Segment {index}. Changes are saved to the complete document.",
-  "documentSegmentComposing": "Finish composing text before changing segments.",
   "@documentSegmentPosition": {
     "placeholders": {
       "index": {
-        "type": "int"
+        "type": "int",
+        "example": "3"
       }
-    }
-  }
+    },
+    "description": "One-based position of the visible segment in a large document."
+  },
+  "documentSegmentComposing": "Finish composing text before changing segments."
 }
