@@ -24,6 +24,7 @@ final class DiagnosticLan extends ChangeNotifier with WidgetsBindingObserver {
   final _responses = <HttpResponse>{};
   final _timers = <HttpResponse, Timer>{};
   bool _busy = false;
+  Future<void>? _stopping;
   bool _closed = false;
   void _notify() {
     if (!_closed) notifyListeners();
@@ -38,7 +39,7 @@ final class DiagnosticLan extends ChangeNotifier with WidgetsBindingObserver {
   bool? batteryOptimizationIgnored;
   bool get supported => true;
   bool get running => _server != null;
-  bool get busy => _busy;
+  bool get busy => _busy || _stopping != null;
   String? get address => _address;
   String? get credential => _credential;
   Object? get error => _error;
@@ -49,7 +50,7 @@ final class DiagnosticLan extends ChangeNotifier with WidgetsBindingObserver {
   ];
 
   Future<void> start({String? address, String language = 'en'}) async {
-    if (_closed || running || _busy) return;
+    if (_closed || running || busy) return;
     final generation = ++_generation;
     _busy = true;
     _error = null;
@@ -273,7 +274,10 @@ final class DiagnosticLan extends ChangeNotifier with WidgetsBindingObserver {
     }
   }
 
-  Future<void> _shutdown() async {
+  Future<void> _shutdown() =>
+      _stopping ??= _shutdownOwned().whenComplete(() => _stopping = null);
+
+  Future<void> _shutdownOwned() async {
     _credential = null;
     _address = null;
     final server = _server;
@@ -282,16 +286,20 @@ final class DiagnosticLan extends ChangeNotifier with WidgetsBindingObserver {
       timer.cancel();
     }
     _timers.clear();
-    for (final sub in _streams.values) {
+    final subscriptions = _streams.values.toList();
+    _streams.clear();
+    for (final sub in subscriptions) {
       await sub.cancel();
     }
-    _streams.clear();
     await server?.close(force: true);
     _responses.clear();
     if (_ownsService) {
       final result = await FlutterForegroundTask.stopService();
-      if (result is ServiceRequestFailure) _error = result.error;
-      _ownsService = false;
+      if (result is ServiceRequestFailure) {
+        _error = result.error;
+      } else {
+        _ownsService = false;
+      }
     }
   }
 

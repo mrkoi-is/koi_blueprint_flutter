@@ -6,7 +6,7 @@
 
 ## 版本与验收
 
-v0.3.0 的范围、迁移要求与验收边界见 [版本记录](docs/releases/v0.3.0.md)；发布后的固定提交、最终 CI、构建归档和校验摘要以 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.0) 为准。前序候选已通过完整门禁及两模板六端构建；完整国际化 UI、系统语言和部分真机场景仍待验收。语言配置见 [国际化契约](docs/architecture/localization.md)。
+v0.3.1 修复升级事务和诊断 LAN 关闭流程，范围、迁移要求与验收边界见 [补丁记录](docs/releases/v0.3.1.md)；发布后的固定提交、最终 CI、构建归档和校验摘要以 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.1) 为准。[v0.3.0](docs/releases/v0.3.0.md) 已通过完整门禁及两模板六端构建；本补丁重新验证，完整国际化 UI、系统语言和部分真机场景仍待验收。语言配置见 [国际化契约](docs/architecture/localization.md)。
 
 ## 创建项目
 
