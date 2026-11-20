@@ -144,7 +144,7 @@ def main() -> None:
             raise AssertionError('Module Feature created an accidental App layout')
         package = output / 'packages/feature_host'
         package.mkdir()
-        (package / 'pubspec.yaml').write_text('name: feature_host\nresolution: workspace\nenvironment:\n  sdk: ^3.13.0\n')
+        (package / 'pubspec.yaml').write_text('name: feature_host\nresolution: workspace\nenvironment:\n  sdk: ^3.14.0\n')
         manifest = output / 'pubspec.yaml'
         spec = manifest.read_text()
         spec = spec.replace('workspace:\n', 'workspace:\n  - packages/feature_host\n', 1)

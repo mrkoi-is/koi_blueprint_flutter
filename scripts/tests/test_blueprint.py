@@ -590,6 +590,29 @@ class BlueprintTest(unittest.TestCase):
             self.assertEqual(REAL_RUN(['tool'], self.root, capture=True), '中文')
         self.assertEqual(run.call_args.kwargs['encoding'], 'utf-8')
 
+    def test_analyze_allows_only_the_known_sdk_design_library_deprecations(self):
+        diagnostic = (
+            "INFO|HINT|DEPRECATED_MEMBER_USE|lib/app.dart|1|1|39|"
+            "'package:flutter/material.dart' is deprecated and shouldn't be used. "
+            "Use package:material_ui/material_ui.dart instead. "
+            "This feature was deprecated after v3.47.0-0.0.pre."
+        )
+        args = argparse.Namespace(workspace=self.root, phase='analyze')
+        with patch.object(blueprint.subprocess, 'run', return_value=subprocess.CompletedProcess([], 1, diagnostic, '')):
+            blueprint.check(args)
+
+        for status, output in (
+            (1, diagnostic + '\nINFO|LINT|AVOID_PRINT|lib/app.dart|5|1|5|Avoid print.'),
+            (1, diagnostic.replace('package:flutter/material.dart', 'oldMember')),
+            (2, diagnostic.replace('INFO|', 'WARNING|', 1)),
+            (3, diagnostic),
+            (1, ''),
+        ):
+            with self.subTest(status=status, output=output), patch.object(
+                blueprint.subprocess, 'run', return_value=subprocess.CompletedProcess([], status, output, '')
+            ), self.assertRaises(blueprint.BlueprintError):
+                blueprint.check(args)
+
 
 if __name__ == '__main__':
     unittest.main()

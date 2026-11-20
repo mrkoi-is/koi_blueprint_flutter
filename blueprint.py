@@ -164,6 +164,38 @@ def check_localizations(root, sdk, workspace):
         run([sdk.dart, 'run', 'tool/check_l10n.dart', *localized], root)
 
 
+def check_analysis(root, sdk):
+    # go_router and Flutter's gen-l10n still use the SDK design libraries.
+    # Allow only their specific Flutter deprecations while keeping other infos fatal.
+    replacements = {
+        'package:flutter/material.dart': 'package:material_ui/material_ui.dart',
+        'package:flutter/cupertino.dart': 'package:cupertino_ui/cupertino_ui.dart',
+        'GlobalMaterialLocalizations': 'GlobalMaterialLocalizations from package:material_ui/material_ui.dart',
+        'GlobalCupertinoLocalizations': 'GlobalCupertinoLocalizations from package:cupertino_ui/cupertino_ui.dart',
+    }
+    allowed = {
+        f"'{symbol}' is deprecated and shouldn't be used. Use {replacement} instead. "
+        'This feature was deprecated after v3.47.0-0.0.pre.'
+        for symbol, replacement in replacements.items()
+    }
+    command = [str(sdk.dart), 'analyze', '--fatal-infos', '--format=machine']
+    print('+ ' + ' '.join(command), flush=True)
+    result = subprocess.run(command, cwd=root, capture_output=True, text=True, encoding='utf-8')
+    if result.stderr:
+        sys.stderr.write(result.stderr)
+    diagnostics = result.stdout.splitlines()
+    remaining = [
+        line for line in diagnostics
+        if not (line.startswith('INFO|HINT|DEPRECATED_MEMBER_USE|') and line.rsplit('|', 1)[-1] in allowed)
+    ]
+    if result.returncode == 0 and not diagnostics:
+        print('No issues found.')
+    elif result.returncode == 1 and diagnostics and not remaining and not result.stderr:
+        print(f'No blocking issues. Allowed {len(diagnostics)} Flutter design library deprecations.')
+    else:
+        raise BlueprintError('\n'.join(remaining) or f'Dart analysis failed ({result.returncode})')
+
+
 def add_members(manifest, paths):
     text = manifest.read_text(encoding='utf-8')
     manifest.write_text(with_members(text, paths), encoding='utf-8')
@@ -530,6 +562,9 @@ def create(args):
         app = stage / 'apps' / f'{name}_app'
         run([sdk.flutter, 'create', '--no-pub', '--empty', '--project-name', f'{name}_app', '--org', args.org,
              '--platforms', ','.join(selected), str(app)], stage)
+        if 'android' in selected:
+            from tool.platform_configuration import configure_android
+            configure_android(app)
         for folder in ('lib', 'test'):
             target = app / folder
             if target.exists():
@@ -814,7 +849,7 @@ def check(args):
         targets += [str(member.relative_to(root) / sub) for member in workspace for sub in ('lib', 'test', 'integration_test', 'test_driver') if (member / sub).exists()]
         run([sdk.dart, 'format', *flags, *targets], root)
     elif phase == 'analyze':
-        run([sdk.dart, 'analyze', '--fatal-infos'], root)
+        check_analysis(root, sdk)
     elif phase == 'test':
         for member in workspace:
             if list((member / 'test').rglob('*_test.dart')):

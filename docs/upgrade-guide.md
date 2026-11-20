@@ -16,6 +16,8 @@ python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app apps/my_app -
 
 `v0.3.0-rc.1` 整合了新的依赖版本，从两个历史 CI 基线直接升级时会报告 root/App/koi_core 的依赖冲突，需要人工审阅迁移。该版本的 `Migration boundary` CI 只验证明确冲突、拒绝应用及工程/来源记录不变，不表示自动升级和升级后运行成功。不要删除冲突或修改基线摘要绕过检查；最终验证范围见 [预发布说明](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.0-rc.1)。
 
+升级到 Flutter 3.50.1 还涉及 `koi_ui` 的 SDK 约束。旧工程需要在独立副本中一起更新 `.fvmrc`、各活动成员的 SDK 约束和 CI 固定版本，再用新 SDK 刷新锁文件并执行完整门禁。迁移矩阵仍以旧工程固定的 Flutter 3.47.2 重建历史基线。
+
 原有只读报告继续可用：
 
 `upgrade-report` 只比较文件和来源，不修改工程，也不执行依赖解析。先确认目标蓝图源码、提交与工作区 dirty 状态，再在现有工程中运行：

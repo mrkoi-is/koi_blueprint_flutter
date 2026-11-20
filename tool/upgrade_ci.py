@@ -85,11 +85,12 @@ def project_snapshot(root: Path) -> dict[str, str]:
 
 def verify_manual_migration(preview: dict, old: Path, project: Path,
                             source: Path, plan: Path, log: Path) -> dict:
-    """Verify the reviewed v0.3 dependency boundary, never accept arbitrary failures."""
+    """Verify the expected pubspec conflicts and refusal to modify the project."""
     expected = {
         ('pubspec.yaml', 'unsupported_managed_change'),
         ('apps/upgrade_ci_app/pubspec.yaml', 'dependency_resolution_required'),
         ('packages/koi_core/pubspec.yaml', 'dependency_resolution_required'),
+        ('packages/koi_ui/pubspec.yaml', 'dependency_resolution_required'),
     }
     conflicts = preview['conflicts']
     blocking = [c for c in conflicts if c.get('reason') != 'unmanaged_reference']
@@ -123,7 +124,7 @@ def main() -> int:
     parser.add_argument('--template', choices=('minimal', 'workbench'), required=True)
     parser.add_argument('--device', choices=('linux', 'macos'), required=True)
     parser.add_argument('--expect-manual-migration', action='store_true',
-                        help='Verify v0.3 dependency conflicts and refusal without project changes; do not apply an upgrade')
+                        help='Verify expected pubspec conflicts and refusal without project changes; do not apply an upgrade')
     args = parser.parse_args()
     source, output = args.source.resolve(), args.output.resolve()
     if output == source or output.is_relative_to(source) or source.is_relative_to(output):

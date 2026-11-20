@@ -82,7 +82,8 @@ class UpgradeCiReviewTest(unittest.TestCase):
             {'path': 'pubspec.yaml', 'reason': 'unsupported_managed_change'},
             *({'path': path, 'reason': 'dependency_resolution_required',
                'detail': 'unsupported upstream pubspec changes'}
-              for path in ('apps/upgrade_ci_app/pubspec.yaml', 'packages/koi_core/pubspec.yaml')),
+              for path in ('apps/upgrade_ci_app/pubspec.yaml', 'packages/koi_core/pubspec.yaml',
+                           'packages/koi_ui/pubspec.yaml')),
             self.conflict,
         ]}
 

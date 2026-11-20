@@ -18,7 +18,7 @@ navigation, table selection/sorting, menus, dialog cancel/confirm, snackbar undo
 banner dismissal and bottom-sheet selection. Theme/layout switches preserve the
 catalog's state. The table scrolls horizontally in narrow containers.
 
-Run directly from this directory (Flutter 3.47.2):
+Run directly from this directory (Flutter 3.50.1):
 
 ```sh
 ../../tool/flutterw run -d chrome

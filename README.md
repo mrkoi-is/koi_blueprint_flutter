@@ -26,7 +26,7 @@ python3 blueprint.py validate
 python3 blueprint.py build --app apps/field_notes_app --platforms web
 ```
 
-生成工程不复制源仓库的本地 SDK。进入新工程后可执行 `fvm install`、`fvm use 3.47.2`，或将 `FLUTTER_BIN` 指向已有的固定版本 Flutter 可执行文件。启动、设备列表、构建与验证均使用同一 SDK 选择规则。
+生成工程不复制源仓库的本地 SDK。进入新工程后可执行 `fvm install`、`fvm use 3.50.1`，或将 `FLUTTER_BIN` 指向已有的固定版本 Flutter 可执行文件。启动、设备列表、构建与验证均使用同一 SDK 选择规则。
 
 Windows 使用 `py -3 blueprint.py`。平台可选 `web,android,ios,macos,windows,linux`；对应平台的构建需要合适主机和 SDK。`--dry-run` 用于检查计划，生成成功不代表所有平台都构建通过。完整说明见 [创建项目](docs/new-project.md)。
 
@@ -89,7 +89,7 @@ Feature 按职责选择 domain/data/application/presentation；data 与 applicat
 
 ## 工具链与验证
 
-当前基线：Flutter 3.47.2 / Dart 3.13.2、Melos 8.9、Riverpod 3.4.3，实际版本以 `.fvmrc`、pubspec 和 lock 为准。SDK 升级同时更新 CI、环境约束、锁文件、生成器兼容组合与版本文档；不要用 dependency_overrides 强行跨越生成器约束。
+当前基线：Flutter 3.50.1 / Dart 3.14.0、Melos 8.9、Riverpod 3.4.3，实际版本以 `.fvmrc`、pubspec 和 lock 为准。SDK 升级同时更新 CI、环境约束、锁文件、生成器兼容组合与版本文档；不要用 dependency_overrides 强行跨越生成器约束。
 
 SDK 选择顺序是 `FLUTTER_BIN` → 项目 `.fvm/flutter_sdk` → PATH 中的 Flutter；Python 入口从所选 Flutter SDK 同目录定位 Dart，使用同一 SDK 运行生成与测试。锁文件使用 pub.dev，严格锁文件检查应使用同一包源。
 

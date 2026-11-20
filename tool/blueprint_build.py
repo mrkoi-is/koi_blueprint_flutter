@@ -257,7 +257,7 @@ def build_target(app, root, sdk, profile_name, profile, run):
             # freezing the real inputs used by compilation.
             preparation_command = [*command, '--config-only']
             if target == 'android':
-                # Flutter 3.47 skips mode-aware plugin registration with
+                # Flutter skips mode-aware plugin registration with
                 # --no-pub. A plain pub get includes dev plugins, while Gradle
                 # excludes them from release: regenerate through the SDK's
                 # config-only command, then keep the actual build --no-pub.
