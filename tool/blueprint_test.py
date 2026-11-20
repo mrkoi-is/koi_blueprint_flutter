@@ -114,14 +114,15 @@ def summarize(log: Path, exit_code: int | None, targets: list[Path], cwd: Path,
             'errors': errors, 'protocolErrors': malformed}
 
 
-def execute(argv: list[str], cwd: Path, output: Path, timeout: float) -> dict:
+def execute(argv: list[str], cwd: Path, output: Path, timeout: float,
+            stdout_name: str = 'events.jsonl') -> dict:
     """Each invocation owns its process group and writes fresh, separate streams."""
     started = time.monotonic()
     timed_out = interrupted = False
     cleanup = 'not_needed'
     code = None
     launch_error = None
-    with (output / 'events.jsonl').open('wb') as stdout, (output / 'stderr.log').open('wb') as stderr:
+    with (output / stdout_name).open('wb') as stdout, (output / 'stderr.log').open('wb') as stderr:
         options = ({'creationflags': subprocess.CREATE_NEW_PROCESS_GROUP}
                    if os.name == 'nt' else {'start_new_session': True})
         try:
@@ -187,10 +188,17 @@ def run_tests(root: Path, sdk, workspace: list[Path], args) -> dict:
     run_id = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%SZ-') + uuid.uuid4().hex[:12]
     output = root / 'build/test-runs' / run_id
     output.mkdir(parents=True, exist_ok=False)
-    argv = [str(sdk.flutter), 'test', '--no-pub', '--reporter', 'json']
+    argv = [str(sdk.flutter), 'test', '--no-pub']
+    stdout_name = 'events.jsonl'
+    reporter = output / 'pending-events.jsonl'
     # Flutter's default tester reports VM suites, but --platform vm is invalid.
     if args.platform == 'chrome':
-        argv += ['--platform', 'chrome']
+        # Flutter 3.50 forwards Chrome console output to stdout even with the
+        # JSON reporter. Keep it separate from the reporter protocol.
+        stdout_name = 'browser-console.log'
+        argv += ['--platform', 'chrome', '--reporter', 'expanded', '--file-reporter', f'json:{reporter}']
+    else:
+        argv += ['--reporter', 'json']
     if args.name:
         argv += ['--name', args.name]
     relative_targets = [protocol_path(path.relative_to(member)) for path in targets]
@@ -211,7 +219,10 @@ def run_tests(root: Path, sdk, workspace: list[Path], args) -> dict:
         phase = 'golden_before'
         previous_goldens = golden_files(member)
         phase = 'execute'
-        process = execute(argv, member, output, args.timeout)
+        process = execute(argv, member, output, args.timeout, stdout_name)
+        if args.platform == 'chrome' and reporter.is_file():
+            # Replaying the recorded Flutter command must not overwrite evidence.
+            reporter.replace(output / 'events.jsonl')
         phase = 'golden_collect'
         for path, identity in golden_files(member).items():
             if previous_goldens.get(path) != identity:
@@ -254,7 +265,7 @@ def run_tests(root: Path, sdk, workspace: list[Path], args) -> dict:
         dirty_state = None
     artifacts = {}
     try:
-        for name in ['events.jsonl', 'stderr.log', 'source.json', *golden_artifacts]:
+        for name in dict.fromkeys(['events.jsonl', stdout_name, 'stderr.log', 'source.json', *golden_artifacts]):
             path = output / name
             if path.is_file():
                 artifacts[name] = {'path': str(path), 'sha256': hashlib.sha256(path.read_bytes()).hexdigest()}

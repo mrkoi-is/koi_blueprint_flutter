@@ -23,7 +23,7 @@ class RunnerResilienceTest(unittest.TestCase):
     def run_fake(self, root, sdk, workspace, args):
         return run_tests(root, sdk, workspace, args)
 
-    def execute(self, argv, cwd, output, timeout):
+    def execute(self, argv, cwd, output, timeout, stdout_name='events.jsonl'):
         target = str(self.member / 'test/example_test.dart')
         events = [
             {'type': 'start', 'protocolVersion': '0.1.1'},
@@ -33,7 +33,13 @@ class RunnerResilienceTest(unittest.TestCase):
             {'type': 'testDone', 'testID': 1, 'hidden': False, 'skipped': False, 'result': 'success'},
             {'type': 'done', 'success': True},
         ]
-        (output / 'events.jsonl').write_text('\n'.join(json.dumps(x) for x in events))
+        payload = '\n'.join(json.dumps(x) for x in events)
+        if '--file-reporter' in argv:
+            report = argv[argv.index('--file-reporter') + 1]
+            Path(report.removeprefix('json:')).write_text(payload)
+            (output / stdout_name).write_text('[BROWSER CONSOLE] [log]: Starting suite\n')
+        else:
+            (output / stdout_name).write_text(payload)
         (output / 'stderr.log').write_text('')
         return {'exitCode': 0, 'timedOut': False, 'interrupted': False,
                 'cleanup': 'not_needed', 'launchError': None, 'durationSeconds': 1}
@@ -49,6 +55,28 @@ class RunnerResilienceTest(unittest.TestCase):
         self.assertEqual(json.loads(Path(result['resultPath']).read_text()), result)
         self.assertFalse(Path(result['resultPath']).with_name('.result.json.tmp').exists())
 
+    def test_chrome_console_is_preserved_separately_from_case_evidence(self):
+        self.args.platform = 'chrome'
+        with patch('tool.blueprint_test.source_manifest', return_value=self.manifest), \
+             patch('tool.blueprint_test.execute', side_effect=self.execute):
+            result = self.run_fake(self.root, self.sdk, [self.member], self.args)
+        self.assertEqual((result['status'], result['executed']), ('passed', 1))
+        artifacts = result['artifacts']
+        self.assertIn('[BROWSER CONSOLE]', Path(artifacts['browser-console.log']['path']).read_text())
+        events = Path(artifacts['events.jsonl']['path'])
+        self.assertEqual(json.loads(events.read_text().splitlines()[-1])['type'], 'done')
+        self.assertNotIn(f'json:{events}', result['replay']['argv'])
+
+    def test_chrome_requires_file_report_even_when_stdout_contains_valid_events(self):
+        self.args.platform = 'chrome'
+        def missing_report(argv, cwd, output, timeout, stdout_name):
+            return self.execute([], cwd, output, timeout, stdout_name)
+        with patch('tool.blueprint_test.source_manifest', return_value=self.manifest), \
+             patch('tool.blueprint_test.execute', side_effect=missing_report):
+            result = self.run_fake(self.root, self.sdk, [self.member], self.args)
+        self.assertFalse(result['evidenceComplete'])
+        self.assertNotEqual(result['status'], 'passed')
+
     def test_run_emits_portable_member_and_target_paths(self):
         self.member = self.root / 'apps/demo_app'
         target = self.member / 'test/browser/example_test.dart'
@@ -56,7 +84,7 @@ class RunnerResilienceTest(unittest.TestCase):
         target.touch()
         self.args.member = 'apps/demo_app'
         self.args.path = ['test/browser/example_test.dart']
-        def execute(argv, cwd, output, timeout):
+        def execute(argv, cwd, output, timeout, stdout_name):
             events = [
                 {'type': 'start', 'protocolVersion': '0.1.1'},
                 {'type': 'suite', 'suite': {'id': 0, 'path': str(target)}},

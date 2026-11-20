@@ -35,7 +35,7 @@ python3 blueprint.py test --member <成员路径> --path test/<用例>_test.dart
 
 `--path` 可以重复，但首版只接受活动成员 test 下实际存在的 `_test.dart` 文件，不推断受影响依赖。`--platform chrome` 运行真实 Chrome 测试。`--name` 缩小声明范围；定向通过不代表成员、消费方或完整门禁通过。共享包修改仍须运行完整 `validate`；本轮没有覆盖率去重、缓存或自动范围选择。
 
-每次运行在 `build/test-runs/<runId>/` 保存独立的 `events.jsonl`、`stderr.log`、源码指纹和 `result.json`，后者包含命令数组/cwd、源码前后摘要、环境、执行范围、退出码、耗时和清理结果。产物不入库、不作为模板输入。退出 0 只表示本次显式范围 passed；其余结果退出非零。`result.json` 不是所有命令 stdout 都是 JSON 的承诺，SDK 准备查询仍输出诊断行。
+每次运行在 `build/test-runs/<runId>/` 保存独立的 `events.jsonl`、`stderr.log`、源码指纹和 `result.json`，后者包含命令数组/cwd、源码前后摘要、环境、执行范围、退出码、耗时和清理结果。Chrome 定向测试通过 Flutter 文件报告器采集 JSON 事件，控制台输出单独写入 `browser-console.log`。产物不入库、不作为模板输入。退出 0 只表示本次显式范围 passed；其余结果退出非零。`result.json` 不是所有命令 stdout 都是 JSON 的承诺，SDK 准备查询仍输出诊断行。
 
 Workbench 的 W1–W6 覆盖真实存储的 UI 保存重开、失败重试、保存期间新编辑、关闭取消、不同工作区隔离和单写者占用；Native 使用临时目录，Chrome 使用独立 IndexedDB。Web Widget 测试使用受支持的 compact 外观，避免测试服务器缺失 InkSparkle shader，不模拟系统平台。Native 跨进程探针分两次启动写入与读取；集成测试通过准备关闭和释放宿主验证存储，不声称触发了操作系统退出事件。真实退出 binding 另由 Widget 测试验证。
 
