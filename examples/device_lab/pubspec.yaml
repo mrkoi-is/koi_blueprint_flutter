@@ -15,7 +15,7 @@ dependencies:
   riverpod_annotation: 4.0.7
   koi_core:
   koi_ui:
-  app_links: 7.2.1
+  app_links: 7.2.2
   bonsoir: 7.1.5
   web_socket_channel: ^3.0.3
   path_provider: 2.1.6
