@@ -405,7 +405,15 @@ class BlueprintTest(unittest.TestCase):
             write(Path(command[-1]) / 'web/manifest.json', json.dumps({'name': 'original', 'short_name': 'original'}))
             write(Path(command[-1]) / 'web/index.html', '<html><head><title>original</title></head></html>\n')
         if command[1:3] == ['pub', 'get']:
-            write(cwd / '.dart_tool/package_config.json', json.dumps({'rootUri': cwd.as_uri()}))
+            config, graph = [], [{'name': 'build_runner', 'dependencies': []}]
+            for path in fixture_members(cwd, None):
+                name = blueprint.package_name(path / 'pubspec.yaml')
+                spec = (path / 'pubspec.yaml').read_text(encoding='utf-8')
+                config.append({'name': name, 'rootUri': path.as_uri()})
+                graph.append({'name': name, 'dependencies': [],
+                              'devDependencies': ['build_runner'] if 'build_runner:' in spec else []})
+            write(cwd / '.dart_tool/package_config.json', json.dumps({'packages': config}))
+            write(cwd / '.dart_tool/package_graph.json', json.dumps({'packages': graph}))
         return ''
 
     def test_create_serializes_display_name_in_generated_pubspec(self):
@@ -454,7 +462,8 @@ class BlueprintTest(unittest.TestCase):
         self.assertNotIn('  - examples/starter_app', spec)
         self.assertIn('analyzer: 14.4.0', spec)
         config = json.loads((target / '.dart_tool/package_config.json').read_text(encoding='utf-8'))
-        self.assertEqual(config['rootUri'], target.as_uri())
+        app_config = next(item for item in config['packages'] if item['name'] == 'my_workspace_app')
+        self.assertEqual(app_config['rootUri'], (target / 'apps/my_workspace_app').as_uri())
         self.assertEqual(run.call_args.args[1], target)
         self.assertTrue((target / '.blueprint/reference/examples/starter_app/lib/main.dart').is_file())
         self.assertIn('../.blueprint/reference/examples/', (target / 'docs/examples.md').read_text(encoding='utf-8'))

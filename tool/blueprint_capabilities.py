@@ -92,6 +92,26 @@ def snapshot_install_inputs(root, app):
     return snapshot
 
 
+def _remove_new_package_outputs(package, staged):
+    """Clean a transaction-created support package after its managed files were rolled back."""
+    if package.is_symlink() or package.parent.is_symlink() or not package.is_dir():
+        return
+    for path in sorted(package.rglob('*'), reverse=True):
+        relative = path.relative_to(package)
+        reference = staged / relative
+        if path.is_symlink() or reference.is_symlink():
+            continue
+        if path.is_file() and reference.is_file():
+            # These freshly created Pub and build_runner caches encode the
+            # absolute workspace path, which differs between staging and live.
+            sdk_cache = relative.parts[:2] in (('.dart_tool', 'pub'), ('.dart_tool', 'build'),
+                                               ('.dart_tool', 'build_resolvers'))
+            if sdk_cache or path.read_bytes() == reference.read_bytes():
+                path.unlink()
+        elif path.is_dir() and reference.is_dir() and not any(path.iterdir()):
+            path.rmdir()
+
+
 class FileTransaction:
     """Compare-before-write and rollback only bytes still owned by this operation."""
     def __init__(self, root, changes, *, expected_hashes=None, watch=()):
@@ -106,8 +126,8 @@ class FileTransaction:
                 if observed != expected_hashes.get(relative):
                     raise ValueError(f'File changed while planning installation: {relative}')
 
-    def commit(self, after_write=None):
-        written, created = [], []
+    def commit(self, after_write=None, *, staged_workspace=None):
+        written, created, new_packages = [], [], []
         # A separate lock avoids overwriting another installer's transaction journal.
         lock = self.root / '.blueprint-install.lock'
         try:
@@ -135,6 +155,9 @@ class FileTransaction:
                 atomic_write(path, content)
                 written.append(relative)
             if after_write:
+                if staged_workspace is not None:
+                    new_packages = [d for d in created if d.parent == self.root / 'packages'
+                                    and (d.relative_to(self.root) / 'pubspec.yaml').as_posix() in written]
                 after_write()
         except Exception:
             for relative in reversed(written):
@@ -145,6 +168,8 @@ class FileTransaction:
                         path.unlink()
                     else:
                         atomic_write(path, self.before[relative])
+            for package in new_packages:
+                _remove_new_package_outputs(package, staged_workspace / package.relative_to(self.root))
             for directory in reversed(created):
                 if directory.exists() and not any(directory.iterdir()):
                     directory.rmdir()

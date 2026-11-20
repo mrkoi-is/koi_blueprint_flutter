@@ -155,13 +155,25 @@ def replace_tree(root, replacements):
 
 def members(root, sdk):
     data = json.loads(run([sdk.dart, 'pub', 'workspace', 'list', '--json'], root, capture=True))
-    return [Path(item['path']) for item in data['packages'] if Path(item['path']).resolve() != root.resolve()]
+    paths = [root / item['path'] for item in data['packages']]
+    return [path for path in paths if path.resolve() != root.resolve()]
 
 
 def check_localizations(root, sdk, workspace):
     localized = [member for member in workspace if (member / 'l10n.yaml').is_file()]
     if localized:
         run([sdk.dart, 'run', 'tool/check_l10n.dart', *localized], root)
+
+
+def generate_workspace(root, sdk, workspace):
+    from tool.blueprint_codegen import generation_plan
+    plan = generation_plan(root, workspace)
+    check_localizations(root, sdk, workspace)
+    for member, uses_build_runner in plan:
+        if (member / 'l10n.yaml').is_file():
+            run([sdk.flutter, 'gen-l10n'], member)
+        if uses_build_runner:
+            run([sdk.dart, 'run', 'build_runner', 'build'], member)
 
 
 def check_analysis(root, sdk):
@@ -662,12 +674,8 @@ def create(args):
         run([sdk.flutter, 'pub', 'get'], stage)
         # The complete app is generated before the destination becomes visible.
         workspace = members(stage, sdk)
-        check_localizations(stage, sdk, workspace)
+        generate_workspace(stage, sdk, workspace)
         for member in workspace:
-            if (member / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], member)
-            if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
-                run([sdk.dart, 'run', 'build_runner', 'build'], member)
             targets = [member / sub for sub in ('lib', 'test', 'integration_test') if (member / sub).is_dir()]
             if targets:
                 run([sdk.dart, 'format', *targets], stage)
@@ -836,12 +844,7 @@ def check(args):
         return
     workspace = members(root, sdk)
     if phase in ('generate', 'generate-check'):
-        check_localizations(root, sdk, workspace)
-        for member in workspace:
-            if (member / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], member)
-            if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
-                run([sdk.dart, 'run', 'build_runner', 'build'], member)
+        generate_workspace(root, sdk, workspace)
     elif phase == 'l10n':
         check_localizations(root, sdk, workspace)
     elif phase in ('format-check', 'format'):
@@ -1028,15 +1031,8 @@ def capability(args):
             target = stage / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(content)
-        staged_app = stage / app.relative_to(root)
         run([sdk.flutter, 'pub', 'get'], stage)
-        workspace = members(stage, sdk)
-        check_localizations(stage, sdk, workspace)
-        for member in workspace:
-            if (member / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], member)
-            if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
-                run([sdk.dart, 'run', 'build_runner', 'build'], member)
+        generate_workspace(stage, sdk, members(stage, sdk))
         dart_targets = [stage / relative for relative in plan['changes'] if relative.endswith('.dart')]
         if dart_targets:
             run([sdk.dart, 'format', *dart_targets], stage)
@@ -1063,11 +1059,8 @@ def capability(args):
             transaction.before[relative] = path.read_bytes() if path.is_file() else None
         def refresh():
             run([sdk.flutter, 'pub', 'get', '--enforce-lockfile'], root)
-            check_localizations(root, sdk, [app])
-            if (app / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], app)
-            run([sdk.dart, 'run', 'build_runner', 'build'], app)
-        transaction.commit(refresh)
+            generate_workspace(root, sdk, members(root, sdk))
+        transaction.commit(refresh, staged_workspace=stage)
 
 
 def finalize_generated_provenance(stage, app, template_source, inherited_origins=None):

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- `generate-check`、创建工程、安装能力和完整验证现在都按 Pub 解析的 workspace 依赖顺序运行 `build_runner`。安装能力时，临时工作区和实际工程都会先生成依赖包，再生成使用它们的 App。
+- 安装能力时，若新依赖包已生成而 App 生成失败，回滚会清理本次新包的 SDK 缓存和匹配的生成文件，允许重新安装。用户另加或改写的源文件会保留。
 - 能力安装按 key 合并 ARB，保留项目自定义译文并补入配方新增文案。同版本重装支持刷新译文，双方对同一 key 的不同修改会报告文件和 key。
 - 将蓝图、生成工程和 CI 的 SDK 升级至 Flutter 3.50.1 / Dart 3.14.0，更新 workspace SDK 约束和锁文件。新建 Android runner 使用 AGP 9.3.2，修复 JDK 17 下的 release lint 崩溃。
 - 修复 App 目录名与 Dart 包名不一致时的升级误报。`upgrade-report` 和 `upgrade plan` 共用 App 的 `pubspec.yaml` 包名，已采用的导入修复可正确归类为 `alreadyApplied`，计划也会用该包名还原基线并生成新的导入。
