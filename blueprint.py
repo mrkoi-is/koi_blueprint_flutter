@@ -229,10 +229,11 @@ def safe_target(root, path, must_be_new=False):
 
 
 def package_name(spec):
-    match = re.search(r'^name:[ \t]*([a-z][a-z0-9_]*)[ \t]*(?:#.*)?$', spec.read_text(encoding='utf-8'), re.M)
+    pattern = r"""^name:[ \t]*(?P<quote>['"]?)(?P<name>[a-z][a-z0-9_]*)(?P=quote)[ \t]*(?:#.*)?$"""
+    match = re.search(pattern, spec.read_text(encoding='utf-8'), re.M)
     if not match:
         raise BlueprintError(f'Missing or unsupported package name in {spec}')
-    return match[1]
+    return match['name']
 
 
 def workspace_for(app):

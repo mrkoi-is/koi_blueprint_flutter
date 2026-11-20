@@ -23,10 +23,12 @@ python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app apps/my_app -
 `upgrade-report` 只比较文件和来源，不修改工程，也不执行依赖解析。先确认目标蓝图源码、提交与工作区 dirty 状态，再在现有工程中运行：
 
 ```sh
-python3 blueprint.py upgrade-report --app apps/my_app --source /path/to/koi_blueprint_flutter > upgrade-report.json
+python3 /path/to/new-blueprint/blueprint.py upgrade-report --app apps/my_app --source /path/to/new-blueprint
 ```
 
 报告中的 `upstreamChanges` 是本地仍保持创建基线、但上游已变化的文件；`localChanges` 是仅下游修改；`conflicts` 是双方改动不同；`alreadyApplied` 表示下游已经采用与新上游相同的内容；`unchanged` 无需处理。`newCapabilities` 只表示目标蓝图提供了新配方，不表示应全部安装。`capabilityUpdates` 提醒能力版本或翻译来源变化。
+
+例如上面命令的 App 在 `pubspec.yaml` 中声明了 `name: field_notes`，两条命令仍传 `--app apps/my_app`。如果本地已采用上游修复，示例中的导入替换为 `package:field_notes/` 后与本地文件完全一致，报告会将它列入 `alreadyApplied`。计划用同一包名还原受管 Dart 文件的基线，并渲染新增文件的导入。清单存在但缺少有效的 `name` 时，两条命令都会提示需要检查的文件。
 
 schema 2 的指导文件若缺少创建时基线，会出现在 `untrackedGuidance`：`path`、`source`、`status: NO_BASELINE`、`localExists` 和两侧当前摘要。即使两侧当前内容相同，也不能归为未变化或已应用；本地缺文件时当前摘要为 null。这些项需要人工比较，报告不会覆盖文件、补造历史基线或修改 blueprint.json。新生成项目的指导文件复用 `managedFiles` 和内容基线，并登记原始源摘要与生成后摘要。
 

@@ -53,10 +53,12 @@ python3 blueprint.py capability add images --app apps/notes_app --dry-run
 python3 blueprint.py capability add images --app apps/notes_app
 python3 blueprint.py build --app apps/notes_app --profile web-local
 python3 blueprint.py package --app apps/notes_app --profile web-local
-python3 blueprint.py upgrade-report --app apps/notes_app --source ../koi_blueprint_flutter
+python3 ../koi_blueprint_flutter/blueprint.py upgrade-report --app apps/notes_app --source ../koi_blueprint_flutter
 ```
 
-images 自动安装 network；安装只采用内置配方，依赖、原生配置、测试和清单一起装配。重复安装检查文件所有权，用户修改或版本冲突会拒绝覆盖。升级报告仅比较基线/本地/上游并输出迁移说明，不自动修改下游。旧 schema 1 工程先人工迁移装配与基线，不能直接增装能力。
+images 自动安装 network；安装只采用内置配方，依赖、原生配置、测试和清单一起装配。重复安装检查文件所有权，用户修改或版本冲突会拒绝覆盖。旧 schema 1 工程先人工迁移装配与基线，不能直接增装能力。
+
+已有 schema 2 工程可用新版蓝图的 `upgrade-report` 查看三方差异，再用 `upgrade plan` 生成计划。两条命令的 `--app` 都填写 App 目录，Dart 包名取自该 App 的 `pubspec.yaml`，目录名可以与包名不同。见[下游工程升级指南](docs/upgrade-guide.md)。
 
 profile 明确平台、架构、模式、channel 和格式；构建与打包清单绑定实际产物和输入摘要，过期或修改过的产物不能直接打包。doctor 显示工具版本、已装能力依赖和实际动态库加载/资产校验结果；六端设备运行、安装及系统交互仍单独验收，未执行项标记 NOT_RUN。
 

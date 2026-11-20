@@ -235,7 +235,7 @@ class UpgradeToolsTest(unittest.TestCase):
         self.assertEqual([item['path'] for item in report['alreadyApplied']], ['apps/demo_app/lib/feature.dart'])
         self.assertEqual(report['conflicts'], [])
 
-    def test_upgrade_report_recognizes_renamed_example_import_already_applied(self):
+    def test_upgrade_report_uses_declared_app_package_for_example_imports(self):
         source = self.root / 'upstream'
         project = self.root / 'project'
         upstream = source / 'examples/network_lab/lib/feature.dart'
@@ -243,7 +243,8 @@ class UpgradeToolsTest(unittest.TestCase):
         upstream.write_text('import "package:network_lab/old.dart";')
         local = project / 'apps/demo_app/lib/feature.dart'
         local.parent.mkdir(parents=True)
-        local.write_text('import "package:demo_app/old.dart";')
+        (project / 'apps/demo_app/pubspec.yaml').write_text("name: 'custom_flutter'  # Dart package\n")
+        local.write_text('import "package:custom_flutter/old.dart";')
         metadata = {'schema': 2, 'app': 'apps/demo_app', 'managedFiles': {
             'apps/demo_app/lib/feature.dart': {
                 'source': 'examples/network_lab/lib/feature.dart',
@@ -253,10 +254,15 @@ class UpgradeToolsTest(unittest.TestCase):
         }}
         (project / 'blueprint.json').write_text(json.dumps(metadata))
         upstream.write_text('import "package:network_lab/fixed.dart";')
-        local.write_text('import "package:demo_app/fixed.dart";')
+        local.write_text('import "package:custom_flutter/fixed.dart";')
         report = upgrade_report(project, source)
         self.assertEqual([item['path'] for item in report['alreadyApplied']], ['apps/demo_app/lib/feature.dart'])
         self.assertEqual(report['conflicts'], [])
+
+        local.write_text('import "package:custom_flutter/local.dart";')
+        report = upgrade_report(project, source)
+        self.assertEqual(report['alreadyApplied'], [])
+        self.assertEqual([item['path'] for item in report['conflicts']], ['apps/demo_app/lib/feature.dart'])
 
     def test_install_baseline_tracks_new_recipe_but_preserves_prior_user_edit(self):
         source = self.root / 'source'

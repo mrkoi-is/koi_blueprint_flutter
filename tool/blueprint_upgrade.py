@@ -19,7 +19,7 @@ import uuid
 from pathlib import Path, PureWindowsPath
 
 from tool.blueprint_capabilities import atomic_write, safe_file
-from tool.blueprint_provenance import read_metadata, source_identity
+from tool.blueprint_provenance import read_metadata, resolve_app_package_name, source_identity
 
 
 def _hash(data):
@@ -41,8 +41,8 @@ def _seal(value):
     return _hash(json.dumps(value, sort_keys=True, separators=(',', ':'), ensure_ascii=False).encode())
 
 
-def _render_app_test(raw, relative, metadata, blueprint):
-    """Use the same simultaneous substitutions as blueprint.create."""
+def _render_app_test(raw, relative, metadata, blueprint, app_package):
+    """Render template assets with the target App package and project branding."""
     path = Path(relative)
     if 'assets' in path.parts or path.suffix not in ('.dart', '.yaml', '.md', '.json', '.arb'):
         return raw
@@ -51,7 +51,7 @@ def _render_app_test(raw, relative, metadata, blueprint):
     name = metadata['name']
     brand = metadata.get('configuration', {}).get('brand', {}).get('displayName')
     replacements = {
-        template_name: f'{name}_app',
+        template_name: app_package,
         blueprint.pascal(template_name): blueprint.pascal(name) + 'App',
         'Starter App' if template == 'minimal' else 'Koi Workbench': brand or blueprint.pascal(name),
         'Executable blueprint reference, also used by the generator': json.dumps(
@@ -295,6 +295,7 @@ def plan(root, source, resolutions=None):
     template_name = blueprint.TEMPLATES.get(template)
     if not template_name or not app:
         raise ValueError('Unknown project template or app path')
+    app_package = resolve_app_package_name(root, app)
     for entry in references.values():
         origin = entry['source']
         origin_path = Path(origin)
@@ -362,8 +363,9 @@ def plan(root, source, resolutions=None):
                                   'detail': 'Original upstream bytes unavailable for reliable rendering.'})
                 continue
             try:
-                old_render = _render_app_test(previous, Path(origin).relative_to('examples/' + template_name), metadata, blueprint)
-                new_render = _render_app_test(raw, Path(origin).relative_to('examples/' + template_name), metadata, blueprint)
+                relative = Path(origin).relative_to('examples/' + template_name)
+                old_render = _render_app_test(previous, relative, metadata, blueprint, app_package)
+                new_render = _render_app_test(raw, relative, metadata, blueprint, app_package)
                 formatted_old, new, evidence = _format_app_pair(root, metadata, old_render, new_render, blueprint)
                 if _hash(formatted_old) != prior['sha256']:
                     raise ValueError('Original source cannot reproduce the trusted generated baseline')
@@ -373,7 +375,7 @@ def plan(root, source, resolutions=None):
                 continue
         elif entry['kind'] == 'app_new_lib':
             relative = Path(origin).relative_to('examples/' + template_name)
-            new = _render_app_test(raw, relative, metadata, blueprint)
+            new = _render_app_test(raw, relative, metadata, blueprint, app_package)
             if relative.suffix == '.dart':
                 try:
                     _, new, evidence = _format_app_pair(root, metadata, new, new, blueprint)
@@ -382,7 +384,8 @@ def plan(root, source, resolutions=None):
                     conflicts.append({'path': path, 'reason': 'unsupported_managed_change', 'detail': str(error)})
                     continue
         elif entry['kind'] in ('app_test', 'app_pubspec'):
-            new = _render_app_test(raw, Path(origin).relative_to('examples/' + template_name), metadata, blueprint)
+            relative = Path(origin).relative_to('examples/' + template_name)
+            new = _render_app_test(raw, relative, metadata, blueprint, app_package)
         elif entry['kind'] == 'package':
             new = raw
         else:

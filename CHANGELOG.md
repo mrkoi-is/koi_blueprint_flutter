@@ -3,7 +3,7 @@
 ## Unreleased
 
 - 将蓝图、生成工程和 CI 的 SDK 升级至 Flutter 3.50.1 / Dart 3.14.0，更新 workspace SDK 约束和锁文件。新建 Android runner 使用 AGP 9.3.2，修复 JDK 17 下的 release lint 崩溃。
-
+- 修复 App 目录名与 Dart 包名不一致时的升级误报。`upgrade-report` 和 `upgrade plan` 共用 App 的 `pubspec.yaml` 包名，已采用的导入修复可正确归类为 `alreadyApplied`，计划也会用该包名还原基线并生成新的导入。
 - 同步 README、创建指南与初始化契约中的默认 diagnostics v2、显式能力选择及 Chrome 前置条件；更新工具清单与升级指南，补齐 v0.3.0-rc.1 的发布入口和最终 CI 记录，区分合并前设备证据与发布提交构建结果。
 - 修复升级计划的只读语义：不在受审工程生成 Python 缓存，拒绝将计划写入目标或源蓝图目录；依赖解析在启动 pub 前拒绝不明确的 YAML 与越界本地路径。
 - 升级新增工具保留上游执行权限，已有文件保留用户权限；备份与回退写入前重新核对内容，拒绝备份期间的用户修改或预检后损坏的备份。可选能力包的变更继续要求人工迁移。

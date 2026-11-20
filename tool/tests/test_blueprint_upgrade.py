@@ -91,6 +91,24 @@ class UpgradeTest(unittest.TestCase):
             self.assertEqual({p.relative_to(self.source).as_posix(): p.read_bytes()
                               for p in self.source.rglob('*') if p.is_file()}, source_before)
 
+    def test_upgrade_commands_reject_invalid_app_package_cleanly(self):
+        cli = Path(__file__).resolve().parents[2] / 'blueprint.py'
+        app = self.root / 'apps/demo_app'
+        app.mkdir(parents=True)
+        (self.root / 'pubspec.yaml').write_text('name: demo\nworkspace:\n  - apps/demo_app\n')
+        spec = app / 'pubspec.yaml'
+        spec.write_text('description: no package name\n')
+        output = self.source.parent / 'plan.json'
+        for command in (['upgrade-report'], ['upgrade', 'plan', '--output', str(output)]):
+            with self.subTest(command=command):
+                result = subprocess.run([sys.executable, str(cli), *command, '--app', str(app),
+                                         '--source', str(self.source)], cwd=self.root,
+                                        capture_output=True, text=True, check=False)
+                self.assertEqual(result.returncode, 2, result.stderr)
+                self.assertEqual(result.stderr.strip(),
+                                 f'blueprint: Missing or unsupported package name in {spec.resolve()}')
+                self.assertFalse(output.exists())
+
     @unittest.skipIf(os.name == 'nt', 'POSIX executable permissions')
     def test_new_tool_keeps_executable_mode_and_can_run_after_upgrade(self):
         script = self.source / 'tool/new-command'
@@ -318,13 +336,16 @@ class UpgradeTest(unittest.TestCase):
         test = self.source / 'examples/starter_app/test/new_test.dart'
         test.parent.mkdir(parents=True)
         test.write_bytes(b'import "package:starter_app/main.dart"; StarterApp();')
+        app = self.root / 'apps/demo_app'
+        app.mkdir(parents=True)
+        (app / 'pubspec.yaml').write_bytes(b'name: "custom_flutter"\n')
         result = upgrade.plan(self.root, self.source)
         self.assertTrue(result['applicable'], result['conflicts'])
         upgrade.apply(self.root, result)
         self.assertEqual(package.read_bytes(), b'new widget')
         self.assertEqual((self.root / 'packages/koi_ui/test/golden/fonts/sample.ttf').read_bytes(), b'font-bytes')
         rendered = (self.root / 'apps/demo_app/test/new_test.dart').read_text(encoding='utf-8')
-        self.assertIn('package:demo_app/main.dart', rendered)
+        self.assertIn('package:custom_flutter/main.dart', rendered)
         self.assertIn('DemoApp()', rendered)
 
     def test_new_app_lib_is_rendered_but_never_overwrites_unmanaged_file(self):
@@ -360,10 +381,11 @@ class UpgradeTest(unittest.TestCase):
         origin = 'examples/starter_app/lib/main.dart'
         relative = 'apps/demo_app/lib/main.dart'
         old = b'import "package:starter_app/app.dart";\n'
-        generated = b'import "package:demo_app/app.dart";\n'
+        generated = b'import "package:custom_flutter/app.dart";\n'
         newer = b'import "package:starter_app/new.dart";\n'
         path = self.root / relative
         path.parent.mkdir(parents=True)
+        (self.root / 'apps/demo_app/pubspec.yaml').write_bytes(b'name: custom_flutter\n')
         path.write_bytes(generated)
         (self.root / '.blueprint/baseline' / digest(generated)).write_bytes(generated)
         ref = self.root / '.blueprint/reference' / origin
@@ -384,7 +406,7 @@ class UpgradeTest(unittest.TestCase):
             result = upgrade.plan(self.root, self.source, reviewed)
             self.assertTrue(result['applicable'], result['conflicts'])
             operation = next(o for o in result['operations'] if o['path'] == relative)
-            self.assertEqual(operation['after'], digest(b'import "package:demo_app/new.dart";\n'))
+            self.assertEqual(operation['after'], digest(b'import "package:custom_flutter/new.dart";\n'))
             path.write_bytes(b'local edit')
             conflict = upgrade.plan(self.root, self.source, reviewed)
             self.assertTrue(any(c['path'] == relative and c['reason'] == 'conflict' for c in conflict['conflicts']))
