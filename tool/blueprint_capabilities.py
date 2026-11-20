@@ -92,13 +92,33 @@ def snapshot_install_inputs(root, app):
     return snapshot
 
 
+def _remove_new_package_outputs(package, staged):
+    """Clean a transaction-created support package after its managed files were rolled back."""
+    if package.is_symlink() or package.parent.is_symlink() or not package.is_dir():
+        return
+    for path in sorted(package.rglob('*'), reverse=True):
+        relative = path.relative_to(package)
+        reference = staged / relative
+        if path.is_symlink() or reference.is_symlink():
+            continue
+        if path.is_file() and reference.is_file():
+            # These freshly created Pub and build_runner caches encode the
+            # absolute workspace path, which differs between staging and live.
+            sdk_cache = relative.parts[:2] in (('.dart_tool', 'pub'), ('.dart_tool', 'build'),
+                                               ('.dart_tool', 'build_resolvers'))
+            if sdk_cache or path.read_bytes() == reference.read_bytes():
+                path.unlink()
+        elif path.is_dir() and reference.is_dir() and not any(path.iterdir()):
+            path.rmdir()
+
+
 class FileTransaction:
     """Compare-before-write and rollback only bytes still owned by this operation."""
-    def __init__(self, root, changes, *, expected_hashes=None):
+    def __init__(self, root, changes, *, expected_hashes=None, watch=()):
         self.root = Path(root).resolve()
         self.changes = changes
         self.before = {}
-        for relative in changes:
+        for relative in dict.fromkeys((*changes, *watch)):
             path = safe_file(self.root, relative)
             self.before[relative] = path.read_bytes() if path.is_file() else None
             if expected_hashes is not None:
@@ -106,8 +126,8 @@ class FileTransaction:
                 if observed != expected_hashes.get(relative):
                     raise ValueError(f'File changed while planning installation: {relative}')
 
-    def commit(self, after_write=None):
-        written, created = [], []
+    def commit(self, after_write=None, *, staged_workspace=None):
+        written, created, new_packages = [], [], []
         # A separate lock avoids overwriting another installer's transaction journal.
         lock = self.root / '.blueprint-install.lock'
         try:
@@ -135,6 +155,9 @@ class FileTransaction:
                 atomic_write(path, content)
                 written.append(relative)
             if after_write:
+                if staged_workspace is not None:
+                    new_packages = [d for d in created if d.parent == self.root / 'packages'
+                                    and (d.relative_to(self.root) / 'pubspec.yaml').as_posix() in written]
                 after_write()
         except Exception:
             for relative in reversed(written):
@@ -145,6 +168,8 @@ class FileTransaction:
                         path.unlink()
                     else:
                         atomic_write(path, self.before[relative])
+            for package in new_packages:
+                _remove_new_package_outputs(package, staged_workspace / package.relative_to(self.root))
             for directory in reversed(created):
                 if directory.exists() and not any(directory.iterdir()):
                     directory.rmdir()
@@ -181,35 +206,141 @@ def with_assets(spec, paths):
     return spec[:block[1]] + content + spec[block[2]:]
 
 
-def merge_localizations(root, app_relative, item, source, changes, managed):
-    """Merge recipe keys into App-owned ARB files without replacing local edits."""
-    origins = {}
-    for locale, origin in item.get('localizationSources', {}).items():
-        if locale not in ('en', 'zh', 'zh_Hant'):
-            raise ValueError(f'Unsupported recipe locale: {locale}')
-        relative = (app_relative / 'lib/l10n' / f'app_{locale}.arb').as_posix()
+def read_arb(content, locale, path):
+    def unique_keys(pairs):
+        result = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValueError(f'Duplicate ARB key in {path}: {key}')
+            result[key] = value
+        return result
+
+    try:
+        data = json.loads(content, object_pairs_hook=unique_keys)
+    except (UnicodeError, json.JSONDecodeError) as error:
+        raise ValueError(f'Invalid ARB in {path}: {error}') from error
+    if not isinstance(data, dict) or data.get('@@locale') != locale:
+        raise ValueError(f'Expected ARB locale {locale} in {path}')
+    return data
+
+
+def arb_baseline(root, sha, path, *, old_source=None, source=None):
+    if not isinstance(sha, str) or not re.fullmatch(r'[0-9a-f]{64}', sha):
+        raise ValueError(f'Invalid ARB baseline digest: {path}')
+    blob = safe_file(root, f'.blueprint/baseline/{sha}')
+    if blob.is_file():
+        content = blob.read_bytes()
+        if hashlib.sha256(content).hexdigest() == sha:
+            return content
+        raise ValueError(f'Corrupt ARB baseline: {path}')
+    # Older receipts recorded the recipe digest before installers kept a blob.
+    if old_source:
+        for workspace in dict.fromkeys((root, source or root)):
+            for relative in (old_source, Path('.blueprint/reference') / old_source):
+                candidate = safe_file(workspace, relative)
+                if candidate.is_file():
+                    content = candidate.read_bytes()
+                    if hashlib.sha256(content).hexdigest() == sha:
+                        return content
+    raise ValueError(f'Missing verified ARB baseline: {path} ({sha})')
+
+
+def same_arb_value(left, right):
+    # JSON distinguishes true from 1, including inside placeholder metadata.
+    return json.dumps(left, sort_keys=True) == json.dumps(right, sort_keys=True)
+
+
+def merge_arb_keys(current, incoming, previous, app_base, path):
+    merged = current.copy()
+    for key, value in incoming.items():
+        bases = previous.get(key, [app_base[key]] if key in app_base else [])
+        if key in current:
+            local = current[key]
+            if same_arb_value(local, value) or (bases and all(same_arb_value(value, old) for old in bases)):
+                continue
+            if not bases or any(not same_arb_value(local, old) for old in bases):
+                raise ValueError(f'Localization key conflicts: {path}: {key}')
+        elif bases:
+            raise ValueError(f'Localization key removed locally: {path}: {key}')
+        merged[key] = value
+    return merged
+
+
+def plan_localizations(root, metadata, selected, source, changes, installed):
+    """Compare all active owners of each key before writing its App locale."""
+    previous_caps = metadata['capabilities']
+    by_locale = {}
+    for cap, recipe in selected.items():
+        sources = recipe.get('localizationSources', {})
+        if sources or 'localizations' in installed[cap]:
+            installed[cap]['localizations'] = {}
+        for locale, origin in sources.items():
+            if locale not in ('en', 'zh', 'zh_Hant'):
+                raise ValueError(f'Unsupported recipe locale: {locale}')
+            by_locale.setdefault(locale, {})[cap] = origin
+
+    for locale, sources in by_locale.items():
+        relative = (Path(metadata['app']) / 'lib/l10n' / f'app_{locale}.arb').as_posix()
         target = safe_file(root, relative)
         if not target.is_file():
             raise ValueError(f'App-owned localization file is missing: {relative}')
-        previous = managed.get(relative)
-        if previous and hashlib.sha256(target.read_bytes()).hexdigest() != previous['sha256']:
-            raise ValueError(f'Localization conflicts with existing user file: {relative}')
-        data = json.loads(changes.get(relative, target.read_bytes()))
-        origin_bytes = recipe_source(source, origin).read_bytes()
-        contribution = json.loads(origin_bytes)
-        if not isinstance(data, dict) or not isinstance(contribution, dict) or contribution.get('@@locale') != locale:
-            raise ValueError(f'Invalid {locale} capability localization')
-        for key, value in contribution.items():
-            if key == '@@locale':
+        declared, incoming, previous = {}, {}, {}
+        for cap, origin in sources.items():
+            raw = recipe_source(source, origin).read_bytes()
+            values = read_arb(raw, locale, origin)
+            del values['@@locale']
+            sha = hashlib.sha256(raw).hexdigest()
+            record = {'source': origin, 'sourceSha256': sha}
+            installed[cap]['localizations'][locale] = record
+            prior = previous_caps.get(cap, {}).get('localizations', {}).get(locale)
+            old = {}
+            if prior:
+                if prior.get('sourceSha256') == sha:
+                    old = values
+                else:
+                    old_raw = arb_baseline(root, prior.get('sourceSha256'), relative,
+                                           old_source=prior['source'], source=source)
+                    old = read_arb(old_raw, locale, prior['source'])
+                for key, value in old.items():
+                    previous.setdefault(key, []).append(value)
+            for key, value in values.items():
+                if key in declared and not same_arb_value(declared[key], value):
+                    raise ValueError(f'Localization key conflicts: {relative}: {key}')
+                declared[key] = value
+                if key not in old or not same_arb_value(old[key], value):
+                    incoming[key] = value
+            if prior != record:
+                baseline = f'.blueprint/baseline/{sha}'
+                blob = safe_file(root, baseline)
+                if not blob.exists():
+                    changes[baseline] = raw
+                elif blob.read_bytes() != raw:
+                    raise ValueError(f'Corrupt ARB baseline: {origin}')
+        if not incoming:
+            continue
+
+        # Outside this request, installed recipes keep their recorded claims.
+        for cap, capability in previous_caps.items():
+            prior = capability.get('localizations', {}).get(locale)
+            if cap in selected or not prior:
                 continue
-            if key in data and data[key] != value:
-                raise ValueError(f'Localization key conflicts: {relative}: {key}')
-            data[key] = value
-        content = (json.dumps(data, ensure_ascii=False, indent=2) + '\n').encode()
-        if content != target.read_bytes():
-            changes[relative] = content
-        origins[locale] = {'source': origin, 'sourceSha256': hashlib.sha256(origin_bytes).hexdigest()}
-    return origins
+            raw = arb_baseline(root, prior.get('sourceSha256'), relative, old_source=prior['source'], source=source)
+            claims = read_arb(raw, locale, prior['source'])
+            for key in incoming:
+                if key in claims:
+                    if not same_arb_value(incoming[key], claims[key]):
+                        raise ValueError(f'Localization key conflicts: {relative}: {key}')
+                    previous.setdefault(key, []).append(claims[key])
+
+        app_base = {}
+        managed = metadata.get('managedFiles', {})
+        if relative in managed:
+            raw = arb_baseline(root, managed[relative].get('sha256'), relative)
+            app_base = read_arb(raw, locale, relative)
+        current = read_arb(target.read_bytes(), locale, relative)
+        merged = merge_arb_keys(current, incoming, previous, app_base, relative)
+        if not same_arb_value(current, merged):
+            changes[relative] = (json.dumps(merged, ensure_ascii=False, indent=2) + '\n').encode()
 
 
 def registry_content(package, ordered, entries):
@@ -357,11 +488,9 @@ def install_plan(root, app, selected, source, *, config=None, brand=None, brand_
             if not registered:
                 from blueprint import with_members
                 root_spec = with_members(root_spec, [package_relative.as_posix()])
-        localization_origins = merge_localizations(root, app_relative, item, source, changes,
-                                                   metadata.get('managedFiles', {}))
         installed[key] = {'version': item['version'], 'configurationSha256': digest(requested_config),
                           'configuration': requested_config, 'files': files, 'origins': origins,
-                          'localizations': localization_origins}
+                          'localizations': {}}
         for section_name, dep_field in [('dependencies', 'pubspecDependencies'), ('dev_dependencies', 'pubspecDevDependencies')]:
             dependencies = {**({name: 'any' for name in item.get('packages', [])} if section_name == 'dependencies' else {}),
                             **item.get(dep_field, {})}
@@ -378,6 +507,7 @@ def install_plan(root, app, selected, source, *, config=None, brand=None, brand_
                     else:
                         spec = spec.rstrip() + f'\n\n{section_name}:\n  {name}: {constraint}\n'
         spec = with_assets(spec, item.get('assets', []))
+    plan_localizations(root, metadata, {key: entries[key] for key in ordered}, source, changes, installed)
     # Native outputs share exactly the same outer transaction as Dart and Pub.
     for relative, expected in metadata.get('nativeFiles', {}).items():
         path = safe_file(root, relative)
@@ -438,12 +568,13 @@ def install_plan(root, app, selected, source, *, config=None, brand=None, brand_
         raise ValueError('Managed capability registry was modified; move custom entries to app_capabilities.dart')
     if not old_hash and metadata['capabilities']:
         raise ValueError('Installed capability registry has no baseline')
-    if all_preexisting and not changes:
+    if all_preexisting and not changes and receipt == metadata:
         return {'capabilities': ordered, 'files': [], 'changes': {}}
-    content = registry_content(package_name, resolve(sorted(installed), entries), entries)
-    if content != registration_path.read_bytes():
-        changes[registration.as_posix()] = content
-    receipt['registrySha256'] = hashlib.sha256(content).hexdigest()
+    if not all_preexisting:
+        content = registry_content(package_name, resolve(sorted(installed), entries), entries)
+        if content != registration_path.read_bytes():
+            changes[registration.as_posix()] = content
+        receipt['registrySha256'] = hashlib.sha256(content).hexdigest()
     receipt_content = (json.dumps(receipt, ensure_ascii=False, sort_keys=True, indent=2) + '\n').encode()
     if receipt_content != (root / 'blueprint.json').read_bytes():
         changes['blueprint.json'] = receipt_content

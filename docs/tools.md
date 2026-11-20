@@ -51,6 +51,10 @@ doctor 的 JSON 区分工具 AVAILABLE、能力依赖 MATCH、库 LOADABLE、Web
 | `analyze`、`test`、`browser` | fatal-infos 分析；成员及工具测试；活动成员 test/browser 的真实 Chrome 测试 |
 | `coverage` | 合并手写覆盖率，未采集可执行源码按零命中计入；默认 80% |
 
+生成顺序来自 Pub 解析后的包名、成员路径和依赖图，包含 workspace 成员的开发依赖。创建工程、安装能力时的临时工作区和实际工程，以及完整验证中的 `generate-check`，都会先处理依赖包，再处理消费方。每个成员按需先运行 `gen-l10n`，声明了 `build_runner` 的成员再运行代码生成。缺少 Pub 解析文件时，先运行 `python3 blueprint.py check bootstrap`。成员间有循环依赖时，生成会停止并列出形成环的包名。
+
+如果能力安装在新依赖包生成后失败，工具会回滚安装清单，清理新包中与临时工作区匹配的生成产物和 SDK 缓存，随后可重新安装。若有人在失败期间向新包添加或改写源文件，工具会保留这些文件，重试时会提示包目录冲突。
+
 `make validate` 与 `make precommit` 都运行完整 validate。Melos 包装见 [MELOS_USAGE.md](../MELOS_USAGE.md)。
 
 | 文件 | 用途 |

@@ -14,7 +14,9 @@ python3 blueprint.py create studio --output ../studio --org com.example --templa
 
 `--template minimal|workbench` 默认 minimal。基础活动成员为 App、`koi_core`、`koi_ui`，默认 diagnostics v2 另加入 `koi_diagnostics` 及其持久化、平台依赖。两种模板默认具备主题、en/zh/zh_Hant 本地化、错误接线和来源信息；认证、业务网络客户端、媒体和数据库能力按需加入。workbench 提供文本资料、图片/视频素材、待办、导入任务与会话存储。增装能力保留原有 App 的装配与 router。
 
-工作台使用 SDK 生成 runner，再合并平台配置。macOS 加入用户选择文件的只读权限并保留其他 entitlement；未知结构报错。当前沿用 Flutter 3.47.2 的 Android 24、iOS 15、macOS 12 下限。Linux 工作台需要 `libmpv-dev mpv libepoxy-dev` 及 Flutter GTK 构建依赖。
+工作台使用 SDK 生成 runner，再合并平台配置。macOS 加入用户选择文件的只读权限并保留其他 entitlement；未知结构报错。当前沿用 Flutter 3.50.1 的 Android 24、iOS 15、macOS 12 下限。Linux 工作台需要 `libmpv-dev mpv libepoxy-dev` 及 Flutter GTK 构建依赖。
+
+生成器将 Flutter 3.50.1 Android runner 使用的 AGP 9.3.1 更新至 9.3.2，修复 JDK 17 上的 release lint 崩溃。[Android Gradle 插件发布说明](https://developer.android.com/build/releases/agp-9-3-0-release-notes)
 
 ## 用配置创建
 

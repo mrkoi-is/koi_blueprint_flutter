@@ -1,5 +1,5 @@
 name: koi_blueprint_flutter
-version: 0.3.0-rc.1
+version: 0.3.2
 publish_to: none
 description: Koi Flutter monorepo blueprint
 repository: https://github.com/mrkoi-is/koi_blueprint_flutter
@@ -7,7 +7,7 @@ homepage: https://github.com/mrkoi-is/koi_blueprint_flutter
 issue_tracker: https://github.com/mrkoi-is/koi_blueprint_flutter/issues
 
 environment:
-  sdk: '>=3.13.0 <4.0.0'
+  sdk: '>=3.14.0 <4.0.0'
 
 workspace:
   - apps/koi_admin_app

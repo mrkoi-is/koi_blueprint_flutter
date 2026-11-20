@@ -35,6 +35,25 @@ def read_metadata(root):
     return value
 
 
+def resolve_app_package_name(root, app):
+    """Resolve the Dart package identity for an App recorded in the metadata."""
+    from blueprint import BlueprintError, package_name, safe_target
+
+    app_path = Path(app)
+    if app_path.is_absolute() or '..' in app_path.parts:
+        raise ValueError('App metadata path must stay inside the workspace')
+    spec = root / app_path / 'pubspec.yaml'
+    try:
+        safe_target(root, spec)
+        if not spec.exists():
+            return app_path.name
+        if not spec.is_file():
+            raise ValueError(f'Not a regular file: {spec}')
+        return package_name(spec)
+    except BlueprintError as error:
+        raise ValueError(str(error)) from error
+
+
 def initialize_metadata(root, source, *, name, app, platforms, template, config):
     parent = read_metadata(source)
     identity = source_identity(source)
@@ -110,7 +129,11 @@ def plan_install_baseline(root, source, previous, receipt, changes):
             upstream_file = source / upstream
             if not upstream_file.is_file():
                 upstream_file = source / '.blueprint/reference' / upstream
-            if upstream_file.is_file() and not upstream_file.is_symlink():
+            if (original and candidate.parent == Path(previous.get('app', '')) / 'lib/l10n'
+                    and candidate.suffix == '.arb'):
+                # Installing recipe keys does not install a newer App template.
+                entry['sourceSha256'] = original.get('sourceSha256', original['sha256'])
+            elif upstream_file.is_file() and not upstream_file.is_symlink():
                 entry['sourceSha256'] = hashlib.sha256(upstream_file.read_bytes()).hexdigest()
             elif original and 'sourceSha256' in original:
                 entry['sourceSha256'] = original['sourceSha256']
@@ -140,6 +163,8 @@ def upgrade_report(root, source):
         ])
         return report
     from blueprint import workspace_asset_plan, render_workspace_asset
+    app = value.get('app')
+    app_package = resolve_app_package_name(root, app) if app else None
     asset_plan = workspace_asset_plan(source, value.get('name', 'project'))
     guidance_paths = {item['destination'] for item in asset_plan if item['kind'] == 'guidance'}
     for item in asset_plan:
@@ -180,9 +205,8 @@ def upgrade_report(root, source):
         source_old = entry.get('sourceSha256', old)
         local_changed, upstream_changed = current != old, origin is not None and new != source_old
         rendered = upstream_content
-        if rendered is not None and origin is not None and candidate.suffix == '.dart' and value.get('app'):
-            package = Path(value['app']).name
-            rendered = rendered.replace(b'__APP_PACKAGE__', package.encode('utf-8'))
+        if rendered is not None and origin is not None and candidate.suffix == '.dart' and app_package:
+            rendered = rendered.replace(b'__APP_PACKAGE__', app_package.encode('utf-8'))
             # The creator and capability installer rewrite imports from source
             # examples to the generated App package. Compare the rendered bytes,
             # otherwise an already adopted upstream fix looks like a conflict.
@@ -190,7 +214,7 @@ def upgrade_report(root, source):
                 old_package = origin.parts[1]
                 rendered = rendered.replace(
                     f'package:{old_package}/'.encode('utf-8'),
-                    f'package:{package}/'.encode('utf-8'),
+                    f'package:{app_package}/'.encode('utf-8'),
                 )
         if relative in guidance_paths and upstream is not None and upstream.is_file():
             rendered = render_workspace_asset(upstream.read_bytes(), relative, value.get('name', 'project'))

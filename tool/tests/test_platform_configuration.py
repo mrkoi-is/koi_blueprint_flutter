@@ -25,6 +25,21 @@ class MainFlutterWindow: NSWindow {
 
 
 class PlatformConfigurationTest(unittest.TestCase):
+    def test_android_lint_fix_updates_only_the_affected_plugin(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            app = Path(temporary)
+            settings = app / 'android/settings.gradle.kts'
+            settings.parent.mkdir()
+            settings.write_bytes(
+                b'    id("com.android.application") version "9.3.1" apply false\r\n'
+                b'    id("another.plugin") version "9.3.1" apply false\r\n'
+            )
+            expected = settings.read_bytes().replace(b'9.3.1', b'9.3.2', 1)
+            MODULE.configure_android(app)
+            self.assertEqual(settings.read_bytes(), expected)
+            MODULE.configure_android(app)
+            self.assertEqual(settings.read_bytes(), expected)
+
     def test_merge_is_deterministic_and_preserves_sdk_keys(self):
         with tempfile.TemporaryDirectory() as temporary:
             app = Path(temporary)

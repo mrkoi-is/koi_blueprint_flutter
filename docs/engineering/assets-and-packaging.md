@@ -14,7 +14,7 @@ DEB 将随 App 一起提供的私有 Flutter 库排除于 Debian 包名推断，
 
 doctor 根据完整 build profile 推断省略的默认格式。AppImage runtime 与 package 共用 type-2 ELF 标识、实际架构和 SHA256 校验，异机标记 `WRONG_HOST`；打包过程中 runtime 被替换会失败。最终输出必须恰有约定产物：ZIP 逐文件检查条目、大小和解压字节哈希；APK/App 与已验证构建一致；EXE 检查 PE，DEB 检查 ar 格式版本及 control/data 容器，AppImage 检查实际架构。格式检查仍不能替代目标系统安装与启动，任何失败均不晋升 staging 输出。
 
-构建先执行严格锁文件的依赖刷新；Android/macOS/iOS 再运行 Flutter `build --config-only` 完成原生配置，随后冻结来源和锁文件，再执行真正编译。Android 准备命令显式使用 `--pub`，让 Flutter 按 debug/release 模式刷新插件注册器；Flutter 3.47 的 `--no-pub` 会跳过这一步，而普通 `pub get` 产生的开发插件注册器不匹配 release Gradle 依赖。准备后验证锁文件未变，再用 `--no-pub` 真正编译，不把 `integration_test` 加入运行依赖。Android SDK 迁移的 Gradle 文件、首次 CocoaPods 修改的 Podfile.lock、Xcode project/workspace 仍是摘要输入，准备清单逐文件记录修改前后哈希。准备时改写非原生源码、准备失败、冻结后源码或锁文件改变均留下 `FAIL` 清单；不匹配的构建主机保持 `NOT_RUN`。产物内的 `BUILD_SOURCE` 使用准备完成后的摘要。
+构建先执行严格锁文件的依赖刷新；Android/macOS/iOS 再运行 Flutter `build --config-only` 完成原生配置，随后冻结来源和锁文件，再执行真正编译。Android 准备命令显式使用 `--pub`，让 Flutter 按 debug/release 模式刷新插件注册器；Flutter 的 `--no-pub` 会跳过这一步，而普通 `pub get` 产生的开发插件注册器不匹配 release Gradle 依赖。准备后验证锁文件未变，再用 `--no-pub` 真正编译，不把 `integration_test` 加入运行依赖。Android SDK 迁移的 Gradle 文件、首次 CocoaPods 修改的 Podfile.lock、Xcode project/workspace 仍是摘要输入，准备清单逐文件记录修改前后哈希。准备时改写非原生源码、准备失败、冻结后源码或锁文件改变均留下 `FAIL` 清单；不匹配的构建主机保持 `NOT_RUN`。产物内的 `BUILD_SOURCE` 使用准备完成后的摘要。
 
 `generate_assets(app)` 从目标 pubspec 的 `flutter.assets` 字符串列表生成 稳定导出 `lib/shared/assets/app_assets.dart`、实现 `lib/shared/assets/generated/app_assets.dart` 与受管的 `test/typed_assets_test.dart`。测试通过 `AppAssets.all` 和 `rootBundle` 实际加载每项资源，比较生成时记录的原始字节长度（允许合法空文件）；PNG/JPEG/GIF/WebP 还经过 Flutter codec 解码并释放图像与 codec，其它格式只验证加载长度。空清单的加载测试明确跳过，不表示已加载资源。`AppAssets.bundleKey(path, package: 'shared_assets')` 提供跨包键名；生成测试的 import 跟随目标 pubspec 包名。
 

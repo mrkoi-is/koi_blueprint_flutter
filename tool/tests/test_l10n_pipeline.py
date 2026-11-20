@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import tempfile
 from types import SimpleNamespace
@@ -16,6 +17,13 @@ class LocalizationPipelineTest(unittest.TestCase):
         self.app.mkdir(parents=True)
         (self.app / 'l10n.yaml').write_text('arb-dir: lib/l10n\n')
         (self.app / 'pubspec.yaml').write_text('name: demo\ndev_dependencies:\n  build_runner: any\n')
+        tool = self.root / '.dart_tool'
+        tool.mkdir()
+        (tool / 'package_config.json').write_text(json.dumps({'packages': [{'name': 'demo', 'rootUri': '../apps/demo'}]}))
+        (tool / 'package_graph.json').write_text(json.dumps({'packages': [
+            {'name': 'demo', 'dependencies': [], 'devDependencies': ['build_runner']},
+            {'name': 'build_runner', 'dependencies': []},
+        ]}))
         self.sdk = SimpleNamespace(dart='dart', flutter='flutter')
         self.enterContext(patch.object(blueprint, 'SDK', return_value=self.sdk))
         self.enterContext(patch.object(blueprint, 'members', return_value=[self.app]))

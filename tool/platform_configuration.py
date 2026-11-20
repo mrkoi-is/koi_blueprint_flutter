@@ -232,6 +232,18 @@ def _configure_window(source: str) -> str:
     return head + '\n' + _WINDOW_MEMBERS + closing + tail + _WINDOW_CONFORMANCE
 
 
+def configure_android(app: Path) -> None:
+    """Use the AGP patch that fixes Android lint on JDK 17 (issue 522845800)."""
+    settings = app / 'android/settings.gradle.kts'
+    original = settings.read_bytes()
+    updated = original.replace(
+        b'id("com.android.application") version "9.3.1" apply false',
+        b'id("com.android.application") version "9.3.2" apply false',
+    )
+    if updated != original:
+        settings.write_bytes(updated)
+
+
 def configure_workbench(app: Path, platforms: list[str]) -> None:
     """Merge file access and theme-aware chrome into the pinned macOS runner."""
     if 'macos' not in platforms:

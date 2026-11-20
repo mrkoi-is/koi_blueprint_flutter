@@ -55,10 +55,10 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Install Flutter 3.47.2
+      - name: Install Flutter 3.50.1
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.47.2
+          flutter-version: 3.50.1
           channel: stable
           cache: true
 
@@ -104,7 +104,7 @@ jobs:
           python-version: '3.12'
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.47.2
+          flutter-version: 3.50.1
           channel: stable
           cache: true
       - run: python blueprint.py check bootstrap
@@ -155,7 +155,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         if: steps.platforms.outputs.platforms != ''
         with:
-          flutter-version: 3.47.2
+          flutter-version: 3.50.1
           channel: stable
           cache: true
       - name: Prepare this project's dependencies
@@ -204,7 +204,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - uses: subosito/flutter-action@v2
+      - name: Install Flutter 3.47.2 for archived projects
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: 3.47.2
           channel: stable
@@ -284,10 +285,10 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update && sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev liblzma-dev libmpv-dev mpv libepoxy-dev
 
-      - name: Install Flutter 3.47.2
+      - name: Install Flutter 3.50.1
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: 3.47.2
+          flutter-version: 3.50.1
           channel: stable
           cache: true
 

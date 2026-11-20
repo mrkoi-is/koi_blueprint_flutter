@@ -6,7 +6,7 @@
 
 ## 版本与验收
 
-v0.3.1 修复升级事务和诊断 LAN 关闭流程，范围、迁移要求与验收边界见 [补丁记录](docs/releases/v0.3.1.md)；发布后的固定提交、最终 CI、构建归档和校验摘要以 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.1) 为准。[v0.3.0](docs/releases/v0.3.0.md) 已通过完整门禁及两模板六端构建；本补丁重新验证，完整国际化 UI、系统语言和部分真机场景仍待验收。语言配置见 [国际化契约](docs/architecture/localization.md)。
+v0.3.2 使用 Flutter 3.50.1 和 Dart 3.14.0，修复 App 包名识别、能力译文合并及跨包代码生成顺序。升级步骤见[版本记录](docs/releases/v0.3.2.md)，对应提交、验证记录和下载见 [GitHub Release](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.2)。
 
 ## 创建项目
 
@@ -26,7 +26,7 @@ python3 blueprint.py validate
 python3 blueprint.py build --app apps/field_notes_app --platforms web
 ```
 
-生成工程不复制源仓库的本地 SDK。进入新工程后可执行 `fvm install`、`fvm use 3.47.2`，或将 `FLUTTER_BIN` 指向已有的固定版本 Flutter 可执行文件。启动、设备列表、构建与验证均使用同一 SDK 选择规则。
+生成工程不复制源仓库的本地 SDK。进入新工程后可执行 `fvm install`、`fvm use 3.50.1`，或将 `FLUTTER_BIN` 指向已有的固定版本 Flutter 可执行文件。启动、设备列表、构建与验证均使用同一 SDK 选择规则。
 
 Windows 使用 `py -3 blueprint.py`。平台可选 `web,android,ios,macos,windows,linux`；对应平台的构建需要合适主机和 SDK。`--dry-run` 用于检查计划，生成成功不代表所有平台都构建通过。完整说明见 [创建项目](docs/new-project.md)。
 
@@ -53,10 +53,12 @@ python3 blueprint.py capability add images --app apps/notes_app --dry-run
 python3 blueprint.py capability add images --app apps/notes_app
 python3 blueprint.py build --app apps/notes_app --profile web-local
 python3 blueprint.py package --app apps/notes_app --profile web-local
-python3 blueprint.py upgrade-report --app apps/notes_app --source ../koi_blueprint_flutter
+python3 ../koi_blueprint_flutter/blueprint.py upgrade-report --app apps/notes_app --source ../koi_blueprint_flutter
 ```
 
-images 自动安装 network；安装只采用内置配方，依赖、原生配置、测试和清单一起装配。重复安装检查文件所有权，用户修改或版本冲突会拒绝覆盖。`upgrade-report` 只读比较基线/本地/上游；受管升级另提供 `upgrade plan/apply/rollback`，必须处理所有阻断，见 [升级指南](docs/upgrade-guide.md)。旧 schema 1 工程先人工迁移装配与基线，不能直接增装能力。
+安装 `images` 会一并安装 `network`。能力安装按 key 合并 ARB，保留项目自定义文案。配方和项目对同一个 key 作出不同修改时，命令会报告文件路径和 key。安装后按 workspace 依赖顺序重建代码，依赖包先于 App 生成。
+
+已有 schema 2 工程可用新版蓝图的 `upgrade-report` 只读比较基线、本地和上游，再用 `upgrade plan` 生成计划。两条命令的 `--app` 都填写 App 目录，Dart 包名取自该 App 的 `pubspec.yaml`。处理计划中全部阻断后可执行 `upgrade apply`，需要回退时使用 `upgrade rollback`。旧 schema 1 工程先人工迁移装配与基线。见[升级指南](docs/upgrade-guide.md)。
 
 profile 明确平台、架构、模式、channel 和格式；构建与打包清单绑定实际产物和输入摘要，过期或修改过的产物不能直接打包。doctor 显示工具版本、已装能力依赖和实际动态库加载/资产校验结果；六端设备运行、安装及系统交互仍单独验收，未执行项标记 NOT_RUN。
 
@@ -89,7 +91,7 @@ Feature 按职责选择 domain/data/application/presentation；data 与 applicat
 
 ## 工具链与验证
 
-当前基线：Flutter 3.47.2 / Dart 3.13.2、Melos 8.9、Riverpod 3.4.3，实际版本以 `.fvmrc`、pubspec 和 lock 为准。SDK 升级同时更新 CI、环境约束、锁文件、生成器兼容组合与版本文档；不要用 dependency_overrides 强行跨越生成器约束。
+当前基线：Flutter 3.50.1 / Dart 3.14.0、Melos 8.9、Riverpod 3.4.3，实际版本以 `.fvmrc`、pubspec 和 lock 为准。SDK 升级同时更新 CI、环境约束、锁文件、生成器兼容组合与版本文档；不要用 dependency_overrides 强行跨越生成器约束。
 
 SDK 选择顺序是 `FLUTTER_BIN` → 项目 `.fvm/flutter_sdk` → PATH 中的 Flutter；Python 入口从所选 Flutter SDK 同目录定位 Dart，使用同一 SDK 运行生成与测试。锁文件使用 pub.dev，严格锁文件检查应使用同一包源。
 

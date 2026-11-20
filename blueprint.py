@@ -155,13 +155,57 @@ def replace_tree(root, replacements):
 
 def members(root, sdk):
     data = json.loads(run([sdk.dart, 'pub', 'workspace', 'list', '--json'], root, capture=True))
-    return [Path(item['path']) for item in data['packages'] if Path(item['path']).resolve() != root.resolve()]
+    paths = [root / item['path'] for item in data['packages']]
+    return [path for path in paths if path.resolve() != root.resolve()]
 
 
 def check_localizations(root, sdk, workspace):
     localized = [member for member in workspace if (member / 'l10n.yaml').is_file()]
     if localized:
         run([sdk.dart, 'run', 'tool/check_l10n.dart', *localized], root)
+
+
+def generate_workspace(root, sdk, workspace):
+    from tool.blueprint_codegen import generation_plan
+    plan = generation_plan(root, workspace)
+    check_localizations(root, sdk, workspace)
+    for member, uses_build_runner in plan:
+        if (member / 'l10n.yaml').is_file():
+            run([sdk.flutter, 'gen-l10n'], member)
+        if uses_build_runner:
+            run([sdk.dart, 'run', 'build_runner', 'build'], member)
+
+
+def check_analysis(root, sdk):
+    # go_router and Flutter's gen-l10n still use the SDK design libraries.
+    # Allow only their specific Flutter deprecations while keeping other infos fatal.
+    replacements = {
+        'package:flutter/material.dart': 'package:material_ui/material_ui.dart',
+        'package:flutter/cupertino.dart': 'package:cupertino_ui/cupertino_ui.dart',
+        'GlobalMaterialLocalizations': 'GlobalMaterialLocalizations from package:material_ui/material_ui.dart',
+        'GlobalCupertinoLocalizations': 'GlobalCupertinoLocalizations from package:cupertino_ui/cupertino_ui.dart',
+    }
+    allowed = {
+        f"'{symbol}' is deprecated and shouldn't be used. Use {replacement} instead. "
+        'This feature was deprecated after v3.47.0-0.0.pre.'
+        for symbol, replacement in replacements.items()
+    }
+    command = [str(sdk.dart), 'analyze', '--fatal-infos', '--format=machine']
+    print('+ ' + ' '.join(command), flush=True)
+    result = subprocess.run(command, cwd=root, capture_output=True, text=True, encoding='utf-8')
+    if result.stderr:
+        sys.stderr.write(result.stderr)
+    diagnostics = result.stdout.splitlines()
+    remaining = [
+        line for line in diagnostics
+        if not (line.startswith('INFO|HINT|DEPRECATED_MEMBER_USE|') and line.rsplit('|', 1)[-1] in allowed)
+    ]
+    if result.returncode == 0 and not diagnostics:
+        print('No issues found.')
+    elif result.returncode == 1 and diagnostics and not remaining and not result.stderr:
+        print(f'No blocking issues. Allowed {len(diagnostics)} Flutter design library deprecations.')
+    else:
+        raise BlueprintError('\n'.join(remaining) or f'Dart analysis failed ({result.returncode})')
 
 
 def add_members(manifest, paths):
@@ -197,10 +241,11 @@ def safe_target(root, path, must_be_new=False):
 
 
 def package_name(spec):
-    match = re.search(r'^name:[ \t]*([a-z][a-z0-9_]*)[ \t]*(?:#.*)?$', spec.read_text(encoding='utf-8'), re.M)
+    pattern = r"""^name:[ \t]*(?P<quote>['"]?)(?P<name>[a-z][a-z0-9_]*)(?P=quote)[ \t]*(?:#.*)?$"""
+    match = re.search(pattern, spec.read_text(encoding='utf-8'), re.M)
     if not match:
         raise BlueprintError(f'Missing or unsupported package name in {spec}')
-    return match[1]
+    return match['name']
 
 
 def workspace_for(app):
@@ -530,6 +575,9 @@ def create(args):
         app = stage / 'apps' / f'{name}_app'
         run([sdk.flutter, 'create', '--no-pub', '--empty', '--project-name', f'{name}_app', '--org', args.org,
              '--platforms', ','.join(selected), str(app)], stage)
+        if 'android' in selected:
+            from tool.platform_configuration import configure_android
+            configure_android(app)
         for folder in ('lib', 'test'):
             target = app / folder
             if target.exists():
@@ -626,12 +674,8 @@ def create(args):
         run([sdk.flutter, 'pub', 'get'], stage)
         # The complete app is generated before the destination becomes visible.
         workspace = members(stage, sdk)
-        check_localizations(stage, sdk, workspace)
+        generate_workspace(stage, sdk, workspace)
         for member in workspace:
-            if (member / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], member)
-            if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
-                run([sdk.dart, 'run', 'build_runner', 'build'], member)
             targets = [member / sub for sub in ('lib', 'test', 'integration_test') if (member / sub).is_dir()]
             if targets:
                 run([sdk.dart, 'format', *targets], stage)
@@ -800,12 +844,7 @@ def check(args):
         return
     workspace = members(root, sdk)
     if phase in ('generate', 'generate-check'):
-        check_localizations(root, sdk, workspace)
-        for member in workspace:
-            if (member / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], member)
-            if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
-                run([sdk.dart, 'run', 'build_runner', 'build'], member)
+        generate_workspace(root, sdk, workspace)
     elif phase == 'l10n':
         check_localizations(root, sdk, workspace)
     elif phase in ('format-check', 'format'):
@@ -814,7 +853,7 @@ def check(args):
         targets += [str(member.relative_to(root) / sub) for member in workspace for sub in ('lib', 'test', 'integration_test', 'test_driver') if (member / sub).exists()]
         run([sdk.dart, 'format', *flags, *targets], root)
     elif phase == 'analyze':
-        run([sdk.dart, 'analyze', '--fatal-infos'], root)
+        check_analysis(root, sdk)
     elif phase == 'test':
         for member in workspace:
             if list((member / 'test').rglob('*_test.dart')):
@@ -971,8 +1010,11 @@ def capability(args):
         return
     # Resolve all recipe dependencies in one isolated staging workspace, then
     # publish source/manifests/lock together. Refresh only derived local paths.
+    # Even a locale already matching the recipe is an input to the new receipt.
+    arb_inputs = {(app.relative_to(root) / 'lib/l10n' / f'app_{locale}.arb').as_posix()
+                  for key in plan['capabilities'] for locale in entries[key].get('localizationSources', {})}
     transaction = FileTransaction(root, {**plan['changes'], 'pubspec.lock': (root / 'pubspec.lock').read_bytes()},
-                                  expected_hashes=snapshot)
+                                  expected_hashes=snapshot, watch=arb_inputs)
     sdk = SDK(root)
     with tempfile.TemporaryDirectory(prefix='.capability-', dir=root.parent) as temporary:
         stage = Path(temporary)
@@ -989,24 +1031,18 @@ def capability(args):
             target = stage / relative
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(content)
-        staged_app = stage / app.relative_to(root)
         run([sdk.flutter, 'pub', 'get'], stage)
-        workspace = members(stage, sdk)
-        check_localizations(stage, sdk, workspace)
-        for member in workspace:
-            if (member / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], member)
-            if 'build_runner:' in (member / 'pubspec.yaml').read_text(encoding='utf-8'):
-                run([sdk.dart, 'run', 'build_runner', 'build'], member)
+        generate_workspace(stage, sdk, members(stage, sdk))
         dart_targets = [stage / relative for relative in plan['changes'] if relative.endswith('.dart')]
         if dart_targets:
             run([sdk.dart, 'format', *dart_targets], stage)
         receipt = read_metadata(stage)
         import hashlib
         registration = app.relative_to(root) / 'lib/core/capabilities/installed_capabilities.dart'
-        receipt['registrySha256'] = hashlib.sha256((stage / registration).read_bytes()).hexdigest()
+        if registration.as_posix() in plan['changes']:
+            receipt['registrySha256'] = hashlib.sha256((stage / registration).read_bytes()).hexdigest()
         for item in receipt['capabilities'].values():
-            for relative in item['files']:
+            for relative in item['files'].keys() & plan['changes'].keys():
                 item['files'][relative] = hashlib.sha256((stage / relative).read_bytes()).hexdigest()
         from tool.blueprint_provenance import plan_install_baseline, write_metadata
         changes = {relative: (stage / relative).read_bytes() for relative in plan['changes']
@@ -1023,11 +1059,8 @@ def capability(args):
             transaction.before[relative] = path.read_bytes() if path.is_file() else None
         def refresh():
             run([sdk.flutter, 'pub', 'get', '--enforce-lockfile'], root)
-            check_localizations(root, sdk, [app])
-            if (app / 'l10n.yaml').is_file():
-                run([sdk.flutter, 'gen-l10n'], app)
-            run([sdk.dart, 'run', 'build_runner', 'build'], app)
-        transaction.commit(refresh)
+            generate_workspace(root, sdk, members(root, sdk))
+        transaction.commit(refresh, staged_workspace=stage)
 
 
 def finalize_generated_provenance(stage, app, template_source, inherited_origins=None):

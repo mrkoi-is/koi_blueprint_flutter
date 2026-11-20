@@ -16,15 +16,19 @@ python3 /path/to/new-blueprint/blueprint.py upgrade rollback --app apps/my_app -
 
 `v0.3.1` 延续 v0.3.0 的依赖基线。从两个历史 CI 基线直接升级时，root/App/koi_core 的依赖差异仍需人工审阅；从 v0.3.0 升级还须处理 `koi_diagnostics` 等可选能力包的源码变更。`Migration boundary` CI 验证预期冲突、拒绝应用及工程/来源记录不变，不表示自动升级和升级后运行成功。不要删除冲突或修改基线摘要绕过检查；最终验证范围见 [补丁发布记录](https://github.com/mrkoi-is/koi_blueprint_flutter/releases/tag/v0.3.1)。
 
+升级到 Flutter 3.50.1 还涉及 `koi_ui` 的 SDK 约束。旧工程需要在独立副本中一起更新 `.fvmrc`、各活动成员的 SDK 约束和 CI 固定版本，再用新 SDK 刷新锁文件并执行完整门禁。迁移矩阵仍以旧工程固定的 Flutter 3.47.2 重建历史基线。
+
 原有只读报告继续可用：
 
 `upgrade-report` 只比较文件和来源，不修改工程，也不执行依赖解析。先确认目标蓝图源码、提交与工作区 dirty 状态，再在现有工程中运行：
 
 ```sh
-python3 blueprint.py upgrade-report --app apps/my_app --source /path/to/koi_blueprint_flutter > upgrade-report.json
+python3 /path/to/new-blueprint/blueprint.py upgrade-report --app apps/my_app --source /path/to/new-blueprint
 ```
 
 报告中的 `upstreamChanges` 是本地仍保持创建基线、但上游已变化的文件；`localChanges` 是仅下游修改；`conflicts` 是双方改动不同；`alreadyApplied` 表示下游已经采用与新上游相同的内容；`unchanged` 无需处理。`newCapabilities` 只表示目标蓝图提供了新配方，不表示应全部安装。`capabilityUpdates` 提醒能力版本或翻译来源变化。
+
+例如上面命令的 App 在 `pubspec.yaml` 中声明了 `name: field_notes`，两条命令仍传 `--app apps/my_app`。如果本地已采用上游修复，示例中的导入替换为 `package:field_notes/` 后与本地文件完全一致，报告会将它列入 `alreadyApplied`。计划用同一包名还原受管 Dart 文件的基线，并渲染新增文件的导入。清单存在但缺少有效的 `name` 时，两条命令都会提示需要检查的文件。
 
 schema 2 的指导文件若缺少创建时基线，会出现在 `untrackedGuidance`：`path`、`source`、`status: NO_BASELINE`、`localExists` 和两侧当前摘要。即使两侧当前内容相同，也不能归为未变化或已应用；本地缺文件时当前摘要为 null。这些项需要人工比较，报告不会覆盖文件、补造历史基线或修改 blueprint.json。新生成项目的指导文件复用 `managedFiles` 和内容基线，并登记原始源摘要与生成后摘要。
 
@@ -32,4 +36,4 @@ schema 2 的指导文件若缺少创建时基线，会出现在 `untrackedGuidan
 
 schema 1 或缺少来源元数据的旧工程无法做可信三方比较。报告会返回 `manualMigration` 步骤。此时从目标蓝图另建一个 schema 2 工程，保持旧工程不变，手工对照模板、App 装配、平台 runner、依赖与业务文件；将业务改动迁入新副本并验证后，才为确知来源的文件建立基线。不能只改 `blueprint.json` 的 schema 数字，也不能把新模板整体覆盖旧工程。
 
-已安装能力若因用户编辑受管文件而拒绝重新安装，先运行只读报告并保存冲突文件。保留用户修改，在新副本内合并对应配方、ARB 和原生配置，验证后再继续。`capability add --dry-run` 可先列出文件和依赖变更；安装器不会自动解决冲突、卸载能力或升级业务数据。
+同版本、同配置的能力有新译文时，可先运行 `capability add ID --app PATH --dry-run`。安装器按 key 合并 ARB。若报告同一 key 的冲突，按路径核对本地和配方的值，解决后重新规划。其他受管配方文件或原生配置出现冲突时，仍需在独立副本里人工合并。见[国际化契约](architecture/localization.md)。
