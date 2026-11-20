@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- 能力安装按 key 合并 ARB，保留项目自定义译文并补入配方新增文案。同版本重装支持刷新译文，双方对同一 key 的不同修改会报告文件和 key。
 - 将蓝图、生成工程和 CI 的 SDK 升级至 Flutter 3.50.1 / Dart 3.14.0，更新 workspace SDK 约束和锁文件。新建 Android runner 使用 AGP 9.3.2，修复 JDK 17 下的 release lint 崩溃。
 - 修复 App 目录名与 Dart 包名不一致时的升级误报。`upgrade-report` 和 `upgrade plan` 共用 App 的 `pubspec.yaml` 包名，已采用的导入修复可正确归类为 `alreadyApplied`，计划也会用该包名还原基线并生成新的导入。
 - 同步 README、创建指南与初始化契约中的默认 diagnostics v2、显式能力选择及 Chrome 前置条件；更新工具清单与升级指南，补齐 v0.3.0-rc.1 的发布入口和最终 CI 记录，区分合并前设备证据与发布提交构建结果。

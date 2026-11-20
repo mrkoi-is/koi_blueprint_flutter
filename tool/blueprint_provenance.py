@@ -129,7 +129,11 @@ def plan_install_baseline(root, source, previous, receipt, changes):
             upstream_file = source / upstream
             if not upstream_file.is_file():
                 upstream_file = source / '.blueprint/reference' / upstream
-            if upstream_file.is_file() and not upstream_file.is_symlink():
+            if (original and candidate.parent == Path(previous.get('app', '')) / 'lib/l10n'
+                    and candidate.suffix == '.arb'):
+                # Installing recipe keys does not install a newer App template.
+                entry['sourceSha256'] = original.get('sourceSha256', original['sha256'])
+            elif upstream_file.is_file() and not upstream_file.is_symlink():
                 entry['sourceSha256'] = hashlib.sha256(upstream_file.read_bytes()).hexdigest()
             elif original and 'sourceSha256' in original:
                 entry['sourceSha256'] = original['sourceSha256']

@@ -1007,8 +1007,11 @@ def capability(args):
         return
     # Resolve all recipe dependencies in one isolated staging workspace, then
     # publish source/manifests/lock together. Refresh only derived local paths.
+    # Even a locale already matching the recipe is an input to the new receipt.
+    arb_inputs = {(app.relative_to(root) / 'lib/l10n' / f'app_{locale}.arb').as_posix()
+                  for key in plan['capabilities'] for locale in entries[key].get('localizationSources', {})}
     transaction = FileTransaction(root, {**plan['changes'], 'pubspec.lock': (root / 'pubspec.lock').read_bytes()},
-                                  expected_hashes=snapshot)
+                                  expected_hashes=snapshot, watch=arb_inputs)
     sdk = SDK(root)
     with tempfile.TemporaryDirectory(prefix='.capability-', dir=root.parent) as temporary:
         stage = Path(temporary)
@@ -1040,9 +1043,10 @@ def capability(args):
         receipt = read_metadata(stage)
         import hashlib
         registration = app.relative_to(root) / 'lib/core/capabilities/installed_capabilities.dart'
-        receipt['registrySha256'] = hashlib.sha256((stage / registration).read_bytes()).hexdigest()
+        if registration.as_posix() in plan['changes']:
+            receipt['registrySha256'] = hashlib.sha256((stage / registration).read_bytes()).hexdigest()
         for item in receipt['capabilities'].values():
-            for relative in item['files']:
+            for relative in item['files'].keys() & plan['changes'].keys():
                 item['files'][relative] = hashlib.sha256((stage / relative).read_bytes()).hexdigest()
         from tool.blueprint_provenance import plan_install_baseline, write_metadata
         changes = {relative: (stage / relative).read_bytes() for relative in plan['changes']
